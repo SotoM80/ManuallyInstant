@@ -75,4 +75,4 @@ Each style field is an autocomplete input that starts with its default value alr
 ### Scenario 5: Font Style Is Visibly Applied
 * **Given**: The user has typed `"My Brand"`, selected Font Family `"Open Sans"` and Font Style `"Bold Italic"`.
 * **When**: The user clicks the submit action button.
-* **Then**: The header shows the title in bold italic, and the Google Fonts stylesheet for Open Sans includes the bold and italic variants (`ital,wght@0,400;0,700;1,400;1,700`)..
+* **Then**: The header shows the title in bold italic, and the Google Fonts stylesheet for Open Sans includes the bold and italic variants (`ital,wght@0,400;0,700;1,400;1,700`)...
