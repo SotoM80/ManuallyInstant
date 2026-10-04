@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    "verbatimModuleSyntax": false,
+    "esModuleInterop": true,
+    "types": ["vite/client", "jest", "@testing-library/jest-dom"]
+  },
+  "include": ["src", "test"]
+}
