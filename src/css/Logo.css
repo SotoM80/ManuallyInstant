@@ -1,0 +1,10 @@
+.app-logo {
+  display: inline-flex;
+  border-radius: 10px;
+}
+
+.app-logo img {
+  display: block;
+  width: 40px;
+  height: 40px;
+}

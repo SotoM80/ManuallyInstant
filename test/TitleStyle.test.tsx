@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { BrandForm } from '../src/components/BrandForm';
-import App from '../src/App';
+import { renderApp } from './renderApp';
 
 const FIELDS = ['Font family', 'Font color', 'Font style', 'Font size'];
 
@@ -25,7 +25,7 @@ function clickSubmit() {
   fireEvent.click(screen.getByRole('button', { name: /save|print/i }));
 }
 
-// Spec: titlefild.md, Section 2 — Interface + Predefined Options
+// Spec: specs/titlefild.md, Section 2 — Interface + Predefined Options
 describe('Title style – interface', () => {
   it('renders the four style fields with their default values', () => {
     render(<BrandForm />);
@@ -37,7 +37,7 @@ describe('Title style – interface', () => {
   });
 });
 
-// Spec: titlefild.md, Failure Modes — Inline Search & Typing Restrictions
+// Spec: specs/titlefild.md, Failure Modes — Inline Search & Typing Restrictions
 describe('Title style – real-time filtering', () => {
   it('shows only the options that match what the user types', () => {
     // Given
@@ -69,7 +69,7 @@ describe('Title style – real-time filtering', () => {
   });
 });
 
-// Spec: titlefild.md, Scenario 4 — Invalid Style Value on Focus Loss (Blur)
+// Spec: specs/titlefild.md, Scenario 4 — Invalid Style Value on Focus Loss (Blur)
 describe('Title style – invalid value', () => {
   it.each(FIELDS)('%s: shows an error with a red border on blur', (name) => {
     // Given: an invalid value is typed
@@ -105,7 +105,7 @@ describe('Title style – invalid value', () => {
   });
 });
 
-// Spec: titlefild.md, Scenario 3 — Missing Style Selection Validation Failure
+// Spec: specs/titlefild.md, Scenario 3 — Missing Style Selection Validation Failure
 describe('Title style – required fields', () => {
   it.each(FIELDS)('%s: blocks submit and shows "Required field" when blank', (name) => {
     // Given: a valid title, but this style field is empty
@@ -124,7 +124,7 @@ describe('Title style – required fields', () => {
   });
 });
 
-// Spec: titlefild.md, Scenario 1 — Successful Title Processing
+// Spec: specs/titlefild.md, Scenario 1 — Successful Title Processing
 describe('Title style – successful submit', () => {
   it('sends the title together with the selected style', () => {
     // Given
@@ -149,14 +149,21 @@ describe('Title style – successful submit', () => {
   });
 });
 
-// Spec: titlefild.md, Scenario 1 — the header shows the style after Save
-describe('Title style – header preview', () => {
+// The saved title is drawn on the Cover page of the manual preview.
+function getCoverTitle() {
+  const preview = screen.getByRole('region', { name: 'Manual preview' });
+  return within(within(preview).getByRole('article', { name: 'Cover' })).getByText('My Brand');
+}
+
+// Spec: specs/titlefild.md, Scenario 1 — the Cover shows the style after Save
+// The Cover is a thumbnail, so the title is drawn at half its real size (Large 48px → 24px).
+describe('Title style – cover preview', () => {
   afterEach(() => {
     document.head.querySelectorAll('link[href*="fonts.googleapis.com"]').forEach((l) => l.remove());
   });
 
-  it('applies the style to the header when the user clicks Save', () => {
-    render(<App />);
+  it('applies the style to the Cover when the user clicks Save', () => {
+    renderApp();
     typeTitle('My Brand');
     pickOption('Font family', 'Open Sans');
     pickOption('Font color', 'Blue');
@@ -165,31 +172,31 @@ describe('Title style – header preview', () => {
 
     clickSubmit();
 
-    const title = within(screen.getByRole('banner')).getByRole('heading');
+    const title = getCoverTitle();
     expect(title).toHaveStyle({
       color: '#1E88E5',
       fontWeight: 'bold',
       fontStyle: 'italic',
-      fontSize: '48px',
+      fontSize: '24px',
     });
     expect(title.style.fontFamily).toContain('Open Sans');
   });
 
-  it('does not change the header before Save (not live)', () => {
-    render(<App />);
+  it('does not change the Cover before Save (not live)', () => {
+    renderApp();
     typeTitle('My Brand');
     clickSubmit();
 
     pickOption('Font size', 'Large');
 
-    const title = within(screen.getByRole('banner')).getByRole('heading');
-    expect(title).toHaveStyle({ fontSize: '32px' });
+    // Still Medium (32px → 16px on the thumbnail)
+    expect(getCoverTitle()).toHaveStyle({ fontSize: '16px' });
   });
 
-  // Spec: titlefild.md, Scenario 5 — Font Style Is Visibly Applied
+  // Spec: specs/titlefild.md, Scenario 5 — Font Style Is Visibly Applied
   it('requests the bold and italic font files so the style is really drawn', () => {
     // Given
-    render(<App />);
+    renderApp();
     typeTitle('My Brand');
     pickOption('Font family', 'Open Sans');
     pickOption('Font style', 'Bold Italic');
@@ -197,9 +204,8 @@ describe('Title style – header preview', () => {
     // When
     clickSubmit();
 
-    // Then: the header is bold italic...
-    const title = within(screen.getByRole('banner')).getByRole('heading');
-    expect(title).toHaveStyle({ fontWeight: 'bold', fontStyle: 'italic' });
+    // Then: the Cover title is bold italic...
+    expect(getCoverTitle()).toHaveStyle({ fontWeight: 'bold', fontStyle: 'italic' });
 
     // ...and Google Fonts is asked for the bold and italic variants
     const link = document.head.querySelector('link[href*="family=Open+Sans"]');
@@ -210,7 +216,7 @@ describe('Title style – header preview', () => {
   });
 
   it('loads the font from Google Fonts only once', () => {
-    render(<App />);
+    renderApp();
     typeTitle('My Brand');
     pickOption('Font family', 'Open Sans');
     clickSubmit();

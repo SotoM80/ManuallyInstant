@@ -1,0 +1,63 @@
+/* Two columns: preview (left) | sections (right) */
+.brand-manual-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+  text-align: left;
+}
+
+.manual-sections ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.manual-section {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.manual-section[aria-disabled='true'] {
+  opacity: 0.55;
+}
+
+.manual-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.manual-section h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.manual-section form {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.manual-section-badge {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--code-bg);
+  white-space: nowrap;
+}
+
+/* Narrow screens: one column, preview on top, sections below */
+@media (max-width: 900px) {
+  .brand-manual-page {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,16 @@
+/* One row: logo (left) | menu (right) */
+.preview-header {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Future mobile/tablet versions are planned (see specs/navmenu.md, "Responsive Design"). */
+
+main {
+  padding: 32px 16px;
+}

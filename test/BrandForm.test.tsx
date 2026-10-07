@@ -14,7 +14,7 @@ function clickSubmit() {
   fireEvent.click(screen.getByRole('button', { name: /save|print/i }));
 }
 
-// Spec: titlefild.md, Section 2 — Interface
+// Spec: specs/titlefild.md, Section 2 — Interface
 describe('BrandForm – interface', () => {
   it('renders an empty, enabled brand title field and a Save/Print button', () => {
     render(<BrandForm />);
@@ -25,7 +25,7 @@ describe('BrandForm – interface', () => {
   });
 });
 
-// Spec: titlefild.md, Scenario 2 — Missing Title Validation Failure
+// Spec: specs/titlefild.md, Scenario 2 — Missing Title Validation Failure
 describe('BrandForm – brand title validation', () => {
   it.each([
     ['empty', ''],
@@ -75,7 +75,7 @@ describe('BrandForm – brand title validation', () => {
   });
 });
 
-// Spec: titlefild.md, Scenario 1 — Successful Title Processing (postcondition: clean text)
+// Spec: specs/titlefild.md, Scenario 1 — Successful Title Processing (postcondition: clean text)
 describe('BrandForm – clean title submission', () => {
   it('calls onSubmit once with the trimmed title', () => {
     // Given

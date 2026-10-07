@@ -1,0 +1,111 @@
+/* Stays visible while the sections column scrolls */
+.manual-preview {
+  position: sticky;
+  top: 16px;
+}
+
+/* 2 × 2 grid of page thumbnails */
+.manual-pages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* Segmented control: two radio buttons that look like one switch */
+.orientation-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 16px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.orientation-picker legend {
+  float: left; /* keeps the legend on the same row as the options */
+  margin-right: 8px;
+  padding-left: 6px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.orientation-picker label {
+  cursor: pointer;
+}
+
+/* The real radio stays in the page (for keyboard and screen readers) but is not drawn */
+.orientation-picker input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.orientation-picker span {
+  display: block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.orientation-picker input:checked + span {
+  color: var(--accent);
+  background: var(--accent-bg);
+  font-weight: 600;
+}
+
+.orientation-picker input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.manual-page {
+  aspect-ratio: 210 / 297; /* A4, portrait */
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #ffffff; /* a printed page is white in light and dark mode */
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.manual-page[data-orientation='landscape'] {
+  aspect-ratio: 297 / 210; /* A4, landscape (apaisado) */
+}
+
+.manual-page-content {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  text-align: center;
+}
+
+.manual-page-content p {
+  margin: 0;
+}
+
+.manual-cover-title {
+  overflow-wrap: anywhere;
+}
+
+.manual-page-empty {
+  color: #9a96a0;
+  font-size: 13px;
+}
+
+.manual-page-name {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+@media (max-width: 900px) {
+  .manual-preview {
+    position: static;
+  }
+}

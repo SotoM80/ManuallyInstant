@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react'
-import { BrandForm } from './components/BrandForm'
-import { DEFAULT_TITLE_STYLE, toTitleCss } from './data/titleOptions'
+import { Navigate, Route, Routes } from 'react-router'
+import { Logo } from './components/Logo'
+import { NavMenu } from './components/NavMenu'
+import { HomePage } from './pages/HomePage'
+import { BrandManualPage } from './pages/BrandManualPage'
+import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
 import { loadGoogleFont } from './utils/googleFonts'
-import type { TitleStyle } from './types'
-import './App.css'
+import type { Orientation, TitleStyle } from './types'
+import './css/App.css'
 
 function App() {
+  // Kept here, above the routes, so they survive moving between pages.
   const [brandTitle, setBrandTitle] = useState('')
   const [titleStyle, setTitleStyle] = useState<TitleStyle>(DEFAULT_TITLE_STYLE)
+  const [orientation, setOrientation] = useState<Orientation>('portrait')
 
   useEffect(() => {
     loadGoogleFont(titleStyle.fontFamily)
@@ -21,11 +27,27 @@ function App() {
   return (
     <>
       <header className="preview-header">
-        <h1 style={toTitleCss(titleStyle)}>{brandTitle}</h1>
+        <Logo />
+        <NavMenu />
       </header>
 
       <main>
-        <BrandForm onSubmit={handleSubmit} />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/brand-manual"
+            element={
+              <BrandManualPage
+                brandTitle={brandTitle}
+                titleStyle={titleStyle}
+                orientation={orientation}
+                onOrientationChange={setOrientation}
+                onSubmit={handleSubmit}
+              />
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
     </>
   )

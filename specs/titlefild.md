@@ -2,7 +2,7 @@
 # Technical Specification: Brand Title Input & Preview
 
 ## 1. What it does
-Allows the user to enter the project/brand title and instantly display it at the top of the page upon clicking a button, include options to change fonts, colors, or text sizes.
+Allows the user to enter the project/brand title and instantly display it on the Cover page of the manual preview (see `brandmanual.md`) upon clicking a button, include options to change fonts, colors, or text sizes.
 
 ## Out of Scope
 Will not save the title to a database or browser storage (localStorage / cookies) for now. Refreshing the page will reset the title to its default state. (Note: This is deferred for a future iteration).
@@ -12,7 +12,7 @@ Customization features are deferred for future styling updates.
 ### UI Elements
 * **Brand Title Field**: A text,color change,font change and size input components.
 * **Action Button**: A button labeled "Print" or "Save".
-* **Preview Header**: A text element fixed at the absolute top of the page layout.
+* **Cover Preview**: The Cover page of the manual preview (see `brandmanual.md`) shows the saved title. The title is **not** shown in the site header.
 
 ### Predefined Options
 Each style field is an autocomplete input that starts with its default value already selected.
@@ -26,17 +26,17 @@ Each style field is an autocomplete input that starts with its default value alr
 
 * **Font Size** follows the same rules as Font Family, Font Color and Font Style (Failure Modes, Scenarios 3 and 4).
 * The explicit error message for an invalid value is: `"Select a valid option"`.
-* The selected style is applied to the header together with the title when the user clicks the button (not while typing).
+* The selected style is applied to the Cover together with the title when the user clicks the button (not while typing).
 * **Font loading**: Each Font Family is requested from Google Fonts with all four variants needed by Font Style: regular 400, bold 700, italic 400 and bold italic 700 (`family=<Font>:ital,wght@0,400;0,700;1,400;1,700`). Each font is requested only once per session.
 
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the active single-session workspace. The title input field is rendered and interactive.
-* **Postconditions**: Clicking the button validation injects the clean, verified text payload into the top page element state.
+* **Postconditions**: Clicking the button validation injects the clean, verified text payload into the Cover page of the manual preview.
 
 ## 4. Invariants
-* The visual position of the top header area must remain structural and constant, regardless of whether it is empty or populated.
-* Bold, Italic and Bold Italic must be drawn with the real font files from Google Fonts, never faked by the browser (the app uses `font-synthesis: none`). Choosing any Font Style must visibly change the header compared to Regular.
+* The Cover page keeps its size and position whether it is empty or populated.
+* Bold, Italic and Bold Italic must be drawn with the real font files from Google Fonts, never faked by the browser (the app uses `font-synthesis: none`). Choosing any Font Style must visibly change the Cover title compared to Regular.
 
 ##  Failure Modes
 * **Empty Input on Submit**: If the user clicks the button while the field is blank or contains only spaces, the action is blocked. The input transitions to an error state displaying the explicit text: `"Required field"`.
@@ -54,7 +54,7 @@ Each style field is an autocomplete input that starts with its default value alr
 * **Given**: The user has typed a valid text string (e.g., `"My Brand"`) into the input field.
 * **And**: The user has selected a valid option for Font Family, Font Color, and Font Style via the autocomplete dropdowns.
 * **When**: The user clicks the submit action button.
-* **Then**: No errors are raised, and the text instantly populates the header element at the top of the page.
+* **Then**: No errors are raised, and the text instantly populates the Cover page of the manual preview.
 
 ### Scenario 2: Missing Title Validation Failure
 * **Given**: The brand title input field is completely empty or contains only whitespace.
@@ -75,4 +75,4 @@ Each style field is an autocomplete input that starts with its default value alr
 ### Scenario 5: Font Style Is Visibly Applied
 * **Given**: The user has typed `"My Brand"`, selected Font Family `"Open Sans"` and Font Style `"Bold Italic"`.
 * **When**: The user clicks the submit action button.
-* **Then**: The header shows the title in bold italic, and the Google Fonts stylesheet for Open Sans includes the bold and italic variants (`ital,wght@0,400;0,700;1,400;1,700`)...
+* **Then**: The Cover shows the title in bold italic, and the Google Fonts stylesheet for Open Sans includes the bold and italic variants (`ital,wght@0,400;0,700;1,400;1,700`)...

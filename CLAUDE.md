@@ -18,6 +18,7 @@ Frontend only: there is no backend and nothing is saved between sessions. CMYK i
 ManuallyInstant
     ├── node_modules
     ├── public
+    ├── specs
     ├── src
     ├── test
     ├── .gitignore
@@ -55,6 +56,7 @@ Solo frontend: no hay backend ni se guarda nada entre sesiones. El CMYK es una a
 ManuallyInstant
     ├── node_modules
     ├── public
+    ├── specs
     ├── src
     ├── test
     ├── .gitignore

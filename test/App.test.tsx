@@ -1,5 +1,14 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import App from '../src/App';
+import { screen, fireEvent, within } from '@testing-library/react';
+import { renderApp } from './renderApp';
+
+const EMPTY_COVER = 'Your brand title';
+
+// The saved title is shown on the Cover page of the manual preview.
+function getCover() {
+  return within(screen.getByRole('region', { name: 'Manual preview' })).getByRole('article', {
+    name: 'Cover',
+  });
+}
 
 function typeTitle(value: string) {
   fireEvent.change(screen.getByLabelText(/brand title/i), { target: { value } });
@@ -9,37 +18,36 @@ function clickSubmit() {
   fireEvent.click(screen.getByRole('button', { name: /save|print/i }));
 }
 
-// Spec: titlefild.md, Scenario 1 — Successful Title Processing
+// Spec: specs/titlefild.md, Scenario 1 — Successful Title Processing
 describe('App – brand title preview', () => {
-  it('shows the brand title in the top header after a valid submit', () => {
+  it('shows the brand title on the Cover after a valid submit', () => {
     // Given: the user has typed a valid title
-    render(<App />);
-    const header = screen.getByRole('banner');
-    expect(header.textContent).toBe('');
+    renderApp();
+    expect(getCover()).toHaveTextContent(EMPTY_COVER);
     typeTitle('  My Brand  ');
 
     // When: the user clicks the submit action button
     clickSubmit();
 
-    // Then: no error, and the clean title populates the header
+    // Then: no error, and the clean title populates the Cover
     expect(screen.queryByText('Required field')).not.toBeInTheDocument();
-    expect(header.textContent).toBe('My Brand');
+    expect(getCover().textContent).toBe('My Brand');
   });
 
-  it('does not update the header while typing, only after clicking', () => {
+  it('does not update the Cover while typing, only after clicking', () => {
     // Given
-    render(<App />);
+    renderApp();
 
     // When: the user types but does not click
     typeTitle('My Brand');
 
     // Then
-    expect(screen.getByRole('banner').textContent).toBe('');
+    expect(getCover()).toHaveTextContent(EMPTY_COVER);
   });
 
   it('replaces the previous title with a new valid one', () => {
     // Given: a title is already shown
-    render(<App />);
+    renderApp();
     typeTitle('First Brand');
     clickSubmit();
 
@@ -48,24 +56,24 @@ describe('App – brand title preview', () => {
     clickSubmit();
 
     // Then
-    expect(screen.getByRole('banner').textContent).toBe('Second Brand');
+    expect(getCover().textContent).toBe('Second Brand');
   });
 });
 
-// Spec: titlefild.md, Scenario 2 — Missing Title Validation Failure
+// Spec: specs/titlefild.md, Scenario 2 — Missing Title Validation Failure
 describe('App – blank title is blocked', () => {
-  it('keeps the header empty when the title is blank', () => {
-    render(<App />);
+  it('keeps the Cover empty when the title is blank', () => {
+    renderApp();
 
     clickSubmit();
 
     expect(screen.getByText('Required field')).toBeInTheDocument();
-    expect(screen.getByRole('banner').textContent).toBe('');
+    expect(getCover()).toHaveTextContent(EMPTY_COVER);
   });
 
-  it('keeps the previous title in the header when a blank title is submitted', () => {
+  it('keeps the previous title on the Cover when a blank title is submitted', () => {
     // Given: a valid title is shown
-    render(<App />);
+    renderApp();
     typeTitle('My Brand');
     clickSubmit();
 
@@ -73,33 +81,38 @@ describe('App – blank title is blocked', () => {
     typeTitle('');
     clickSubmit();
 
-    // Then: the action is blocked and the header is unchanged
+    // Then: the action is blocked and the Cover is unchanged
     expect(screen.getByText('Required field')).toBeInTheDocument();
-    expect(screen.getByRole('banner').textContent).toBe('My Brand');
+    expect(getCover().textContent).toBe('My Brand');
   });
 });
 
-// Spec: titlefild.md, Section 4 — Invariants
-describe('App – header position invariant', () => {
-  it('renders the header before the form, both empty and populated', () => {
-    render(<App />);
-    const header = screen.getByRole('banner');
-    const isBeforeForm = () =>
-      Boolean(header.compareDocumentPosition(screen.getByRole('main')) & Node.DOCUMENT_POSITION_FOLLOWING);
+// Spec: specs/titlefild.md, Section 2 — Interface (Cover Preview) + Section 4 — Invariants
+describe('App – where the title is shown', () => {
+  it('never shows the brand title in the site header', () => {
+    renderApp();
+    typeTitle('My Brand');
+    clickSubmit();
+
+    expect(screen.getByRole('banner')).not.toHaveTextContent('My Brand');
+  });
+
+  it('keeps the Cover as the first page, both empty and populated', () => {
+    renderApp();
+    const firstPage = () =>
+      within(screen.getByRole('region', { name: 'Manual preview' })).getAllByRole('article')[0];
 
     // Empty
-    expect(header).toBeInTheDocument();
-    expect(isBeforeForm()).toBe(true);
+    expect(firstPage()).toBe(getCover());
 
     // Populated
     typeTitle('My Brand');
     clickSubmit();
-    expect(screen.getByRole('banner')).toBe(header);
-    expect(isBeforeForm()).toBe(true);
+    expect(firstPage()).toBe(getCover());
   });
 });
 
-// Spec: titlefild.md, Out of Scope — no persistence
+// Spec: specs/titlefild.md, Out of Scope — no persistence
 describe('App – title is not persisted', () => {
   afterEach(() => {
     jest.restoreAllMocks();
@@ -108,7 +121,7 @@ describe('App – title is not persisted', () => {
   it('does not write the title to localStorage', () => {
     // Given
     const setItem = jest.spyOn(Storage.prototype, 'setItem');
-    render(<App />);
+    renderApp();
 
     // When
     typeTitle('My Brand');
@@ -118,18 +131,18 @@ describe('App – title is not persisted', () => {
     expect(setItem).not.toHaveBeenCalled();
   });
 
-  it('resets the header after a reload (unmount and mount again)', () => {
+  it('resets the Cover after a reload (unmount and mount again)', () => {
     // Given: a title is shown
-    const { unmount } = render(<App />);
+    const { unmount } = renderApp();
     typeTitle('My Brand');
     clickSubmit();
-    expect(screen.getByRole('banner').textContent).toBe('My Brand');
+    expect(getCover().textContent).toBe('My Brand');
 
     // When: the page is "reloaded"
     unmount();
-    render(<App />);
+    renderApp();
 
     // Then
-    expect(screen.getByRole('banner').textContent).toBe('');
+    expect(getCover()).toHaveTextContent(EMPTY_COVER);
   });
 });
