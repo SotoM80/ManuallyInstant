@@ -11,7 +11,8 @@ Customization features are deferred for future styling updates.
 ## 2. Interface
 ### UI Elements
 * **Brand Title Field**: A text,color change,font change and size input components.
-* **Action Button**: A button labeled "Print" or "Save".
+* **Action Button**: A button labeled "Print" or "Save". It is only as wide as its label (not full width) and sits on the right.
+* **Alignment**: All the text in the form (labels, typed values and error messages) is aligned to the right.
 * **Cover Preview**: The Cover page of the manual preview (see `brandmanual.md`) shows the saved title. The title is **not** shown in the site header.
 
 ### Predefined Options

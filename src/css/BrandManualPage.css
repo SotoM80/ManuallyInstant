@@ -1,9 +1,9 @@
-/* Two columns: preview (left) | sections (right) */
+/* Two columns: preview (left, wider) | sections (right, a bit narrower) */
 .brand-manual-page {
   max-width: 1100px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   gap: 32px;
   align-items: start;
   text-align: left;
@@ -43,6 +43,18 @@
   display: grid;
   gap: 12px;
   margin-top: 16px;
+  text-align: right;
+}
+
+/* Form controls do not inherit text-align, so the typed text is aligned too */
+.manual-section form input {
+  text-align: right;
+}
+
+/* Only as wide as its label, on the right (grid items stretch by default) */
+.manual-section form button[type='submit'] {
+  justify-self: end;
+  padding: 8px 24px;
 }
 
 .manual-section-badge {

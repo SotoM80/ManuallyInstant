@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { BrandForm } from '../components/BrandForm'
 import { ManualPreview } from '../components/ManualPreview'
 import { MANUAL_SECTIONS } from '../data/manualSections'
-import type { Orientation, TitleStyle } from '../types'
+import type { Orientation, PreviewView, TitleStyle } from '../types'
 import '../css/BrandManualPage.css'
 
 type BrandManualPageProps = {
@@ -10,6 +10,8 @@ type BrandManualPageProps = {
   titleStyle: TitleStyle
   orientation: Orientation
   onOrientationChange: (orientation: Orientation) => void
+  previewView: PreviewView
+  onPreviewViewChange: (view: PreviewView) => void
   onSubmit: (title: string, style: TitleStyle) => void
 }
 
@@ -18,6 +20,8 @@ export function BrandManualPage({
   titleStyle,
   orientation,
   onOrientationChange,
+  previewView,
+  onPreviewViewChange,
   onSubmit,
 }: BrandManualPageProps) {
   // Form of each built section. Sections not listed here show "Coming soon".
@@ -32,6 +36,8 @@ export function BrandManualPage({
         titleStyle={titleStyle}
         orientation={orientation}
         onOrientationChange={onOrientationChange}
+        previewView={previewView}
+        onPreviewViewChange={onPreviewViewChange}
       />
 
       <section className="manual-sections" aria-label="Manual sections">

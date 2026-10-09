@@ -150,3 +150,66 @@ describe('Brand Manual – page orientation', () => {
     expect(getPageOrientations()).toEqual(['landscape', 'landscape', 'landscape', 'landscape']);
   });
 });
+
+// Spec: specs/brandmanual.md, Section 2 — Preview View
+describe('Brand Manual – preview view', () => {
+  function getViewGroup() {
+    return within(getPreview()).getByRole('group', { name: 'Preview view' });
+  }
+
+  function selectView(name: 'Grid' | 'Pages') {
+    fireEvent.click(within(getViewGroup()).getByRole('radio', { name }));
+  }
+
+  it('starts in Grid', () => {
+    renderApp('/brand-manual');
+
+    expect(within(getViewGroup()).getByRole('radio', { name: 'Grid' })).toBeChecked();
+    expect(getPreview()).toHaveAttribute('data-view', 'grid');
+  });
+
+  // Spec: specs/brandmanual.md, Scenario 8 — Changing the Preview View
+  it('shows the pages one below the other when Pages is selected, without Save', () => {
+    // Given
+    renderApp('/brand-manual');
+    fireEvent.click(screen.getByRole('radio', { name: 'Landscape' }));
+
+    // When
+    selectView('Pages');
+
+    // Then
+    expect(within(getViewGroup()).getByRole('radio', { name: 'Pages' })).toBeChecked();
+    expect(within(getViewGroup()).getByRole('radio', { name: 'Grid' })).not.toBeChecked();
+    expect(getPreview()).toHaveAttribute('data-view', 'pages');
+
+    const pages = within(getPreview()).getAllByRole('article');
+    expect(pages.map((page) => page.getAttribute('aria-label'))).toEqual([
+      'Cover',
+      'Logo',
+      'Color palette',
+      'Typography',
+    ]);
+    expect(pages.map((page) => page.getAttribute('data-orientation'))).toEqual([
+      'landscape',
+      'landscape',
+      'landscape',
+      'landscape',
+    ]);
+  });
+
+  // Spec: specs/brandmanual.md, Scenario 9 — Preview View Is Kept Between Pages
+  it('keeps Pages after going to Home and back', () => {
+    // Given
+    renderApp('/brand-manual');
+    selectView('Pages');
+    const menu = within(screen.getByRole('banner')).getByRole('navigation', { name: 'Main' });
+
+    // When
+    fireEvent.click(within(menu).getByRole('link', { name: 'Home' }));
+    fireEvent.click(within(menu).getByRole('link', { name: 'Brand Manual' }));
+
+    // Then
+    expect(within(getViewGroup()).getByRole('radio', { name: 'Pages' })).toBeChecked();
+    expect(getPreview()).toHaveAttribute('data-view', 'pages');
+  });
+});

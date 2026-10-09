@@ -4,7 +4,12 @@
   top: 16px;
 }
 
-/* 2 × 2 grid of page thumbnails */
+/* Pages view: taller than the screen, so it scrolls with the page instead of sticking */
+.manual-preview[data-view='pages'] {
+  position: static;
+}
+
+/* Grid view: 2 × 2 grid of page thumbnails */
 .manual-pages {
   list-style: none;
   margin: 0;
@@ -14,18 +19,32 @@
   gap: 16px;
 }
 
+/* Pages view: one big page per row, one below the other */
+.manual-preview[data-view='pages'] .manual-pages {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+}
+
+/* Orientation and view pickers, side by side (wrap on narrow columns) */
+.preview-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
 /* Segmented control: two radio buttons that look like one switch */
-.orientation-picker {
+.segmented-control {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin: 0 0 16px;
+  margin: 0;
   padding: 4px;
   border: 1px solid var(--border);
   border-radius: 8px;
 }
 
-.orientation-picker legend {
+.segmented-control legend {
   float: left; /* keeps the legend on the same row as the options */
   margin-right: 8px;
   padding-left: 6px;
@@ -33,18 +52,18 @@
   color: var(--text);
 }
 
-.orientation-picker label {
+.segmented-control label {
   cursor: pointer;
 }
 
 /* The real radio stays in the page (for keyboard and screen readers) but is not drawn */
-.orientation-picker input {
+.segmented-control input {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
 
-.orientation-picker span {
+.segmented-control span {
   display: block;
   padding: 4px 12px;
   border-radius: 6px;
@@ -52,13 +71,13 @@
   color: var(--text);
 }
 
-.orientation-picker input:checked + span {
+.segmented-control input:checked + span {
   color: var(--accent);
   background: var(--accent-bg);
   font-weight: 600;
 }
 
-.orientation-picker input:focus-visible + span {
+.segmented-control input:focus-visible + span {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }

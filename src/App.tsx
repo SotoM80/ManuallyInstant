@@ -6,7 +6,7 @@ import { HomePage } from './pages/HomePage'
 import { BrandManualPage } from './pages/BrandManualPage'
 import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
 import { loadGoogleFont } from './utils/googleFonts'
-import type { Orientation, TitleStyle } from './types'
+import type { Orientation, PreviewView, TitleStyle } from './types'
 import './css/App.css'
 
 function App() {
@@ -14,6 +14,7 @@ function App() {
   const [brandTitle, setBrandTitle] = useState('')
   const [titleStyle, setTitleStyle] = useState<TitleStyle>(DEFAULT_TITLE_STYLE)
   const [orientation, setOrientation] = useState<Orientation>('portrait')
+  const [previewView, setPreviewView] = useState<PreviewView>('grid')
 
   useEffect(() => {
     loadGoogleFont(titleStyle.fontFamily)
@@ -42,6 +43,8 @@ function App() {
                 titleStyle={titleStyle}
                 orientation={orientation}
                 onOrientationChange={setOrientation}
+                previewView={previewView}
+                onPreviewViewChange={setPreviewView}
                 onSubmit={handleSubmit}
               />
             }

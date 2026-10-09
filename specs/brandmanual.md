@@ -8,11 +8,17 @@ The content of the Logo, Colors and Typography sections (each one has its own fu
 
 ## 2. Interface
 ### Layout
+* **Column widths**: The columns are not the same width. The preview (left) is wider, about 60%, and the sections (right) are narrower, about 40% (`3fr` / `2fr`).
 * **Page Orientation** (top of the left column, above the thumbnails): A group labeled "Page orientation" with two options:
   * **Portrait** (vertical): A4 standing, `210 × 297`. Selected by default.
   * **Landscape** (apaisado): A4 lying down, `297 × 210`.
 
   Choosing an option changes the shape of all four page thumbnails immediately (no Save needed). The chosen orientation is also the one the PDF export will use (Phase 4).
+* **Preview View** (next to Page orientation): A group labeled "Preview view" with two options:
+  * **Grid**: the four pages as small thumbnails in a 2 × 2 grid. Selected by default.
+  * **Pages**: a closer look. Each page takes the full width of the left column, one below the other, and the user scrolls down to see them. The cover title is drawn at its real size (in Grid it is drawn at half size). In this view the preview is not sticky, so every page can be reached by scrolling.
+
+  Choosing an option changes the view immediately (no Save needed). It only changes how the preview looks, not the manual or the PDF.
 * **Left column — Manual Preview**: A region labeled "Manual preview". It shows the manual's pages as small page thumbnails, in this order:
   1. **Cover**: shows the saved brand title with its style. Before a title is saved, it shows the placeholder text "Your brand title".
   2. **Logo**
@@ -45,6 +51,8 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * The brand title in the preview changes only when the user clicks Save (same rule as in `titlefild.md`). The page orientation is the exception: it changes immediately.
 * All four pages always share the same orientation.
 * The chosen orientation is kept when the user moves between pages. It is only reset (to Portrait) when the browser page is refreshed.
+* Both views always show the same four pages, in the same order, with the same orientation.
+* The chosen preview view is kept when the user moves between pages. It is only reset (to Grid) when the browser page is refreshed.
 
 ## Failure Modes
 * **No title saved yet**: The Cover shows "Your brand title" instead of an empty page.
@@ -85,3 +93,13 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Given**: The user selected Landscape.
 * **When**: The user goes to Home and then back to Brand Manual.
 * **Then**: Landscape is still selected and the pages are still landscape.
+
+### Scenario 8: Changing the Preview View
+* **Given**: The user is on the Brand Manual page and Grid is selected (default).
+* **When**: The user selects Pages.
+* **Then**: Pages is selected, the preview shows the four pages one below the other, in the same order and orientation, without clicking Save.
+
+### Scenario 9: Preview View Is Kept Between Pages
+* **Given**: The user selected Pages.
+* **When**: The user goes to Home and then back to Brand Manual.
+* **Then**: Pages is still selected.
