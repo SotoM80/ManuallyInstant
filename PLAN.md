@@ -10,6 +10,7 @@
 - [ ] Logo upload
 - [ ] Google Fonts selection (primary and secondary)
 - [ ] Color picker with name (HEX / RGB / CMYK)
+- [ ] Template selector (3 different templates to create each manual)
 
 ## Phase 3: 4-page template
 - [ ] Cover → Logo → Color palette → Typography
