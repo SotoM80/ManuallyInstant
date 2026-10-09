@@ -7,10 +7,10 @@
 
 ## Phase 2: Brand data input
 - [ ] Brand title
-- [ ] Logo upload
+- [ ] Logo upload (in the Cover section, see specs/cover.md)
 - [ ] Google Fonts selection (primary and secondary)
 - [ ] Color picker with name (HEX / RGB / CMYK)
-- [ ] Template selector (3 different templates to create each manual)
+- [x] Template selector (3 different templates to create each manual, see specs/templates.md)
 
 ## Phase 3: 4-page template
 - [ ] Cover → Logo → Color palette → Typography

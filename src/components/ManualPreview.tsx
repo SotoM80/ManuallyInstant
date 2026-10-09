@@ -1,15 +1,18 @@
 import { MANUAL_PAGES } from '../data/manualSections'
-import { toTitleCss } from '../data/titleOptions'
-import type { Orientation, PreviewView, TitleStyle } from '../types'
+import { TEMPLATES } from '../templates'
+import type { TemplateId } from '../templates'
+import { CoverPage } from './pages/CoverPage'
+import type { CoverData, Orientation, PreviewView } from '../types'
 import '../css/ManualPreview.css'
 
 type ManualPreviewProps = {
-  brandTitle: string
-  titleStyle: TitleStyle
+  cover: CoverData | null
   orientation: Orientation
   onOrientationChange: (orientation: Orientation) => void
   previewView: PreviewView
   onPreviewViewChange: (view: PreviewView) => void
+  template: TemplateId
+  onTemplateChange: (template: TemplateId) => void
 }
 
 const ORIENTATIONS: { value: Orientation; label: string }[] = [
@@ -27,31 +30,27 @@ const VIEWS: { value: PreviewView; label: string }[] = [
 const TITLE_SCALE: Record<PreviewView, number> = { grid: 0.5, pages: 1 }
 
 export function ManualPreview({
-  brandTitle,
-  titleStyle,
+  cover,
   orientation,
   onOrientationChange,
   previewView,
   onPreviewViewChange,
+  template,
+  onTemplateChange,
 }: ManualPreviewProps) {
-  const titleCss = toTitleCss(titleStyle)
-  const pageTitleCss = {
-    ...titleCss,
-    fontSize: `${parseFloat(String(titleCss.fontSize)) * TITLE_SCALE[previewView]}px`,
-  }
-
   function renderPage(page: string) {
     if (page !== 'Cover') return <p className="manual-page-empty">Coming soon</p>
-    if (brandTitle === '') return <p className="manual-page-empty">Your brand title</p>
-    return (
-      <p className="manual-cover-title" style={pageTitleCss}>
-        {brandTitle}
-      </p>
-    )
+    return <CoverPage cover={cover} titleScale={TITLE_SCALE[previewView]} />
   }
 
+  // data-template is set once here: every page of the manual uses the same template.
   return (
-    <section className="manual-preview" aria-label="Manual preview" data-view={previewView}>
+    <section
+      className="manual-preview"
+      aria-label="Manual preview"
+      data-view={previewView}
+      data-template={template}
+    >
       <div className="preview-toolbar">
         <fieldset className="segmented-control">
           <legend>Page orientation</legend>
@@ -84,12 +83,33 @@ export function ManualPreview({
             </label>
           ))}
         </fieldset>
+
+        <fieldset className="segmented-control">
+          <legend>Template</legend>
+          {TEMPLATES.map((option) => (
+            <label key={option.id}>
+              <input
+                type="radio"
+                name="template"
+                value={option.id}
+                checked={template === option.id}
+                onChange={() => onTemplateChange(option.id)}
+              />
+              <span>{option.name}</span>
+            </label>
+          ))}
+        </fieldset>
       </div>
 
       <ol className="manual-pages">
         {MANUAL_PAGES.map((page, index) => (
           <li key={page}>
-            <article className="manual-page" aria-label={page} data-orientation={orientation}>
+            <article
+              className="manual-page"
+              aria-label={page}
+              data-orientation={orientation}
+              style={cover ? { background: cover.colors.background } : undefined}
+            >
               <div className="manual-page-content">{renderPage(page)}</div>
             </article>
             <span className="manual-page-name">

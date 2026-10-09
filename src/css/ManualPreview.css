@@ -96,10 +96,11 @@
 }
 
 .manual-page-content {
+  box-sizing: border-box; /* padding inside the 100% height, so nothing falls off the page */
   height: 100%;
   display: grid;
   place-items: center;
-  padding: 12px;
+  padding: 8%; /* % of the page width: margins grow with the page (Grid vs Pages view) */
   text-align: center;
 }
 
@@ -107,9 +108,7 @@
   margin: 0;
 }
 
-.manual-cover-title {
-  overflow-wrap: anywhere;
-}
+/* Where the content of each page sits is decided by the template: see src/templates/ */
 
 .manual-page-empty {
   color: #9a96a0;

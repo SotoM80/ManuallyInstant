@@ -6,24 +6,23 @@ import { HomePage } from './pages/HomePage'
 import { BrandManualPage } from './pages/BrandManualPage'
 import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
 import { loadGoogleFont } from './utils/googleFonts'
-import type { Orientation, PreviewView, TitleStyle } from './types'
+import { DEFAULT_TEMPLATE } from './templates'
+import type { TemplateId } from './templates'
+import type { CoverData, Orientation, PreviewView } from './types'
 import './css/App.css'
 
 function App() {
   // Kept here, above the routes, so they survive moving between pages.
-  const [brandTitle, setBrandTitle] = useState('')
-  const [titleStyle, setTitleStyle] = useState<TitleStyle>(DEFAULT_TITLE_STYLE)
+  // `cover` is null until the Cover section is saved for the first time.
+  const [cover, setCover] = useState<CoverData | null>(null)
   const [orientation, setOrientation] = useState<Orientation>('portrait')
   const [previewView, setPreviewView] = useState<PreviewView>('grid')
+  const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
 
+  const fontFamily = cover?.style.fontFamily ?? DEFAULT_TITLE_STYLE.fontFamily
   useEffect(() => {
-    loadGoogleFont(titleStyle.fontFamily)
-  }, [titleStyle.fontFamily])
-
-  function handleSubmit(title: string, style: TitleStyle) {
-    setBrandTitle(title)
-    setTitleStyle(style)
-  }
+    loadGoogleFont(fontFamily)
+  }, [fontFamily])
 
   return (
     <>
@@ -39,13 +38,14 @@ function App() {
             path="/brand-manual"
             element={
               <BrandManualPage
-                brandTitle={brandTitle}
-                titleStyle={titleStyle}
+                cover={cover}
                 orientation={orientation}
                 onOrientationChange={setOrientation}
                 previewView={previewView}
                 onPreviewViewChange={setPreviewView}
-                onSubmit={handleSubmit}
+                template={template}
+                onTemplateChange={setTemplate}
+                onSubmit={setCover}
               />
             }
           />

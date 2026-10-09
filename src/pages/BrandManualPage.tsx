@@ -2,42 +2,46 @@ import type { ReactNode } from 'react'
 import { BrandForm } from '../components/BrandForm'
 import { ManualPreview } from '../components/ManualPreview'
 import { MANUAL_SECTIONS } from '../data/manualSections'
-import type { Orientation, PreviewView, TitleStyle } from '../types'
+import type { TemplateId } from '../templates'
+import type { CoverData, Orientation, PreviewView } from '../types'
 import '../css/BrandManualPage.css'
 
 type BrandManualPageProps = {
-  brandTitle: string
-  titleStyle: TitleStyle
+  cover: CoverData | null
   orientation: Orientation
   onOrientationChange: (orientation: Orientation) => void
   previewView: PreviewView
   onPreviewViewChange: (view: PreviewView) => void
-  onSubmit: (title: string, style: TitleStyle) => void
+  template: TemplateId
+  onTemplateChange: (template: TemplateId) => void
+  onSubmit: (cover: CoverData) => void
 }
 
 export function BrandManualPage({
-  brandTitle,
-  titleStyle,
+  cover,
   orientation,
   onOrientationChange,
   previewView,
   onPreviewViewChange,
+  template,
+  onTemplateChange,
   onSubmit,
 }: BrandManualPageProps) {
   // Form of each built section. Sections not listed here show "Coming soon".
   const sectionForms: Record<string, ReactNode> = {
-    'brand-title': <BrandForm onSubmit={onSubmit} />,
+    cover: <BrandForm onSubmit={onSubmit} />,
   }
 
   return (
     <div className="brand-manual-page">
       <ManualPreview
-        brandTitle={brandTitle}
-        titleStyle={titleStyle}
+        cover={cover}
         orientation={orientation}
         onOrientationChange={onOrientationChange}
         previewView={previewView}
         onPreviewViewChange={onPreviewViewChange}
+        template={template}
+        onTemplateChange={onTemplateChange}
       />
 
       <section className="manual-sections" aria-label="Manual sections">

@@ -1,8 +1,10 @@
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { BrandForm } from '../src/components/BrandForm';
 import { renderApp } from './renderApp';
+import { clickSave, fillRequiredCoverFields, pickSwatch, typeTitle } from './coverForm';
 
-const FIELDS = ['Font family', 'Font color', 'Font style', 'Font size'];
+// The title color is now the Typography color picker (see ColorPicker.test.tsx).
+const FIELDS = ['Font family', 'Font style', 'Font size'];
 
 function getField(name: string) {
   return screen.getByRole('combobox', { name });
@@ -17,21 +19,18 @@ function pickOption(name: string, option: string) {
   fireEvent.click(screen.getByRole('option', { name: option }));
 }
 
-function typeTitle(value: string) {
-  fireEvent.change(screen.getByLabelText(/brand title/i), { target: { value } });
-}
-
+// Designed by and Logo are required too, so they are filled before every Save.
 function clickSubmit() {
-  fireEvent.click(screen.getByRole('button', { name: /save|print/i }));
+  fillRequiredCoverFields();
+  clickSave();
 }
 
 // Spec: specs/titlefild.md, Section 2 — Interface + Predefined Options
 describe('Title style – interface', () => {
-  it('renders the four style fields with their default values', () => {
+  it('renders the three style fields with their default values', () => {
     render(<BrandForm />);
 
     expect(getField('Font family')).toHaveValue('Roboto');
-    expect(getField('Font color')).toHaveValue('Black');
     expect(getField('Font style')).toHaveValue('Regular');
     expect(getField('Font size')).toHaveValue('Medium');
   });
@@ -43,12 +42,12 @@ describe('Title style – real-time filtering', () => {
     // Given
     render(<BrandForm />);
 
-    // When: the user types "bl" in Font color
-    typeInto('Font color', 'bl');
+    // When: the user types "bold" in Font style
+    typeInto('Font style', 'bol');
 
-    // Then: only Black and Blue are listed
+    // Then: only Bold and Bold Italic are listed
     const options = within(screen.getByRole('listbox')).getAllByRole('option');
-    expect(options.map((o) => o.textContent)).toEqual(['Black', 'Blue']);
+    expect(options.map((o) => o.textContent)).toEqual(['Bold', 'Bold Italic']);
   });
 
   it('shows "No results found" when nothing matches', () => {
@@ -132,7 +131,6 @@ describe('Title style – successful submit', () => {
     render(<BrandForm onSubmit={onSubmit} />);
     typeTitle('My Brand');
     pickOption('Font family', 'Open Sans');
-    pickOption('Font color', 'Blue');
     pickOption('Font style', 'Bold Italic');
     pickOption('Font size', 'Large');
 
@@ -140,12 +138,12 @@ describe('Title style – successful submit', () => {
     clickSubmit();
 
     // Then
-    expect(onSubmit).toHaveBeenCalledWith('My Brand', {
-      fontFamily: 'Open Sans',
-      color: 'Blue',
-      fontStyle: 'Bold Italic',
-      fontSize: 'Large',
-    });
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'My Brand',
+        style: { fontFamily: 'Open Sans', fontStyle: 'Bold Italic', fontSize: 'Large' },
+      }),
+    );
   });
 });
 
@@ -166,7 +164,7 @@ describe('Title style – cover preview', () => {
     renderApp();
     typeTitle('My Brand');
     pickOption('Font family', 'Open Sans');
-    pickOption('Font color', 'Blue');
+    pickSwatch('Typography color', 'Blue');
     pickOption('Font style', 'Bold Italic');
     pickOption('Font size', 'Large');
 

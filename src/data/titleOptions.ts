@@ -1,17 +1,7 @@
 import type { CSSProperties } from 'react'
-import type { FontColor, FontSize, FontStyleName, TitleStyle } from '../types'
+import type { FontSize, FontStyleName, TitleStyle } from '../types'
 
 export const FONT_FAMILIES = ['Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Playfair Display']
-
-export const FONT_COLORS: Record<FontColor, string> = {
-  Black: '#000000',
-  White: '#FFFFFF',
-  Red: '#E53935',
-  Blue: '#1E88E5',
-  Green: '#43A047',
-  Yellow: '#FDD835',
-  Gray: '#757575',
-}
 
 export const FONT_STYLES: Record<FontStyleName, CSSProperties> = {
   Regular: { fontWeight: 'normal', fontStyle: 'normal' },
@@ -28,14 +18,13 @@ export const FONT_SIZES: Record<FontSize, string> = {
 
 export const DEFAULT_TITLE_STYLE: TitleStyle = {
   fontFamily: 'Roboto',
-  color: 'Black',
   fontStyle: 'Regular',
   fontSize: 'Medium',
 }
 
+// The title color is not here: it is the Typography color of the Cover (see colorPalette.ts).
 export const STYLE_FIELDS: { key: keyof TitleStyle; label: string; options: readonly string[] }[] = [
   { key: 'fontFamily', label: 'Font family', options: FONT_FAMILIES },
-  { key: 'color', label: 'Font color', options: Object.keys(FONT_COLORS) },
   { key: 'fontStyle', label: 'Font style', options: Object.keys(FONT_STYLES) },
   { key: 'fontSize', label: 'Font size', options: Object.keys(FONT_SIZES) },
 ]
@@ -43,7 +32,6 @@ export const STYLE_FIELDS: { key: keyof TitleStyle; label: string; options: read
 export function toTitleCss(style: TitleStyle): CSSProperties {
   return {
     fontFamily: `'${style.fontFamily}', sans-serif`,
-    color: FONT_COLORS[style.color],
     fontSize: FONT_SIZES[style.fontSize],
     ...FONT_STYLES[style.fontStyle],
   }

@@ -1,0 +1,16 @@
+/* Template 1
+   ┌──────────────┐
+   │   MY BRAND   │  title, top
+   │    [LOGO]    │  logo, center
+   │ Designed by  │  designed by, bottom
+   └──────────────┘ */
+
+.manual-preview[data-template='template1'] .cover-layout {
+  grid-template-areas:
+    'title'
+    'logo'
+    'designed';
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  row-gap: 8%; /* % of the page height: same breathing room in every view and orientation */
+  text-align: center;
+}

@@ -1,7 +1,8 @@
-import { screen, fireEvent, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
+import { clickSave, fillRequiredCoverFields, typeTitle } from './coverForm';
 
-const EMPTY_COVER = 'Your brand title';
+const EMPTY_COVER = 'Your brand manual title';
 
 // The saved title is shown on the Cover page of the manual preview.
 function getCover() {
@@ -10,12 +11,15 @@ function getCover() {
   });
 }
 
-function typeTitle(value: string) {
-  fireEvent.change(screen.getByLabelText(/brand title/i), { target: { value } });
+// The title slot of the Cover (the Cover also shows the logo and "Designed by").
+function getCoverTitle() {
+  return getCover().querySelector('.cover-title');
 }
 
+// Designed by and Logo are required too, so they are filled before every Save.
 function clickSubmit() {
-  fireEvent.click(screen.getByRole('button', { name: /save|print/i }));
+  fillRequiredCoverFields();
+  clickSave();
 }
 
 // Spec: specs/titlefild.md, Scenario 1 — Successful Title Processing
@@ -31,7 +35,7 @@ describe('App – brand title preview', () => {
 
     // Then: no error, and the clean title populates the Cover
     expect(screen.queryByText('Required field')).not.toBeInTheDocument();
-    expect(getCover().textContent).toBe('My Brand');
+    expect(getCoverTitle()?.textContent).toBe('My Brand');
   });
 
   it('does not update the Cover while typing, only after clicking', () => {
@@ -56,7 +60,7 @@ describe('App – brand title preview', () => {
     clickSubmit();
 
     // Then
-    expect(getCover().textContent).toBe('Second Brand');
+    expect(getCoverTitle()?.textContent).toBe('Second Brand');
   });
 });
 
@@ -83,7 +87,7 @@ describe('App – blank title is blocked', () => {
 
     // Then: the action is blocked and the Cover is unchanged
     expect(screen.getByText('Required field')).toBeInTheDocument();
-    expect(getCover().textContent).toBe('My Brand');
+    expect(getCoverTitle()?.textContent).toBe('My Brand');
   });
 });
 
@@ -136,7 +140,7 @@ describe('App – title is not persisted', () => {
     const { unmount } = renderApp();
     typeTitle('My Brand');
     clickSubmit();
-    expect(getCover().textContent).toBe('My Brand');
+    expect(getCoverTitle()?.textContent).toBe('My Brand');
 
     // When: the page is "reloaded"
     unmount();

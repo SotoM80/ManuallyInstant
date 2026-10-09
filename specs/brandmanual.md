@@ -19,8 +19,9 @@ The content of the Logo, Colors and Typography sections (each one has its own fu
   * **Pages**: a closer look. Each page takes the full width of the left column, one below the other, and the user scrolls down to see them. The cover title is drawn at its real size (in Grid it is drawn at half size). In this view the preview is not sticky, so every page can be reached by scrolling.
 
   Choosing an option changes the view immediately (no Save needed). It only changes how the preview looks, not the manual or the PDF.
+* **Template** (next to Preview view): A group labeled "Template" with three options: **Template 1** (default), **Template 2** and **Template 3**. It changes where the content sits on every page, immediately (no Save needed). See `templates.md`.
 * **Left column — Manual Preview**: A region labeled "Manual preview". It shows the manual's pages as small page thumbnails, in this order:
-  1. **Cover**: shows the saved brand title with its style. Before a title is saved, it shows the placeholder text "Your brand title".
+  1. **Cover**: shows the saved brand manual title with its style, the logo and "Designed by <name>", placed by the template (see `cover.md`). Before the first Save, it shows the placeholders "Your brand manual title", "Your logo" and "Designed by …".
   2. **Logo**
   3. **Color palette**
   4. **Typography**
@@ -28,7 +29,7 @@ The content of the Logo, Colors and Typography sections (each one has its own fu
   Pages whose section is not built yet show "Coming soon".
   The preview stays visible while the user scrolls the sections (sticky).
 * **Right column — Manual Sections**: A region labeled "Manual sections". It lists every section needed to create the manual, one below the other, numbered, in this order:
-  1. **Brand title**: the form described in `titlefild.md`.
+  1. **Cover**: brand manual title, Designed by and logo (see `cover.md` and `titlefild.md`).
   2. **Logo**: "Coming soon".
   3. **Colors**: "Coming soon".
   4. **Typography**: "Coming soon".
@@ -43,19 +44,19 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`).
-* **Postconditions**: After saving the brand title, the Cover page of the preview shows the title with the selected style.
+* **Postconditions**: After saving the Cover section, the Cover page of the preview shows the title with the selected style, the logo and "Designed by <name>".
 
 ## 4. Invariants
 * The preview always shows the four pages, in the same order, whether they have content or not.
 * The sections list always shows every section, in the same order, whether it is built or not.
-* The brand title in the preview changes only when the user clicks Save (same rule as in `titlefild.md`). The page orientation is the exception: it changes immediately.
+* The Cover in the preview changes only when the user clicks Save (same rule as in `titlefild.md` and `cover.md`). The page orientation is the exception: it changes immediately.
 * All four pages always share the same orientation.
 * The chosen orientation is kept when the user moves between pages. It is only reset (to Portrait) when the browser page is refreshed.
 * Both views always show the same four pages, in the same order, with the same orientation.
 * The chosen preview view is kept when the user moves between pages. It is only reset (to Grid) when the browser page is refreshed.
 
 ## Failure Modes
-* **No title saved yet**: The Cover shows "Your brand title" instead of an empty page.
+* **Nothing saved yet**: The Cover shows the placeholders "Your brand manual title", "Your logo" and "Designed by …" instead of an empty page.
 
 ## 5. Given-When-Then Test Criteria
 
@@ -67,7 +68,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ### Scenario 2: All Sections Listed
 * **Given**: The user is on the Brand Manual page.
 * **When**: The user looks at the sections column.
-* **Then**: The sections Brand title, Logo, Colors and Typography are listed in that order, and Logo, Colors and Typography show "Coming soon".
+* **Then**: The sections Cover, Logo, Colors and Typography are listed in that order, and Logo, Colors and Typography show "Coming soon".
 
 ### Scenario 3: All Pages Previewed
 * **Given**: The user is on the Brand Manual page.
@@ -75,14 +76,14 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Then**: The pages Cover, Logo, Color palette and Typography are shown in that order.
 
 ### Scenario 4: Cover Shows the Saved Title
-* **Given**: The Cover shows "Your brand title", and the user types "My Brand" and selects Font color "Blue".
+* **Given**: The Cover shows "Your brand manual title", and the user types "My Brand", selects the "Blue" swatch in Typography color and fills Designed by and Logo.
 * **When**: The user clicks Save.
 * **Then**: The Cover shows "My Brand" in blue.
 
 ### Scenario 5: Preview Waits for Save
 * **Given**: The user is on the Brand Manual page.
 * **When**: The user types "My Brand" without clicking Save.
-* **Then**: The Cover still shows "Your brand title".
+* **Then**: The Cover still shows "Your brand manual title".
 
 ### Scenario 6: Changing the Page Orientation
 * **Given**: The user is on the Brand Manual page and Portrait is selected (default).

@@ -1,0 +1,29 @@
+/* Template 3
+   ┌──────────────┐
+   │    [LOGO]    │  logo, upper part
+   │──────────────│  divider line
+   │      MY BRAND│  title, right
+   │ Designed by X│  designed by, right
+   └──────────────┘ */
+
+.manual-preview[data-template='template3'] .cover-layout {
+  grid-template-areas:
+    'logo'
+    'title'
+    'designed';
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  row-gap: 3%;
+  text-align: right;
+}
+
+/* The divider is the bottom border of the logo area: no extra markup needed */
+.manual-preview[data-template='template3'] .cover-logo {
+  /* A faint line in the Typography color, so it shows on light and dark backgrounds */
+  border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  margin-bottom: 5%;
+}
+
+/* Leave room between the logo and the divider */
+.manual-preview[data-template='template3'] .cover-logo img {
+  height: 80%;
+}

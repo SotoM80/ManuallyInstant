@@ -1,6 +1,7 @@
 import { screen, fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import { NAV_ITEMS } from '../src/data/navItems';
+import { clickSave, fillRequiredCoverFields, typeTitle } from './coverForm';
 
 function getMenu() {
   return within(screen.getByRole('banner')).getByRole('navigation', { name: 'Main' });
@@ -61,7 +62,7 @@ describe('NavMenu – going to the Brand Manual', () => {
     fireEvent.click(getMenuLink('Brand Manual'));
 
     // Then
-    expect(screen.getByLabelText(/brand title/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('Brand manual title')).toBeInTheDocument();
     expect(getMenuLink('Brand Manual')).toHaveAttribute('aria-current', 'page');
     expect(getMenuLink('Home')).not.toHaveAttribute('aria-current');
   });
@@ -77,7 +78,7 @@ describe('NavMenu – starting from Home', () => {
     fireEvent.click(screen.getByRole('link', { name: 'Start your brand manual' }));
 
     // Then
-    expect(screen.getByLabelText(/brand title/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('Brand manual title')).toBeInTheDocument();
   });
 });
 
@@ -86,12 +87,13 @@ describe('NavMenu – title is kept between pages', () => {
   it('keeps the saved title when going to Home and back', () => {
     // Given: a saved title
     renderApp('/brand-manual');
-    fireEvent.change(screen.getByLabelText(/brand title/i), { target: { value: 'My Brand' } });
-    fireEvent.click(screen.getByRole('button', { name: /save|print/i }));
+    typeTitle('My Brand');
+    fillRequiredCoverFields();
+    clickSave();
 
     // When: on Home the Brand Manual page is gone...
     fireEvent.click(getMenuLink('Home'));
-    expect(screen.queryByLabelText(/brand title/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Brand manual title')).not.toBeInTheDocument();
 
     // ...Then: back on Brand Manual, the Cover still shows the title
     fireEvent.click(getMenuLink('Brand Manual'));
@@ -122,7 +124,7 @@ describe('Header – logo', () => {
 
     // Then
     expect(screen.getByRole('heading', { name: 'ManuallyInstant' })).toBeInTheDocument();
-    expect(screen.queryByLabelText(/brand title/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Brand manual title')).not.toBeInTheDocument();
   });
 });
 

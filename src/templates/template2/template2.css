@@ -1,0 +1,29 @@
+/* Template 2
+   ┌──────────────┐
+   │[logo]        │  small logo, top left
+   │              │
+   │MY BRAND      │  title, bottom left
+   │Designed by X │  designed by, under the title
+   └──────────────┘ */
+
+.manual-preview[data-template='template2'] .cover-layout {
+  grid-template-areas:
+    'logo'
+    '.'
+    'title'
+    'designed';
+  grid-template-rows: minmax(0, 18%) minmax(0, 1fr) auto auto;
+  row-gap: 3%;
+  text-align: left;
+}
+
+.manual-preview[data-template='template2'] .cover-logo {
+  justify-items: start;
+}
+
+/* Small logo, pinned to the top-left corner of its box */
+.manual-preview[data-template='template2'] .cover-logo img {
+  margin: 0;
+  width: 40%;
+  object-position: left center;
+}

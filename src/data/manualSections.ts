@@ -7,7 +7,7 @@ export type ManualSection = {
 // Sections of the Brand Manual page (right column), in order.
 // When a section is built: set `ready: true` and plug its form in BrandManualPage.
 export const MANUAL_SECTIONS: ManualSection[] = [
-  { id: 'brand-title', label: 'Brand title', ready: true },
+  { id: 'cover', label: 'Cover', ready: true },
   { id: 'logo', label: 'Logo', ready: false },
   { id: 'colors', label: 'Colors', ready: false },
   { id: 'typography', label: 'Typography', ready: false },

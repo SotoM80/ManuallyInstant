@@ -1,17 +1,21 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { BrandForm } from '../src/components/BrandForm';
 import { DEFAULT_TITLE_STYLE } from '../src/data/titleOptions';
+import { clickSave, fillRequiredCoverFields, typeTitle } from './coverForm';
 
 function getInput() {
-  return screen.getByLabelText(/brand title/i);
+  return screen.getByLabelText('Brand manual title');
 }
 
-function typeTitle(value: string) {
-  fireEvent.change(getInput(), { target: { value } });
-}
-
+// Designed by and Logo are required too, so they are filled before every Save:
+// these tests only look at the title.
 function clickSubmit() {
-  fireEvent.click(screen.getByRole('button', { name: /save|print/i }));
+  fillRequiredCoverFields();
+  clickSave();
+}
+
+function sentTitle(title: string) {
+  return expect.objectContaining({ title, style: DEFAULT_TITLE_STYLE });
 }
 
 // Spec: specs/titlefild.md, Section 2 — Interface
@@ -88,7 +92,7 @@ describe('BrandForm – clean title submission', () => {
 
     // Then
     expect(onSubmit).toHaveBeenCalledTimes(1);
-    expect(onSubmit).toHaveBeenCalledWith('My Brand', DEFAULT_TITLE_STYLE);
+    expect(onSubmit).toHaveBeenCalledWith(sentTitle('My Brand'));
     expect(screen.queryByText('Required field')).not.toBeInTheDocument();
   });
 
@@ -106,7 +110,7 @@ describe('BrandForm – clean title submission', () => {
     clickSubmit();
 
     // Then
-    expect(onSubmit).toHaveBeenCalledWith(value, DEFAULT_TITLE_STYLE);
+    expect(onSubmit).toHaveBeenCalledWith(sentTitle(value));
   });
 
   it('clears the error once the user fixes the title and submits again', () => {
@@ -123,6 +127,6 @@ describe('BrandForm – clean title submission', () => {
     // Then: the error is gone and the title is sent
     expect(screen.queryByText('Required field')).not.toBeInTheDocument();
     expect(getInput()).toHaveAttribute('aria-invalid', 'false');
-    expect(onSubmit).toHaveBeenCalledWith('My Brand', DEFAULT_TITLE_STYLE);
+    expect(onSubmit).toHaveBeenCalledWith(sentTitle('My Brand'));
   });
 });

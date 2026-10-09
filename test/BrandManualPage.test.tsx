@@ -1,5 +1,6 @@
 import { screen, fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
+import { clickSave, fillRequiredCoverFields, pickSwatch, typeTitle } from './coverForm';
 
 function getPreview() {
   return screen.getByRole('region', { name: 'Manual preview' });
@@ -13,12 +14,10 @@ function getCover() {
   return within(getPreview()).getByRole('article', { name: 'Cover' });
 }
 
-function typeTitle(value: string) {
-  fireEvent.change(screen.getByLabelText(/brand title/i), { target: { value } });
-}
-
+// Designed by and Logo are required too, so they are filled before every Save.
 function clickSubmit() {
-  fireEvent.click(screen.getByRole('button', { name: /save|print/i }));
+  fillRequiredCoverFields();
+  clickSave();
 }
 
 // Spec: specs/brandmanual.md, Scenario 1 — Page Layout
@@ -39,7 +38,7 @@ describe('Brand Manual – sections column', () => {
 
     const items = within(getSections()).getAllByRole('listitem');
     const headings = items.map((item) => within(item).getByRole('heading').textContent);
-    expect(headings).toEqual(['1. Brand title', '2. Logo', '3. Colors', '4. Typography']);
+    expect(headings).toEqual(['1. Cover', '2. Logo', '3. Colors', '4. Typography']);
 
     expect(within(items[0]).queryByText('Coming soon')).not.toBeInTheDocument();
     for (const item of items.slice(1)) {
@@ -47,11 +46,13 @@ describe('Brand Manual – sections column', () => {
     }
   });
 
-  it('puts the brand title form inside the Brand title section', () => {
+  it('puts the cover form inside the Cover section', () => {
     renderApp('/brand-manual');
 
-    const [brandTitleSection] = within(getSections()).getAllByRole('listitem');
-    expect(within(brandTitleSection).getByLabelText(/brand title/i)).toBeInTheDocument();
+    const [coverSection] = within(getSections()).getAllByRole('listitem');
+    expect(within(coverSection).getByLabelText('Brand manual title')).toBeInTheDocument();
+    expect(within(coverSection).getByLabelText('Designed by')).toBeInTheDocument();
+    expect(within(coverSection).getByLabelText('Logo')).toBeInTheDocument();
   });
 });
 
@@ -75,12 +76,9 @@ describe('Brand Manual – cover preview', () => {
   it('shows the saved title with its style on the Cover', () => {
     // Given
     renderApp('/brand-manual');
-    expect(getCover()).toHaveTextContent('Your brand title');
+    expect(getCover()).toHaveTextContent('Your brand manual title');
     typeTitle('My Brand');
-    fireEvent.change(screen.getByRole('combobox', { name: 'Font color' }), {
-      target: { value: 'Blue' },
-    });
-    fireEvent.click(screen.getByRole('option', { name: 'Blue' }));
+    pickSwatch('Typography color', 'Blue');
 
     // When
     clickSubmit();
@@ -88,7 +86,7 @@ describe('Brand Manual – cover preview', () => {
     // Then
     const title = within(getCover()).getByText('My Brand');
     expect(title).toHaveStyle({ color: '#1E88E5' });
-    expect(getCover()).not.toHaveTextContent('Your brand title');
+    expect(getCover()).not.toHaveTextContent('Your brand manual title');
   });
 
   // Spec: specs/brandmanual.md, Scenario 5 — Preview Waits for Save
@@ -97,7 +95,7 @@ describe('Brand Manual – cover preview', () => {
 
     typeTitle('My Brand');
 
-    expect(getCover()).toHaveTextContent('Your brand title');
+    expect(getCover()).toHaveTextContent('Your brand manual title');
   });
 });
 
