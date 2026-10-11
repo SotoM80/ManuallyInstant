@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { BrandForm } from '../src/components/BrandForm';
 import { DEFAULT_TITLE_STYLE } from '../src/data/titleOptions';
 import { clickSave, fillRequiredCoverFields, typeTitle } from './coverForm';
@@ -128,5 +128,55 @@ describe('BrandForm – clean title submission', () => {
     expect(screen.queryByText('Required field')).not.toBeInTheDocument();
     expect(getInput()).toHaveAttribute('aria-invalid', 'false');
     expect(onSubmit).toHaveBeenCalledWith(sentTitle('My Brand'));
+  });
+});
+
+// Motion: the Save button shakes when the form is not valid and pulses with a check when it is.
+// jsdom does not run CSS animations, so the tests check the state the CSS reads.
+describe('BrandForm – Save feedback', () => {
+  function getSave() {
+    return screen.getByRole('button', { name: /save|print/i });
+  }
+
+  it('starts idle', () => {
+    render(<BrandForm />);
+
+    expect(getSave()).toHaveAttribute('data-feedback', 'idle');
+  });
+
+  it('shakes when the form is not valid', () => {
+    // Given: the title is empty
+    render(<BrandForm />);
+
+    // When
+    clickSubmit();
+
+    // Then
+    expect(getSave()).toHaveAttribute('data-feedback', 'error');
+  });
+
+  it('pulses when the cover is saved, and keeps the name "Save"', () => {
+    // Given
+    render(<BrandForm onSubmit={jest.fn()} />);
+    typeTitle('My Brand');
+
+    // When
+    clickSubmit();
+
+    // Then: the check is decoration only, the accessible name does not change
+    expect(getSave()).toHaveAttribute('data-feedback', 'saved');
+    expect(getSave()).toHaveAccessibleName('Save');
+  });
+
+  it('goes back to idle when the animation ends, so the next Save animates again', () => {
+    // Given
+    render(<BrandForm />);
+    clickSubmit();
+
+    // When
+    fireEvent.animationEnd(getSave());
+
+    // Then
+    expect(getSave()).toHaveAttribute('data-feedback', 'idle');
   });
 });

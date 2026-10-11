@@ -22,8 +22,19 @@
   border: 1px solid var(--accent-border);
   font-weight: 600;
   text-decoration: none;
+  transition:
+    transform var(--dur) var(--ease-bounce),
+    box-shadow var(--dur) ease,
+    border-color var(--dur-fast) ease;
 }
 
 .home-page-start:hover {
   border-color: var(--accent);
+  box-shadow: var(--shadow);
+  transform: translateY(-3px) scale(1.04);
+}
+
+.home-page-start:active {
+  transform: scale(0.96);
+  transition-duration: var(--dur-fast);
 }

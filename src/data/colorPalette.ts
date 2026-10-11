@@ -26,3 +26,16 @@ export function normalizeHex(value: string): string | null {
   if (/^[0-9A-F]{3}$/.test(hex)) return `#${[...hex].map((c) => c + c).join('')}`
   return null
 }
+
+export type Rgb = { r: number; g: number; b: number }
+
+// "#1E88E5" → { r: 30, g: 136, b: 229 }. Expects a normalized HEX (see normalizeHex).
+export function hexToRgb(hex: string): Rgb {
+  const value = parseInt(hex.slice(1), 16)
+  return { r: (value >> 16) & 255, g: (value >> 8) & 255, b: value & 255 }
+}
+
+// { r: 30, g: 136, b: 229 } → "#1E88E5"
+export function rgbToHex({ r, g, b }: Rgb): string {
+  return `#${[r, g, b].map((channel) => channel.toString(16).padStart(2, '0')).join('').toUpperCase()}`
+}

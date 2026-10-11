@@ -13,15 +13,85 @@
   float: right; /* lets the legend sit inside the grid, aligned like the other labels */
 }
 
+/* Folded: no height and nothing visible. Unfolded: two rows of swatches.
+   max-height (not height: auto) because height: auto cannot be animated. */
 .color-swatches {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(6, 22px);
+  justify-content: end;
+  gap: 8px;
+  max-height: 0;
+  padding: 0 4px; /* room for the outline of the chosen swatch */
+  overflow: hidden;
+  transition:
+    max-height var(--dur) var(--ease-out),
+    padding var(--dur) var(--ease-out);
 }
 
+/* overflow visible lets the name pop-ups show above the first row */
+.color-swatches[data-open='true'] {
+  max-height: 120px;
+  padding: 6px 4px;
+  overflow: visible;
+}
+
+/* Each swatch flies out of the circle (up and to the left) one after the other,
+   and folds back in the reverse order: the last one out is the first one in. */
 .color-swatch {
+  position: relative; /* anchors the pop-up */
   cursor: pointer;
+  opacity: 0;
+  transform: translate(12px, -24px) scale(0.2);
+  transition:
+    opacity var(--dur-fast) ease,
+    transform var(--dur) var(--ease-bounce);
+  transition-delay: calc((11 - var(--i)) * 15ms); /* 12 swatches: --i goes 0 to 11 */
+}
+
+.color-swatches[data-open='true'] .color-swatch {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i) * 35ms);
+}
+
+/* The circle with the current color: click it to fan out the swatches */
+.color-swatches-toggle {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(0 0 0 / 20%); /* keeps White and Beige visible */
+  background: transparent;
+  cursor: pointer;
+  transition:
+    transform var(--dur) var(--ease-bounce),
+    box-shadow var(--dur-fast) ease;
+}
+
+/* No color while the HEX field is not valid */
+.color-swatches-toggle[data-empty='true'] {
+  border: 2px dashed var(--border);
+}
+
+.color-swatches-toggle:hover {
+  transform: scale(1.12);
+}
+
+.color-swatches-toggle:active {
+  transform: scale(0.9);
+}
+
+/* Open: an accent ring around it, like a pressed button */
+.color-swatches-toggle[aria-expanded='true'] {
+  box-shadow:
+    0 0 0 2px var(--bg),
+    0 0 0 4px var(--accent);
+  transform: scale(1.12);
+}
+
+.color-swatches-toggle:focus-visible {
+  outline: 2px dashed var(--accent);
+  outline-offset: 3px;
 }
 
 /* The real radio stays in the page (for keyboard and screen readers) but is not drawn */
@@ -31,17 +101,72 @@
   pointer-events: none;
 }
 
-.color-swatch span {
+.color-swatch > span:first-of-type {
   display: block;
   width: 22px;
   height: 22px;
   border-radius: 50%;
   border: 1px solid rgb(0 0 0 / 20%); /* keeps White and Beige visible */
+  transition: transform var(--dur-fast) var(--ease-bounce);
 }
 
+.color-swatch:hover input + span {
+  transform: scale(1.2);
+}
+
+/* Runs every time a swatch becomes the chosen one: it pops and sends out a ring */
 .color-swatch input:checked + span {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+  animation:
+    pop var(--dur) var(--ease-bounce),
+    pulse var(--dur-slow) var(--ease-out);
+}
+
+/* Pop-up above the swatch: grows out of it on hover or keyboard focus */
+.color-swatch-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  z-index: 1;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: var(--bg);
+  background: var(--text-h);
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%) translateY(6px) scale(0.6);
+  transform-origin: bottom center;
+  transition:
+    opacity var(--dur-fast) ease,
+    transform var(--dur) var(--ease-bounce);
+}
+
+.color-swatch-tip code {
+  padding: 0;
+  font-size: 11px;
+  color: inherit;
+  background: none;
+  opacity: 0.7;
+}
+
+/* Little arrow pointing at the swatch */
+.color-swatch-tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -4px;
+  border: 4px solid transparent;
+  border-top-color: var(--text-h);
+}
+
+.color-swatch:hover .color-swatch-tip,
+.color-swatch:has(input:focus-visible) .color-swatch-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
 }
 
 .color-swatch input:focus-visible + span {
@@ -63,10 +188,188 @@
   border-radius: 6px;
   background: none;
   cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease-bounce),
+    border-color var(--dur-fast) ease;
+}
+
+.color-custom input[type='color']:hover {
+  border-color: var(--accent);
+  transform: scale(1.08) rotate(4deg);
 }
 
 .color-custom input[type='text'] {
   width: 9ch;
   font-family: monospace;
   text-transform: uppercase;
+}
+
+/* A HEX that is not valid shakes "no", like the Save button */
+.color-custom input[aria-invalid='true'] {
+  animation: shake var(--dur-slow) ease;
+}
+
+/* RGB pop-up: a button that opens three sliders under it */
+.rgb-popover {
+  position: relative; /* anchors the panel */
+}
+
+.rgb-popover-toggle {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  color: var(--text-h);
+  background: var(--code-bg);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease-bounce),
+    color var(--dur-fast) ease,
+    background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease;
+}
+
+.rgb-popover-toggle:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.rgb-popover-toggle:active {
+  transform: scale(0.92);
+}
+
+.rgb-popover-toggle[aria-expanded='true'] {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+/* Closed: small, see-through and hidden. Open: it grows out of the button's corner.
+   visibility waits for the closing animation to end before hiding the panel. */
+.rgb-popover-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 2;
+  width: 220px;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  text-align: left;
+  transform-origin: top right;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.6);
+  transition:
+    opacity var(--dur-fast) ease,
+    transform var(--dur) var(--ease-bounce),
+    visibility 0s linear var(--dur);
+}
+
+.rgb-popover-panel[data-open='true'] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+
+/* Little arrow pointing at the RGB button */
+.rgb-popover-panel::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  right: 14px;
+  border: 7px solid transparent;
+  border-bottom-color: var(--border);
+}
+
+.rgb-popover-preview {
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgb(0 0 0 / 20%);
+  transition: background-color var(--dur-fast) ease;
+}
+
+.rgb-popover-channel {
+  display: grid;
+  grid-template-columns: 14px 1fr 3ch;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+/* The sliders slide in one after the other each time the pop-up opens */
+.rgb-popover-panel[data-open='true'] .rgb-popover-channel {
+  animation: channel-enter var(--dur) var(--ease-bounce) both;
+  animation-delay: calc(80ms + var(--i) * 60ms);
+}
+
+@keyframes channel-enter {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+.rgb-popover-channel output {
+  font-family: var(--mono);
+  font-weight: 400;
+  text-align: right;
+}
+
+/* The track's colors come from the component (they change with the color) */
+.rgb-popover-channel input[type='range'] {
+  appearance: none;
+  height: 8px;
+  margin: 0;
+  border-radius: 999px;
+  border: 1px solid rgb(0 0 0 / 15%);
+  cursor: pointer;
+}
+
+.rgb-popover-channel input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--text-h);
+  background: #ffffff;
+  transition: transform var(--dur-fast) var(--ease-bounce);
+}
+
+.rgb-popover-channel input[type='range']::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--text-h);
+  background: #ffffff;
+  transition: transform var(--dur-fast) var(--ease-bounce);
+}
+
+.rgb-popover-channel input[type='range']:hover::-webkit-slider-thumb,
+.rgb-popover-channel input[type='range']:focus-visible::-webkit-slider-thumb {
+  transform: scale(1.3);
+}
+
+.rgb-popover-channel input[type='range']:hover::-moz-range-thumb,
+.rgb-popover-channel input[type='range']:focus-visible::-moz-range-thumb {
+  transform: scale(1.3);
+}
+
+.rgb-popover-channel input[type='range']:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.rgb-popover-value {
+  justify-self: center;
+  font-size: 12px;
 }

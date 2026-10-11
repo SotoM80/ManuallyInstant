@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
+import type { AnimationEvent, ChangeEvent, FormEvent } from 'react'
 import { AutocompleteField } from './AutocompleteField'
 import { ColorPicker } from './ColorPicker'
 import { DEFAULT_TITLE_STYLE, STYLE_FIELDS } from '../data/titleOptions'
@@ -14,6 +14,8 @@ import type { CoverData, ManualColors, TitleStyle } from '../types'
 type StyleKey = keyof TitleStyle
 type StyleValues = Record<StyleKey, string>
 type ColorKey = keyof ManualColors
+// What the Save button shows after a click: a pulse with a check, or a shake.
+type SaveFeedback = 'idle' | 'saved' | 'error'
 
 // Form of the Cover section: brand manual title (+ style), colors, Designed by and logo.
 type BrandFormProps = {
@@ -73,6 +75,7 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
   const [styleErrors, setStyleErrors] = useState<StyleValues>(NO_STYLE_ERRORS)
   const [colors, setColors] = useState<ManualColors>(DEFAULT_COLORS)
   const [colorErrors, setColorErrors] = useState<ManualColors>(NO_COLOR_ERRORS)
+  const [feedback, setFeedback] = useState<SaveFeedback>('idle')
 
   function updateColor(key: ColorKey, value: string, fieldError = '') {
     setColors((prev) => ({ ...prev, [key]: value }))
@@ -130,9 +133,17 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
     setLogoError(nextLogoError)
     setStyleErrors(nextStyleErrors)
     setColorErrors(nextColorErrors)
-    if (titleError || nextDesignedByError || nextLogoError) return
-    if (Object.values(nextStyleErrors).some(Boolean) || !logoFile) return
-    if (Object.values(nextColorErrors).some(Boolean)) return
+    const invalid =
+      titleError ||
+      nextDesignedByError ||
+      nextLogoError ||
+      !logoFile ||
+      Object.values(nextStyleErrors).some(Boolean) ||
+      Object.values(nextColorErrors).some(Boolean)
+    if (invalid) {
+      setFeedback('error')
+      return
+    }
 
     const cleanStyle = Object.fromEntries(
       STYLE_FIELDS.map((field) => [field.key, findOption(field.options, style[field.key])]),
@@ -147,6 +158,13 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
         background: normalizeHex(colors.background) as string,
       },
     })
+    setFeedback('saved')
+  }
+
+  // Back to idle when the button's own animation ends, so the next Save animates again.
+  // The check (::after) has its own animation, which must not end the pulse early.
+  function handleFeedbackEnd(event: AnimationEvent<HTMLButtonElement>) {
+    if (!event.pseudoElement) setFeedback('idle')
   }
 
   return (
@@ -208,22 +226,33 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
       )}
 
       <label htmlFor="logo">Logo</label>
-      <input
-        id="logo"
-        type="file"
-        accept={LOGO_TYPES.join(',')}
-        onChange={handleLogoChange}
-        aria-invalid={logoError !== ''}
-        aria-describedby={logoError ? 'logo-error' : undefined}
-        style={logoError ? { borderColor: 'red' } : undefined}
-      />
+      {/* The browser writes the native file button in the system's language, so it is
+          hidden (still there for keyboard and screen readers) and drawn here in English. */}
+      <div className="file-field">
+        <input
+          id="logo"
+          type="file"
+          accept={LOGO_TYPES.join(',')}
+          onChange={handleLogoChange}
+          aria-invalid={logoError !== ''}
+          aria-describedby={logoError ? 'logo-error' : undefined}
+        />
+        <label htmlFor="logo" className="file-field-button" aria-hidden="true">
+          Choose file
+        </label>
+        <span className="file-field-name" aria-hidden="true">
+          {logoFile?.name ?? 'No file chosen'}
+        </span>
+      </div>
       {logoError && (
         <p id="logo-error" role="alert">
           {logoError}
         </p>
       )}
 
-      <button type="submit">Save</button>
+      <button type="submit" data-feedback={feedback} onAnimationEnd={handleFeedbackEnd}>
+        Save
+      </button>
     </form>
   )
 }

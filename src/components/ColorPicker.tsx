@@ -1,6 +1,8 @@
-import { useId } from 'react'
-import type { KeyboardEvent } from 'react'
+import { useCallback, useId, useRef, useState } from 'react'
+import type { CSSProperties, KeyboardEvent, MouseEvent } from 'react'
 import { PALETTE, normalizeHex } from '../data/colorPalette'
+import { RgbPopover } from './RgbPopover'
+import { useDismiss } from '../utils/useDismiss'
 import '../css/ColorPicker.css'
 
 type ColorPickerProps = {
@@ -12,11 +14,47 @@ type ColorPickerProps = {
   onCommit: () => void // blur or Enter in the HEX field
 }
 
+// The custom picker jumps when a swatch is chosen, to show it took that color.
+// Web Animations (not CSS) because the same element must animate again on every pick.
+function bounce(element: HTMLElement | null) {
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+  element?.animate?.(
+    [
+      { transform: 'scale(1)' },
+      { transform: 'scale(1.25) rotate(-8deg)' },
+      { transform: 'scale(1)' },
+    ],
+    { duration: 450, easing: 'cubic-bezier(0.34, 1.2, 0.64, 1)' },
+  )
+}
+
 // Quick swatches + any color (native picker and HEX field), all kept in sync.
+// The swatches start folded into one circle with the current color; a click fans them out.
 export function ColorPicker({ label, value, error, onChange, onSelect, onCommit }: ColorPickerProps) {
   const id = useId()
   const errorId = `${id}-error`
   const hex = normalizeHex(value)
+  const customRef = useRef<HTMLInputElement>(null)
+  const [open, setOpen] = useState(false)
+  const swatchesId = `${id}-swatches`
+  const rootRef = useRef<HTMLFieldSetElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+
+  // Closing gives the focus back to the circle, unless the user clicked somewhere else
+  const close = useCallback(() => {
+    if (rootRef.current?.contains(document.activeElement)) toggleRef.current?.focus()
+    setOpen(false)
+  }, [])
+  useDismiss(rootRef, open, close)
+
+  // A mouse click on a swatch folds them back. Arrow keys also "click" the radios
+  // (with detail 0), and those keep the fan open so the keyboard can keep browsing.
+  // The focus always goes back to the circle: some browsers (Safari) never focus the radio.
+  function handleSwatchClick(event: MouseEvent<HTMLInputElement>) {
+    if (event.detail === 0) return
+    toggleRef.current?.focus()
+    setOpen(false)
+  }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key !== 'Enter') return
@@ -25,27 +63,23 @@ export function ColorPicker({ label, value, error, onChange, onSelect, onCommit 
   }
 
   return (
-    <fieldset className="color-picker">
+    <fieldset className="color-picker" ref={rootRef}>
       <legend>{label}</legend>
 
-      <div className="color-swatches">
-        {PALETTE.map((swatch) => (
-          <label key={swatch.hex} className="color-swatch" title={swatch.name}>
-            <input
-              type="radio"
-              name={id}
-              value={swatch.hex}
-              checked={hex === swatch.hex}
-              onChange={() => onSelect(swatch.hex)}
-              aria-label={swatch.name}
-            />
-            <span style={{ background: swatch.hex }} />
-          </label>
-        ))}
-      </div>
-
       <div className="color-custom">
+        <button
+          ref={toggleRef}
+          type="button"
+          className="color-swatches-toggle"
+          aria-expanded={open}
+          aria-controls={swatchesId}
+          aria-label={`${label} swatches`}
+          onClick={() => setOpen((wasOpen) => !wasOpen)}
+          data-empty={!hex}
+          style={hex ? { background: hex } : undefined}
+        />
         <input
+          ref={customRef}
           type="color"
           value={hex ?? '#000000'}
           onChange={(event) => onSelect(event.target.value.toUpperCase())}
@@ -63,6 +97,33 @@ export function ColorPicker({ label, value, error, onChange, onSelect, onCommit 
           style={error ? { borderColor: 'red' } : undefined}
           spellCheck={false}
         />
+        <RgbPopover label={label} hex={hex} onSelect={onSelect} />
+      </div>
+
+      {/* Always in the page so it can fold and unfold; inert while folded */}
+      <div id={swatchesId} className="color-swatches" data-open={open} inert={!open}>
+        {/* --i staggers the fan: the swatches come out one after the other */}
+        {PALETTE.map((swatch, index) => (
+          <label key={swatch.hex} className="color-swatch" style={{ '--i': index } as CSSProperties}>
+            <input
+              type="radio"
+              name={id}
+              value={swatch.hex}
+              checked={hex === swatch.hex}
+              onChange={() => {
+                onSelect(swatch.hex)
+                bounce(customRef.current)
+              }}
+              onClick={handleSwatchClick}
+              aria-label={swatch.name}
+            />
+            <span style={{ background: swatch.hex }} />
+            {/* Pop-up with the name and HEX; the radio's aria-label already says the name */}
+            <span className="color-swatch-tip" aria-hidden="true">
+              {swatch.name} <code>{swatch.hex}</code>
+            </span>
+          </label>
+        ))}
       </div>
 
       {error && (

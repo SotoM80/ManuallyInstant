@@ -55,6 +55,98 @@
 .manual-section form button[type='submit'] {
   justify-self: end;
   padding: 8px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  background: var(--accent-bg);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform var(--dur) var(--ease-bounce),
+    box-shadow var(--dur) ease,
+    border-color var(--dur-fast) ease;
+}
+
+.manual-section form button[type='submit']:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.manual-section form button[type='submit']:active {
+  transform: scale(0.95);
+  transition-duration: var(--dur-fast);
+}
+
+.manual-section form button[type='submit']:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Saved: a ring spreads out and a check pops in. The "/ ''" keeps the check out of
+   the accessible name, so screen readers still announce "Save". */
+.manual-section form button[data-feedback='saved'] {
+  animation: pulse var(--dur-slow) var(--ease-out) 2;
+}
+
+.manual-section form button[data-feedback='saved']::after {
+  content: ' ✓' / '';
+  display: inline-block;
+  margin-left: 4px;
+  animation: pop var(--dur) var(--ease-bounce);
+}
+
+/* Not saved: the button shakes "no" */
+.manual-section form button[data-feedback='error'] {
+  animation: shake var(--dur-slow) ease;
+}
+
+/* Logo: "Choose file" button + file name, in English (see BrandForm) */
+.file-field {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* the Cover form is aligned right */
+  gap: 8px;
+}
+
+/* The real file input stays in the page (for keyboard and screen readers) but is not drawn */
+.file-field input[type='file'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.file-field-button {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  color: var(--text-h);
+  background: var(--code-bg);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.file-field-button:hover {
+  border-color: var(--accent);
+}
+
+.file-field input:focus-visible + .file-field-button {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.file-field input[aria-invalid='true'] + .file-field-button {
+  border-color: red;
+}
+
+.file-field-name {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .manual-section-badge {

@@ -5,14 +5,19 @@ A custom color picker that lets the user choose colors for the manual. The Cover
 * **Typography color**: the color of the text on the pages (the brand manual title and "Designed by").
 * **Background color**: the background of every page of the manual (the same for all four pages).
 
-Each picker combines **quick swatches** (one click) with **any color** (a native color picker and a HEX field).
+Each picker combines **quick swatches** (folded into one circle that fans them out) with **any color** (a native color picker, a HEX field and RGB sliders).
 
 ## Out of Scope
 The brand's color palette (the "Colors" section with names, RGB and CMYK values; it will have its own spec and may reuse this picker). Different colors per page or per text element. Gradients, transparency or background images. Warnings about low contrast between text and background. Saving colors between sessions.
 
 ## 2. Interface
-Each picker is a group labeled with its name ("Typography color" or "Background color") and contains, in this order:
-1. **Swatches**: 12 round color buttons that work as a single choice. Each one has the color's name as its accessible name (shown as a tooltip):
+Each picker is a group labeled with its name ("Typography color" or "Background color"). Its first row contains, in this order:
+1. **Swatches circle**: a round button (labeled "<name> swatches") filled with the current color, or empty with a dashed border while the HEX is not valid. Clicking it opens or closes the swatches.
+2. **Custom color**: the browser's native color picker (labeled "<name> custom"). It jumps when a swatch is chosen, to show it took that color.
+3. **HEX field**: a text field (labeled "<name> HEX") with the color as `#RRGGBB`. It shakes when its value is not valid.
+4. **RGB button**: opens the **RGB pop-up** (see below).
+
+Under that row, the **swatches**: 12 round color buttons in two rows of six that work as a single choice. Each one has the color's name as its accessible name. Hovering or focusing one pops up a bubble with its name and HEX (e.g. "Blue #1E88E5"); the bubble is decoration only.
 
    | Name | HEX | Name | HEX | Name | HEX |
    |---|---|---|---|---|---|
@@ -21,10 +26,20 @@ Each picker is a group labeled with its name ("Typography color" or "Background 
    | Gray | `#757575` | Yellow | `#FDD835` | Navy | `#1A237E` |
    | Beige | `#F5F0E6` | Green | `#43A047` | Purple | `#8E24AA` |
 
-2. **Custom color**: the browser's native color picker (labeled "<name> custom").
-3. **HEX field**: a text field (labeled "<name> HEX") with the color as `#RRGGBB`.
+### Swatch fan
+* The swatches start **folded**: no space, not visible, not reachable with the keyboard.
+* Clicking the swatches circle **unfolds** them: they fly out one after the other and the chosen one pops with an accent ring. Clicking the circle again folds them.
+* A **mouse click** on a swatch chooses it and folds the swatches back (in reverse order); the focus goes back to the circle.
+* With the **keyboard**, the arrow keys move between swatches and the fan stays open.
+* **Escape** or a click outside the picker folds them.
 
-The three parts always show the same color: clicking a swatch or using the native picker fills the HEX field, and typing a HEX that matches a swatch selects that swatch. A color that is not in the swatches leaves no swatch selected.
+### RGB pop-up
+* The RGB button opens a pop-up under it that grows out of the button. It shows a preview of the color, three sliders **Red**, **Green** and **Blue** (0–255) with their numbers, and the value as `rgb(R, G, B)`.
+* Each slider's track shows the colors it can reach with the other two channels as they are.
+* Moving a slider changes the color at once, like any other part of the picker.
+* When it opens, the Red slider gets the focus. **Escape** (focus goes back to the button), a click outside, or the RGB button again close it.
+
+All the parts always show the same color: clicking a swatch or using the native picker fills the HEX field, and typing a HEX that matches a swatch selects that swatch. A color that is not in the swatches leaves no swatch selected.
 
 | Picker | Default |
 |---|---|
@@ -57,7 +72,7 @@ The three parts always show the same color: clicking a swatch or using the nativ
 
 ### Scenario 1: Picking a Swatch
 * **Given**: The user is in the Cover section, Background color is White.
-* **When**: The user clicks the "Navy" swatch in Background color.
+* **When**: The user opens the Background color swatches and clicks "Navy".
 * **Then**: The Background color HEX field shows `#1A237E`, Navy is selected, and Typography color is unchanged.
 
 ### Scenario 2: Any Color by HEX
@@ -79,3 +94,13 @@ The three parts always show the same color: clicking a swatch or using the nativ
 * **Given**: The user is on the Brand Manual page.
 * **When**: The user picks Navy as Background color without clicking Save.
 * **Then**: The pages keep their white background.
+
+### Scenario 6: Swatch Fan
+* **Given**: The Typography color swatches are folded.
+* **When**: The user clicks the swatches circle and then clicks "Blue".
+* **Then**: The swatches unfold, then fold back; the circle and the HEX field show `#1E88E5`, and the focus is on the circle.
+
+### Scenario 7: RGB Sliders
+* **Given**: Background color is White (`#FFFFFF`).
+* **When**: The user opens the RGB pop-up and moves Red to 0.
+* **Then**: The HEX field shows `#00FFFF` and the pop-up shows `rgb(0, 255, 255)`.

@@ -44,3 +44,35 @@
 .manual-preview[data-view='pages'] .cover-designed-by {
   font-size: 13px;
 }
+
+/* Motion (see src/utils/viewTransition.ts): when the template, orientation or view
+   changes, each named piece glides from its old spot to its new one. Only the Cover
+   page has content, so these names are unique on the page. */
+.cover-title {
+  view-transition-name: cover-title;
+}
+
+.cover-logo {
+  view-transition-name: cover-logo;
+}
+
+.cover-designed-by {
+  view-transition-name: cover-designed-by;
+}
+
+::view-transition-group(*) {
+  animation-duration: var(--dur-slow);
+  animation-timing-function: var(--ease-bounce);
+}
+
+/* A freshly saved cover grows into the page */
+@keyframes cover-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+.cover-layout {
+  animation: cover-enter var(--dur-slow) var(--ease-bounce);
+}

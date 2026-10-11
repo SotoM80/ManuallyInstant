@@ -16,6 +16,8 @@ Frontend only: there is no backend and nothing is saved between sessions. CMYK i
 ## Directory Structure
 ```
 ManuallyInstant
+    ├── docs
+    │   └── adr
     ├── node_modules
     ├── public
     ├── specs
@@ -57,6 +59,8 @@ Solo frontend: no hay backend ni se guarda nada entre sesiones. El CMYK es una a
 ## Estructura de carpetas
 ```
 ManuallyInstant
+    ├── docs
+    │   └── adr
     ├── node_modules
     ├── public
     ├── specs

@@ -69,12 +69,27 @@
   border-radius: 6px;
   font-size: 14px;
   color: var(--text);
+  transition:
+    background-color var(--dur-fast) ease,
+    color var(--dur-fast) ease,
+    transform var(--dur-fast) var(--ease-bounce);
+}
+
+.segmented-control label:hover input:not(:checked) + span {
+  color: var(--text-h);
+  background: var(--code-bg);
+  transform: translateY(-1px);
+}
+
+.segmented-control label:active span {
+  transform: scale(0.92);
 }
 
 .segmented-control input:checked + span {
   color: var(--accent);
   background: var(--accent-bg);
   font-weight: 600;
+  animation: pop var(--dur) var(--ease-bounce);
 }
 
 .segmented-control input:focus-visible + span {
@@ -94,6 +109,13 @@
 .manual-page[data-orientation='landscape'] {
   aspect-ratio: 297 / 210; /* A4, landscape (apaisado) */
 }
+
+/* A unique name per page lets each page glide to its new size and spot
+   when the orientation or view changes (see src/utils/viewTransition.ts) */
+.manual-pages li:nth-child(1) .manual-page { view-transition-name: manual-page-1; }
+.manual-pages li:nth-child(2) .manual-page { view-transition-name: manual-page-2; }
+.manual-pages li:nth-child(3) .manual-page { view-transition-name: manual-page-3; }
+.manual-pages li:nth-child(4) .manual-page { view-transition-name: manual-page-4; }
 
 .manual-page-content {
   box-sizing: border-box; /* padding inside the 100% height, so nothing falls off the page */

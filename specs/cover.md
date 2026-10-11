@@ -12,7 +12,7 @@ Choosing a template and the layout of each template (see `templates.md`). The Lo
 2. **Typography color**: color picker for the title and "Designed by". Default Black `#000000`.
 3. **Background color**: color picker for the background of every page of the manual. Default White `#FFFFFF`.
 4. **Designed by**: a free-text field (who designed the manual, e.g. a studio or a person).
-5. **Logo**: a file field to upload the brand's logo. Accepted files: PNG, JPG, SVG or WebP, up to 5 MB.
+5. **Logo**: a file field to upload the brand's logo. Accepted files: PNG, JPG, SVG or WebP, up to 5 MB. It is drawn as a **"Choose file"** button followed by the chosen file's name (or **"No file chosen"**), always in English: the browser's own file button follows the system language, so it is hidden (still used by the keyboard and screen readers).
 6. **Save** button.
 
 The two color pickers follow `colorpicker.md`.

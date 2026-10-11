@@ -2,6 +2,7 @@ import { MANUAL_PAGES } from '../data/manualSections'
 import { TEMPLATES } from '../templates'
 import type { TemplateId } from '../templates'
 import { CoverPage } from './pages/CoverPage'
+import { withViewTransition } from '../utils/viewTransition'
 import type { CoverData, Orientation, PreviewView } from '../types'
 import '../css/ManualPreview.css'
 
@@ -40,7 +41,14 @@ export function ManualPreview({
 }: ManualPreviewProps) {
   function renderPage(page: string) {
     if (page !== 'Cover') return <p className="manual-page-empty">Coming soon</p>
-    return <CoverPage cover={cover} titleScale={TITLE_SCALE[previewView]} />
+    // A new key on every Save (each logo gets a new URL) redraws the cover, so it grows in again
+    return (
+      <CoverPage
+        key={cover?.logo.url ?? 'empty'}
+        cover={cover}
+        titleScale={TITLE_SCALE[previewView]}
+      />
+    )
   }
 
   // data-template is set once here: every page of the manual uses the same template.
@@ -61,7 +69,7 @@ export function ManualPreview({
                 name="page-orientation"
                 value={option.value}
                 checked={orientation === option.value}
-                onChange={() => onOrientationChange(option.value)}
+                onChange={() => withViewTransition(() => onOrientationChange(option.value))}
               />
               <span>{option.label}</span>
             </label>
@@ -77,7 +85,7 @@ export function ManualPreview({
                 name="preview-view"
                 value={option.value}
                 checked={previewView === option.value}
-                onChange={() => onPreviewViewChange(option.value)}
+                onChange={() => withViewTransition(() => onPreviewViewChange(option.value))}
               />
               <span>{option.label}</span>
             </label>
@@ -93,7 +101,7 @@ export function ManualPreview({
                 name="template"
                 value={option.id}
                 checked={template === option.id}
-                onChange={() => onTemplateChange(option.id)}
+                onChange={() => withViewTransition(() => onTemplateChange(option.id))}
               />
               <span>{option.name}</span>
             </label>
