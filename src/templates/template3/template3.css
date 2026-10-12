@@ -27,3 +27,35 @@
 .manual-preview[data-template='template3'] .cover-logo img {
   height: 80%;
 }
+
+/* Color palette: tall columns side by side, under a divider, text aligned right
+   ┌──────────────┐
+   │ Color palette│
+   │──────────────│
+   │ ██ │ ██ │ ██ │
+   │Blue│ Red│Navy│
+   └──────────────┘ */
+
+.manual-preview[data-template='template3'] .palette-layout {
+  text-align: right;
+}
+
+/* Same faint divider as the Cover of this template */
+.manual-preview[data-template='template3'] .palette-heading {
+  padding-bottom: 4%;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+}
+
+.manual-preview[data-template='template3'] .palette-colors {
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 4px 4%;
+}
+
+/* Every column shares the same two rows (subgrid), so all chips end at the same line
+   even when one name or value wraps to more lines than the others */
+.manual-preview[data-template='template3'] .palette-color {
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+}

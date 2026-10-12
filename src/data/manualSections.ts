@@ -9,7 +9,7 @@ export type ManualSection = {
 export const MANUAL_SECTIONS: ManualSection[] = [
   { id: 'cover', label: 'Cover', ready: true },
   { id: 'logo', label: 'Logo', ready: false },
-  { id: 'colors', label: 'Colors', ready: false },
+  { id: 'colors', label: 'Colors', ready: true },
   { id: 'typography', label: 'Typography', ready: false },
 ]
 

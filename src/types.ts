@@ -31,3 +31,9 @@ export type ManualColors = {
   typography: string // title and "Designed by"
   background: string // background of every page
 }
+
+// One color of the brand palette (Colors section), with its HEX as "#RRGGBB".
+export type PaletteColor = {
+  name: string
+  hex: string
+}

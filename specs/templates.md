@@ -4,7 +4,7 @@
 The user picks one of three templates for the manual: **Template 1**, **Template 2** or **Template 3**. A template decides **where** the content sits on each page of the manual. It never changes **what** the content is: the title, logo, "Designed by" and their styles are the same in every template.
 
 ## Out of Scope
-Templates for the Logo, Colors and Typography pages (those pages are not built yet; each template will get their layout when they are). Creating or editing templates from the app. Template colors, decorations or fonts beyond the layouts below.
+Templates for the Logo and Typography pages (those pages are not built yet; each template will get their layout when they are). The Color palette layouts are in `colorpalette.md`. Creating or editing templates from the app. Template colors, decorations or fonts beyond the layouts below.
 
 ## 2. Interface
 ### Selector

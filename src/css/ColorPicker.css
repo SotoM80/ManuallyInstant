@@ -13,45 +13,77 @@
   float: right; /* lets the legend sit inside the grid, aligned like the other labels */
 }
 
-/* Folded: no height and nothing visible. Unfolded: two rows of swatches.
-   max-height (not height: auto) because height: auto cannot be animated. */
+/* The circle and its floating swatches */
+.color-swatches-anchor {
+  position: relative; /* anchors the swatches pop-up */
+  display: flex;
+}
+
+/* Floating pop-up under the circle, so the rest of the form never moves.
+   Closed: a little smaller, lifted and see-through. Open: it settles into place,
+   growing out of the circle. visibility waits for the closing fade before hiding it. */
 .color-swatches {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: -10px;
+  z-index: 3;
   display: grid;
   grid-template-columns: repeat(6, 22px);
-  justify-content: end;
-  gap: 8px;
-  max-height: 0;
-  padding: 0 4px; /* room for the outline of the chosen swatch */
-  overflow: hidden;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  transform-origin: 24px top; /* the circle, so the pop-up grows out of it */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(0.96);
   transition:
-    max-height var(--dur) var(--ease-out),
-    padding var(--dur) var(--ease-out);
+    opacity 220ms ease,
+    transform 380ms var(--ease-smooth),
+    visibility 0s linear 380ms;
 }
 
-/* overflow visible lets the name pop-ups show above the first row */
 .color-swatches[data-open='true'] {
-  max-height: 120px;
-  padding: 6px 4px;
-  overflow: visible;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 260ms ease,
+    transform 520ms var(--ease-smooth),
+    visibility 0s;
 }
 
-/* Each swatch flies out of the circle (up and to the left) one after the other,
-   and folds back in the reverse order: the last one out is the first one in. */
+/* Little arrow pointing at the circle */
+.color-swatches::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 17px;
+  border: 7px solid transparent;
+  border-bottom-color: var(--border);
+}
+
+/* Once the pop-up opens, the swatches fade up into place one after the other.
+   Closing, they all fade out together with the pop-up. */
 .color-swatch {
-  position: relative; /* anchors the pop-up */
+  position: relative; /* anchors the name pop-up */
   cursor: pointer;
   opacity: 0;
-  transform: translate(12px, -24px) scale(0.2);
+  transform: translateY(6px) scale(0.85);
   transition:
-    opacity var(--dur-fast) ease,
-    transform var(--dur) var(--ease-bounce);
-  transition-delay: calc((11 - var(--i)) * 15ms); /* 12 swatches: --i goes 0 to 11 */
+    opacity 200ms ease,
+    transform 200ms var(--ease-smooth);
 }
 
 .color-swatches[data-open='true'] .color-swatch {
   opacity: 1;
   transform: none;
-  transition-delay: calc(var(--i) * 35ms);
+  transition:
+    opacity 360ms ease,
+    transform 520ms var(--ease-smooth);
+  transition-delay: calc(60ms + var(--i) * 22ms); /* 12 swatches: --i goes 0 to 11 */
 }
 
 /* The circle with the current color: click it to fan out the swatches */
@@ -64,8 +96,8 @@
   background: transparent;
   cursor: pointer;
   transition:
-    transform var(--dur) var(--ease-bounce),
-    box-shadow var(--dur-fast) ease;
+    transform var(--dur) var(--ease-smooth),
+    box-shadow var(--dur) var(--ease-smooth);
 }
 
 /* No color while the HEX field is not valid */
@@ -74,11 +106,11 @@
 }
 
 .color-swatches-toggle:hover {
-  transform: scale(1.12);
+  transform: scale(1.08);
 }
 
 .color-swatches-toggle:active {
-  transform: scale(0.9);
+  transform: scale(0.94);
 }
 
 /* Open: an accent ring around it, like a pressed button */
@@ -86,7 +118,7 @@
   box-shadow:
     0 0 0 2px var(--bg),
     0 0 0 4px var(--accent);
-  transform: scale(1.12);
+  transform: scale(1.08);
 }
 
 .color-swatches-toggle:focus-visible {
@@ -107,20 +139,18 @@
   height: 22px;
   border-radius: 50%;
   border: 1px solid rgb(0 0 0 / 20%); /* keeps White and Beige visible */
-  transition: transform var(--dur-fast) var(--ease-bounce);
+  transition: transform var(--dur-fast) var(--ease-smooth);
 }
 
 .color-swatch:hover input + span {
-  transform: scale(1.2);
+  transform: scale(1.15);
 }
 
-/* Runs every time a swatch becomes the chosen one: it pops and sends out a ring */
+/* Runs every time a swatch becomes the chosen one: a soft ring spreads out of it */
 .color-swatch input:checked + span {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  animation:
-    pop var(--dur) var(--ease-bounce),
-    pulse var(--dur-slow) var(--ease-out);
+  animation: pulse var(--dur-slow) var(--ease-out);
 }
 
 /* Pop-up above the swatch: grows out of it on hover or keyboard focus */
@@ -137,11 +167,11 @@
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transform: translateX(-50%) translateY(6px) scale(0.6);
+  transform: translateX(-50%) translateY(4px) scale(0.92);
   transform-origin: bottom center;
   transition:
     opacity var(--dur-fast) ease,
-    transform var(--dur) var(--ease-bounce);
+    transform var(--dur) var(--ease-smooth);
 }
 
 .color-swatch-tip code {
@@ -189,13 +219,13 @@
   background: none;
   cursor: pointer;
   transition:
-    transform var(--dur-fast) var(--ease-bounce),
+    transform var(--dur) var(--ease-smooth),
     border-color var(--dur-fast) ease;
 }
 
 .color-custom input[type='color']:hover {
   border-color: var(--accent);
-  transform: scale(1.08) rotate(4deg);
+  transform: scale(1.06);
 }
 
 .color-custom input[type='text'] {
@@ -225,7 +255,7 @@
   font-weight: 600;
   cursor: pointer;
   transition:
-    transform var(--dur-fast) var(--ease-bounce),
+    transform var(--dur) var(--ease-smooth),
     color var(--dur-fast) ease,
     background-color var(--dur-fast) ease,
     border-color var(--dur-fast) ease;
@@ -233,11 +263,11 @@
 
 .rgb-popover-toggle:hover {
   border-color: var(--accent);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .rgb-popover-toggle:active {
-  transform: scale(0.92);
+  transform: scale(0.96);
 }
 
 .rgb-popover-toggle[aria-expanded='true'] {
@@ -246,8 +276,9 @@
   background: var(--accent-bg);
 }
 
-/* Closed: small, see-through and hidden. Open: it grows out of the button's corner.
-   visibility waits for the closing animation to end before hiding the panel. */
+/* Same motion as the swatches pop-up. Closed: a little smaller, lifted and see-through.
+   Open: it settles into place, growing out of the button's corner.
+   visibility waits for the closing fade to end before hiding the panel. */
 .rgb-popover-panel {
   position: absolute;
   top: calc(100% + 10px);
@@ -265,18 +296,21 @@
   transform-origin: top right;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-8px) scale(0.6);
+  transform: translateY(-6px) scale(0.96);
   transition:
-    opacity var(--dur-fast) ease,
-    transform var(--dur) var(--ease-bounce),
-    visibility 0s linear var(--dur);
+    opacity 220ms ease,
+    transform 380ms var(--ease-smooth),
+    visibility 0s linear 380ms;
 }
 
 .rgb-popover-panel[data-open='true'] {
   opacity: 1;
   visibility: visible;
   transform: none;
-  transition-delay: 0s;
+  transition:
+    opacity 260ms ease,
+    transform 520ms var(--ease-smooth),
+    visibility 0s;
 }
 
 /* Little arrow pointing at the RGB button */
@@ -306,16 +340,16 @@
   color: var(--text-h);
 }
 
-/* The sliders slide in one after the other each time the pop-up opens */
+/* The sliders glide in one after the other each time the pop-up opens */
 .rgb-popover-panel[data-open='true'] .rgb-popover-channel {
-  animation: channel-enter var(--dur) var(--ease-bounce) both;
-  animation-delay: calc(80ms + var(--i) * 60ms);
+  animation: channel-enter 520ms var(--ease-smooth) both;
+  animation-delay: calc(100ms + var(--i) * 50ms);
 }
 
 @keyframes channel-enter {
   from {
     opacity: 0;
-    transform: translateX(12px);
+    transform: translateX(8px);
   }
 }
 
@@ -342,7 +376,7 @@
   border-radius: 50%;
   border: 2px solid var(--text-h);
   background: #ffffff;
-  transition: transform var(--dur-fast) var(--ease-bounce);
+  transition: transform var(--dur-fast) var(--ease-smooth);
 }
 
 .rgb-popover-channel input[type='range']::-moz-range-thumb {
@@ -351,7 +385,7 @@
   border-radius: 50%;
   border: 2px solid var(--text-h);
   background: #ffffff;
-  transition: transform var(--dur-fast) var(--ease-bounce);
+  transition: transform var(--dur-fast) var(--ease-smooth);
 }
 
 .rgb-popover-channel input[type='range']:hover::-webkit-slider-thumb,

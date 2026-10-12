@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react'
 import { BrandForm } from '../components/BrandForm'
+import { ColorsForm } from '../components/ColorsForm'
 import { ManualPreview } from '../components/ManualPreview'
 import { MANUAL_SECTIONS } from '../data/manualSections'
 import type { TemplateId } from '../templates'
-import type { CoverData, Orientation, PreviewView } from '../types'
+import type { CoverData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/BrandManualPage.css'
 
 type BrandManualPageProps = {
@@ -15,6 +16,8 @@ type BrandManualPageProps = {
   template: TemplateId
   onTemplateChange: (template: TemplateId) => void
   onSubmit: (cover: CoverData) => void
+  palette: PaletteColor[] | null
+  onPaletteSubmit: (palette: PaletteColor[]) => void
 }
 
 export function BrandManualPage({
@@ -26,16 +29,20 @@ export function BrandManualPage({
   template,
   onTemplateChange,
   onSubmit,
+  palette,
+  onPaletteSubmit,
 }: BrandManualPageProps) {
   // Form of each built section. Sections not listed here show "Coming soon".
   const sectionForms: Record<string, ReactNode> = {
     cover: <BrandForm onSubmit={onSubmit} />,
+    colors: <ColorsForm onSubmit={onPaletteSubmit} />,
   }
 
   return (
     <div className="brand-manual-page">
       <ManualPreview
         cover={cover}
+        palette={palette}
         orientation={orientation}
         onOrientationChange={onOrientationChange}
         previewView={previewView}

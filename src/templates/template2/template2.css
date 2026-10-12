@@ -27,3 +27,37 @@
   width: 40%;
   object-position: left center;
 }
+
+/* Color palette: one color per row, chip on the left, everything aligned left
+   ┌──────────────┐
+   │Color palette │
+   │██ Blue  #1E..│
+   │██ Red   #E5..│
+   └──────────────┘ */
+
+.manual-preview[data-template='template2'] .palette-layout {
+  text-align: left;
+}
+
+.manual-preview[data-template='template2'] .palette-colors {
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 3%;
+}
+
+.manual-preview[data-template='template2'] .palette-color {
+  grid-template-columns: 18% minmax(0, 1fr);
+  grid-template-rows: none;
+  align-items: center;
+  gap: 6%;
+}
+
+.manual-preview[data-template='template2'] .palette-chip {
+  height: 100%;
+}
+
+/* Rows are short, so the three values sit on one line */
+.manual-preview[data-template='template2'] .palette-values {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.6em;
+}

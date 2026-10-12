@@ -14,3 +14,28 @@
   row-gap: 8%; /* % of the page height: same breathing room in every view and orientation */
   text-align: center;
 }
+
+/* Color palette: cards in a grid of up to 3 columns, everything centered
+   ┌──────────────┐
+   │Color palette │
+   │ ██   ██   ██ │
+   │Blue Red  Navy│
+   └──────────────┘ */
+
+.manual-preview[data-template='template1'] .palette-layout {
+  text-align: center;
+}
+
+.manual-preview[data-template='template1'] .palette-colors {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+}
+
+/* Fewer colors use fewer columns; four make a 2 × 2 grid */
+.manual-preview[data-template='template1'] .palette-colors[data-count='1'] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.manual-preview[data-template='template1'] .palette-colors:is([data-count='2'], [data-count='4']) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}

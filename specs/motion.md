@@ -12,7 +12,8 @@ The autocomplete lists (Font family, Font style, Font size). Moving between page
 | Token | Value | Used for |
 |---|---|---|
 | `--ease-bounce` | `cubic-bezier(0.34, 1.2, 0.64, 1)` | everything that grows, pops or glides |
-| `--ease-out` | `cubic-bezier(0.22, 1, 0.36, 1)` | rings and folding/unfolding |
+| `--ease-out` | `cubic-bezier(0.22, 1, 0.36, 1)` | rings |
+| `--ease-smooth` | `cubic-bezier(0.16, 1, 0.3, 1)` | color picker pop-ups and controls: settles slowly, never overshoots |
 | `--dur-fast` | 250 ms | hover, press, color changes |
 | `--dur` | 450 ms | pops, pop-ups, swatches |
 | `--dur-slow` | 600 ms | preview, Save feedback |
@@ -27,7 +28,7 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 | Save | hover: lift and shadow; press: shrink. **Not valid** → shakes. **Saved** → accent ring pulses twice and a ✓ pops in next to "Save" (decoration only: the accessible name stays "Save") |
 | Logo "Choose file" | **no motion**: only the border color changes on hover |
 | Segmented controls (Orientation, Preview view, Template) | hover tints the options not chosen; press shrinks; the chosen one pops |
-| Color pickers | see `colorpicker.md` (swatch fan, name pop-ups, RGB pop-up) |
+| Color pickers | **no bounce**: elegant fades and glides with `--ease-smooth`. See `colorpicker.md` (swatches pop-up, name pop-ups, RGB pop-up) |
 
 ### Preview
 * Changing **Template**, **Page orientation** or **Preview view** makes each page and the cover's title, logo and "Designed by" glide from their old place and size to the new ones (browser View Transitions).

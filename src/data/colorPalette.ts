@@ -39,3 +39,22 @@ export function hexToRgb(hex: string): Rgb {
 export function rgbToHex({ r, g, b }: Rgb): string {
   return `#${[r, g, b].map((channel) => channel.toString(16).padStart(2, '0')).join('').toUpperCase()}`
 }
+
+export type Cmyk = { c: number; m: number; y: number; k: number }
+
+// Naive, approximate CMYK (ADR 0003), as whole percentages.
+// { r: 30, g: 136, b: 229 } → { c: 87, m: 41, y: 0, k: 10 }
+export function rgbToCmyk({ r, g, b }: Rgb): Cmyk {
+  const [red, green, blue] = [r, g, b].map((channel) => channel / 255)
+  const k = 1 - Math.max(red, green, blue)
+  if (k === 1) return { c: 0, m: 0, y: 0, k: 100 } // pure black: avoids dividing by 0
+  const ink = (channel: number) => Math.round(((1 - channel - k) / (1 - k)) * 100)
+  return { c: ink(red), m: ink(green), y: ink(blue), k: Math.round(k * 100) }
+}
+
+// The three values shown for a palette color, as text ("#1E88E5", "30, 136, 229", "87, 41, 0, 10").
+export function colorValues(hex: string) {
+  const rgb = hexToRgb(hex)
+  const { c, m, y, k } = rgbToCmyk(rgb)
+  return { hex, rgb: `${rgb.r}, ${rgb.g}, ${rgb.b}`, cmyk: `${c}, ${m}, ${y}, ${k}` }
+}

@@ -2,7 +2,7 @@ import { fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import { getColorGroup, typeHex } from './coverForm';
 
-// The swatches start folded into one circle with the current color; a click fans them out.
+// The swatches start hidden behind one circle with the current color; a click opens them in a pop-up.
 
 function getToggle() {
   return within(getColorGroup('Typography color')).getByRole('button', { name: 'Typography color swatches' });
@@ -16,7 +16,7 @@ function getSwatch(name: string) {
   return within(getColorGroup('Typography color')).getByRole('radio', { name });
 }
 
-describe('Swatch fan', () => {
+describe('Swatches pop-up', () => {
   it('starts folded and shows the current color in the circle', () => {
     renderApp();
 

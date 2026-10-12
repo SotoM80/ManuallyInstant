@@ -76,3 +76,84 @@
 .cover-layout {
   animation: cover-enter var(--dur-slow) var(--ease-bounce);
 }
+
+/* Color palette: heading, the colors, and the CMYK note, on a grid that fills the page.
+   Each template only decides how the colors are laid out (see templateN/templateN.css). */
+.palette-layout {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  line-height: 1.25; /* the site's roomy line height would push the colors off small pages */
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  row-gap: 6%;
+  animation: cover-enter var(--dur-slow) var(--ease-bounce);
+}
+
+.palette-heading {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.palette-colors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  display: grid;
+  gap: 6%;
+}
+
+/* A color: the chip takes the room left by its text, so any number of colors fits the page */
+.palette-color {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 4px;
+  overflow: hidden;
+}
+
+/* The faint outline keeps a chip visible when it is the same color as the page */
+.palette-chip {
+  display: block;
+  min-height: 0;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 20%, transparent);
+}
+
+.palette-name {
+  font-size: 8px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.palette-values {
+  display: grid;
+  font-size: 6px;
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.palette-label {
+  font-weight: 600;
+}
+
+.palette-note {
+  font-size: 6px;
+  opacity: 0.6;
+}
+
+.manual-preview[data-view='pages'] .palette-heading {
+  font-size: 20px;
+}
+
+.manual-preview[data-view='pages'] .palette-name {
+  font-size: 13px;
+}
+
+.manual-preview[data-view='pages'] .palette-values,
+.manual-preview[data-view='pages'] .palette-note {
+  font-size: 10px;
+}

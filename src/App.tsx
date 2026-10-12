@@ -8,13 +8,15 @@ import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
 import { loadGoogleFont } from './utils/googleFonts'
 import { DEFAULT_TEMPLATE } from './templates'
 import type { TemplateId } from './templates'
-import type { CoverData, Orientation, PreviewView } from './types'
+import type { CoverData, Orientation, PaletteColor, PreviewView } from './types'
 import './css/App.css'
 
 function App() {
   // Kept here, above the routes, so they survive moving between pages.
   // `cover` is null until the Cover section is saved for the first time.
   const [cover, setCover] = useState<CoverData | null>(null)
+  // `palette` is null until the Colors section is saved for the first time.
+  const [palette, setPalette] = useState<PaletteColor[] | null>(null)
   const [orientation, setOrientation] = useState<Orientation>('portrait')
   const [previewView, setPreviewView] = useState<PreviewView>('grid')
   const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
@@ -46,6 +48,8 @@ function App() {
                 template={template}
                 onTemplateChange={setTemplate}
                 onSubmit={setCover}
+                palette={palette}
+                onPaletteSubmit={setPalette}
               />
             }
           />

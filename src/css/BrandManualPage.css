@@ -165,3 +165,198 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Colors section: an accordion. Each color is a card; only the open one shows its fields,
+   the others fold into their header row (chip, name, HEX) one under the other. */
+.palette-block {
+  display: grid;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  transition:
+    border-color var(--dur) var(--ease-smooth),
+    box-shadow var(--dur) var(--ease-smooth);
+}
+
+.palette-block[data-open='true'] {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow);
+}
+
+/* A folded color with an error still shows it is wrong */
+.palette-block[data-invalid='true'] {
+  border-color: red;
+}
+
+.palette-block-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--text-h);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.palette-block-header:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.palette-block-chip {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgb(0 0 0 / 20%); /* keeps White and Beige visible */
+  transition:
+    background-color var(--dur-fast) ease,
+    transform var(--dur) var(--ease-smooth);
+}
+
+.palette-block-header:hover .palette-block-chip {
+  transform: scale(1.1);
+}
+
+/* No color while the HEX field is not valid */
+.palette-block-chip[data-empty='true'] {
+  border: 2px dashed var(--border);
+}
+
+.palette-block-title {
+  flex: none;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.palette-block-summary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.palette-block-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-block-hex {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+/* A small "v" that turns into "^" while the color is open */
+.palette-block-chevron {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin: 0 2px 4px 4px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--dur) var(--ease-smooth);
+}
+
+.palette-block[data-open='true'] .palette-block-chevron {
+  transform: translateY(3px) rotate(-135deg);
+}
+
+/* Folding: the body's row goes from 0fr (no height) to 1fr (its real height), which can be
+   animated, unlike height: auto. The fields fade and glide in once the row has started to open. */
+.palette-block-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 380ms var(--ease-smooth);
+}
+
+.palette-block[data-open='true'] .palette-block-body {
+  grid-template-rows: 1fr;
+  transition-duration: 520ms;
+}
+
+.palette-block-inner {
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  gap: 8px;
+  padding: 0 14px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 180ms ease,
+    transform 380ms var(--ease-smooth),
+    padding 380ms var(--ease-smooth);
+}
+
+/* Open: once it has unfolded, overflow turns visible so the floating swatches and RGB
+   pop-ups are not cut off. The animation keeps it hidden only while it unfolds. */
+.palette-block[data-open='true'] .palette-block-inner {
+  overflow: visible;
+  padding: 4px 14px 14px;
+  opacity: 1;
+  transform: none;
+  animation: palette-unfold 520ms;
+  transition:
+    opacity 360ms ease 80ms,
+    transform 520ms var(--ease-smooth),
+    padding 520ms var(--ease-smooth);
+}
+
+@keyframes palette-unfold {
+  from,
+  to {
+    overflow: hidden;
+  }
+}
+
+/* HEX, RGB and CMYK of the color, one per line, aligned like the rest of the form */
+.palette-block-values {
+  margin: 0;
+  display: grid;
+  font-size: 13px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Add color / Remove: quieter than Save, only as wide as their label */
+.palette-secondary-button {
+  justify-self: end;
+  padding: 4px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  color: var(--text-h);
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease-bounce),
+    border-color var(--dur-fast) ease;
+}
+
+.palette-secondary-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.palette-secondary-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.palette-secondary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

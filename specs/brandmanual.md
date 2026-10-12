@@ -4,7 +4,7 @@
 Organizes the Brand Manual page in two columns: on the **left**, a live preview of how the manual's pages are being organized; on the **right**, all the sections used to create the manual, one below the other.
 
 ## Out of Scope
-The content of the Logo, Colors and Typography sections (each one has its own future spec). Opening or closing sections (accordion). Zooming into a page of the preview.
+The content of the Logo and Typography sections (each one has its own future spec). The content of the Colors section (see `colorpalette.md`). Opening or closing sections (accordion). Zooming into a page of the preview.
 
 ## 2. Interface
 ### Layout
@@ -23,7 +23,7 @@ The content of the Logo, Colors and Typography sections (each one has its own fu
 * **Left column — Manual Preview**: A region labeled "Manual preview". It shows the manual's pages as small page thumbnails, in this order:
   1. **Cover**: shows the saved brand manual title with its style, the logo and "Designed by <name>", placed by the template (see `cover.md`). Before the first Save, it shows the placeholders "Your brand manual title", "Your logo" and "Designed by …".
   2. **Logo**
-  3. **Color palette**
+  3. **Color palette**: shows the saved colors with their name, HEX, RGB and CMYK values (see `colorpalette.md`). Before the first Save, it shows the placeholder "Your color palette".
   4. **Typography**
 
   Pages whose section is not built yet show "Coming soon".
@@ -31,7 +31,7 @@ The content of the Logo, Colors and Typography sections (each one has its own fu
 * **Right column — Manual Sections**: A region labeled "Manual sections". It lists every section needed to create the manual, one below the other, numbered, in this order:
   1. **Cover**: brand manual title, Designed by and logo (see `cover.md` and `titlefild.md`).
   2. **Logo**: "Coming soon".
-  3. **Colors**: "Coming soon".
+  3. **Colors**: the brand's color palette (see `colorpalette.md`).
   4. **Typography**: "Coming soon".
 
   Sections that are not built yet are shown disabled with the label "Coming soon", so the user can see the full path from the start.
@@ -68,7 +68,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ### Scenario 2: All Sections Listed
 * **Given**: The user is on the Brand Manual page.
 * **When**: The user looks at the sections column.
-* **Then**: The sections Cover, Logo, Colors and Typography are listed in that order, and Logo, Colors and Typography show "Coming soon".
+* **Then**: The sections Cover, Logo, Colors and Typography are listed in that order, and Logo and Typography show "Coming soon".
 
 ### Scenario 3: All Pages Previewed
 * **Given**: The user is on the Brand Manual page.

@@ -14,22 +14,19 @@ type ColorPickerProps = {
   onCommit: () => void // blur or Enter in the HEX field
 }
 
-// The custom picker jumps when a swatch is chosen, to show it took that color.
+// The custom picker swells gently when a swatch is chosen, to show it took that color.
 // Web Animations (not CSS) because the same element must animate again on every pick.
-function bounce(element: HTMLElement | null) {
+function nudge(element: HTMLElement | null) {
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
   element?.animate?.(
-    [
-      { transform: 'scale(1)' },
-      { transform: 'scale(1.25) rotate(-8deg)' },
-      { transform: 'scale(1)' },
-    ],
-    { duration: 450, easing: 'cubic-bezier(0.34, 1.2, 0.64, 1)' },
+    [{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }, { transform: 'scale(1)' }],
+    { duration: 520, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
   )
 }
 
 // Quick swatches + any color (native picker and HEX field), all kept in sync.
-// The swatches start folded into one circle with the current color; a click fans them out.
+// The swatches start hidden behind one circle with the current color; a click opens them
+// in a floating pop-up under the circle, so the rest of the form never moves.
 export function ColorPicker({ label, value, error, onChange, onSelect, onCommit }: ColorPickerProps) {
   const id = useId()
   const errorId = `${id}-error`
@@ -67,17 +64,46 @@ export function ColorPicker({ label, value, error, onChange, onSelect, onCommit 
       <legend>{label}</legend>
 
       <div className="color-custom">
-        <button
-          ref={toggleRef}
-          type="button"
-          className="color-swatches-toggle"
-          aria-expanded={open}
-          aria-controls={swatchesId}
-          aria-label={`${label} swatches`}
-          onClick={() => setOpen((wasOpen) => !wasOpen)}
-          data-empty={!hex}
-          style={hex ? { background: hex } : undefined}
-        />
+        {/* Anchors the floating swatches to the circle */}
+        <div className="color-swatches-anchor">
+          <button
+            ref={toggleRef}
+            type="button"
+            className="color-swatches-toggle"
+            aria-expanded={open}
+            aria-controls={swatchesId}
+            aria-label={`${label} swatches`}
+            onClick={() => setOpen((wasOpen) => !wasOpen)}
+            data-empty={!hex}
+            style={hex ? { background: hex } : undefined}
+          />
+
+          {/* Always in the page so it can animate in and out; inert while closed */}
+          <div id={swatchesId} className="color-swatches" data-open={open} inert={!open}>
+            {/* --i staggers the swatches: they fade in one after the other */}
+            {PALETTE.map((swatch, index) => (
+              <label key={swatch.hex} className="color-swatch" style={{ '--i': index } as CSSProperties}>
+                <input
+                  type="radio"
+                  name={id}
+                  value={swatch.hex}
+                  checked={hex === swatch.hex}
+                  onChange={() => {
+                    onSelect(swatch.hex)
+                    nudge(customRef.current)
+                  }}
+                  onClick={handleSwatchClick}
+                  aria-label={swatch.name}
+                />
+                <span style={{ background: swatch.hex }} />
+                {/* Pop-up with the name and HEX; the radio's aria-label already says the name */}
+                <span className="color-swatch-tip" aria-hidden="true">
+                  {swatch.name} <code>{swatch.hex}</code>
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
         <input
           ref={customRef}
           type="color"
@@ -98,32 +124,6 @@ export function ColorPicker({ label, value, error, onChange, onSelect, onCommit 
           spellCheck={false}
         />
         <RgbPopover label={label} hex={hex} onSelect={onSelect} />
-      </div>
-
-      {/* Always in the page so it can fold and unfold; inert while folded */}
-      <div id={swatchesId} className="color-swatches" data-open={open} inert={!open}>
-        {/* --i staggers the fan: the swatches come out one after the other */}
-        {PALETTE.map((swatch, index) => (
-          <label key={swatch.hex} className="color-swatch" style={{ '--i': index } as CSSProperties}>
-            <input
-              type="radio"
-              name={id}
-              value={swatch.hex}
-              checked={hex === swatch.hex}
-              onChange={() => {
-                onSelect(swatch.hex)
-                bounce(customRef.current)
-              }}
-              onClick={handleSwatchClick}
-              aria-label={swatch.name}
-            />
-            <span style={{ background: swatch.hex }} />
-            {/* Pop-up with the name and HEX; the radio's aria-label already says the name */}
-            <span className="color-swatch-tip" aria-hidden="true">
-              {swatch.name} <code>{swatch.hex}</code>
-            </span>
-          </label>
-        ))}
       </div>
 
       {error && (

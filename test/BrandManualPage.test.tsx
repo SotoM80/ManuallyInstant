@@ -40,8 +40,11 @@ describe('Brand Manual – sections column', () => {
     const headings = items.map((item) => within(item).getByRole('heading').textContent);
     expect(headings).toEqual(['1. Cover', '2. Logo', '3. Colors', '4. Typography']);
 
-    expect(within(items[0]).queryByText('Coming soon')).not.toBeInTheDocument();
-    for (const item of items.slice(1)) {
+    // Built: Cover and Colors. Not built yet: Logo and Typography.
+    for (const item of [items[0], items[2]]) {
+      expect(within(item).queryByText('Coming soon')).not.toBeInTheDocument();
+    }
+    for (const item of [items[1], items[3]]) {
       expect(within(item).getByText('Coming soon')).toBeInTheDocument();
     }
   });

@@ -18,6 +18,8 @@
   /* Motion: the bounce easing overshoots just a little, which gives a soft, playful feel */
   --ease-bounce: cubic-bezier(0.34, 1.2, 0.64, 1);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Smooth: starts quick and settles slowly, never overshoots (color picker pop-ups) */
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-fast: 250ms;
   --dur: 450ms;
   --dur-slow: 600ms;

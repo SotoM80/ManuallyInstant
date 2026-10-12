@@ -9,6 +9,7 @@ import {
   INVALID_HEX_MESSAGE,
   normalizeHex,
 } from '../data/colorPalette'
+import { validateColor, validateText } from '../utils/validation'
 import type { CoverData, ManualColors, TitleStyle } from '../types'
 
 type StyleKey = keyof TitleStyle
@@ -46,15 +47,6 @@ function findOption(options: readonly string[], value: string) {
 function validateStyleValue(options: readonly string[], value: string) {
   if (value.trim() === '') return 'Required field'
   return findOption(options, value) ? '' : 'Select a valid option'
-}
-
-function validateText(value: string) {
-  return value.trim() === '' ? 'Required field' : ''
-}
-
-function validateColor(value: string) {
-  if (value.trim() === '') return 'Required field'
-  return normalizeHex(value) ? '' : INVALID_HEX_MESSAGE
 }
 
 function validateLogo(file: File | null) {
@@ -168,7 +160,7 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
+    <form onSubmit={handleSubmit} noValidate aria-label="Cover">
       <label htmlFor="brand-title">Brand manual title</label>
       <input
         id="brand-title"

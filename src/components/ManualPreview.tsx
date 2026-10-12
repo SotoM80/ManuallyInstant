@@ -2,12 +2,15 @@ import { MANUAL_PAGES } from '../data/manualSections'
 import { TEMPLATES } from '../templates'
 import type { TemplateId } from '../templates'
 import { CoverPage } from './pages/CoverPage'
+import { ColorPalettePage } from './pages/ColorPalettePage'
+import { DEFAULT_TYPOGRAPHY_COLOR } from '../data/colorPalette'
 import { withViewTransition } from '../utils/viewTransition'
-import type { CoverData, Orientation, PreviewView } from '../types'
+import type { CoverData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/ManualPreview.css'
 
 type ManualPreviewProps = {
   cover: CoverData | null
+  palette: PaletteColor[] | null
   orientation: Orientation
   onOrientationChange: (orientation: Orientation) => void
   previewView: PreviewView
@@ -32,6 +35,7 @@ const TITLE_SCALE: Record<PreviewView, number> = { grid: 0.5, pages: 1 }
 
 export function ManualPreview({
   cover,
+  palette,
   orientation,
   onOrientationChange,
   previewView,
@@ -40,6 +44,14 @@ export function ManualPreview({
   onTemplateChange,
 }: ManualPreviewProps) {
   function renderPage(page: string) {
+    if (page === 'Color palette') {
+      return (
+        <ColorPalettePage
+          palette={palette}
+          color={cover?.colors.typography ?? DEFAULT_TYPOGRAPHY_COLOR}
+        />
+      )
+    }
     if (page !== 'Cover') return <p className="manual-page-empty">Coming soon</p>
     // A new key on every Save (each logo gets a new URL) redraws the cover, so it grows in again
     return (

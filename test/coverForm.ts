@@ -48,6 +48,8 @@ export function typeHex(field: ColorField, value: string) {
   fireEvent.change(getHexInput(field), { target: { value } });
 }
 
+// The Colors section has its own Save, so only look inside the Cover form.
 export function clickSave() {
-  fireEvent.click(screen.getByRole('button', { name: /save|print/i }));
+  const coverForm = screen.getByRole('form', { name: 'Cover' });
+  fireEvent.click(within(coverForm).getByRole('button', { name: /save|print/i }));
 }
