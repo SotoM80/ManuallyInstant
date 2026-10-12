@@ -8,7 +8,7 @@
 ## Phase 2: Brand data input
 - [x] Brand title
 - [x] Logo upload (in the Cover section, see specs/cover.md)
-- [ ] Google Fonts selection (primary and secondary)
+- [x] Google Fonts selection (primary and secondary, see specs/typography.md)
 - [x] Color picker with name (HEX / RGB / CMYK, see specs/colorpalette.md)
 - [x] Template selector (3 different templates to create each manual, see specs/templates.md)
 
@@ -18,3 +18,6 @@
 ## Phase 4: Export
 - [ ] Print PDF (high resolution, CMYK values highlighted)
 - [ ] Screen PDF (RGB/HEX, lightweight)
+
+## Future
+- [ ] Cover title uses the Primary font of the Typography section (today it keeps its own font picker)

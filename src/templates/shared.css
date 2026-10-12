@@ -157,3 +157,91 @@
 .manual-preview[data-view='pages'] .palette-note {
   font-size: 10px;
 }
+
+/* Typography: heading and the two brand fonts, on a grid that fills the page.
+   Each template only decides how the two fonts are laid out (see templateN/templateN.css). */
+.type-layout {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  row-gap: 6%;
+  line-height: 1.2; /* the site's roomy line height would push the fonts off small pages */
+  animation: cover-enter var(--dur-slow) var(--ease-bounce);
+}
+
+.type-heading {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.type-fonts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  display: grid;
+  align-content: center;
+  gap: 8%;
+}
+
+.type-font {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  overflow: hidden;
+}
+
+/* line-height 1 keeps the big "Aa" from taking more room than its letters */
+.type-sample {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.type-usage {
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.type-name {
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.type-alphabet {
+  display: grid;
+  font-size: 6px;
+  opacity: 0.8;
+  overflow-wrap: anywhere;
+}
+
+/* Small landscape thumbnails are short: a smaller "Aa" leaves room for both fonts */
+.manual-preview[data-view='grid'] .manual-page[data-orientation='landscape'] .type-sample {
+  font-size: 22px;
+}
+
+.manual-preview[data-view='pages'] .type-heading {
+  font-size: 20px;
+}
+
+.manual-preview[data-view='pages'] .type-sample {
+  font-size: 60px;
+}
+
+.manual-preview[data-view='pages'] .type-usage {
+  font-size: 10px;
+}
+
+.manual-preview[data-view='pages'] .type-name {
+  font-size: 18px;
+}
+
+.manual-preview[data-view='pages'] .type-alphabet {
+  font-size: 11px;
+}

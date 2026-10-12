@@ -8,7 +8,7 @@ import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
 import { loadGoogleFont } from './utils/googleFonts'
 import { DEFAULT_TEMPLATE } from './templates'
 import type { TemplateId } from './templates'
-import type { CoverData, Orientation, PaletteColor, PreviewView } from './types'
+import type { BrandFonts, CoverData, Orientation, PaletteColor, PreviewView } from './types'
 import './css/App.css'
 
 function App() {
@@ -17,6 +17,8 @@ function App() {
   const [cover, setCover] = useState<CoverData | null>(null)
   // `palette` is null until the Colors section is saved for the first time.
   const [palette, setPalette] = useState<PaletteColor[] | null>(null)
+  // `typography` is null until the Typography section is saved for the first time.
+  const [typography, setTypography] = useState<BrandFonts | null>(null)
   const [orientation, setOrientation] = useState<Orientation>('portrait')
   const [previewView, setPreviewView] = useState<PreviewView>('grid')
   const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
@@ -25,6 +27,13 @@ function App() {
   useEffect(() => {
     loadGoogleFont(fontFamily)
   }, [fontFamily])
+
+  // The brand fonts are only drawn in regular (see specs/typography.md)
+  useEffect(() => {
+    if (!typography) return
+    loadGoogleFont(typography.primary, 'regular')
+    loadGoogleFont(typography.secondary, 'regular')
+  }, [typography])
 
   return (
     <>
@@ -50,6 +59,8 @@ function App() {
                 onSubmit={setCover}
                 palette={palette}
                 onPaletteSubmit={setPalette}
+                typography={typography}
+                onTypographySubmit={setTypography}
               />
             }
           />

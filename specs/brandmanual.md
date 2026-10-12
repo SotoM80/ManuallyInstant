@@ -4,7 +4,7 @@
 Organizes the Brand Manual page in two columns: on the **left**, a live preview of how the manual's pages are being organized; on the **right**, all the sections used to create the manual, one below the other.
 
 ## Out of Scope
-The content of the Logo and Typography sections (each one has its own future spec). The content of the Colors section (see `colorpalette.md`). Opening or closing sections (accordion). Zooming into a page of the preview.
+The content of the Logo section (it will have its own future spec). The content of the Colors and Typography sections (see `colorpalette.md` and `typography.md`). Zooming into a page of the preview. Opening a section by clicking its page in the preview.
 
 ## 2. Interface
 ### Layout
@@ -24,7 +24,7 @@ The content of the Logo and Typography sections (each one has its own future spe
   1. **Cover**: shows the saved brand manual title with its style, the logo and "Designed by <name>", placed by the template (see `cover.md`). Before the first Save, it shows the placeholders "Your brand manual title", "Your logo" and "Designed by …".
   2. **Logo**
   3. **Color palette**: shows the saved colors with their name, HEX, RGB and CMYK values (see `colorpalette.md`). Before the first Save, it shows the placeholder "Your color palette".
-  4. **Typography**
+  4. **Typography**: shows the two brand fonts with their usage, name, "Aa" and alphabet (see `typography.md`). Before the first Save, it shows the placeholder "Your typography".
 
   Pages whose section is not built yet show "Coming soon".
   The preview stays visible while the user scrolls the sections (sticky).
@@ -32,9 +32,17 @@ The content of the Logo and Typography sections (each one has its own future spe
   1. **Cover**: brand manual title, Designed by and logo (see `cover.md` and `titlefild.md`).
   2. **Logo**: "Coming soon".
   3. **Colors**: the brand's color palette (see `colorpalette.md`).
-  4. **Typography**: "Coming soon".
+  4. **Typography**: the brand's primary and secondary fonts (see `typography.md`).
 
   Sections that are not built yet are shown disabled with the label "Coming soon", so the user can see the full path from the start.
+
+### Opening and Folding Sections
+The sections work as an **accordion**, like the colors of the Colors section (see `colorpalette.md`):
+* The title of each built section (e.g. "1. Cover") is a button with an arrow. Clicking it **opens** the section's work area and folds the one that was open. Clicking the title of the open section folds it, leaving every section folded.
+* Only **one** section is open at a time. The Page starts with **Cover** open.
+* Sections not built yet ("Coming soon") can't be opened.
+* A folded section keeps everything typed in it, and can't be reached with the keyboard or by screen readers (`inert`).
+* **Motion** (no bounce, `--ease-smooth`): the work area unfolds from no height to its full height, settling slowly, while its content fades in and glides down a few pixels; folding is the same in reverse, a little faster. The arrow turns with it, and the open section gets an accent border and a soft shadow.
 
 ### Adding Sections
 Sections and preview pages come from lists (`src/data/manualSections.ts`). When a section is built, it is marked as ready in the list and its form is plugged in; the layout does not change.
@@ -68,7 +76,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ### Scenario 2: All Sections Listed
 * **Given**: The user is on the Brand Manual page.
 * **When**: The user looks at the sections column.
-* **Then**: The sections Cover, Logo, Colors and Typography are listed in that order, and Logo and Typography show "Coming soon".
+* **Then**: The sections Cover, Logo, Colors and Typography are listed in that order, and only Logo shows "Coming soon".
 
 ### Scenario 3: All Pages Previewed
 * **Given**: The user is on the Brand Manual page.
@@ -104,3 +112,18 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Given**: The user selected Pages.
 * **When**: The user goes to Home and then back to Brand Manual.
 * **Then**: Pages is still selected.
+
+### Scenario 10: Cover Open by Default
+* **Given**: The user opens the Brand Manual page.
+* **When**: The page loads.
+* **Then**: Cover is open, Colors and Typography are folded, and Logo ("Coming soon") can't be opened.
+
+### Scenario 11: Opening Another Section
+* **Given**: Cover is open.
+* **When**: The user clicks "3. Colors".
+* **Then**: Colors opens and Cover folds.
+
+### Scenario 12: Folding Keeps the Work
+* **Given**: The user typed "My Brand" in the Cover title.
+* **When**: The user opens Typography and then opens Cover again.
+* **Then**: The title field still shows "My Brand".

@@ -37,3 +37,9 @@ export type PaletteColor = {
   name: string
   hex: string
 }
+
+// The brand's two Google Fonts (Typography section), by family name.
+export type BrandFonts = {
+  primary: string // headings
+  secondary: string // body text
+}

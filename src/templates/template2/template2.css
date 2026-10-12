@@ -61,3 +61,28 @@
   flex-wrap: wrap;
   column-gap: 0.6em;
 }
+
+/* Typography: one font per row, the big "Aa" on the left, everything aligned left
+   ┌──────────────┐
+   │Typography    │
+   │Aa  Primary   │
+   │    Montserrat│
+   │Aa  Secondary │
+   │    Open Sans │
+   └──────────────┘ */
+
+.manual-preview[data-template='template2'] .type-layout {
+  text-align: left;
+}
+
+/* A fixed column for the "Aa", so the text of both fonts starts at the same line */
+.manual-preview[data-template='template2'] .type-font {
+  grid-template-columns: 28% minmax(0, 1fr);
+  align-items: center;
+  column-gap: 8%;
+}
+
+.manual-preview[data-template='template2'] .type-info {
+  display: grid;
+  gap: 3px;
+}

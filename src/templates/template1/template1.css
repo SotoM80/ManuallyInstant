@@ -39,3 +39,16 @@
 .manual-preview[data-template='template1'] .palette-colors:is([data-count='2'], [data-count='4']) {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+
+/* Typography: the two fonts one under the other, everything centered
+   ┌──────────────┐
+   │  Typography  │
+   │      Aa      │
+   │  Montserrat  │
+   │      Aa      │
+   │  Open Sans   │
+   └──────────────┘ */
+
+.manual-preview[data-template='template1'] .type-layout {
+  text-align: center;
+}

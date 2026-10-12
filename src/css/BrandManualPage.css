@@ -21,6 +21,9 @@
   padding: 20px;
   border: 1px solid var(--border);
   border-radius: 12px;
+  transition:
+    border-color var(--dur) var(--ease-smooth),
+    box-shadow var(--dur) var(--ease-smooth);
 }
 
 .manual-section[aria-disabled='true'] {
@@ -37,6 +40,100 @@
 .manual-section h2 {
   margin: 0;
   font-size: 18px;
+}
+
+/* Sections are an accordion (same motion as the colors of the Colors section):
+   the open one gets an accent border and a soft shadow */
+.manual-section[data-open='true'] {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow);
+}
+
+/* The whole title is the button that opens and folds its section */
+.manual-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.manual-section-header:has(.manual-section-toggle) {
+  display: block; /* the button already lays out the title and the arrow */
+}
+
+.manual-section-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+/* A small "v" that turns into "^" while the section is open */
+.manual-section-chevron {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin: 0 4px 4px 0;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--dur) var(--ease-smooth);
+}
+
+.manual-section[data-open='true'] .manual-section-chevron {
+  transform: translateY(3px) rotate(-135deg);
+}
+
+.manual-section-toggle:hover .manual-section-chevron {
+  color: var(--accent);
+}
+
+/* Folding: the row goes from 0fr (no height) to 1fr (its real height), which can be animated */
+.manual-section-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 380ms var(--ease-smooth);
+}
+
+.manual-section[data-open='true'] .manual-section-body {
+  grid-template-rows: 1fr;
+  transition-duration: 560ms;
+}
+
+.manual-section-inner {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 180ms ease,
+    transform 380ms var(--ease-smooth);
+}
+
+/* Open: once it has unfolded, overflow turns visible so the floating pop-ups (swatches,
+   RGB, font lists) are not cut off. The animation keeps it hidden only while it unfolds. */
+.manual-section[data-open='true'] .manual-section-inner {
+  overflow: visible;
+  opacity: 1;
+  transform: none;
+  animation: section-unfold 560ms;
+  transition:
+    opacity 360ms ease 80ms,
+    transform 560ms var(--ease-smooth);
+}
+
+@keyframes section-unfold {
+  from,
+  to {
+    overflow: hidden;
+  }
 }
 
 .manual-section form {

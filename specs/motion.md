@@ -4,7 +4,7 @@
 Buttons and controls react with movement when the user hovers, clicks or chooses something, and the manual preview animates its changes instead of jumping. The style is **playful but soft**: a small overshoot (bounce) and unhurried durations.
 
 ## Out of Scope
-The autocomplete lists (Font family, Font style, Font size). Moving between pages of the app (Home ↔ Brand Manual). Anything in the exported PDFs. Motion settings inside the app (the system setting is used instead, see Invariants). The native file and color dialogs, which are drawn by the operating system.
+Moving between pages of the app (Home ↔ Brand Manual). Anything in the exported PDFs. Motion settings inside the app (the system setting is used instead, see Invariants). The native file and color dialogs, which are drawn by the operating system.
 
 ## 2. Interface
 
@@ -28,6 +28,7 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 | Save | hover: lift and shadow; press: shrink. **Not valid** → shakes. **Saved** → accent ring pulses twice and a ✓ pops in next to "Save" (decoration only: the accessible name stays "Save") |
 | Logo "Choose file" | **no motion**: only the border color changes on hover |
 | Segmented controls (Orientation, Preview view, Template) | hover tints the options not chosen; press shrinks; the chosen one pops |
+| Autocomplete lists (Font family, Font style, Font size, Primary font, Secondary font) | **no bounce**: on open, the floating list fades in, rises 4px and grows from 96% out of the field (`--ease-smooth`, about 0.45 s); it closes at once. Hovering an option tints it |
 | Color pickers | **no bounce**: elegant fades and glides with `--ease-smooth`. See `colorpicker.md` (swatches pop-up, name pop-ups, RGB pop-up) |
 
 ### Preview

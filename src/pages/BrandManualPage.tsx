@@ -1,10 +1,12 @@
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { BrandForm } from '../components/BrandForm'
 import { ColorsForm } from '../components/ColorsForm'
+import { TypographyForm } from '../components/TypographyForm'
 import { ManualPreview } from '../components/ManualPreview'
 import { MANUAL_SECTIONS } from '../data/manualSections'
 import type { TemplateId } from '../templates'
-import type { CoverData, Orientation, PaletteColor, PreviewView } from '../types'
+import type { BrandFonts, CoverData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/BrandManualPage.css'
 
 type BrandManualPageProps = {
@@ -18,6 +20,8 @@ type BrandManualPageProps = {
   onSubmit: (cover: CoverData) => void
   palette: PaletteColor[] | null
   onPaletteSubmit: (palette: PaletteColor[]) => void
+  typography: BrandFonts | null
+  onTypographySubmit: (fonts: BrandFonts) => void
 }
 
 export function BrandManualPage({
@@ -31,11 +35,22 @@ export function BrandManualPage({
   onSubmit,
   palette,
   onPaletteSubmit,
+  typography,
+  onTypographySubmit,
 }: BrandManualPageProps) {
+  // The sections work like an accordion: only one is open, the others fold into their header.
+  // Folded forms stay in the page (inert), so nothing typed in them is lost.
+  const [openSection, setOpenSection] = useState<string | null>('cover')
+
+  function toggleSection(id: string) {
+    setOpenSection((prev) => (prev === id ? null : id))
+  }
+
   // Form of each built section. Sections not listed here show "Coming soon".
   const sectionForms: Record<string, ReactNode> = {
     cover: <BrandForm onSubmit={onSubmit} />,
     colors: <ColorsForm onSubmit={onPaletteSubmit} />,
+    typography: <TypographyForm onSubmit={onTypographySubmit} />,
   }
 
   return (
@@ -43,6 +58,7 @@ export function BrandManualPage({
       <ManualPreview
         cover={cover}
         palette={palette}
+        typography={typography}
         orientation={orientation}
         onOrientationChange={onOrientationChange}
         previewView={previewView}
@@ -53,21 +69,45 @@ export function BrandManualPage({
 
       <section className="manual-sections" aria-label="Manual sections">
         <ol>
-          {MANUAL_SECTIONS.map((section, index) => (
-            <li
-              key={section.id}
-              className="manual-section"
-              aria-disabled={section.ready ? undefined : 'true'}
-            >
-              <div className="manual-section-header">
-                <h2>
-                  {index + 1}. {section.label}
-                </h2>
-                {!section.ready && <span className="manual-section-badge">Coming soon</span>}
-              </div>
-              {section.ready && sectionForms[section.id]}
-            </li>
-          ))}
+          {MANUAL_SECTIONS.map((section, index) => {
+            const isOpen = section.ready && openSection === section.id
+            const bodyId = `manual-section-${section.id}`
+            return (
+              <li
+                key={section.id}
+                className="manual-section"
+                aria-disabled={section.ready ? undefined : 'true'}
+                data-open={isOpen}
+              >
+                <div className="manual-section-header">
+                  <h2>
+                    {section.ready ? (
+                      <button
+                        type="button"
+                        className="manual-section-toggle"
+                        aria-expanded={isOpen}
+                        aria-controls={bodyId}
+                        onClick={() => toggleSection(section.id)}
+                      >
+                        {index + 1}. {section.label}
+                        <span className="manual-section-chevron" aria-hidden="true" />
+                      </button>
+                    ) : (
+                      <>
+                        {index + 1}. {section.label}
+                      </>
+                    )}
+                  </h2>
+                  {!section.ready && <span className="manual-section-badge">Coming soon</span>}
+                </div>
+                {section.ready && (
+                  <div id={bodyId} className="manual-section-body" inert={!isOpen}>
+                    <div className="manual-section-inner">{sectionForms[section.id]}</div>
+                  </div>
+                )}
+              </li>
+            )
+          })}
         </ol>
       </section>
     </div>

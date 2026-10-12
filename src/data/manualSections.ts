@@ -10,7 +10,7 @@ export const MANUAL_SECTIONS: ManualSection[] = [
   { id: 'cover', label: 'Cover', ready: true },
   { id: 'logo', label: 'Logo', ready: false },
   { id: 'colors', label: 'Colors', ready: true },
-  { id: 'typography', label: 'Typography', ready: false },
+  { id: 'typography', label: 'Typography', ready: true },
 ]
 
 // Pages of the manual shown in the preview (left column), in order.

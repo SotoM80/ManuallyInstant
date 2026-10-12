@@ -3,14 +3,16 @@ import { TEMPLATES } from '../templates'
 import type { TemplateId } from '../templates'
 import { CoverPage } from './pages/CoverPage'
 import { ColorPalettePage } from './pages/ColorPalettePage'
+import { TypographyPage } from './pages/TypographyPage'
 import { DEFAULT_TYPOGRAPHY_COLOR } from '../data/colorPalette'
 import { withViewTransition } from '../utils/viewTransition'
-import type { CoverData, Orientation, PaletteColor, PreviewView } from '../types'
+import type { BrandFonts, CoverData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/ManualPreview.css'
 
 type ManualPreviewProps = {
   cover: CoverData | null
   palette: PaletteColor[] | null
+  typography: BrandFonts | null
   orientation: Orientation
   onOrientationChange: (orientation: Orientation) => void
   previewView: PreviewView
@@ -36,6 +38,7 @@ const TITLE_SCALE: Record<PreviewView, number> = { grid: 0.5, pages: 1 }
 export function ManualPreview({
   cover,
   palette,
+  typography,
   orientation,
   onOrientationChange,
   previewView,
@@ -44,14 +47,9 @@ export function ManualPreview({
   onTemplateChange,
 }: ManualPreviewProps) {
   function renderPage(page: string) {
-    if (page === 'Color palette') {
-      return (
-        <ColorPalettePage
-          palette={palette}
-          color={cover?.colors.typography ?? DEFAULT_TYPOGRAPHY_COLOR}
-        />
-      )
-    }
+    const textColor = cover?.colors.typography ?? DEFAULT_TYPOGRAPHY_COLOR
+    if (page === 'Color palette') return <ColorPalettePage palette={palette} color={textColor} />
+    if (page === 'Typography') return <TypographyPage fonts={typography} color={textColor} />
     if (page !== 'Cover') return <p className="manual-page-empty">Coming soon</p>
     // A new key on every Save (each logo gets a new URL) redraws the cover, so it grows in again
     return (

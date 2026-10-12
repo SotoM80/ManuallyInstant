@@ -18,7 +18,7 @@ Customization features are deferred for future styling updates.
 * **Cover Preview**: The Cover page of the manual preview (see `brandmanual.md`) shows the saved title. The title is **not** shown in the site header.
 
 ### Predefined Options
-Each style field is an autocomplete input that starts with its default value already selected.
+Each style field is an autocomplete input that starts with its default value already selected. Its list of options **floats** under the field, above the rest of the form, so opening it never pushes anything down. It shows about six options at a time (the rest scroll), scrolls to the chosen option when it opens, and marks the chosen option with ✓ (a decoration: it is not part of the option's accessible name).
 
 | Field | Options | Default |
 |---|---|---|

@@ -40,13 +40,11 @@ describe('Brand Manual – sections column', () => {
     const headings = items.map((item) => within(item).getByRole('heading').textContent);
     expect(headings).toEqual(['1. Cover', '2. Logo', '3. Colors', '4. Typography']);
 
-    // Built: Cover and Colors. Not built yet: Logo and Typography.
-    for (const item of [items[0], items[2]]) {
+    // Built: Cover, Colors and Typography. Not built yet: Logo.
+    for (const item of [items[0], items[2], items[3]]) {
       expect(within(item).queryByText('Coming soon')).not.toBeInTheDocument();
     }
-    for (const item of [items[1], items[3]]) {
-      expect(within(item).getByText('Coming soon')).toBeInTheDocument();
-    }
+    expect(within(items[1]).getByText('Coming soon')).toBeInTheDocument();
   });
 
   it('puts the cover form inside the Cover section', () => {
@@ -212,5 +210,55 @@ describe('Brand Manual – preview view', () => {
     // Then
     expect(within(getViewGroup()).getByRole('radio', { name: 'Pages' })).toBeChecked();
     expect(getPreview()).toHaveAttribute('data-view', 'pages');
+  });
+});
+
+// Spec: specs/brandmanual.md, Section 2 — Opening and Folding Sections (Scenarios 10 to 12)
+describe('Brand Manual – sections accordion', () => {
+  function getToggle(name: string) {
+    return within(getSections()).getByRole('button', { name });
+  }
+
+  function expanded() {
+    return ['1. Cover', '3. Colors', '4. Typography'].map((name) =>
+      getToggle(name).getAttribute('aria-expanded'),
+    );
+  }
+
+  it('starts with only Cover open, and Logo (not built) is not a button', () => {
+    renderApp('/brand-manual');
+
+    expect(expanded()).toEqual(['true', 'false', 'false']);
+    expect(within(getSections()).queryByRole('button', { name: '2. Logo' })).not.toBeInTheDocument();
+  });
+
+  it('opens a section with a click on its title and folds the open one', () => {
+    renderApp('/brand-manual');
+
+    fireEvent.click(getToggle('3. Colors'));
+
+    expect(expanded()).toEqual(['false', 'true', 'false']);
+    const colorsBody = document.getElementById(getToggle('3. Colors').getAttribute('aria-controls') as string);
+    expect(colorsBody).not.toHaveAttribute('inert');
+    const coverBody = document.getElementById(getToggle('1. Cover').getAttribute('aria-controls') as string);
+    expect(coverBody).toHaveAttribute('inert');
+  });
+
+  it('folds every section when the open one is clicked', () => {
+    renderApp('/brand-manual');
+
+    fireEvent.click(getToggle('1. Cover'));
+
+    expect(expanded()).toEqual(['false', 'false', 'false']);
+  });
+
+  it('keeps what was typed in a section while it is folded', () => {
+    renderApp('/brand-manual');
+    typeTitle('My Brand');
+
+    fireEvent.click(getToggle('4. Typography'));
+    fireEvent.click(getToggle('1. Cover'));
+
+    expect(screen.getByLabelText('Brand manual title')).toHaveValue('My Brand');
   });
 });

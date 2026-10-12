@@ -9,7 +9,7 @@ import {
   INVALID_HEX_MESSAGE,
   normalizeHex,
 } from '../data/colorPalette'
-import { validateColor, validateText } from '../utils/validation'
+import { findOption, validateColor, validateOption, validateText } from '../utils/validation'
 import type { CoverData, ManualColors, TitleStyle } from '../types'
 
 type StyleKey = keyof TitleStyle
@@ -38,16 +38,6 @@ const COLOR_FIELDS: { key: ColorKey; label: string }[] = [
 
 const LOGO_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp']
 const LOGO_MAX_BYTES = 5 * 1024 * 1024
-
-function findOption(options: readonly string[], value: string) {
-  const typed = value.trim().toLowerCase()
-  return options.find((option) => option.toLowerCase() === typed)
-}
-
-function validateStyleValue(options: readonly string[], value: string) {
-  if (value.trim() === '') return 'Required field'
-  return findOption(options, value) ? '' : 'Select a valid option'
-}
 
 function validateLogo(file: File | null) {
   if (!file) return 'Required field'
@@ -112,7 +102,7 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
 
     const nextStyleErrors = { ...NO_STYLE_ERRORS }
     for (const field of STYLE_FIELDS) {
-      nextStyleErrors[field.key] = validateStyleValue(field.options, style[field.key])
+      nextStyleErrors[field.key] = validateOption(field.options, style[field.key])
     }
 
     const nextColorErrors: ManualColors = {
