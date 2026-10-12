@@ -24,7 +24,9 @@
 
 /* Absolute, so the logo takes the size of its area instead of pushing the others.
    contain fits any logo inside the box, big or small, without stretching it.
-   Templates change the box width and where the logo sits inside it. */
+   Templates change the box width and where the logo sits inside it.
+   --logo-scale (the Logo size of the Cover) shrinks it from there; being absolute,
+   the smaller logo never moves the title or "Designed by". */
 .cover-logo img {
   position: absolute;
   inset: 0;
@@ -32,6 +34,8 @@
   width: 50%;
   height: 100%;
   object-fit: contain;
+  transform: scale(var(--logo-scale, 1));
+  transform-origin: center;
 }
 
 /* Same ink as the title (the Typography color), a bit softer */

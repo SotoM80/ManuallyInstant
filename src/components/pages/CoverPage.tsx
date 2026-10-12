@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react'
+import { LOGO_SCALES } from '../../data/logoOptions'
 import { toTitleCss } from '../../data/titleOptions'
 import type { CoverData } from '../../types'
 
@@ -24,6 +26,8 @@ export function CoverPage({ cover, titleScale }: CoverPageProps) {
     color: cover.colors.typography,
     fontSize: `${parseFloat(String(titleCss.fontSize)) * titleScale}px`,
   }
+  // The logo size scales the image inside its area (see .cover-logo img in shared.css)
+  const logoCss = { '--logo-scale': LOGO_SCALES[cover.logo.size] } as CSSProperties
   // The Typography color is set on the whole layout so "Designed by" (and the
   // divider of Template 3) take it too.
   return (
@@ -31,7 +35,7 @@ export function CoverPage({ cover, titleScale }: CoverPageProps) {
       <p className="cover-title" style={pageTitleCss}>
         {cover.title}
       </p>
-      <div className="cover-logo">
+      <div className="cover-logo" style={logoCss}>
         <img src={cover.logo.url} alt="Logo" />
       </div>
       <p className="cover-designed-by">Designed by {cover.designedBy}</p>

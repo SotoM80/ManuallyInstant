@@ -26,6 +26,7 @@
   margin: 0;
   width: 40%;
   object-position: left center;
+  transform-origin: left center; /* a smaller logo stays in its corner */
 }
 
 /* Color palette: one color per row, chip on the left, everything aligned left

@@ -12,9 +12,12 @@ export type TitleStyle = {
   fontSize: FontSize
 }
 
+export type LogoSize = 'Small' | 'Medium' | 'Large'
+
 export type Logo = {
   url: string // object URL of the uploaded file (lives only in this session)
   name: string
+  size: LogoSize // how much of its area the logo fills on the Cover
 }
 
 // Everything the Cover section saves. Also reused by the Logo page later.

@@ -23,6 +23,15 @@ export function uploadLogo(file: File = makeLogo()) {
   fireEvent.change(getLogoInput(), { target: { files: [file] } });
 }
 
+export function getLogoSizeOption(size: 'Small' | 'Medium' | 'Large') {
+  const group = screen.getByRole('group', { name: 'Logo size' });
+  return within(group).getByRole('radio', { name: size });
+}
+
+export function pickLogoSize(size: 'Small' | 'Medium' | 'Large') {
+  fireEvent.click(getLogoSizeOption(size));
+}
+
 // Designed by and Logo are required, so every successful Save needs them.
 export function fillRequiredCoverFields() {
   typeDesignedBy('Studio X');

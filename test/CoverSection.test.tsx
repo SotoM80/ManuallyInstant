@@ -2,8 +2,11 @@ import { screen, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import {
   clickSave,
+  fillRequiredCoverFields,
   getLogoInput,
+  getLogoSizeOption,
   makeLogo,
+  pickLogoSize,
   typeDesignedBy,
   typeTitle,
   uploadLogo,
@@ -160,5 +163,44 @@ describe('Cover – waits for Save', () => {
     expect(within(getCover()).queryByRole('img', { name: 'Logo' })).not.toBeInTheDocument();
     expect(getCover()).toHaveTextContent('Your logo');
     expect(getCover()).toHaveTextContent('Designed by …');
+  });
+});
+
+// Spec: specs/cover.md, Scenario 7 — Logo Size
+describe('Cover – logo size', () => {
+  function getCoverLogoArea() {
+    return within(getCover()).getByRole('img', { name: 'Logo' }).parentElement as HTMLElement;
+  }
+
+  it('starts on Medium', () => {
+    renderApp();
+
+    expect(getLogoSizeOption('Medium')).toBeChecked();
+  });
+
+  it.each([
+    ['Small', '0.5'],
+    ['Medium', '0.75'],
+    ['Large', '1'],
+  ] as const)('draws a %s logo at %s of its area after Save', (size, scale) => {
+    renderApp();
+    typeTitle('My Brand');
+    fillRequiredCoverFields();
+    pickLogoSize(size);
+
+    clickSave();
+
+    expect(getCoverLogoArea().style.getPropertyValue('--logo-scale')).toBe(scale);
+  });
+
+  it('keeps the saved size until Save is clicked again', () => {
+    renderApp();
+    typeTitle('My Brand');
+    fillRequiredCoverFields();
+    clickSave();
+
+    pickLogoSize('Small');
+
+    expect(getCoverLogoArea().style.getPropertyValue('--logo-scale')).toBe('0.75');
   });
 });

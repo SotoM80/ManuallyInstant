@@ -4,7 +4,7 @@
 The first section of the Brand Manual page is **Cover** (portada). It collects everything shown on the cover page of the manual: the **brand manual title** (with its style), **Designed by** and the **logo**. After the user clicks Save, the Cover page of the preview shows the three of them. Where each one sits on the page depends on the chosen template.
 
 ## Out of Scope
-Choosing a template and the layout of each template (see `templates.md`). The Logo page and section (they will reuse this same logo later). Cropping, resizing or editing the logo. Styling "Designed by" (font, color, size). Saving anything between sessions.
+Choosing a template and the layout of each template (see `templates.md`). The Logo page and section (they will reuse this same logo later). Cropping or editing the logo (the Logo size field only scales it). Styling "Designed by" (font, color, size). Saving anything between sessions.
 
 ## 2. Interface
 ### Fields (in this order, all inside the "1. Cover" section)
@@ -13,7 +13,8 @@ Choosing a template and the layout of each template (see `templates.md`). The Lo
 3. **Background color**: color picker for the background of every page of the manual. Default White `#FFFFFF`.
 4. **Designed by**: a free-text field (who designed the manual, e.g. a studio or a person).
 5. **Logo**: a file field to upload the brand's logo. Accepted files: PNG, JPG, SVG or WebP, up to 5 MB. It is drawn as a **"Choose file"** button followed by the chosen file's name (or **"No file chosen"**), always in English: the browser's own file button follows the system language, so it is hidden (still used by the keyboard and screen readers).
-6. **Save** button.
+6. **Logo size**: three buttons in a row, **Small**, **Medium** and **Large**, with one always chosen (default **Medium**). They scale the logo inside its area on the Cover: Small 50%, Medium 75%, Large 100% (the whole area). It never shows an error.
+7. **Save** button.
 
 The two color pickers follow `colorpicker.md`.
 
@@ -33,6 +34,7 @@ The layouts of Template 2 and Template 3 are in `templates.md`.
 ```
 * The title is drawn with its saved style.
 * The logo keeps its proportions and is never stretched.
+* The logo is drawn at the saved Logo size. A smaller logo stays in the same spot (centered, or in the top-left corner in Template 2) and never moves the title or "Designed by".
 * "Designed by" is shown as `Designed by <name>`.
 
 Before the first Save the Cover shows placeholders in the same places: `Your brand manual title`, `Your logo` and `Designed by …`.
@@ -48,6 +50,7 @@ The position of the title, logo and "Designed by" belongs to the template, not t
 * The Cover changes only when the user clicks Save, never while typing or choosing a file.
 * The Cover always shows the three slots (content or placeholder), in the positions of the current template.
 * The title, logo and "Designed by" always stay inside the page, with a margin around them and space between them, in both orientations and both preview views. Margins and spacing grow with the page (they are a percentage of its size). The logo is scaled to fit its space: bigger in Pages view, smaller in Grid view.
+* The Logo size only shrinks the logo inside its area, so the logo never leaves the page, at any size.
 * The logo saved here is the brand's only logo; the Logo page will use this same file.
 * Nothing is stored between sessions: refreshing the browser clears the Cover.
 
@@ -91,3 +94,8 @@ The rules for an empty title and invalid style fields are in `titlefild.md`.
 * **Given**: The user is on the Brand Manual page and has never saved.
 * **When**: The user types Designed by and chooses a logo, without clicking Save.
 * **Then**: The Cover still shows the placeholders "Your logo" and "Designed by …".
+
+### Scenario 7: Logo Size
+* **Given**: The user filled the Cover and chose **Small** in Logo size.
+* **When**: The user clicks Save.
+* **Then**: The Cover draws the logo at 50% of its area. Choosing another size afterwards changes nothing until the next Save.

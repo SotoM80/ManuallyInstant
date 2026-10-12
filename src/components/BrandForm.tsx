@@ -9,8 +9,9 @@ import {
   INVALID_HEX_MESSAGE,
   normalizeHex,
 } from '../data/colorPalette'
+import { DEFAULT_LOGO_SIZE, LOGO_SIZES } from '../data/logoOptions'
 import { findOption, validateColor, validateOption, validateText } from '../utils/validation'
-import type { CoverData, ManualColors, TitleStyle } from '../types'
+import type { CoverData, LogoSize, ManualColors, TitleStyle } from '../types'
 
 type StyleKey = keyof TitleStyle
 type StyleValues = Record<StyleKey, string>
@@ -53,6 +54,7 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
   const [designedByError, setDesignedByError] = useState('')
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [logoError, setLogoError] = useState('')
+  const [logoSize, setLogoSize] = useState<LogoSize>(DEFAULT_LOGO_SIZE)
   const [style, setStyle] = useState<StyleValues>(DEFAULT_TITLE_STYLE)
   const [styleErrors, setStyleErrors] = useState<StyleValues>(NO_STYLE_ERRORS)
   const [colors, setColors] = useState<ManualColors>(DEFAULT_COLORS)
@@ -134,7 +136,7 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
       title: title.trim(),
       style: cleanStyle,
       designedBy: designedBy.trim(),
-      logo: { url: URL.createObjectURL(logoFile), name: logoFile.name },
+      logo: { url: URL.createObjectURL(logoFile), name: logoFile.name, size: logoSize },
       colors: {
         typography: normalizeHex(colors.typography) as string,
         background: normalizeHex(colors.background) as string,
@@ -231,6 +233,23 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
           {logoError}
         </p>
       )}
+
+      {/* Always one option chosen, so it never shows an error */}
+      <fieldset className="segmented-control logo-size-control">
+        <legend>Logo size</legend>
+        {LOGO_SIZES.map((size) => (
+          <label key={size}>
+            <input
+              type="radio"
+              name="logo-size"
+              value={size}
+              checked={logoSize === size}
+              onChange={() => setLogoSize(size)}
+            />
+            <span>{size}</span>
+          </label>
+        ))}
+      </fieldset>
 
       <button type="submit" data-feedback={feedback} onAnimationEnd={handleFeedbackEnd}>
         Save

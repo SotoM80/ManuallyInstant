@@ -148,6 +148,11 @@
   text-align: right;
 }
 
+/* Logo size: only as wide as its three options, on the right like the other fields */
+.manual-section form .logo-size-control {
+  justify-self: end;
+}
+
 /* Only as wide as its label, on the right (grid items stretch by default) */
 .manual-section form button[type='submit'] {
   justify-self: end;
