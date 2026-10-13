@@ -41,6 +41,55 @@ export type PaletteColor = {
   hex: string
 }
 
+// Kind of brand mark (Logo section): wordmark only, symbol only, or both.
+export type MarkType = 'Logotype' | 'Imagotype' | 'Isologo' | 'Isotype'
+
+// An uploaded image (object URL, lives only in this session) and its file name.
+export type UploadedImage = {
+  url: string
+  name: string
+}
+
+// One piece a mark is built from, e.g. Tagline / "Energy for all" / "States the promise".
+// Everything is optional; the label falls back to "Part 1", "Part 2"…
+export type MarkPart = {
+  label: string
+  name: string
+  role: string
+  image: UploadedImage | null
+}
+
+// One kind of mark the brand uses, shown as a card on the Brand concept page.
+// Everything but the type is optional, e.g. Isotype / "Lightning symbol" / "Conveys energy".
+// With parts, the page shows how it is built: Isotype + Logotype + Tagline = Imagotype.
+export type MarkCard = {
+  type: MarkType
+  name: string
+  role: string
+  image: UploadedImage | null
+  parts: MarkPart[] // 0 to 4
+}
+
+// One official version of the logo, e.g. "Horizontal" / "for web and long stationery".
+export type LogoVariant = {
+  name: string
+  usage: string
+  image: UploadedImage
+}
+
+// Everything the Logo section saves. It fills three pages: Brand concept, Logo versions
+// and Clear space (see specs/logo.md).
+export type LogoData = {
+  brandName: string
+  concept: string // the idea behind the design, in the user's words
+  marks: MarkCard[] // the chosen mark types (at least one), in the order of MARK_TYPES
+  variants: LogoVariant[] // 1 to 4; the first one is the Primary version
+  clearSpaceUnit: string // what X measures, e.g. "the height of the letter X"
+  minDigitalPx: number
+  minPrintMm: number
+  grid: UploadedImage | null // optional construction grid
+}
+
 // The brand's two Google Fonts (Typography section), by family name.
 export type BrandFonts = {
   primary: string // headings

@@ -250,3 +250,452 @@
 .manual-preview[data-view='pages'] .type-alphabet {
   font-size: 11px;
 }
+
+/* Logo pages (Brand concept, Logo versions, Clear space): a header (brand name + heading)
+   and a few blocks, on a grid that fills the page. Each template decides where the blocks
+   sit (see templateN/templateN.css); by default they stack, aligned left. */
+.logo-page {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 5%;
+  line-height: 1.3; /* the site's roomy line height would push the blocks off small pages */
+  text-align: left;
+  animation: cover-enter var(--dur-slow) var(--ease-bounce);
+}
+
+/* Rows: the header and the text blocks take what they need, the image blocks the rest */
+.concept-layout {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+/* Anatomy: header and the marks block, which takes the rest of the page */
+.anatomy-layout {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.versions-layout {
+  grid-template-rows: auto minmax(0, 1.4fr) minmax(0, 1fr) auto;
+}
+
+/* With a single version there is no 2.2 block, so the primary one takes its room */
+.versions-layout:not(:has(.versions-others)) {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.clearspace-layout {
+  grid-template-rows: auto minmax(0, 1.4fr) minmax(0, 1fr) auto;
+}
+
+/* Long names stay on one line and end in "…" (the full name is in the tooltip) */
+.logo-cut {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Long texts stop after a few lines and end in "…", so they never push the blocks down */
+.logo-clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.logo-clamp[data-lines='2'] {
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.logo-clamp[data-lines='6'] {
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+}
+
+.logo-page-header {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.logo-page-brand {
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.logo-page-heading {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* A block: small numbered title, then its content. Its rows never grow past the page. */
+.logo-block {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 4px;
+  overflow: hidden;
+}
+
+/* Blocks with an image: the image takes the room left by the text */
+.versions-primary,
+.clearspace-area,
+.clearspace-grid {
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-auto-rows: auto;
+  align-content: stretch;
+}
+
+.logo-block-title {
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.logo-text {
+  font-size: 6px;
+}
+
+.logo-quote {
+  font-style: italic;
+  font-weight: 600;
+}
+
+.logo-rules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+/* An image area: the image fits inside it (contain), whatever its shape, without pushing
+   anything. The faint outline shows the area even with a transparent logo. */
+.logo-figure {
+  position: relative;
+  min-height: 24px;
+  margin: 0;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.logo-figure img {
+  position: absolute;
+  inset: 8%;
+  width: 84%;
+  height: 84%;
+  object-fit: contain;
+}
+
+.logo-version-name {
+  font-size: 7px;
+  font-weight: 600;
+}
+
+/* 2.2: the other versions side by side, each with its image and name */
+.versions-others {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.logo-versions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 6%;
+}
+
+.logo-version {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 3px;
+}
+
+/* 3.1 Clear space: the logo inside a dashed frame; the gap between them is X */
+.clearspace-diagram {
+  min-height: 0;
+  margin: 0;
+  display: grid;
+  /* A size container, so X can follow the room the diagram really has (cqw / cqh) */
+  container-type: size;
+}
+
+/* X: the free area around the logo. It follows the smaller side of the diagram, so on short
+   landscape pages the frame never grows taller than its row. */
+.clearspace-frame {
+  --x: min(10cqw, 18cqh);
+  position: relative;
+  min-height: 0;
+  display: grid;
+  padding: var(--x);
+  border: 1px dashed currentColor;
+  border-radius: 2px;
+}
+
+.clearspace-frame .logo-figure {
+  min-height: 0;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 35%, transparent);
+}
+
+.clearspace-frame .logo-figure img {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* An "X" in the middle of each side of the free area (half of X away from the frame) */
+.clearspace-x {
+  position: absolute;
+  font-size: 6px;
+  font-weight: 600;
+  opacity: 0.7;
+  transform: translate(-50%, -50%);
+}
+
+.clearspace-x[data-side='top'] {
+  top: calc(var(--x) / 2);
+  left: 50%;
+}
+
+.clearspace-x[data-side='bottom'] {
+  top: calc(100% - var(--x) / 2);
+  left: 50%;
+}
+
+.clearspace-x[data-side='left'] {
+  top: 50%;
+  left: calc(var(--x) / 2);
+}
+
+.clearspace-x[data-side='right'] {
+  top: 50%;
+  left: calc(100% - var(--x) / 2);
+}
+
+/* 3.2 without an uploaded grid: a placeholder box */
+.logo-figure[data-empty='true'] {
+  display: grid;
+  place-items: center;
+  background: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, currentColor 6%, transparent) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.clearspace-grid-empty {
+  font-size: 6px;
+  opacity: 0.6;
+}
+
+/* Anatomy: the cards take the room left by the text */
+.anatomy-marks {
+  grid-template-rows: auto auto minmax(0, 1fr);
+  align-content: stretch;
+}
+
+/* One row per mark type; the rows share the room of the block */
+.logo-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  display: grid;
+  grid-auto-rows: minmax(0, 1fr);
+  row-gap: 6%;
+}
+
+/* A row: [parts + … =] the mark. The cards keep the same width, so a part and the
+   final mark are drawn at the same scale. */
+.logo-equation {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 2%;
+}
+
+.logo-parts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 2%;
+  flex: var(--parts) 1 0; /* as wide as its cards together */
+}
+
+/* A card: its image takes the room left by the label, name and role under it */
+.logo-card {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto auto;
+  align-content: start;
+  gap: 2px;
+}
+
+/* A mark without parts stays at a reasonable width instead of filling the row */
+.logo-equation > .logo-card-result:only-child {
+  max-width: 45%;
+}
+
+/* No image: a faint striped box, so the card still shows where the mark goes */
+.logo-card .logo-figure[data-empty='true'] {
+  background: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, currentColor 5%, transparent) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.logo-card-type {
+  margin-top: 2px;
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.logo-card-name {
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.logo-card-role {
+  font-size: 7px;
+  opacity: 0.8;
+}
+
+/* "+" and "=" sit in the middle of the images (not of image + text) */
+.logo-card-sign {
+  flex: none;
+  align-self: center;
+  margin-bottom: 18px;
+  font-size: 14px;
+  font-weight: 300;
+  opacity: 0.6;
+}
+
+.manual-preview[data-view='pages'] .logo-card-type {
+  font-size: 10px;
+}
+
+.manual-preview[data-view='pages'] .logo-card-name {
+  font-size: 14px;
+}
+
+.manual-preview[data-view='pages'] .logo-card-role {
+  font-size: 12px;
+}
+
+.manual-preview[data-view='pages'] .logo-card-sign {
+  margin-bottom: 36px;
+  font-size: 28px;
+}
+
+/* Brand concept and Anatomy have room to spare, so their text is a bit bigger */
+:is(.concept-layout, .anatomy-layout) .logo-page-brand {
+  font-size: 8px;
+}
+
+:is(.concept-layout, .anatomy-layout) .logo-page-heading {
+  font-size: 14px;
+}
+
+:is(.concept-layout, .anatomy-layout) .logo-block-title {
+  font-size: 7px;
+}
+
+:is(.concept-layout, .anatomy-layout) .logo-text {
+  font-size: 8px;
+}
+
+.manual-preview[data-view='pages'] :is(.concept-layout, .anatomy-layout) .logo-page-brand {
+  font-size: 12px;
+}
+
+.manual-preview[data-view='pages'] :is(.concept-layout, .anatomy-layout) .logo-page-heading {
+  font-size: 24px;
+}
+
+.manual-preview[data-view='pages'] :is(.concept-layout, .anatomy-layout) .logo-block-title {
+  font-size: 11px;
+}
+
+.manual-preview[data-view='pages'] :is(.concept-layout, .anatomy-layout) .logo-text {
+  font-size: 14px;
+}
+
+/* Pages view: each page is about twice as wide, so the text is bigger */
+.manual-preview[data-view='pages'] .logo-page-brand {
+  font-size: 11px;
+}
+
+.manual-preview[data-view='pages'] .logo-page-heading {
+  font-size: 20px;
+}
+
+.manual-preview[data-view='pages'] .logo-block {
+  gap: 8px;
+}
+
+.manual-preview[data-view='pages'] .logo-block-title,
+.manual-preview[data-view='pages'] .clearspace-grid-empty {
+  font-size: 10px;
+}
+
+.manual-preview[data-view='pages'] .logo-text {
+  font-size: 11px;
+}
+
+.manual-preview[data-view='pages'] .logo-version-name {
+  font-size: 12px;
+}
+
+.manual-preview[data-view='pages'] .clearspace-x {
+  font-size: 11px;
+}
+
+/* Brand concept: the Cover's logo takes the room under the text */
+.concept-logo {
+  min-height: 0;
+  box-shadow: none; /* no frame: the logo stands on the page */
+}
+
+.concept-logo[data-empty='true'] {
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.concept-logo-empty {
+  font-size: 7px;
+  opacity: 0.5;
+}
+
+.manual-preview[data-view='pages'] .concept-logo-empty {
+  font-size: 11px;
+}

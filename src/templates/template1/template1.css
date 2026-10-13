@@ -52,3 +52,20 @@
 .manual-preview[data-template='template1'] .type-layout {
   text-align: center;
 }
+
+/* Logo pages (Brand concept, Logo versions, Clear space): blocks stacked, everything centered
+   ┌──────────────┐
+   │    VOLTA     │
+   │Logo versions │
+   │   [ LOGO ]   │
+   │ text…        │
+   │ [v2]  [v3]   │
+   └──────────────┘ */
+
+.manual-preview[data-template='template1'] .logo-page {
+  text-align: center;
+}
+
+.manual-preview[data-template='template1'] .logo-clamp {
+  justify-content: center; /* keeps the clamped box centered too */
+}

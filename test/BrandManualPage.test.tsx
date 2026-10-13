@@ -2,6 +2,17 @@ import { screen, fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import { clickSave, fillRequiredCoverFields, pickSwatch, typeTitle } from './coverForm';
 
+// The manual's pages, in order (the Logo section fills pages 2 to 5)
+const ALL_PAGES = [
+  'Cover',
+  'Brand concept',
+  'Anatomy',
+  'Logo versions',
+  'Clear space',
+  'Color palette',
+  'Typography',
+];
+
 function getPreview() {
   return screen.getByRole('region', { name: 'Manual preview' });
 }
@@ -33,18 +44,17 @@ describe('Brand Manual – layout', () => {
 
 // Spec: specs/brandmanual.md, Scenario 2 — All Sections Listed
 describe('Brand Manual – sections column', () => {
-  it('lists every section in order, with the unbuilt ones marked "Coming soon"', () => {
+  it('lists every section in order, all of them built', () => {
     renderApp('/brand-manual');
 
     const items = within(getSections()).getAllByRole('listitem');
     const headings = items.map((item) => within(item).getByRole('heading').textContent);
     expect(headings).toEqual(['1. Cover', '2. Logo', '3. Colors', '4. Typography']);
 
-    // Built: Cover, Colors and Typography. Not built yet: Logo.
-    for (const item of [items[0], items[2], items[3]]) {
-      expect(within(item).queryByText('Coming soon')).not.toBeInTheDocument();
+    // Built sections open with a click on their title (unbuilt ones have no button)
+    for (const [index, item] of items.entries()) {
+      expect(within(item).getByRole('button', { name: headings[index] as string })).toBeInTheDocument();
     }
-    expect(within(items[1]).getByText('Coming soon')).toBeInTheDocument();
   });
 
   it('puts the cover form inside the Cover section', () => {
@@ -59,16 +69,11 @@ describe('Brand Manual – sections column', () => {
 
 // Spec: specs/brandmanual.md, Scenario 3 — All Pages Previewed
 describe('Brand Manual – preview column', () => {
-  it('shows the four manual pages in order', () => {
+  it('shows the seven manual pages in order', () => {
     renderApp('/brand-manual');
 
     const pages = within(getPreview()).getAllByRole('article');
-    expect(pages.map((page) => page.getAttribute('aria-label'))).toEqual([
-      'Cover',
-      'Logo',
-      'Color palette',
-      'Typography',
-    ]);
+    expect(pages.map((page) => page.getAttribute('aria-label'))).toEqual(ALL_PAGES);
   });
 });
 
@@ -116,7 +121,7 @@ describe('Brand Manual – page orientation', () => {
     renderApp('/brand-manual');
 
     expect(within(getOrientationGroup()).getByRole('radio', { name: 'Portrait' })).toBeChecked();
-    expect(getPageOrientations()).toEqual(['portrait', 'portrait', 'portrait', 'portrait']);
+    expect(getPageOrientations()).toEqual(Array(ALL_PAGES.length).fill('portrait'));
   });
 
   // Spec: specs/brandmanual.md, Scenario 6 — Changing the Page Orientation
@@ -130,7 +135,7 @@ describe('Brand Manual – page orientation', () => {
     // Then
     expect(within(getOrientationGroup()).getByRole('radio', { name: 'Landscape' })).toBeChecked();
     expect(within(getOrientationGroup()).getByRole('radio', { name: 'Portrait' })).not.toBeChecked();
-    expect(getPageOrientations()).toEqual(['landscape', 'landscape', 'landscape', 'landscape']);
+    expect(getPageOrientations()).toEqual(Array(ALL_PAGES.length).fill('landscape'));
   });
 
   // Spec: specs/brandmanual.md, Scenario 7 — Orientation Is Kept Between Pages
@@ -146,7 +151,7 @@ describe('Brand Manual – page orientation', () => {
 
     // Then
     expect(within(getOrientationGroup()).getByRole('radio', { name: 'Landscape' })).toBeChecked();
-    expect(getPageOrientations()).toEqual(['landscape', 'landscape', 'landscape', 'landscape']);
+    expect(getPageOrientations()).toEqual(Array(ALL_PAGES.length).fill('landscape'));
   });
 });
 
@@ -182,18 +187,8 @@ describe('Brand Manual – preview view', () => {
     expect(getPreview()).toHaveAttribute('data-view', 'pages');
 
     const pages = within(getPreview()).getAllByRole('article');
-    expect(pages.map((page) => page.getAttribute('aria-label'))).toEqual([
-      'Cover',
-      'Logo',
-      'Color palette',
-      'Typography',
-    ]);
-    expect(pages.map((page) => page.getAttribute('data-orientation'))).toEqual([
-      'landscape',
-      'landscape',
-      'landscape',
-      'landscape',
-    ]);
+    expect(pages.map((page) => page.getAttribute('aria-label'))).toEqual(ALL_PAGES);
+    expect(pages.map((page) => page.getAttribute('data-orientation'))).toEqual(Array(ALL_PAGES.length).fill('landscape'));
   });
 
   // Spec: specs/brandmanual.md, Scenario 8b — Overview Shows Four Pages Per Row
@@ -212,7 +207,7 @@ describe('Brand Manual – preview view', () => {
       within(getPreview())
         .getAllByRole('article')
         .map((page) => page.getAttribute('aria-label')),
-    ).toEqual(['Cover', 'Logo', 'Color palette', 'Typography']);
+    ).toEqual(ALL_PAGES);
   });
 
   // Spec: specs/brandmanual.md, Scenario 9 — Preview View Is Kept Between Pages
@@ -239,16 +234,15 @@ describe('Brand Manual – sections accordion', () => {
   }
 
   function expanded() {
-    return ['1. Cover', '3. Colors', '4. Typography'].map((name) =>
+    return ['1. Cover', '2. Logo', '3. Colors', '4. Typography'].map((name) =>
       getToggle(name).getAttribute('aria-expanded'),
     );
   }
 
-  it('starts with only Cover open, and Logo (not built) is not a button', () => {
+  it('starts with only Cover open', () => {
     renderApp('/brand-manual');
 
-    expect(expanded()).toEqual(['true', 'false', 'false']);
-    expect(within(getSections()).queryByRole('button', { name: '2. Logo' })).not.toBeInTheDocument();
+    expect(expanded()).toEqual(['true', 'false', 'false', 'false']);
   });
 
   it('opens a section with a click on its title and folds the open one', () => {
@@ -256,7 +250,7 @@ describe('Brand Manual – sections accordion', () => {
 
     fireEvent.click(getToggle('3. Colors'));
 
-    expect(expanded()).toEqual(['false', 'true', 'false']);
+    expect(expanded()).toEqual(['false', 'false', 'true', 'false']);
     const colorsBody = document.getElementById(getToggle('3. Colors').getAttribute('aria-controls') as string);
     expect(colorsBody).not.toHaveAttribute('inert');
     const coverBody = document.getElementById(getToggle('1. Cover').getAttribute('aria-controls') as string);
@@ -268,7 +262,7 @@ describe('Brand Manual – sections accordion', () => {
 
     fireEvent.click(getToggle('1. Cover'));
 
-    expect(expanded()).toEqual(['false', 'false', 'false']);
+    expect(expanded()).toEqual(['false', 'false', 'false', 'false']);
   });
 
   it('keeps what was typed in a section while it is folded', () => {

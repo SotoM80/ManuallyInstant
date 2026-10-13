@@ -138,6 +138,9 @@
 
 .manual-section form {
   display: grid;
+  /* One column that never grows past the section: a long name (e.g. of a Logo version)
+     is cut with "…" instead of widening the form */
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   margin-top: 16px;
   text-align: right;
@@ -210,6 +213,7 @@
   align-items: center;
   justify-content: flex-end; /* the Cover form is aligned right */
   gap: 8px;
+  min-width: 0;
 }
 
 /* The real file input stays in the page (for keyboard and screen readers) but is not drawn */
@@ -222,6 +226,8 @@
 }
 
 .file-field-button {
+  flex: none; /* never squeezed by a long file name */
+  white-space: nowrap;
   padding: 4px 12px;
   border-radius: 6px;
   border: 1px solid var(--border);
@@ -245,6 +251,9 @@
 }
 
 .file-field-name {
+  /* A long file name is cut with "…" (the full name is in the tooltip) instead of
+     pushing the field out of the section */
+  min-width: 0;
   font-size: 14px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -272,6 +281,7 @@
    the others fold into their header row (chip, name, HEX) one under the other. */
 .palette-block {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--bg);
@@ -461,4 +471,109 @@
 .palette-secondary-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Logo section: three groups (Concept, Versions, Clear space & size), one per page.
+   Each starts with a small title and a thin line, and lays out its fields like the form. */
+.logo-form-group {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 16px 0 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+.logo-form-group:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.logo-form-group > legend {
+  float: right; /* sits inside the grid, aligned like the other labels */
+  padding: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.manual-section form textarea {
+  font: inherit;
+  font-size: 14px; /* close to the text fields; the page's 18px felt too big for typing */
+  line-height: 1.4;
+  text-align: right;
+  resize: vertical;
+}
+
+/* Mark type: four options, so they may wrap onto two rows */
+.manual-section form .logo-mark-type {
+  justify-self: end;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* A card per ticked mark type: a small framed box with the type as its title,
+   then its image and its name | role side by side (all optional) */
+.logo-mark-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 10px 12px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.logo-mark-card > legend {
+  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.logo-mark-card-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+}
+
+.logo-primary-tag {
+  font-weight: 400;
+  color: var(--accent);
+}
+
+/* Version header: the version's name keeps its room; a long file name is the one cut short */
+.logo-version-file {
+  flex: 0 1 auto;
+  max-width: 45%;
+  opacity: 0.75;
+}
+
+/* A Logo group that is not built yet: only its title and the "Coming soon" badge */
+.logo-form-group:disabled {
+  opacity: 0.55;
+}
+
+.logo-form-soon {
+  justify-self: end;
+}
+
+/* A part inside a card (e.g. its Tagline): a lighter box, nested in the card */
+.logo-mark-part {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 10px 10px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+
+.logo-mark-part > legend {
+  padding: 0 4px;
+  font-size: 12px;
+  color: var(--text);
 }

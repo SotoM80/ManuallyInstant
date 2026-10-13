@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { BrandForm } from '../components/BrandForm'
+import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
 import { ManualPreview } from '../components/ManualPreview'
 import { MANUAL_SECTIONS } from '../data/manualSections'
 import { keepInPlace } from '../utils/scrollAnchor'
 import type { TemplateId } from '../templates'
-import type { BrandFonts, CoverData, Orientation, PaletteColor, PreviewView } from '../types'
+import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/BrandManualPage.css'
 
 type BrandManualPageProps = {
@@ -19,6 +20,8 @@ type BrandManualPageProps = {
   template: TemplateId
   onTemplateChange: (template: TemplateId) => void
   onSubmit: (cover: CoverData) => void
+  logo: LogoData | null
+  onLogoSubmit: (logo: LogoData) => void
   palette: PaletteColor[] | null
   onPaletteSubmit: (palette: PaletteColor[]) => void
   typography: BrandFonts | null
@@ -34,6 +37,8 @@ export function BrandManualPage({
   template,
   onTemplateChange,
   onSubmit,
+  logo,
+  onLogoSubmit,
   palette,
   onPaletteSubmit,
   typography,
@@ -50,6 +55,7 @@ export function BrandManualPage({
   // Form of each built section. Sections not listed here show "Coming soon".
   const sectionForms: Record<string, ReactNode> = {
     cover: <BrandForm onSubmit={onSubmit} />,
+    logo: <LogoForm onSubmit={onLogoSubmit} />,
     colors: <ColorsForm onSubmit={onPaletteSubmit} />,
     typography: <TypographyForm onSubmit={onTypographySubmit} />,
   }
@@ -58,6 +64,7 @@ export function BrandManualPage({
     <div className="brand-manual-page">
       <ManualPreview
         cover={cover}
+        logo={logo}
         palette={palette}
         typography={typography}
         orientation={orientation}

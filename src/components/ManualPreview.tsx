@@ -1,16 +1,21 @@
-import { MANUAL_PAGES } from '../data/manualSections'
+import { LOGO_PARTS, MANUAL_PAGES } from '../data/manualSections'
 import { TEMPLATES } from '../templates'
 import type { TemplateId } from '../templates'
 import { CoverPage } from './pages/CoverPage'
+import { BrandConceptPage } from './pages/BrandConceptPage'
+import { AnatomyPage } from './pages/AnatomyPage'
+import { LogoVersionsPage } from './pages/LogoVersionsPage'
+import { ClearSpacePage } from './pages/ClearSpacePage'
 import { ColorPalettePage } from './pages/ColorPalettePage'
 import { TypographyPage } from './pages/TypographyPage'
 import { DEFAULT_TYPOGRAPHY_COLOR } from '../data/colorPalette'
 import { withViewTransition } from '../utils/viewTransition'
-import type { BrandFonts, CoverData, Orientation, PaletteColor, PreviewView } from '../types'
+import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/ManualPreview.css'
 
 type ManualPreviewProps = {
   cover: CoverData | null
+  logo: LogoData | null
   palette: PaletteColor[] | null
   typography: BrandFonts | null
   orientation: Orientation
@@ -39,6 +44,7 @@ const TITLE_SCALE: Record<PreviewView, number> = { grid: 0.5, overview: 0.5, pag
 
 export function ManualPreview({
   cover,
+  logo,
   palette,
   typography,
   orientation,
@@ -50,6 +56,13 @@ export function ManualPreview({
 }: ManualPreviewProps) {
   function renderPage(page: string) {
     const textColor = cover?.colors.typography ?? DEFAULT_TYPOGRAPHY_COLOR
+    if (page === 'Brand concept')
+      return <BrandConceptPage logo={logo} coverLogo={cover?.logo ?? null} color={textColor} />
+    if (page === 'Anatomy') return <AnatomyPage logo={logo} color={textColor} />
+    if (page === 'Logo versions' && LOGO_PARTS.versions)
+      return <LogoVersionsPage logo={logo} color={textColor} />
+    if (page === 'Clear space' && LOGO_PARTS.clearSpace)
+      return <ClearSpacePage logo={logo} color={textColor} />
     if (page === 'Color palette') return <ColorPalettePage palette={palette} color={textColor} />
     if (page === 'Typography') return <TypographyPage fonts={typography} color={textColor} />
     if (page !== 'Cover') return <p className="manual-page-empty">Coming soon</p>

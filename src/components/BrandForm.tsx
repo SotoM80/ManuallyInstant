@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import type { AnimationEvent, ChangeEvent, FormEvent } from 'react'
+import type { AnimationEvent, FormEvent } from 'react'
 import { AutocompleteField } from './AutocompleteField'
 import { ColorPicker } from './ColorPicker'
+import { ImageField } from './ImageField'
 import { DEFAULT_TITLE_STYLE, STYLE_FIELDS } from '../data/titleOptions'
 import {
   DEFAULT_BACKGROUND_COLOR,
@@ -10,7 +11,7 @@ import {
   normalizeHex,
 } from '../data/colorPalette'
 import { DEFAULT_LOGO_SIZE, LOGO_SIZES } from '../data/logoOptions'
-import { findOption, validateColor, validateOption, validateText } from '../utils/validation'
+import { findOption, validateColor, validateImage, validateOption, validateText } from '../utils/validation'
 import type { CoverData, LogoSize, ManualColors, TitleStyle } from '../types'
 
 type StyleKey = keyof TitleStyle
@@ -37,14 +38,8 @@ const COLOR_FIELDS: { key: ColorKey; label: string }[] = [
   { key: 'background', label: 'Background color' },
 ]
 
-const LOGO_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp']
-const LOGO_MAX_BYTES = 5 * 1024 * 1024
-
 function validateLogo(file: File | null) {
-  if (!file) return 'Required field'
-  if (!LOGO_TYPES.includes(file.type)) return 'Use a PNG, JPG, SVG or WebP image'
-  if (file.size > LOGO_MAX_BYTES) return 'The logo must be 5 MB or smaller'
-  return ''
+  return validateImage(file, 'logo')
 }
 
 export function BrandForm({ onSubmit }: BrandFormProps) {
@@ -90,8 +85,7 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
   }
 
   // A wrong file is flagged as soon as it is chosen, not only on submit.
-  function handleLogoChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0] ?? null
+  function handleLogoChange(file: File | null) {
     setLogoFile(file)
     setLogoError(file ? validateLogo(file) : '')
   }
@@ -209,30 +203,13 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
         </p>
       )}
 
-      <label htmlFor="logo">Logo</label>
-      {/* The browser writes the native file button in the system's language, so it is
-          hidden (still there for keyboard and screen readers) and drawn here in English. */}
-      <div className="file-field">
-        <input
-          id="logo"
-          type="file"
-          accept={LOGO_TYPES.join(',')}
-          onChange={handleLogoChange}
-          aria-invalid={logoError !== ''}
-          aria-describedby={logoError ? 'logo-error' : undefined}
-        />
-        <label htmlFor="logo" className="file-field-button" aria-hidden="true">
-          Choose file
-        </label>
-        <span className="file-field-name" aria-hidden="true">
-          {logoFile?.name ?? 'No file chosen'}
-        </span>
-      </div>
-      {logoError && (
-        <p id="logo-error" role="alert">
-          {logoError}
-        </p>
-      )}
+      <ImageField
+        id="logo"
+        label="Logo"
+        fileName={logoFile?.name ?? null}
+        error={logoError}
+        onChange={handleLogoChange}
+      />
 
       {/* Always one option chosen, so it never shows an error */}
       <fieldset className="segmented-control logo-size-control">

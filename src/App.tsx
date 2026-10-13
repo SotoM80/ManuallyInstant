@@ -8,13 +8,15 @@ import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
 import { loadGoogleFont } from './utils/googleFonts'
 import { DEFAULT_TEMPLATE } from './templates'
 import type { TemplateId } from './templates'
-import type { BrandFonts, CoverData, Orientation, PaletteColor, PreviewView } from './types'
+import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from './types'
 import './css/App.css'
 
 function App() {
   // Kept here, above the routes, so they survive moving between pages.
   // `cover` is null until the Cover section is saved for the first time.
   const [cover, setCover] = useState<CoverData | null>(null)
+  // `logo` is null until the Logo section is saved for the first time.
+  const [logo, setLogo] = useState<LogoData | null>(null)
   // `palette` is null until the Colors section is saved for the first time.
   const [palette, setPalette] = useState<PaletteColor[] | null>(null)
   // `typography` is null until the Typography section is saved for the first time.
@@ -57,6 +59,8 @@ function App() {
                 template={template}
                 onTemplateChange={setTemplate}
                 onSubmit={setCover}
+                logo={logo}
+                onLogoSubmit={setLogo}
                 palette={palette}
                 onPaletteSubmit={setPalette}
                 typography={typography}
