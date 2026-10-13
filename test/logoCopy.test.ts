@@ -34,19 +34,19 @@ describe('logo copy', () => {
   });
 
   it('defines a single mark type, with the right article', () => {
-    expect(anatomyText(volta)).toMatch(/^VOLTA is an Imagotype: a symbol and a wordmark/);
+    expect(anatomyText(volta)).toMatch(/^VOLTA is an Imagotype: an isotype \/ brandmark and a logotype \/ wordmark/);
     const logotype = { ...volta, marks: [{ ...volta.marks[0], type: 'Logotype' as const }] };
-    expect(anatomyText(logotype)).toMatch(/^VOLTA is a Logotype:/);
+    expect(anatomyText(logotype)).toMatch(/^VOLTA is a Logotype \/ Wordmark:/);
   });
 
   it('names every mark type when the brand uses several', () => {
     const mark = (type: 'Logotype' | 'Imagotype' | 'Isotype') => ({ type, name: '', role: '', image: null, parts: [] });
 
     expect(anatomyText({ ...volta, marks: [mark('Logotype'), mark('Isotype')] })).toBe(
-      'VOLTA works with a Logotype and an Isotype. Each one has its own role:',
+      'VOLTA works with a Logotype / Wordmark and an Isotype / Brandmark. Each one has its own role:',
     );
     expect(anatomyText({ ...volta, marks: [mark('Logotype'), mark('Imagotype'), mark('Isotype')] })).toBe(
-      'VOLTA works with a Logotype, an Imagotype and an Isotype. Each one has its own role:',
+      'VOLTA works with a Logotype / Wordmark, an Imagotype and an Isotype / Brandmark. Each one has its own role:',
     );
   });
 

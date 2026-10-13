@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import type { AnimationEvent, FormEvent } from 'react'
 import { ImageField } from './ImageField'
-import { DEFAULT_MARK_TYPES, MARK_TYPES } from '../data/logoCopy'
+import { DEFAULT_MARK_TYPES, MARK_TYPE_LABELS, MARK_TYPES } from '../data/logoCopy'
 import { LOGO_PARTS } from '../data/manualSections'
 import type { LogoParts } from '../data/manualSections'
 import { keepInPlace } from '../utils/scrollAnchor'
@@ -36,7 +36,8 @@ const EMPTY_CARD: CardDraft = { name: '', role: '', file: null, fileError: '', p
 const MAX_PARTS = 4
 
 // Suggestions for a part's label; any other label can be typed.
-const PART_LABELS = ['Isotype', 'Logotype', 'Symbol', 'Wordmark', 'Tagline']
+// The same double names as the mark types (Symbol = Isotype, Wordmark = Logotype).
+const PART_LABELS = [MARK_TYPE_LABELS.Isotype, MARK_TYPE_LABELS.Logotype, 'Tagline']
 
 // A part with nothing typed or chosen is left out when saving.
 function isEmptyPart(part: PartDraft) {
@@ -347,7 +348,7 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
                 checked={markTypes.includes(type)}
                 onChange={() => toggleMarkType(type)}
               />
-              <span>{type}</span>
+              <span>{MARK_TYPE_LABELS[type]}</span>
             </label>
           ))}
         </fieldset>
@@ -368,7 +369,7 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
           const card = cards[type] ?? EMPTY_CARD
           return (
             <fieldset key={type} className="logo-mark-card">
-              <legend>{type}</legend>
+              <legend>{MARK_TYPE_LABELS[type]}</legend>
               <ImageField
                 id={`logo-mark-${type}-image`}
                 label={`${type} image (optional)`}

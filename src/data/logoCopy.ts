@@ -9,12 +9,22 @@ export const MARK_TYPES: MarkType[] = ['Logotype', 'Imagotype', 'Isologo', 'Isot
 // The brand may use several kinds of mark; Imagotype is chosen at the start.
 export const DEFAULT_MARK_TYPES: MarkType[] = ['Imagotype']
 
+// How each kind of mark is shown. Isotype and Logotype go with their other common name,
+// since both are used in the industry (isotipo = brandmark, logotipo = wordmark).
+export const MARK_TYPE_LABELS: Record<MarkType, string> = {
+  Logotype: 'Logotype / Wordmark',
+  Imagotype: 'Imagotype',
+  Isologo: 'Isologo',
+  Isotype: 'Isotype / Brandmark',
+}
+
 // What each kind of mark is, as the end of "{brand} is a {mark type}: ..."
 export const MARK_TYPE_DEFINITIONS: Record<MarkType, string> = {
   Logotype: 'a mark built only from typography, where the brand name itself is the symbol',
   Imagotype:
-    'a symbol and a wordmark that work together, yet can also be read apart from each other',
-  Isologo: 'a symbol and a wordmark fused into one single shape that cannot be separated',
+    'an isotype / brandmark and a logotype / wordmark that work together, yet can also be read apart from each other',
+  Isologo:
+    'an isotype / brandmark and a logotype / wordmark fused into one single shape that cannot be separated',
   Isotype: 'a mark made only of a symbol, recognisable without the brand name',
 }
 
@@ -40,7 +50,7 @@ export function philosophyText(data: LogoData) {
 
 // "a Logotype", "an Isotype and a Logotype", "a Logotype, an Imagotype and an Isotype"
 function listOfMarks(types: MarkType[]) {
-  const words = types.map(withArticle)
+  const words = types.map((type) => withArticle(MARK_TYPE_LABELS[type]))
   return words.length > 1 ? `${words.slice(0, -1).join(', ')} and ${words.at(-1)}` : words[0]
 }
 
@@ -49,7 +59,8 @@ function listOfMarks(types: MarkType[]) {
 export function anatomyText(data: LogoData) {
   const types = data.marks.map((mark) => mark.type)
   if (types.length === 1) {
-    return `${data.brandName} is ${withArticle(types[0])}: ${MARK_TYPE_DEFINITIONS[types[0]]}.`
+    const [type] = types
+    return `${data.brandName} is ${withArticle(MARK_TYPE_LABELS[type])}: ${MARK_TYPE_DEFINITIONS[type]}.`
   }
   return `${data.brandName} works with ${listOfMarks(types)}. Each one has its own role:`
 }

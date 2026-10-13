@@ -41,7 +41,7 @@ export type PaletteColor = {
   hex: string
 }
 
-// Kind of brand mark (Logo section): wordmark only, symbol only, or both.
+// Kind of brand mark (Logo section): text only, symbol only, or both (see MARK_TYPE_LABELS).
 export type MarkType = 'Logotype' | 'Imagotype' | 'Isologo' | 'Isotype'
 
 // An uploaded image (object URL, lives only in this session) and its file name.

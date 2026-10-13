@@ -67,7 +67,7 @@ describe('Logo section – form', () => {
     }
     const markType = within(getForm()).getByRole('group', { name: 'Mark type' });
     expect(within(markType).getByRole('checkbox', { name: 'Imagotype' })).toBeChecked();
-    expect(within(markType).getByRole('checkbox', { name: 'Isotype' })).not.toBeChecked();
+    expect(within(markType).getByRole('checkbox', { name: 'Isotype / Brandmark' })).not.toBeChecked();
     expect(within(getForm()).getByLabelText('Unit X')).toHaveValue('the height of the letter X');
     expect(within(getForm()).getByLabelText('Min digital size (px)')).toHaveValue('32');
     expect(within(getForm()).getByLabelText('Min print size (mm)')).toHaveValue('15');
@@ -213,13 +213,13 @@ describe('Logo section – mark cards', () => {
   it('creates a card for each ticked mark type, in a fixed order', () => {
     render(<LogoForm parts={{ versions: false, clearSpace: false }} />);
 
-    toggleMarkType('Isotype');
-    toggleMarkType('Logotype');
+    toggleMarkType('Isotype / Brandmark');
+    toggleMarkType('Logotype / Wordmark');
 
-    expect(cardsInForm()).toEqual(['Logotype', 'Imagotype', 'Isotype']);
+    expect(cardsInForm()).toEqual(['Logotype / Wordmark', 'Imagotype', 'Isotype / Brandmark']);
 
     toggleMarkType('Imagotype');
-    expect(cardsInForm()).toEqual(['Logotype', 'Isotype']);
+    expect(cardsInForm()).toEqual(['Logotype / Wordmark', 'Isotype / Brandmark']);
   });
 
   it('needs at least one mark type', () => {
@@ -248,7 +248,7 @@ describe('Logo section – mark cards', () => {
     renderApp('/brand-manual');
     openLogoSection();
     fillConcept();
-    toggleMarkType('Isotype');
+    toggleMarkType('Isotype / Brandmark');
     upload('Isotype image (optional)', makeLogo('symbol.png'));
     type('Isotype name', 'Bolt');
 

@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import type { CSSProperties } from 'react'
-import { anatomyText } from '../../data/logoCopy'
+import { MARK_TYPE_LABELS, anatomyText } from '../../data/logoCopy'
 import type { LogoData, UploadedImage } from '../../types'
 
 type AnatomyPageProps = {
@@ -62,12 +62,12 @@ export function AnatomyPage({ logo, color }: AnatomyPageProps) {
             reads how it is built: Isotype + Logotype + Tagline = Imagotype. */}
         <ol className="logo-cards" aria-label="Marks of the brand" data-count={logo.marks.length}>
           {logo.marks.map((mark) => (
-            <li key={mark.type} className="logo-equation" aria-label={mark.type}>
+            <li key={mark.type} className="logo-equation" aria-label={MARK_TYPE_LABELS[mark.type]}>
               {mark.parts.length > 0 && (
                 <>
                   <ol
                     className="logo-parts"
-                    aria-label={`Parts of the ${mark.type}`}
+                    aria-label={`Parts of the ${MARK_TYPE_LABELS[mark.type]}`}
                     style={{ '--parts': mark.parts.length } as CSSProperties}
                   >
                     {mark.parts.map((part, index) => (
@@ -89,7 +89,12 @@ export function AnatomyPage({ logo, color }: AnatomyPageProps) {
                 </>
               )}
               <div className="logo-card logo-card-result">
-                <CardContent label={mark.type} name={mark.name} role={mark.role} image={mark.image} />
+                <CardContent
+                  label={MARK_TYPE_LABELS[mark.type]}
+                  name={mark.name}
+                  role={mark.role}
+                  image={mark.image}
+                />
               </div>
             </li>
           ))}
