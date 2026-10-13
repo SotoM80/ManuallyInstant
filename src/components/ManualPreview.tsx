@@ -28,12 +28,14 @@ const ORIENTATIONS: { value: Orientation; label: string }[] = [
 
 const VIEWS: { value: PreviewView; label: string }[] = [
   { value: 'grid', label: 'Grid' },
+  { value: 'overview', label: 'Overview' },
   { value: 'pages', label: 'Pages' },
 ]
 
 // Grid thumbnails are small, so the title is drawn at half its real size.
 // In the Pages view each page is about twice as wide, so it uses the real size.
-const TITLE_SCALE: Record<PreviewView, number> = { grid: 0.5, pages: 1 }
+// Overview draws each page like a Grid thumbnail and shrinks it as a whole (see the CSS).
+const TITLE_SCALE: Record<PreviewView, number> = { grid: 0.5, overview: 0.5, pages: 1 }
 
 export function ManualPreview({
   cover,

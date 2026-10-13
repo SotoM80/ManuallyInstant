@@ -5,6 +5,7 @@ import { ColorsForm } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
 import { ManualPreview } from '../components/ManualPreview'
 import { MANUAL_SECTIONS } from '../data/manualSections'
+import { keepInPlace } from '../utils/scrollAnchor'
 import type { TemplateId } from '../templates'
 import type { BrandFonts, CoverData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/BrandManualPage.css'
@@ -87,7 +88,10 @@ export function BrandManualPage({
                         className="manual-section-toggle"
                         aria-expanded={isOpen}
                         aria-controls={bodyId}
-                        onClick={() => toggleSection(section.id)}
+                        onClick={(event) => {
+                          keepInPlace(event.currentTarget) // the section above may fold
+                          toggleSection(section.id)
+                        }}
                       >
                         {index + 1}. {section.label}
                         <span className="manual-section-chevron" aria-hidden="true" />

@@ -25,6 +25,18 @@
   gap: 24px;
 }
 
+/* Overview: 4 pages per row; when there are more pages they wrap onto new rows */
+.manual-preview[data-view='overview'] .manual-pages {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* Each page is laid out like a Grid thumbnail (about twice as wide) and then drawn at half
+   size, so its text, logo and swatches shrink together instead of overflowing the page */
+.manual-preview[data-view='overview'] .manual-page {
+  zoom: 0.5;
+}
+
 /* Orientation and view pickers, side by side (wrap on narrow columns) */
 .preview-toolbar {
   display: flex;

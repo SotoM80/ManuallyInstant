@@ -1,9 +1,9 @@
-/* Two columns: preview (left, wider) | sections (right, a bit narrower) */
+/* Two columns: preview (left, takes the rest) | sections (right, a fixed narrow column) */
 .brand-manual-page {
-  max-width: 1100px;
+  max-width: none; /* uses the whole width of #root */
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
   gap: 32px;
   align-items: start;
   text-align: left;

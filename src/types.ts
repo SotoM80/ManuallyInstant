@@ -4,7 +4,7 @@ export type FontSize = 'Small' | 'Medium' | 'Large'
 
 export type Orientation = 'portrait' | 'landscape'
 
-export type PreviewView = 'grid' | 'pages'
+export type PreviewView = 'grid' | 'overview' | 'pages'
 
 export type TitleStyle = {
   fontFamily: string

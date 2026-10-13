@@ -156,7 +156,7 @@ describe('Brand Manual – preview view', () => {
     return within(getPreview()).getByRole('group', { name: 'Preview view' });
   }
 
-  function selectView(name: 'Grid' | 'Pages') {
+  function selectView(name: 'Grid' | 'Overview' | 'Pages') {
     fireEvent.click(within(getViewGroup()).getByRole('radio', { name }));
   }
 
@@ -194,6 +194,25 @@ describe('Brand Manual – preview view', () => {
       'landscape',
       'landscape',
     ]);
+  });
+
+  // Spec: specs/brandmanual.md, Scenario 8b — Overview Shows Four Pages Per Row
+  it('shows every page in the Overview when it is selected, without Save', () => {
+    // Given
+    renderApp('/brand-manual');
+
+    // When
+    selectView('Overview');
+
+    // Then
+    expect(within(getViewGroup()).getByRole('radio', { name: 'Overview' })).toBeChecked();
+    expect(within(getViewGroup()).getByRole('radio', { name: 'Grid' })).not.toBeChecked();
+    expect(getPreview()).toHaveAttribute('data-view', 'overview');
+    expect(
+      within(getPreview())
+        .getAllByRole('article')
+        .map((page) => page.getAttribute('aria-label')),
+    ).toEqual(['Cover', 'Logo', 'Color palette', 'Typography']);
   });
 
   // Spec: specs/brandmanual.md, Scenario 9 — Preview View Is Kept Between Pages

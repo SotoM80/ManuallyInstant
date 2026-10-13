@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import type { AnimationEvent, FormEvent } from 'react'
 import { ColorPicker } from './ColorPicker'
 import { INVALID_HEX_MESSAGE, PALETTE, colorValues, normalizeHex } from '../data/colorPalette'
+import { keepInPlace } from '../utils/scrollAnchor'
 import { validateColor, validateText } from '../utils/validation'
 import type { PaletteColor } from '../types'
 
@@ -122,7 +123,10 @@ export function ColorsForm({ onSubmit }: ColorsFormProps) {
               aria-controls={bodyId}
               aria-label={label}
               aria-describedby={summaryId}
-              onClick={() => toggleColor(row.key)}
+              onClick={(event) => {
+                keepInPlace(event.currentTarget) // the color above may fold
+                toggleColor(row.key)
+              }}
             >
               <span
                 className="palette-block-chip"
@@ -190,7 +194,10 @@ export function ColorsForm({ onSubmit }: ColorsFormProps) {
       <button
         type="button"
         className="palette-secondary-button"
-        onClick={addColor}
+        onClick={(event) => {
+          keepInPlace(event.currentTarget) // the open color above folds
+          addColor()
+        }}
         disabled={rows.length >= MAX_COLORS}
       >
         Add color

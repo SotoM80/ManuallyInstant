@@ -226,7 +226,8 @@
 }
 
 /* Small landscape thumbnails are short: a smaller "Aa" leaves room for both fonts */
-.manual-preview[data-view='grid'] .manual-page[data-orientation='landscape'] .type-sample {
+.manual-preview[data-view='grid'] .manual-page[data-orientation='landscape'] .type-sample,
+.manual-preview[data-view='overview'] .manual-page[data-orientation='landscape'] .type-sample {
   font-size: 22px;
 }
 

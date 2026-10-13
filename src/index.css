@@ -60,7 +60,7 @@
 }
 
 #root {
-  width: 1126px;
+  width: 96%; /* almost the whole window, with a small margin on each side */
   max-width: 100%;
   margin: 0 auto;
   text-align: center;

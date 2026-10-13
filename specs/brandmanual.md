@@ -8,14 +8,15 @@ The content of the Logo section (it will have its own future spec). The content 
 
 ## 2. Interface
 ### Layout
-* **Column widths**: The columns are not the same width. The preview (left) is wider, about 60%, and the sections (right) are narrower, about 40% (`3fr` / `2fr`).
+* **Column widths**: The page uses almost the whole window (96%). The sections (right) are a narrow column of 320–380px, and the preview (left) takes the rest of the width (`minmax(0, 1fr)` / `minmax(320px, 380px)`).
 * **Page Orientation** (top of the left column, above the thumbnails): A group labeled "Page orientation" with two options:
   * **Portrait** (vertical): A4 standing, `210 × 297`. Selected by default.
   * **Landscape** (apaisado): A4 lying down, `297 × 210`.
 
   Choosing an option changes the shape of all four page thumbnails immediately (no Save needed). The chosen orientation is also the one the PDF export will use (Phase 4).
-* **Preview View** (next to Page orientation): A group labeled "Preview view" with two options:
+* **Preview View** (next to Page orientation): A group labeled "Preview view" with three options:
   * **Grid**: the four pages as small thumbnails in a 2 × 2 grid. Selected by default.
+  * **Overview**: four pages per row, so many pages can be seen at once; when the manual has more pages they continue on the next rows. Each page looks like a Grid thumbnail drawn at half size. The preview stays sticky.
   * **Pages**: a closer look. Each page takes the full width of the left column, one below the other, and the user scrolls down to see them. The cover title is drawn at its real size (in Grid it is drawn at half size). In this view the preview is not sticky, so every page can be reached by scrolling.
 
   Choosing an option changes the view immediately (no Save needed). It only changes how the preview looks, not the manual or the PDF.
@@ -107,6 +108,11 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Given**: The user is on the Brand Manual page and Grid is selected (default).
 * **When**: The user selects Pages.
 * **Then**: Pages is selected, the preview shows the four pages one below the other, in the same order and orientation, without clicking Save.
+
+### Scenario 8b: Overview Shows Four Pages Per Row
+* **Given**: The user is on the Brand Manual page and Grid is selected (default).
+* **When**: The user selects Overview.
+* **Then**: Overview is selected and the preview shows all the pages, in the same order and orientation, four per row, without clicking Save.
 
 ### Scenario 9: Preview View Is Kept Between Pages
 * **Given**: The user selected Pages.
