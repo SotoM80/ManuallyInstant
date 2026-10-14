@@ -186,12 +186,12 @@
 }
 
 /* Logo is much taller than the screen: it scrolls on its own, so the user moves inside it
-   while the page (and the preview next to it) stays still. Only Logo: it has no floating
-   pop-ups, which a scroll area would cut off (Cover, Colors and Typography have them). */
+   while the page (and the preview next to it) stays still. At its top or bottom, scrolling
+   on carries on with the page. Only Logo: it has no floating pop-ups, which a scroll area
+   would cut off (Cover, Colors and Typography have them). */
 .manual-section[data-section='logo'][data-open='true'] .manual-section-inner {
   max-height: max(320px, calc(100dvh - 160px));
   overflow-y: auto;
-  overscroll-behavior: contain; /* reaching the end does not start scrolling the page */
   scrollbar-gutter: stable;
   padding-right: 4px;
 }

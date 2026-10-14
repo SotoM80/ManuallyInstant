@@ -43,7 +43,7 @@ The sections work as an **accordion**, like the colors of the Colors section (se
 * Only **one** section is open at a time. The Page starts with **Cover** open.
 * Sections not built yet ("Coming soon") can't be opened.
 * A folded section keeps everything typed in it, and can't be reached with the keyboard or by screen readers (`inert`).
-* **Logo scrolls on its own**: while open, the Logo section is at most as tall as the screen (minus 160px, never under 320px) and scrolls inside, so the page and the preview stay still. Reaching its end does not scroll the page. The other sections do not scroll on their own, because a scroll area would cut off their floating pop-ups (swatches, RGB, font lists).
+* **Logo scrolls on its own**: while open, the Logo section is at most as tall as the screen (minus 160px, never under 320px) and scrolls inside, so the page and the preview stay still. At its top or bottom, scrolling on carries on with the page. The other sections do not scroll on their own, because a scroll area would cut off their floating pop-ups (swatches, RGB, font lists).
 * **Motion** (no bounce, `--ease-smooth`): the work area unfolds from no height to its full height, settling slowly, while its content fades in and glides down a few pixels; folding is the same in reverse, a little faster. The arrow turns with it, and the open section gets an accent border and a soft shadow.
 
 ### Live Preview and Apply
@@ -60,6 +60,7 @@ So the page being edited is always in view without scrolling:
 * The pages of the open section get an accent outline, and each page keeps its natural number in its caption (e.g. "7. Typography" while it is first).
 * Apply has nothing to do with the order: it only shows waiting images.
 * With Cover open (as on start) nothing moves, because Cover is already first.
+* **Logo areas**: the Logo section has four areas, each with its page: Concept → Brand concept, Anatomy → Anatomy, Versions → Logo versions, Clear space & size → Clear space. The area being worked in decides the **main page**: it comes first, with the accent outline, followed by the other Logo pages. An area becomes the one being worked in when the user clicks anywhere in it (a field, its title or an empty spot) or reaches it with the keyboard. Scrolling inside Logo does not change it, so the form and the preview never move at the same time. When Logo opens, Concept is the first one.
 * The open **section** moves too: it goes to the top of the right column (keeping its number, e.g. "4. Typography") and the column is pushed down so it starts at the same height as its page. The form and its page sit side by side. Folding it puts every section back in order. The sections glide like the pages. If the top of the column is above the screen when a section opens, the page scrolls smoothly up to it. On narrow screens (one column) the sections move but are not pushed down.
 
 ### Adding Sections
@@ -170,3 +171,8 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Given**: Cover is open.
 * **When**: The user opens Typography.
 * **Then**: "4. Typography" glides to the top of the sections column, at the same height as the Typography page at the top of the preview, so both are seen side by side. Folding it puts the sections back in their order.
+
+### Scenario 17: The Logo Area Decides the Main Page
+* **Given**: Logo is open, and Brand concept is the main page.
+* **When**: The user clicks in "Version 1 name" (scrolling to Versions alone changes nothing).
+* **Then**: Logo versions glides to the first place of the preview, with the accent outline, followed by Brand concept, Anatomy and Clear space.

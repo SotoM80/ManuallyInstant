@@ -287,10 +287,10 @@ describe('Brand Manual – open section first', () => {
       .map((page) => page.getAttribute('aria-label'));
   }
 
-  it('puts the featured pages first, keeping the natural order of both groups', () => {
+  it('puts the featured pages first in the order given, then the rest in their natural order', () => {
     expect(orderPages(['Anatomy', 'Brand concept'])).toEqual([
-      'Brand concept',
       'Anatomy',
+      'Brand concept',
       'Cover',
       'Logo versions',
       'Clear space',
@@ -452,5 +452,63 @@ describe('Brand Manual – open section beside its page', () => {
 
       expect(offset()).toBe('');
     });
+  });
+});
+
+// Spec: specs/brandmanual.md, Section 2 — The area being worked in decides the main Logo page
+describe('Brand Manual – Logo areas', () => {
+  function openLogo() {
+    fireEvent.click(within(getSections()).getByRole('button', { name: '2. Logo' }));
+  }
+
+  function pageOrder() {
+    return within(getPreview())
+      .getAllByRole('article')
+      .map((page) => page.getAttribute('aria-label'));
+  }
+
+  function featuredPages() {
+    return within(getPreview())
+      .getAllByRole('listitem')
+      .filter((item) => item.getAttribute('data-featured') === 'true')
+      .map((item) => item.querySelector('article')?.getAttribute('aria-label'));
+  }
+
+  it('starts with Brand concept as the main page when Logo opens', () => {
+    renderApp('/brand-manual');
+
+    openLogo();
+
+    expect(pageOrder().slice(0, 4)).toEqual(['Brand concept', 'Anatomy', 'Logo versions', 'Clear space']);
+    expect(featuredPages()).toEqual(['Brand concept']);
+  });
+
+  it('makes Logo versions the main page when the user types in Versions', () => {
+    renderApp('/brand-manual');
+    openLogo();
+
+    fireEvent.focus(screen.getByLabelText('Version 1 name'));
+
+    expect(pageOrder().slice(0, 4)).toEqual(['Logo versions', 'Brand concept', 'Anatomy', 'Clear space']);
+    expect(featuredPages()).toEqual(['Logo versions']);
+  });
+
+  it('makes Anatomy the main page when the user clicks anywhere in its area', () => {
+    renderApp('/brand-manual');
+    openLogo();
+
+    fireEvent.click(within(screen.getByRole('form', { name: 'Logo' })).getByRole('group', { name: 'Anatomy' }));
+
+    expect(featuredPages()).toEqual(['Anatomy']);
+    expect(pageOrder()[0]).toBe('Anatomy');
+  });
+
+  it('does not change the main page when the user only scrolls inside Logo', () => {
+    renderApp('/brand-manual');
+    openLogo();
+
+    fireEvent.scroll(screen.getByRole('form', { name: 'Logo' }).parentElement as HTMLElement);
+
+    expect(featuredPages()).toEqual(['Brand concept']);
   });
 });

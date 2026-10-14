@@ -1,11 +1,11 @@
 import { useCallback, useRef, useState } from 'react'
-import type { AnimationEvent, ReactNode } from 'react'
+import type { AnimationEvent, ReactNode, SyntheticEvent } from 'react'
 import { BrandForm } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
 import { ManualPreview } from '../components/ManualPreview'
-import { MANUAL_SECTIONS, SECTION_PAGES, orderPages } from '../data/manualSections'
+import { LOGO_AREA_PAGES, MANUAL_SECTIONS, SECTION_PAGES, orderPages } from '../data/manualSections'
 import { useAlignOpenSection } from '../utils/useAlignOpenSection'
 import { useReorderGlide } from '../utils/useReorderGlide'
 import type { TemplateId } from '../templates'
@@ -50,7 +50,11 @@ export function BrandManualPage({
   const [openSection, setOpenSection] = useState<string | null>('cover')
   // The open section's pages come first in the preview, so the page being edited is always
   // in view; folding the section puts every page back in its natural order.
-  const featured = openSection ? SECTION_PAGES[openSection] : []
+  // In the Logo section, the area being worked in decides which of its four pages is the main one
+  const [logoArea, setLogoArea] = useState('concept')
+  const sectionPages = openSection ? SECTION_PAGES[openSection] : []
+  const mainPage = openSection === 'logo' ? LOGO_AREA_PAGES[logoArea] : sectionPages[0]
+  const featured = mainPage ? [mainPage, ...sectionPages.filter((page) => page !== mainPage)] : []
   // The open section also moves to the top of its column, at the height of its page, so
   // the form and its page sit side by side. Folding it puts every section back in order.
   const sections = openSection
@@ -63,6 +67,13 @@ export function BrandManualPage({
   const sectionList = useRef<HTMLOListElement>(null)
   useAlignOpenSection(pageRoot, openSection !== null)
   useReorderGlide(sectionList, sections.map((section) => section.id).join('|'))
+
+  // Clicking in an area of the Logo form (or reaching it with Tab) makes its page the main
+  // one. Scrolling does not: moving through the form and the preview at once fought each other.
+  function handleLogoArea(event: SyntheticEvent<HTMLElement>) {
+    const area = (event.target as Element).closest('[data-area]')?.getAttribute('data-area')
+    if (area) setLogoArea(area)
+  }
 
   function toggleSection(id: string) {
     const opening = openSection !== id
@@ -117,7 +128,7 @@ export function BrandManualPage({
         template={template}
         onTemplateChange={onTemplateChange}
         pages={orderPages(featured)}
-        featured={featured}
+        featured={mainPage ? [mainPage] : []}
       />
 
       <section className="manual-sections" aria-label="Manual sections">
@@ -172,7 +183,13 @@ export function BrandManualPage({
                 </div>
                 {section.ready && (
                   <div id={bodyId} className="manual-section-body" inert={!isOpen}>
-                    <div className="manual-section-inner">{sectionForms[section.id]}</div>
+                    <div
+                      className="manual-section-inner"
+                      onClick={section.id === 'logo' ? handleLogoArea : undefined}
+                      onFocus={section.id === 'logo' ? handleLogoArea : undefined}
+                    >
+                      {sectionForms[section.id]}
+                    </div>
                   </div>
                 )}
               </li>

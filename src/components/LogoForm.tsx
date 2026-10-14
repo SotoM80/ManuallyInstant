@@ -288,7 +288,8 @@ export function LogoForm({
 
   return (
     <form onSubmit={(event) => event.preventDefault()} noValidate aria-label="Logo">
-      <fieldset className="logo-form-group">
+      {/* data-area: which page each group fills (LOGO_AREA_PAGES), so it can come first */}
+      <fieldset className="logo-form-group" data-area="concept">
         <legend>Concept</legend>
 
         {textField('logo-brand-name', 'Brand name', brandName, '', setBrandName)}
@@ -304,7 +305,7 @@ export function LogoForm({
 
       </fieldset>
 
-      <fieldset className="logo-form-group">
+      <fieldset className="logo-form-group" data-area="anatomy">
         <legend>Anatomy</legend>
 
         {/* One or more kinds of mark; each ticked one gets a card below */}
@@ -432,7 +433,7 @@ export function LogoForm({
         })}
       </fieldset>
 
-      <fieldset className="logo-form-group" disabled={!parts.versions}>
+      <fieldset className="logo-form-group" data-area="versions" disabled={!parts.versions}>
         <legend>Versions</legend>
         {!parts.versions ? (
           <span className="manual-section-badge logo-form-soon">Coming soon</span>
@@ -524,7 +525,7 @@ export function LogoForm({
         )}
       </fieldset>
 
-      <fieldset className="logo-form-group" disabled={!parts.clearSpace}>
+      <fieldset className="logo-form-group" data-area="clearSpace" disabled={!parts.clearSpace}>
         <legend>Clear space & size</legend>
         {!parts.clearSpace ? (
           <span className="manual-section-badge logo-form-soon">Coming soon</span>

@@ -47,10 +47,19 @@ export const SECTION_PAGES: Record<string, string[]> = {
   typography: ['Typography'],
 }
 
-// The featured pages first, then every other page; both keep the order of MANUAL_PAGES.
+// The four areas of the Logo form and the page each one fills. While the user works in an
+// area (typing in it or scrolling to it), its page is the main one: first in the preview.
+export const LOGO_AREA_PAGES: Record<string, string> = {
+  concept: 'Brand concept',
+  anatomy: 'Anatomy',
+  versions: 'Logo versions',
+  clearSpace: 'Clear space',
+}
+
+// The featured pages first, in the order given, then every other page in its natural order.
 export function orderPages(featured: string[]) {
   return [
-    ...MANUAL_PAGES.filter((page) => featured.includes(page)),
+    ...featured.filter((page) => MANUAL_PAGES.includes(page)),
     ...MANUAL_PAGES.filter((page) => !featured.includes(page)),
   ]
 }
