@@ -12,21 +12,24 @@ A web app that builds a brand's visual identity manual in minutes.
 Design agencies fill in four sections, and the brand manual updates **live** next to the form:
 
 1. **Cover**: manual title (font, style, size), colors, "Designed by" and the main logo.
-2. **Logo**: brand name, the idea behind it, and the kinds of mark it uses (Logotype, Isotype, Imagotype, Isologo).
+2. **Logo**: brand name, the idea behind it, the kinds of mark it uses (Logotype, Isotype, Imagotype, Isologo) and the official versions of the logo (Horizontal, Symbol only…).
 3. **Colors**: 1 to 6 colors, each with a name and its HEX, RGB and CMYK (approximate) values.
 4. **Typography**: a primary and a secondary font from Google Fonts.
 
 Key features:
 - **Live preview**: text, colors and fonts show as you type. A new image waits for the **Apply** button, so it is never swapped in by accident.
-- **Work side by side**: when a section opens, it moves to the top of its column and its page moves to the top of the preview, at the same height.
+- **Work side by side**: when a section opens, it moves to the top of its column and its page moves to the top of the preview, at the same height. In the Logo section, clicking in an area (Concept, Anatomy, Versions…) makes its page the main one.
+- **Logo scrolls on its own**: the long Logo section scrolls inside, so the preview stays still; at its top or bottom, the page scrolls on.
 - **Colors calculated for you**: pick a color and get its HEX, RGB and CMYK values.
-- **Three templates**: they change where the content sits on each page, never the content itself.
+- **Three templates**: centered (1), aligned left (2) or with a side column (3). They change where the content sits on each page, never the content itself.
 - **Portrait or landscape**, and three ways to view the manual: Grid, Overview and Pages.
 
 <!-- A screenshot of the Brand Manual page can go here. -->
 
 ### Status
 - ✅ Every section (Cover, Logo, Colors, Typography), the live preview and the three templates.
+- ✅ Logo pages: Brand concept, Anatomy and Logo versions.
+- 🔜 The Clear space page of the Logo section.
 - 🔜 The final layout of the 4-page manual (Phase 3).
 - 🔜 Export to two PDFs: one for print (high resolution, CMYK values highlighted) and one for screen (RGB/HEX, lightweight) (Phase 4).
 
@@ -93,21 +96,24 @@ Write its spec in `specs/` first, and add its tests in `test/`.
 Las agencias de diseño completan cuatro secciones, y el manual de marca se actualiza **en vivo** al lado del formulario:
 
 1. **Cover** (portada): título del manual (fuente, estilo y tamaño), colores, "Designed by" y el logotipo principal.
-2. **Logo**: nombre de la marca, la idea detrás de ella y los tipos de marca que usa (Logotipo, Isotipo, Imagotipo, Isologo).
+2. **Logo**: nombre de la marca, la idea detrás de ella, los tipos de marca que usa (Logotipo, Isotipo, Imagotipo, Isologo) y las versiones oficiales del logo (Horizontal, Solo símbolo…).
 3. **Colors**: de 1 a 6 colores, cada uno con su nombre y sus valores HEX, RGB y CMYK (aproximado).
 4. **Typography**: una fuente principal y una secundaria de Google Fonts.
 
 Funciones clave:
 - **Vista previa en vivo**: el texto, los colores y las fuentes se ven mientras escribes. Una imagen nueva espera al botón **Apply**, así nunca se cambia por accidente.
-- **Trabajo lado a lado**: al abrir una sección, sube al primer lugar de su columna y su hoja sube al primer lugar del preview, a la misma altura.
+- **Trabajo lado a lado**: al abrir una sección, sube al primer lugar de su columna y su hoja sube al primer lugar del preview, a la misma altura. En la sección Logo, al hacer clic en un área (Concept, Anatomy, Versions…) su hoja pasa a ser la principal.
+- **Logo con su propio scroll**: la sección Logo, que es larga, se desplaza por dentro y el preview no se mueve; al llegar arriba o abajo, sigue moviendo la página.
 - **Colores calculados por ti**: eliges un color y obtienes sus valores HEX, RGB y CMYK.
-- **Tres plantillas**: cambian dónde se ubica el contenido en cada hoja, nunca el contenido.
+- **Tres plantillas**: centrada (1), alineada a la izquierda (2) o con columna lateral (3). Cambian dónde se ubica el contenido en cada hoja, nunca el contenido.
 - **Vertical o apaisado**, y tres formas de ver el manual: Grid, Overview y Pages.
 
 <!-- Aquí puede ir una captura de la página Brand Manual. -->
 
 ### Estado
 - ✅ Todas las secciones (Cover, Logo, Colors, Typography), la vista previa en vivo y las tres plantillas.
+- ✅ Hojas de Logo: Brand concept, Anatomy y Logo versions.
+- 🔜 La hoja Clear space de la sección Logo.
 - 🔜 El maquetado final del manual de 4 páginas (Fase 3).
 - 🔜 La exportación a dos PDF: uno para imprenta (alta resolución, valores CMYK destacados) y otro para pantalla (RGB/HEX, liviano) (Fase 4).
 
