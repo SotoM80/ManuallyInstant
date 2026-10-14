@@ -66,6 +66,9 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  /* The open section (first) starts at the height of its page (useAlignOpenSection) */
+  padding-top: var(--sections-offset, 0px);
+  transition: padding-top 500ms var(--ease-smooth);
   display: grid;
   gap: 16px;
 }

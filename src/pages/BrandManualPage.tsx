@@ -1,12 +1,13 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { AnimationEvent, ReactNode } from 'react'
 import { BrandForm } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
 import { ManualPreview } from '../components/ManualPreview'
-import { MANUAL_SECTIONS } from '../data/manualSections'
-import { keepInPlace } from '../utils/scrollAnchor'
+import { MANUAL_SECTIONS, SECTION_PAGES, orderPages } from '../data/manualSections'
+import { useAlignOpenSection } from '../utils/useAlignOpenSection'
+import { useReorderGlide } from '../utils/useReorderGlide'
 import type { TemplateId } from '../templates'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/BrandManualPage.css'
@@ -47,9 +48,28 @@ export function BrandManualPage({
   // The sections work like an accordion: only one is open, the others fold into their header.
   // Folded forms stay in the page (inert), so nothing typed in them is lost.
   const [openSection, setOpenSection] = useState<string | null>('cover')
+  // The open section's pages come first in the preview, so the page being edited is always
+  // in view; folding the section puts every page back in its natural order.
+  const featured = openSection ? SECTION_PAGES[openSection] : []
+  // The open section also moves to the top of its column, at the height of its page, so
+  // the form and its page sit side by side. Folding it puts every section back in order.
+  const sections = openSection
+    ? [
+        ...MANUAL_SECTIONS.filter((section) => section.id === openSection),
+        ...MANUAL_SECTIONS.filter((section) => section.id !== openSection),
+      ]
+    : MANUAL_SECTIONS
+  const pageRoot = useRef<HTMLDivElement>(null)
+  const sectionList = useRef<HTMLOListElement>(null)
+  useAlignOpenSection(pageRoot, openSection !== null)
+  useReorderGlide(sectionList, sections.map((section) => section.id).join('|'))
 
   function toggleSection(id: string) {
-    setOpenSection((prev) => (prev === id ? null : id))
+    const opening = openSection !== id
+    setOpenSection(opening ? id : null)
+    // The section and its page are now at the top: bring the top into view if it is above it
+    const top = sectionList.current?.getBoundingClientRect().top ?? 0
+    if (opening && top < 0) window.scrollBy({ top: top - 16, behavior: 'smooth' })
   }
 
   // The forms send every change to the preview at once, but a new image waits for the
@@ -84,7 +104,7 @@ export function BrandManualPage({
   }
 
   return (
-    <div className="brand-manual-page">
+    <div className="brand-manual-page" ref={pageRoot}>
       <ManualPreview
         cover={cover}
         logo={logo}
@@ -96,6 +116,8 @@ export function BrandManualPage({
         onPreviewViewChange={onPreviewViewChange}
         template={template}
         onTemplateChange={onTemplateChange}
+        pages={orderPages(featured)}
+        featured={featured}
       />
 
       <section className="manual-sections" aria-label="Manual sections">
@@ -112,14 +134,17 @@ export function BrandManualPage({
           Apply
         </button>
 
-        <ol>
-          {MANUAL_SECTIONS.map((section, index) => {
+        <ol ref={sectionList}>
+          {sections.map((section) => {
+            // Always the natural number, so a section moved to the top still reads "4. Typography"
+            const number = MANUAL_SECTIONS.indexOf(section) + 1
             const isOpen = section.ready && openSection === section.id
             const bodyId = `manual-section-${section.id}`
             return (
               <li
                 key={section.id}
                 className="manual-section"
+                data-key={section.id}
                 aria-disabled={section.ready ? undefined : 'true'}
                 data-open={isOpen}
               >
@@ -131,17 +156,14 @@ export function BrandManualPage({
                         className="manual-section-toggle"
                         aria-expanded={isOpen}
                         aria-controls={bodyId}
-                        onClick={(event) => {
-                          keepInPlace(event.currentTarget) // the section above may fold
-                          toggleSection(section.id)
-                        }}
+                        onClick={() => toggleSection(section.id)}
                       >
-                        {index + 1}. {section.label}
+                        {number}. {section.label}
                         <span className="manual-section-chevron" aria-hidden="true" />
                       </button>
                     ) : (
                       <>
-                        {index + 1}. {section.label}
+                        {number}. {section.label}
                       </>
                     )}
                   </h2>

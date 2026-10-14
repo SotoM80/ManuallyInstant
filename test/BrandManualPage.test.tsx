@@ -1,6 +1,7 @@
 import { screen, fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
-import { fillRequiredCoverFields, pickSwatch, typeTitle } from './coverForm';
+import { orderPages } from '../src/data/manualSections';
+import { fillRequiredCoverFields, getApplyButton, pickSwatch, typeTitle } from './coverForm';
 
 // The manual's pages, in order (the Logo section fills pages 2 to 5)
 const ALL_PAGES = [
@@ -271,5 +272,185 @@ describe('Brand Manual – sections accordion', () => {
     fireEvent.click(getToggle('1. Cover'));
 
     expect(screen.getByLabelText('Brand manual title')).toHaveValue('My Brand');
+  });
+});
+
+// Spec: specs/brandmanual.md, Section 2 — The open section's pages come first
+describe('Brand Manual – open section first', () => {
+  function openSection(name: string) {
+    fireEvent.click(within(getSections()).getByRole('button', { name }));
+  }
+
+  function pageOrder() {
+    return within(getPreview())
+      .getAllByRole('article')
+      .map((page) => page.getAttribute('aria-label'));
+  }
+
+  it('puts the featured pages first, keeping the natural order of both groups', () => {
+    expect(orderPages(['Anatomy', 'Brand concept'])).toEqual([
+      'Brand concept',
+      'Anatomy',
+      'Cover',
+      'Logo versions',
+      'Clear space',
+      'Color palette',
+      'Typography',
+    ]);
+    expect(orderPages([])).toEqual(ALL_PAGES);
+  });
+
+  it('starts in the natural order with Cover open, and Apply disabled', () => {
+    renderApp('/brand-manual');
+
+    expect(pageOrder()).toEqual(ALL_PAGES);
+    expect(getApplyButton()).toBeDisabled();
+  });
+
+  it('moves the Typography page to the top when its section opens, keeping its number', () => {
+    renderApp('/brand-manual');
+
+    openSection('4. Typography');
+
+    expect(pageOrder()[0]).toBe('Typography');
+    const first = within(getPreview()).getAllByRole('listitem')[0];
+    expect(first).toHaveAttribute('data-featured', 'true');
+    expect(first).toHaveTextContent('7. Typography');
+  });
+
+  it('moves the four Logo pages to the top, in their order', () => {
+    renderApp('/brand-manual');
+
+    openSection('2. Logo');
+
+    expect(pageOrder().slice(0, 4)).toEqual(['Brand concept', 'Anatomy', 'Logo versions', 'Clear space']);
+    expect(pageOrder()[4]).toBe('Cover');
+  });
+
+  it('puts every page back in its natural order when the section is folded', () => {
+    renderApp('/brand-manual');
+    openSection('3. Colors');
+
+    openSection('3. Colors'); // fold it
+
+    expect(pageOrder()).toEqual(ALL_PAGES);
+  });
+
+  it('swaps the pages at the top when another section opens', () => {
+    renderApp('/brand-manual');
+    openSection('3. Colors');
+
+    openSection('4. Typography');
+
+    expect(pageOrder().slice(0, 2)).toEqual(['Typography', 'Cover']);
+  });
+
+  it('does not use Apply to reorder: Apply stays off while a section is open', () => {
+    renderApp('/brand-manual');
+
+    openSection('4. Typography');
+
+    expect(getApplyButton()).toBeDisabled();
+  });
+
+  it('makes the pages glide to their new places when the order changes', () => {
+    // jsdom has no layout: each item is placed 100px below the one before it
+    const animate = jest.fn();
+    Element.prototype.animate = animate;
+    const rect = jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: Element,
+    ) {
+      const index = this.parentElement ? Array.from(this.parentElement.children).indexOf(this) : 0;
+      return { left: 0, top: index * 100 } as DOMRect;
+    });
+    renderApp('/brand-manual');
+
+    openSection('4. Typography');
+
+    // Typography went from 7th to 1st: it starts 600px lower and glides up
+    const typography = within(getPreview()).getAllByRole('listitem')[0];
+    const call = animate.mock.calls.find((_, i) => animate.mock.contexts[i] === typography);
+    expect(call?.[0][0]).toEqual({ transform: 'translate(0px, 600px)' });
+    expect(call?.[1]).toEqual(expect.objectContaining({ duration: 500 }));
+
+    rect.mockRestore();
+    delete (Element.prototype as Partial<Element>).animate;
+  });
+});
+
+// Spec: specs/brandmanual.md, Section 2 — The open section moves up beside its page
+describe('Brand Manual – open section beside its page', () => {
+  function openSection(name: string) {
+    fireEvent.click(within(getSections()).getByRole('button', { name }));
+  }
+
+  function sectionOrder() {
+    return within(getSections())
+      .getAllByRole('heading', { level: 2 })
+      .map((heading) => heading.textContent);
+  }
+
+  function offset() {
+    return (document.querySelector('.brand-manual-page') as HTMLElement).style.getPropertyValue(
+      '--sections-offset',
+    );
+  }
+
+  it('moves the open section to the top of its column, keeping its number', () => {
+    renderApp('/brand-manual');
+
+    openSection('4. Typography');
+
+    expect(sectionOrder()).toEqual(['4. Typography', '1. Cover', '2. Logo', '3. Colors']);
+  });
+
+  it('puts every section back in order when it is folded', () => {
+    renderApp('/brand-manual');
+    openSection('4. Typography');
+
+    openSection('4. Typography');
+
+    expect(sectionOrder()).toEqual(['1. Cover', '2. Logo', '3. Colors', '4. Typography']);
+  });
+
+  it('keeps what was typed when its section moves', () => {
+    renderApp('/brand-manual');
+    typeTitle('My Brand');
+
+    openSection('3. Colors');
+    openSection('1. Cover');
+
+    expect(screen.getByLabelText('Brand manual title')).toHaveValue('My Brand');
+  });
+
+  describe('alignment', () => {
+    // jsdom has no layout: the page list starts at 140px and the section list at 60px
+    let rect: jest.SpyInstance;
+    beforeEach(() => {
+      rect = jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+        this: Element,
+      ) {
+        if (this.classList.contains('manual-pages')) return { top: 140, left: 0 } as DOMRect;
+        if (this.parentElement?.classList.contains('manual-sections')) return { top: 60, left: 0 } as DOMRect;
+        return { top: 0, left: 0 } as DOMRect;
+      });
+    });
+    afterEach(() => rect.mockRestore());
+
+    it('pushes the sections down so the open one starts at the height of its page', () => {
+      renderApp('/brand-manual');
+
+      openSection('4. Typography');
+
+      expect(offset()).toBe('80px');
+    });
+
+    it('does not align when every section is folded', () => {
+      renderApp('/brand-manual');
+
+      openSection('1. Cover'); // Cover starts open: fold it
+
+      expect(offset()).toBe('');
+    });
   });
 });

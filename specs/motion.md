@@ -34,6 +34,7 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 ### Preview
 * Changing **Template**, **Page orientation** or **Preview view** makes each page and the cover's title, logo and "Designed by" glide from their old place and size to the new ones (browser View Transitions).
 * Each time a new Cover logo is applied, the cover grows into its page. Typing does not replay it.
+* Opening or folding a section makes the pages and the sections glide to their new order, softly and with no bounce, like the accordion (500 ms, `--ease-smooth`). Only the two lists move (FLIP with the Web Animations API, `src/utils/useReorderGlide.ts`), not the whole page as a View Transition would, so the accordion keeps unfolding underneath.
 * In browsers without View Transitions the preview changes at once, with no animation.
 
 ## 3. Preconditions & Postconditions

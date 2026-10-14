@@ -9,7 +9,9 @@ import { ClearSpacePage } from './pages/ClearSpacePage'
 import { ColorPalettePage } from './pages/ColorPalettePage'
 import { TypographyPage } from './pages/TypographyPage'
 import { DEFAULT_TYPOGRAPHY_COLOR } from '../data/colorPalette'
+import { useRef } from 'react'
 import { withViewTransition } from '../utils/viewTransition'
+import { useReorderGlide } from '../utils/useReorderGlide'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/ManualPreview.css'
 
@@ -24,6 +26,8 @@ type ManualPreviewProps = {
   onPreviewViewChange: (view: PreviewView) => void
   template: TemplateId
   onTemplateChange: (template: TemplateId) => void
+  pages?: string[] // the order to draw the pages in (the open section's pages may come first)
+  featured?: string[] // pages moved to the top, marked so the user sees what they are editing
 }
 
 const ORIENTATIONS: { value: Orientation; label: string }[] = [
@@ -53,7 +57,13 @@ export function ManualPreview({
   onPreviewViewChange,
   template,
   onTemplateChange,
+  pages = MANUAL_PAGES,
+  featured = [],
 }: ManualPreviewProps) {
+  // When a section opens or folds, the pages glide to their new places
+  const pageList = useRef<HTMLOListElement>(null)
+  useReorderGlide(pageList, pages.join('|'))
+
   function renderPage(page: string) {
     const textColor = cover?.colors.typography ?? DEFAULT_TYPOGRAPHY_COLOR
     if (page === 'Brand concept')
@@ -134,19 +144,24 @@ export function ManualPreview({
         </fieldset>
       </div>
 
-      <ol className="manual-pages">
-        {MANUAL_PAGES.map((page, index) => (
-          <li key={page}>
+      <ol className="manual-pages" ref={pageList}>
+        {pages.map((page) => (
+          <li key={page} data-key={page} data-featured={featured.includes(page)}>
             <article
               className="manual-page"
               aria-label={page}
               data-orientation={orientation}
-              style={cover ? { background: cover.colors.background } : undefined}
+              style={{
+                // Named after the page, not its place, so each page keeps its own name when the order changes
+                viewTransitionName: `manual-page-${page.toLowerCase().replace(/ /g, '-')}`,
+                background: cover?.colors.background,
+              }}
             >
               <div className="manual-page-content">{renderPage(page)}</div>
             </article>
+            {/* Always the natural number, so a page moved to the top still reads "7. Typography" */}
             <span className="manual-page-name">
-              {index + 1}. {page}
+              {MANUAL_PAGES.indexOf(page) + 1}. {page}
             </span>
           </li>
         ))}

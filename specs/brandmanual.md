@@ -51,6 +51,16 @@ The sections have no Save buttons. Everything typed, picked or chosen in a secti
 * Apply shows every image waiting in every section at once, then is disabled again. It is disabled from the start, and a wrong file never turns it on.
 * It is only as wide as its label and sits on the right. When clicked, an accent ring pulses twice and a ✓ pops in next to "Apply" (decoration only: the accessible name stays "Apply").
 
+### The Open Section's Pages Come First
+So the page being edited is always in view without scrolling:
+* Opening a section moves its pages to the **top** of the preview, at the same size as the others, and the rest follow in their natural order. Cover → Cover; Logo → Brand concept, Anatomy, Logo versions, Clear space; Colors → Color palette; Typography → Typography.
+* Folding the section puts every page back in its natural order. Opening another section moves that section's pages to the top instead.
+* The pages glide softly to their new places, with no bounce: the same timing and easing as the accordion (about 0.5 s, `--ease-smooth`).
+* The pages of the open section get an accent outline, and each page keeps its natural number in its caption (e.g. "7. Typography" while it is first).
+* Apply has nothing to do with the order: it only shows waiting images.
+* With Cover open (as on start) nothing moves, because Cover is already first.
+* The open **section** moves too: it goes to the top of the right column (keeping its number, e.g. "4. Typography") and the column is pushed down so it starts at the same height as its page. The form and its page sit side by side. Folding it puts every section back in order. The sections glide like the pages. If the top of the column is above the screen when a section opens, the page scrolls smoothly up to it. On narrow screens (one column) the sections move but are not pushed down.
+
 ### Adding Sections
 Sections and preview pages come from lists (`src/data/manualSections.ts`). When a section is built, it is marked as ready in the list and its form is plugged in; the layout does not change.
 
@@ -139,3 +149,23 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Given**: The user typed "My Brand" in the Cover title.
 * **When**: The user opens Typography and then opens Cover again.
 * **Then**: The title field still shows "My Brand".
+
+### Scenario 13: The Open Section's Page Comes First
+* **Given**: The user is on the Brand Manual page, with Cover open and the pages in their natural order.
+* **When**: The user opens Typography.
+* **Then**: The Typography page is first in the preview, with an accent outline and the caption "7. Typography". Apply stays off.
+
+### Scenario 14: Folding Puts the Pages Back
+* **Given**: Colors is open and the Color palette page is first.
+* **When**: The user folds Colors (clicks its title).
+* **Then**: Every page glides back to its natural order.
+
+### Scenario 15: Another Section Opens
+* **Given**: Colors is open and the Color palette page is first.
+* **When**: The user opens Typography.
+* **Then**: The Typography page is first, followed by the other pages in their natural order (Cover second).
+
+### Scenario 16: The Open Section Moves Beside Its Page
+* **Given**: Cover is open.
+* **When**: The user opens Typography.
+* **Then**: "4. Typography" glides to the top of the sections column, at the same height as the Typography page at the top of the preview, so both are seen side by side. Folding it puts the sections back in their order.

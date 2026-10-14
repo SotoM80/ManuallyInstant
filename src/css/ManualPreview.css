@@ -122,15 +122,19 @@
   aspect-ratio: 297 / 210; /* A4, landscape (apaisado) */
 }
 
-/* A unique name per page lets each page glide to its new size and spot
-   when the orientation or view changes (see src/utils/viewTransition.ts) */
-.manual-pages li:nth-child(1) .manual-page { view-transition-name: manual-page-1; }
-.manual-pages li:nth-child(2) .manual-page { view-transition-name: manual-page-2; }
-.manual-pages li:nth-child(3) .manual-page { view-transition-name: manual-page-3; }
-.manual-pages li:nth-child(4) .manual-page { view-transition-name: manual-page-4; }
-.manual-pages li:nth-child(5) .manual-page { view-transition-name: manual-page-5; }
-.manual-pages li:nth-child(6) .manual-page { view-transition-name: manual-page-6; }
-.manual-pages li:nth-child(7) .manual-page { view-transition-name: manual-page-7; }
+/* Each page gets a unique view-transition-name inline (after its name, not its place), so it
+   glides to its new size and spot when the orientation or view changes
+   (src/utils/viewTransition.ts). When the order changes, useReorderGlide moves them. */
+
+/* A page of the open section, moved to the top: an accent outline shows what is being edited */
+.manual-pages li[data-featured='true'] .manual-page {
+  outline: 2px solid var(--accent-border);
+  outline-offset: 3px;
+}
+
+.manual-pages li[data-featured='true'] .manual-page-name {
+  color: var(--accent);
+}
 
 .manual-page-content {
   box-sizing: border-box; /* padding inside the 100% height, so nothing falls off the page */

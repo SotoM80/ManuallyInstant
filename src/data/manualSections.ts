@@ -37,3 +37,20 @@ export const MANUAL_PAGES = [
   'Color palette',
   'Typography',
 ]
+
+// Pages each section fills. While a section is open, its pages move to the top of the
+// preview, so the page being edited is always in view (see specs/brandmanual.md).
+export const SECTION_PAGES: Record<string, string[]> = {
+  cover: ['Cover'],
+  logo: ['Brand concept', 'Anatomy', 'Logo versions', 'Clear space'],
+  colors: ['Color palette'],
+  typography: ['Typography'],
+}
+
+// The featured pages first, then every other page; both keep the order of MANUAL_PAGES.
+export function orderPages(featured: string[]) {
+  return [
+    ...MANUAL_PAGES.filter((page) => featured.includes(page)),
+    ...MANUAL_PAGES.filter((page) => !featured.includes(page)),
+  ]
+}
