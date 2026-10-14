@@ -22,7 +22,7 @@ export type LogoParts = {
 }
 
 export const LOGO_PARTS: LogoParts = {
-  versions: false,
+  versions: true,
   clearSpace: false,
 }
 

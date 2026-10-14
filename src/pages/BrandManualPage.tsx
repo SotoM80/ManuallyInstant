@@ -145,6 +145,7 @@ export function BrandManualPage({
                 key={section.id}
                 className="manual-section"
                 data-key={section.id}
+                data-section={section.id}
                 aria-disabled={section.ready ? undefined : 'true'}
                 data-open={isOpen}
               >

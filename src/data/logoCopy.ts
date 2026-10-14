@@ -65,15 +65,25 @@ export function anatomyText(data: LogoData) {
   return `${data.brandName} works with ${listOfMarks(types)}. Each one has its own role:`
 }
 
-// 2.1 Primary version: the first variant
-export function primaryText(data: LogoData) {
-  const primary = data.variants[0]
-  return `The ${primary.name} version is the master configuration of ${data.brandName}. It is the default choice in every application, and the other versions are only used where it does not fit.`
+// The name a version is shown with: its own, or "Primary" / "Version 2"… while it is empty
+// (the preview is live, so a sentence must never show a gap).
+export function versionName(name: string, index: number) {
+  return name.trim() || (index === 0 ? 'Primary' : `Version ${index + 1}`)
 }
 
-// 2.3 Usage rules, one imperative sentence per variant
+// 2.1 Primary version: the first variant
+export function primaryText(data: LogoData) {
+  const name = versionName(data.variants[0]?.name ?? '', 0)
+  const brand = data.brandName || 'the brand'
+  return `The ${name} version is the master configuration of ${brand}. It is the default choice in every application, and the other versions are only used where it does not fit.`
+}
+
+// 2.3 Usage rules, one imperative sentence per variant. A version with no "use for" yet
+// has no rule (the page shows a placeholder when none has one).
 export function usageRules(data: LogoData) {
-  return data.variants.map((variant) => `Use the ${variant.name} version ${sentenceEnd(variant.usage)}.`)
+  return data.variants.flatMap((variant, index) =>
+    variant.usage.trim() ? [`Use the ${versionName(variant.name, index)} version ${sentenceEnd(variant.usage)}.`] : [],
+  )
 }
 
 // 3.1 Clear space

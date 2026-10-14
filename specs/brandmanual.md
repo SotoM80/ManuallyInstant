@@ -43,6 +43,7 @@ The sections work as an **accordion**, like the colors of the Colors section (se
 * Only **one** section is open at a time. The Page starts with **Cover** open.
 * Sections not built yet ("Coming soon") can't be opened.
 * A folded section keeps everything typed in it, and can't be reached with the keyboard or by screen readers (`inert`).
+* **Logo scrolls on its own**: while open, the Logo section is at most as tall as the screen (minus 160px, never under 320px) and scrolls inside, so the page and the preview stay still. Reaching its end does not scroll the page. The other sections do not scroll on their own, because a scroll area would cut off their floating pop-ups (swatches, RGB, font lists).
 * **Motion** (no bounce, `--ease-smooth`): the work area unfolds from no height to its full height, settling slowly, while its content fades in and glides down a few pixels; folding is the same in reverse, a little faster. The arrow turns with it, and the open section gets an accent border and a soft shadow.
 
 ### Live Preview and Apply

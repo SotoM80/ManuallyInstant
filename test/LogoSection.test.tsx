@@ -5,7 +5,11 @@ import { ClearSpacePage } from '../src/components/pages/ClearSpacePage';
 import { renderApp } from './renderApp';
 import type { LogoData } from '../src/types';
 import type { LogoParts } from '../src/data/manualSections';
-import { clickApply, fillRequiredCoverFields, getApplyButton, makeLogo, typeTitle } from './coverForm';
+import { clickApply, fillRequiredCoverFields, getApplyButton, makeLogo, typeTitle, uploadLogo } from './coverForm';
+
+function uploadCoverLogo(name: string) {
+  uploadLogo(makeLogo(name));
+}
 
 // Spec: specs/logo.md — Logo section form
 // Every part on, so the whole form can be tested (the app may still have some off).
@@ -361,12 +365,12 @@ describe('Logo section – preview pages', () => {
     fireEvent.click(within(sections).getByRole('button', { name: '2. Logo' }));
   }
 
-  it('shows the Brand concept and Anatomy placeholders, and "Coming soon" on the pages not built yet', () => {
+  it('shows the Brand concept, Anatomy and Logo versions placeholders, and "Coming soon" on Clear space', () => {
     renderApp('/brand-manual');
 
     expect(getPage('Brand concept')).toHaveTextContent('Your brand concept');
     expect(getPage('Anatomy')).toHaveTextContent('Your anatomy');
-    expect(getPage('Logo versions')).toHaveTextContent('Coming soon');
+    expect(getPage('Logo versions')).toHaveTextContent('Your logo versions');
     expect(getPage('Clear space')).toHaveTextContent('Coming soon');
   });
 
@@ -384,7 +388,36 @@ describe('Logo section – preview pages', () => {
     expect(anatomy).toHaveTextContent('VOLTA is an Imagotype');
     expect(within(anatomy).getByText('Lightning symbol')).toBeInTheDocument();
     expect(within(anatomy).getByText('Conveys energy')).toBeInTheDocument();
-    expect(getPage('Logo versions')).toHaveTextContent('Coming soon');
+  });
+
+  // Spec: specs/logoversions.md
+  it('fills the Logo versions page as the versions are typed', () => {
+    renderApp('/brand-manual');
+    openLogoSection();
+    fillConcept();
+
+    type('Version 1 name', 'Horizontal');
+    type('Version 1 use for', 'for web and long stationery');
+
+    const versions = getPage('Logo versions');
+    expect(versions).toHaveTextContent('The Horizontal version is the master configuration of VOLTA.');
+    expect(versions).toHaveTextContent('Use the Horizontal version for web and long stationery.');
+  });
+
+  it('shows the Cover logo as the Primary version until it has its own image', () => {
+    renderApp('/brand-manual');
+    uploadCoverLogo('cover.png');
+    clickApply();
+    openLogoSection();
+    type('Version 1 name', 'Horizontal');
+
+    const versions = getPage('Logo versions');
+    expect(within(versions).getByRole('img', { name: 'Horizontal version' })).toHaveAttribute('src', 'blob:cover.png');
+
+    upload('Version 1 image', makeLogo('volta-h.png'));
+    clickApply();
+
+    expect(within(versions).getByRole('img', { name: 'Horizontal version' })).toHaveAttribute('src', 'blob:volta-h.png');
   });
 
   it('shows the Cover logo on the Brand concept page, or a box until it is applied', () => {
@@ -440,8 +473,8 @@ describe('Logo section – Apply button', () => {
   });
 });
 
-// The Logo versions and Clear space pages are ready for when their parts are turned on.
-describe('Logo section – pages of the parts not built yet', () => {
+// The Logo versions page, and the Clear space page ready for when its part is turned on.
+describe('Logo section – Logo versions and Clear space pages', () => {
   const image = (name: string) => ({ url: `blob:${name}`, name });
   const volta: LogoData = {
     brandName: 'VOLTA',
@@ -458,11 +491,34 @@ describe('Logo section – pages of the parts not built yet', () => {
   };
 
   it('Logo versions shows every version and its usage rule', () => {
-    render(<LogoVersionsPage logo={volta} color="#000000" />);
+    render(<LogoVersionsPage logo={volta} coverLogo={null} color="#000000" />);
 
     expect(screen.getByRole('img', { name: 'Horizontal version' })).toHaveAttribute('src', 'blob:volta-h.png');
     expect(screen.getByRole('img', { name: 'Symbol only version' })).toBeInTheDocument();
     expect(screen.getByText('Use the Symbol only version for app icons.')).toBeInTheDocument();
+  });
+
+  it('Logo versions never leaves a gap in its sentences while fields are empty', () => {
+    const empty: LogoData = {
+      ...volta,
+      brandName: '',
+      variants: [
+        { name: '', usage: '', image: null },
+        { name: '', usage: 'for app icons', image: null },
+      ],
+    };
+    render(<LogoVersionsPage logo={empty} coverLogo={null} color="#000000" />);
+
+    expect(screen.getByText(/^The Primary version is the master configuration of the brand\./)).toBeInTheDocument();
+    expect(screen.getByText('Version 2')).toBeInTheDocument();
+    expect(screen.getByText('Use the Version 2 version for app icons.')).toBeInTheDocument();
+  });
+
+  it('Logo versions shows a placeholder when no version says where it is used', () => {
+    const noUsage: LogoData = { ...volta, variants: [{ name: 'Horizontal', usage: '', image: null }] };
+    render(<LogoVersionsPage logo={noUsage} coverLogo={null} color="#000000" />);
+
+    expect(screen.getByText('Where each version is used')).toBeInTheDocument();
   });
 
   it('Clear space draws the diagram and states both minimum sizes', () => {

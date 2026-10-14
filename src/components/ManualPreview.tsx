@@ -70,7 +70,7 @@ export function ManualPreview({
       return <BrandConceptPage logo={logo} coverLogo={cover?.logo ?? null} color={textColor} />
     if (page === 'Anatomy') return <AnatomyPage logo={logo} color={textColor} />
     if (page === 'Logo versions' && LOGO_PARTS.versions)
-      return <LogoVersionsPage logo={logo} color={textColor} />
+      return <LogoVersionsPage logo={logo} coverLogo={cover?.logo ?? null} color={textColor} />
     if (page === 'Clear space' && LOGO_PARTS.clearSpace)
       return <ClearSpacePage logo={logo} color={textColor} />
     if (page === 'Color palette') return <ColorPalettePage palette={palette} color={textColor} />
