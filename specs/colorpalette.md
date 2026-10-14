@@ -57,16 +57,16 @@ Until the Colors section is touched, the page shows the placeholder `Your color 
 ```
 Template 1               Template 2               Template 3
 ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│Color palette │         │Color palette │         │ Color palette│
-│ ██   ██   ██ │         │██ Blue  #1E..│         │──────────────│
-│Blue Red  Navy│         │██ Red   #E5..│         │ ██ │ ██ │ ██ │
-│#1E.. #E5.. … │         │██ Navy  #1A..│         │ ██ │ ██ │ ██ │
-│      note    │         │note          │         │Blue│ Red│Navy│
-└──────────────┘         └──────────────┘         └──────────────┘
+│Color palette │         │Color palette │         │Color │███ Blue│
+│ ██   ██   ██ │         │██ Blue  #1E..│         │palet-│    #1E.│
+│Blue Red  Navy│         │██ Red   #E5..│         │te    │███ Red │
+│#1E.. #E5.. … │         │██ Navy  #1A..│         │      │    #E5.│
+│      note    │         │note          │         │note  │███ Navy│
+└──────────────┘         └──────────────┘         └──────┴───────┘
 ```
 * **Template 1**: heading at the top; colors as cards in a grid of up to 3 columns (chip on top, name and values below). Everything centered.
 * **Template 2**: heading at the top; one color per row, chip on the left and the name and values next to it. Everything aligned left.
-* **Template 3**: heading at the top with a thin divider line under it; colors as tall columns side by side (chip on top, name and values below). Text aligned right.
+* **Template 3**: a side column on the left with the heading (top) and the CMYK note (bottom), a faint vertical line, and the colors in the wide column on the right, one per row (a wide chip, then the name and values). Text aligned left.
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`), in the Colors section.

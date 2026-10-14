@@ -1,100 +1,173 @@
-/* Template 3
-   ┌──────────────┐
-   │    [LOGO]    │  logo, upper part
-   │──────────────│  divider line
-   │      MY BRAND│  title, right
-   │ Designed by X│  designed by, right
-   └──────────────┘ */
+/* Template 3: a side column on every page
+   ┌──────┬───────────┐
+   │Title │           │  narrow column (left): what the page is about
+   │      │  content  │  wide column (right): the logo, the colors, the fonts…
+   │      │           │
+   │note  │           │  a faint vertical line between the two
+   └──────┴───────────┘
+   Only the layout changes; every page keeps its content (see ADR 0004). */
+
+/* The two columns, and the faint line between them (drawn as a 1px background stripe in the
+   middle of the gap, in the Typography color, so it shows on light and dark backgrounds) */
+.manual-preview[data-template='template3']
+  :is(.cover-layout, .palette-layout, .type-layout, .logo-page) {
+  grid-template-columns: minmax(0, 30%) minmax(0, 1fr);
+  column-gap: 8%;
+  text-align: left;
+  background: linear-gradient(
+      color-mix(in srgb, currentColor 25%, transparent),
+      color-mix(in srgb, currentColor 25%, transparent)
+    )
+    no-repeat 34% 0 / 1px 100%; /* 30% column + half of the 8% gap */
+}
+
+/* Cover
+   ┌──────┬───────────┐
+   │MY    │           │
+   │BRAND │  [LOGO]   │
+   │      │           │
+   │By X  │           │
+   └──────┴───────────┘ */
 
 .manual-preview[data-template='template3'] .cover-layout {
   grid-template-areas:
-    'logo'
-    'title'
-    'designed';
-  grid-template-rows: minmax(0, 1fr) auto auto;
-  row-gap: 3%;
-  text-align: right;
+    'title    logo'
+    'designed logo';
+  grid-template-rows: minmax(0, 1fr) auto;
 }
 
-/* The divider is the bottom border of the logo area: no extra markup needed */
-.manual-preview[data-template='template3'] .cover-logo {
-  /* A faint line in the Typography color, so it shows on light and dark backgrounds */
-  border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent);
-  margin-bottom: 5%;
+/* A long title wraps inside its narrow column */
+.manual-preview[data-template='template3'] .cover-title {
+  align-self: start;
 }
 
-/* Leave room between the logo and the divider */
+.manual-preview[data-template='template3'] .cover-designed-by {
+  align-self: end;
+}
+
+/* The logo fills most of the wide column */
 .manual-preview[data-template='template3'] .cover-logo img {
-  height: 80%;
+  width: 85%;
 }
 
-/* Color palette: tall columns side by side, under a divider, text aligned right
-   ┌──────────────┐
-   │ Color palette│
-   │──────────────│
-   │ ██ │ ██ │ ██ │
-   │Blue│ Red│Navy│
-   └──────────────┘ */
+/* Color palette
+   ┌──────┬───────────┐
+   │Color │██ Blue    │
+   │palet-│   #1E88E5 │
+   │te    │██ Red     │
+   │      │   #E53935 │
+   │CMYK ≈│           │
+   └──────┴───────────┘ */
 
 .manual-preview[data-template='template3'] .palette-layout {
-  text-align: right;
+  grid-template-areas:
+    'heading colors'
+    '.       colors'
+    'note    colors';
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
-/* Same faint divider as the Cover of this template */
 .manual-preview[data-template='template3'] .palette-heading {
-  padding-bottom: 4%;
-  border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  grid-area: heading;
 }
 
 .manual-preview[data-template='template3'] .palette-colors {
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 4px 4%;
+  grid-area: colors;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 4%;
 }
 
-/* Every column shares the same two rows (subgrid), so all chips end at the same line
-   even when one name or value wraps to more lines than the others */
+.manual-preview[data-template='template3'] .palette-note {
+  grid-area: note;
+}
+
+/* Each color is a row: a wide chip, then its name and values */
 .manual-preview[data-template='template3'] .palette-color {
-  grid-row: span 2;
-  grid-template-rows: subgrid;
+  grid-template-columns: 45% minmax(0, 1fr);
+  grid-template-rows: none;
+  align-items: center;
+  gap: 8%;
 }
 
-/* Typography: the two fonts as columns side by side, under a divider, text aligned right
-   ┌──────────────┐
-   │    Typography│
-   │──────────────│
-   │Primary│Second│
-   │     Aa│    Aa│
-   └──────────────┘ */
+.manual-preview[data-template='template3'] .palette-chip {
+  height: 100%;
+}
+
+/* Typography
+   ┌──────┬───────────┐
+   │Typo- │Aa         │
+   │graphy│PRIMARY    │
+   │      │───────────│
+   │      │Aa         │
+   │      │SECONDARY  │
+   └──────┴───────────┘ */
 
 .manual-preview[data-template='template3'] .type-layout {
-  text-align: right;
+  grid-template-areas: 'heading fonts';
+  grid-template-rows: minmax(0, 1fr);
 }
 
-/* Same faint divider as the Cover of this template */
 .manual-preview[data-template='template3'] .type-heading {
-  padding-bottom: 4%;
-  border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  grid-area: heading;
+  align-self: start;
 }
 
 .manual-preview[data-template='template3'] .type-fonts {
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  align-content: start;
+  grid-area: fonts;
+  grid-auto-rows: minmax(0, 1fr);
+  align-content: stretch;
   gap: 0;
 }
 
-/* A thin line between the two columns, with room on both sides */
+/* A faint line between the two fonts, with room on both sides */
 .manual-preview[data-template='template3'] .type-font {
-  padding: 0 8%;
+  padding: 6% 0;
 }
 
-.manual-preview[data-template='template3'] .type-font:last-child {
-  padding-right: 0;
-  border-left: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+.manual-preview[data-template='template3'] .type-font + .type-font {
+  border-top: 1px solid color-mix(in srgb, currentColor 25%, transparent);
 }
 
-.manual-preview[data-template='template3'] .type-font:first-child {
-  padding-left: 0;
+/* Logo pages (Brand concept, Anatomy, Logo versions, Clear space)
+   ┌──────┬───────────┐
+   │VOLTA │ 2.1 [LOGO]│  the header (brand name + heading) in the side column,
+   │Logo  │ 2.2 [v][v]│  every block in the wide column
+   │ver-  │ 2.3 Use…  │
+   │sions │           │
+   └──────┴───────────┘ */
+
+.manual-preview[data-template='template3'] .logo-page-header {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  align-content: start;
+}
+
+.manual-preview[data-template='template3'] .logo-page > :not(.logo-page-header) {
+  grid-column: 2;
+}
+
+/* The heading wraps in the narrow column instead of being cut */
+.manual-preview[data-template='template3'] .logo-page-heading {
+  overflow-wrap: anywhere;
+}
+
+/* The rows of the wide column (the header no longer takes one) */
+.manual-preview[data-template='template3'] .concept-layout {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.manual-preview[data-template='template3'] .anatomy-layout {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.manual-preview[data-template='template3'] .versions-layout {
+  grid-template-rows: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+}
+
+.manual-preview[data-template='template3'] .versions-layout:not(:has(.versions-others)) {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.manual-preview[data-template='template3'] .clearspace-layout {
+  grid-template-rows: minmax(0, 1.4fr) minmax(0, 1fr) auto;
 }

@@ -4,7 +4,7 @@
 The user picks one of three templates for the manual: **Template 1**, **Template 2** or **Template 3**. A template decides **where** the content sits on each page of the manual. It never changes **what** the content is: the title, logo, "Designed by" and their styles are the same in every template.
 
 ## Out of Scope
-Templates for the Logo page (it is not built yet; each template will get its layout when it is). The Color palette and Typography layouts are in `colorpalette.md` and `typography.md`. Creating or editing templates from the app. Template colors, decorations or fonts beyond the layouts below.
+The Color palette and Typography layouts are in `colorpalette.md` and `typography.md`. Creating or editing templates from the app. Template colors, decorations or fonts beyond the layouts below.
 
 ## 2. Interface
 ### Selector
@@ -14,17 +14,24 @@ In the preview toolbar, next to "Page orientation" and "Preview view": a group l
 ```
 Template 1             Template 2               Template 3
 ┌──────────────┐       ┌──────────────┐         ┌──────────────┐
-│   MY BRAND   │       │[logo]        │         │              │
-│              │       │              │         │    [LOGO]    │
-│    [LOGO]    │       │              │         │              │
-│              │       │              │         │──────────────│
-│ Designed by X│       │MY BRAND      │         │      MY BRAND│
-└──────────────┘       │Designed by X │         │ Designed by X│
-                       └──────────────┘         └──────────────┘
+│   MY BRAND   │       │[logo]        │         │MY    │       │
+│              │       │              │         │BRAND │       │
+│    [LOGO]    │       │              │         │      │[LOGO] │
+│              │       │              │         │      │       │
+│ Designed by X│       │MY BRAND      │         │By X  │       │
+└──────────────┘       │Designed by X │         └──────┴───────┘
+                       └──────────────┘
 ```
 * **Template 1**: title at the top, logo big in the center, "Designed by" at the bottom. Everything centered.
 * **Template 2**: small logo in the top-left corner, empty space, then the title and "Designed by" at the bottom. Everything aligned left.
-* **Template 3**: logo big in the upper part, a thin divider line, then the title and "Designed by" below it. Text aligned right.
+* **Template 3**: a **side column** on every page. On the Cover: the title at the top of the narrow left column, "Designed by" at its bottom, a faint vertical line, and the logo big in the wide right column. Text aligned left.
+
+### Template 3 on every page
+Template 3 is built on a side column, so it looks different from Templates 1 and 2 (which stack everything from top to bottom). Every page is split into a narrow column on the left (30%) and a wide one on the right, with a faint vertical line between them:
+* **Left**: what the page is about: the title and "Designed by" on the Cover, the heading (and the CMYK note) on Color palette and Typography, the brand name and heading on the Logo pages.
+* **Right**: the content: the logo, the colors, the fonts, or the numbered blocks of the Logo pages (1.1, 2.1, 2.2…).
+
+See `colorpalette.md` and `typography.md` for their diagrams.
 
 While a slot is empty, its placeholder ("Your brand manual title", "Your logo", "Designed by …") sits in the same place.
 

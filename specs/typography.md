@@ -48,18 +48,18 @@ The text uses the Cover's Typography color (Black until the Cover's color is cha
 ```
 Template 1               Template 2               Template 3
 ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│  Typography  │         │Typography    │         │    Typography│
-│ Primary·Head │         │Aa  Primary   │         │──────────────│
-│  Montserrat  │         │    Montserrat│         │Primary│Second│
-│      Aa      │         │    ABC abc 12│         │   Mont│  Open│
-│  ABC abc 123 │         │Aa  Secondary │         │     Aa│    Aa│
-│ Second·Body  │         │    Open Sans │         │ABC abc│ABC ab│
-│  Open Sans … │         │    ABC abc 12│         │       │      │
-└──────────────┘         └──────────────┘         └──────────────┘
+│  Typography  │         │Typography    │         │Typo- │Aa      │
+│ Primary·Head │         │Aa  Primary   │         │graphy│PRIMARY │
+│  Montserrat  │         │    Montserrat│         │      │Montser.│
+│      Aa      │         │    ABC abc 12│         │      │────────│
+│  ABC abc 123 │         │Aa  Secondary │         │      │Aa      │
+│ Second·Body  │         │    Open Sans │         │      │SECONDA.│
+│  Open Sans … │         │    ABC abc 12│         │      │Open San│
+└──────────────┘         └──────────────┘         └──────┴────────┘
 ```
 * **Template 1**: heading at the top; the two fonts one under the other. Everything centered.
 * **Template 2**: heading at the top; one font per row, the large "Aa" on the left and the usage, name and alphabet next to it. Everything aligned left.
-* **Template 3**: heading at the top with a thin divider line under it; the two fonts as columns side by side. Text aligned right.
+* **Template 3**: a side column on the left with the heading, a faint vertical line, and the two fonts one under the other in the wide column on the right, with a faint line between them. Text aligned left.
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`), in the Typography section.
