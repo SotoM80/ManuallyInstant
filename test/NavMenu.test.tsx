@@ -1,7 +1,7 @@
 import { screen, fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import { NAV_ITEMS } from '../src/data/navItems';
-import { clickSave, fillRequiredCoverFields, typeTitle } from './coverForm';
+import { clickApply, fillRequiredCoverFields, typeTitle } from './coverForm';
 
 function getMenu() {
   return within(screen.getByRole('banner')).getByRole('navigation', { name: 'Main' });
@@ -89,7 +89,7 @@ describe('NavMenu – title is kept between pages', () => {
     renderApp('/brand-manual');
     typeTitle('My Brand');
     fillRequiredCoverFields();
-    clickSave();
+    clickApply();
 
     // When: on Home the Brand Manual page is gone...
     fireEvent.click(getMenuLink('Home'));

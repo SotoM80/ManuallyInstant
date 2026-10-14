@@ -8,7 +8,7 @@ Templates for the Logo page (it is not built yet; each template will get its lay
 
 ## 2. Interface
 ### Selector
-In the preview toolbar, next to "Page orientation" and "Preview view": a group labeled **"Template"** with three options, **Template 1** (selected by default), **Template 2** and **Template 3**. Choosing an option changes the preview immediately (no Save needed).
+In the preview toolbar, next to "Page orientation" and "Preview view": a group labeled **"Template"** with three options, **Template 1** (selected by default), **Template 2** and **Template 3**. Choosing an option changes the preview immediately.
 
 ### Cover layouts
 ```
@@ -26,7 +26,7 @@ Template 1             Template 2               Template 3
 * **Template 2**: small logo in the top-left corner, empty space, then the title and "Designed by" at the bottom. Everything aligned left.
 * **Template 3**: logo big in the upper part, a thin divider line, then the title and "Designed by" below it. Text aligned right.
 
-Before the first Save, the placeholders ("Your brand manual title", "Your logo", "Designed by …") sit in the same places.
+While a slot is empty, its placeholder ("Your brand manual title", "Your logo", "Designed by …") sits in the same place.
 
 ### Structure in the code
 Each template has its own folder in `src/templates/` (`template1/`, `template2/`, `template3/`) with the CSS that places the content. Every template uses the same page markup; `src/templates/index.ts` lists the templates in the order of the selector.
@@ -50,9 +50,9 @@ Each template has its own folder in `src/templates/` (`template1/`, `template2/`
 * **Then**: The Template group offers Template 1, Template 2 and Template 3, in that order, and Template 1 is selected.
 
 ### Scenario 2: Changing the Template
-* **Given**: The user saved the Cover with "My Brand", a logo and "Studio X".
+* **Given**: The Cover shows "My Brand", an applied logo and "Studio X".
 * **When**: The user selects Template 2 (or Template 3).
-* **Then**: The new template is selected and applied at once, without Save, and the Cover still shows "My Brand", the logo and "Designed by Studio X".
+* **Then**: The new template is selected and applied at once, and the Cover still shows "My Brand", the logo and "Designed by Studio X".
 
 ### Scenario 3: Template Is Kept Between Pages
 * **Given**: The user selected Template 3.

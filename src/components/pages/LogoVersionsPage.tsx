@@ -2,7 +2,7 @@ import { primaryText, usageRules } from '../../data/logoCopy'
 import type { LogoData } from '../../types'
 
 type LogoVersionsPageProps = {
-  logo: LogoData | null // null → nothing saved yet, show the placeholder
+  logo: LogoData | null // null → its section is untouched, show the placeholder
   color: string // the Cover's Typography color
 }
 
@@ -23,8 +23,8 @@ export function LogoVersionsPage({ logo, color }: LogoVersionsPageProps) {
 
       <section className="logo-block versions-primary">
         <p className="logo-block-title">2.1 Primary version</p>
-        <figure className="logo-figure">
-          <img src={primary.image.url} alt={`${primary.name} version`} />
+        <figure className="logo-figure" data-empty={!primary.image}>
+          {primary.image && <img src={primary.image.url} alt={`${primary.name} version`} />}
         </figure>
         <p className="logo-version-name logo-cut" title={primary.name}>
           {primary.name}
@@ -39,8 +39,8 @@ export function LogoVersionsPage({ logo, color }: LogoVersionsPageProps) {
           <ul className="logo-versions" data-count={others.length}>
             {others.map((variant, index) => (
               <li key={index} className="logo-version">
-                <figure className="logo-figure">
-                  <img src={variant.image.url} alt={`${variant.name} version`} />
+                <figure className="logo-figure" data-empty={!variant.image}>
+                  {variant.image && <img src={variant.image.url} alt={`${variant.name} version`} />}
                 </figure>
                 <p className="logo-version-name logo-cut" title={variant.name}>
                   {variant.name}

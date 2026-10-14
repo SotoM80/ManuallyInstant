@@ -2,7 +2,7 @@ import { GRID_TEXT, clearSpaceText, minSizeRules } from '../../data/logoCopy'
 import type { LogoData } from '../../types'
 
 type ClearSpacePageProps = {
-  logo: LogoData | null // null → nothing saved yet, show the placeholder
+  logo: LogoData | null // null → its section is untouched, show the placeholder
   color: string // the Cover's Typography color
 }
 
@@ -35,7 +35,7 @@ export function ClearSpacePage({ logo, color }: ClearSpacePageProps) {
               </span>
             ))}
             <div className="logo-figure">
-              <img src={primary.image.url} alt={`${primary.name} version`} />
+              {primary.image && <img src={primary.image.url} alt={`${primary.name} version`} />}
             </div>
           </div>
         </figure>

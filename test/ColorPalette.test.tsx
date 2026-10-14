@@ -27,10 +27,6 @@ function clickAddColor() {
   fireEvent.click(within(getColorsForm()).getByRole('button', { name: 'Add color' }));
 }
 
-function clickSaveColors() {
-  fireEvent.click(within(getColorsForm()).getByRole('button', { name: 'Save' }));
-}
-
 // The header row of each color: opens and folds it (accordion)
 function getHeader(n: number) {
   return within(getColorsForm()).getByRole('button', { name: `Color ${n}` });
@@ -170,27 +166,23 @@ describe('Color palette – accordion', () => {
     expect(getHeader(1)).toHaveAccessibleDescription('Primary blue #1E88E5');
   });
 
-  it('opens the first color with an error on Save', () => {
+  it('marks a color whose HEX is not valid', () => {
     renderApp();
-    typeName(1, 'Primary blue');
-    clickAddColor(); // Color 2 has no name
-    fireEvent.click(getHeader(1));
 
-    clickSaveColors();
+    fireEvent.change(getHex(1), { target: { value: 'blue' } });
+    fireEvent.blur(getHex(1));
 
-    expect(expanded()).toEqual(['false', 'true']);
-    expect(getHeader(2).closest('.palette-block')).toHaveAttribute('data-invalid', 'true');
+    expect(getHeader(1).closest('.palette-block')).toHaveAttribute('data-invalid', 'true');
   });
 });
 
-// Spec: specs/colorpalette.md, Scenario 5 — Saving the Palette
-describe('Color palette – saving', () => {
-  it('shows the saved color with its name and values on the page', () => {
+// Spec: specs/colorpalette.md, Scenario 5 — Live Palette
+describe('Color palette – live page', () => {
+  it('shows the color with its name and values on the page, with no button', () => {
     renderApp();
 
     typeName(1, 'Primary blue');
     pickBlue(1);
-    clickSaveColors();
 
     const page = within(getPalettePage());
     expect(page.getByText('Primary blue')).toBeInTheDocument();
@@ -200,38 +192,42 @@ describe('Color palette – saving', () => {
     expect(page.getByText('CMYK values are approximate')).toBeInTheDocument();
   });
 
-  // Spec: specs/colorpalette.md, Scenario 6 — Required Name
-  it('blocks Save while a name is empty', () => {
+  // Spec: specs/colorpalette.md, Scenario 6 — Empty Name
+  it('shows "Color 1" on the page while the name is empty, with no error', () => {
     renderApp();
 
-    clickSaveColors();
+    pickBlue(1);
 
-    const name = within(getColorsForm()).getByLabelText('Color 1 name');
-    expect(within(getColorsForm()).getByRole('alert')).toHaveTextContent('Required field');
-    expect(name).toHaveAttribute('aria-invalid', 'true');
-    expect(name).toHaveStyle({ borderColor: 'red' });
-    expect(within(getPalettePage()).getByText('Your color palette')).toBeInTheDocument();
+    expect(within(getColorsForm()).queryByRole('alert')).not.toBeInTheDocument();
+    expect(within(getPalettePage()).getByText('Color 1')).toBeInTheDocument();
   });
 
-  // Spec: specs/colorpalette.md, Scenario 7 — Palette Waits for Save
-  it('does not change the page until Save', () => {
+  // Spec: specs/colorpalette.md, Scenario 7 — Edits Show at Once
+  it('updates the page on every change', () => {
     renderApp();
     typeName(1, 'Primary blue');
-    clickSaveColors();
 
     typeName(1, 'Sky');
 
-    expect(within(getPalettePage()).getByText('Primary blue')).toBeInTheDocument();
-    expect(within(getPalettePage()).queryByText('Sky')).not.toBeInTheDocument();
+    expect(within(getPalettePage()).getByText('Sky')).toBeInTheDocument();
+    expect(within(getPalettePage()).queryByText('Primary blue')).not.toBeInTheDocument();
+  });
+
+  it('keeps the last valid color while the HEX is half typed', () => {
+    renderApp();
+    pickBlue(1);
+
+    fireEvent.change(getHex(1), { target: { value: '#12' } });
+
+    expect(within(getPalettePage()).getByText('#1E88E5')).toBeInTheDocument();
   });
 });
 
 // Spec: specs/colorpalette.md, Scenario 8 — Palette Is Kept Between Pages
 describe('Color palette – navigation', () => {
-  it('keeps the saved palette when going Home and back', () => {
+  it('keeps the palette when going Home and back', () => {
     renderApp();
     typeName(1, 'Primary blue');
-    clickSaveColors();
 
     fireEvent.click(screen.getByRole('link', { name: 'Home' }));
     fireEvent.click(screen.getByRole('link', { name: 'Brand Manual' }));

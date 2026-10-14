@@ -1,13 +1,9 @@
-import { useRef, useState } from 'react'
-import type { AnimationEvent, FormEvent } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { ColorPicker } from './ColorPicker'
 import { INVALID_HEX_MESSAGE, PALETTE, colorValues, normalizeHex } from '../data/colorPalette'
 import { keepInPlace } from '../utils/scrollAnchor'
-import { validateColor, validateText } from '../utils/validation'
+import { useLiveData } from '../utils/pendingImage'
 import type { PaletteColor } from '../types'
-
-// What the Save button shows after a click: a pulse with a check, or a shake.
-type SaveFeedback = 'idle' | 'saved' | 'error'
 
 // One block of the form: what is typed (valid or not) and its errors.
 // `key` stays the same when other colors are removed, so React keeps each block's state.
@@ -15,15 +11,15 @@ type ColorRow = {
   key: number
   name: string
   hex: string
-  nameError: string
+  validHex: string // the last valid HEX: while the field is half typed, the preview keeps it
   hexError: string
 }
 
 // Form of the Colors section: 1 to 6 colors, each with a name and a color picker.
 // The colors work like an accordion: only one is open, the others are folded into a
-// short row (chip, name and HEX) that opens it with a click.
+// short row (chip, name and HEX) that opens it with a click. Every change reaches the preview at once.
 type ColorsFormProps = {
-  onSubmit?: (palette: PaletteColor[]) => void
+  onChange?: (palette: PaletteColor[]) => void
 }
 
 const MAX_COLORS = 6
@@ -35,14 +31,20 @@ function firstUnusedSwatch(rows: ColorRow[]) {
 }
 
 function newRow(key: number, rows: ColorRow[]): ColorRow {
-  return { key, name: '', hex: firstUnusedSwatch(rows), nameError: '', hexError: '' }
+  const hex = firstUnusedSwatch(rows)
+  return { key, name: '', hex, validHex: hex, hexError: '' }
 }
 
-export function ColorsForm({ onSubmit }: ColorsFormProps) {
+export function ColorsForm({ onChange }: ColorsFormProps) {
   const nextKey = useRef(1)
   const [rows, setRows] = useState<ColorRow[]>(() => [newRow(0, [])])
   const [openKey, setOpenKey] = useState<number | null>(0) // null → every color folded
-  const [feedback, setFeedback] = useState<SaveFeedback>('idle')
+
+  const palette = useMemo(
+    () => rows.map((row) => ({ name: row.name.trim(), hex: row.validHex })),
+    [rows],
+  )
+  useLiveData(palette, onChange)
 
   function updateRow(key: number, changes: Partial<ColorRow>) {
     setRows((prev) => prev.map((row) => (row.key === key ? { ...row, ...changes } : row)))
@@ -66,6 +68,12 @@ export function ColorsForm({ onSubmit }: ColorsFormProps) {
     setOpenKey((prev) => (prev === key ? null : key))
   }
 
+  // Typing or picking a color: a valid HEX also becomes the one the preview shows.
+  function updateHex(key: number, value: string) {
+    const hex = normalizeHex(value)
+    updateRow(key, hex ? { hex: value, validHex: hex, hexError: '' } : { hex: value, hexError: '' })
+  }
+
   // On blur or Enter in the HEX field: tidy a valid value, flag the rest (same rule as the Cover).
   function commitHex(row: ColorRow) {
     if (row.hex.trim() === '') return
@@ -73,32 +81,8 @@ export function ColorsForm({ onSubmit }: ColorsFormProps) {
     updateRow(row.key, { hex: hex ?? row.hex, hexError: hex ? '' : INVALID_HEX_MESSAGE })
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const checked = rows.map((row) => ({
-      ...row,
-      nameError: validateText(row.name),
-      hexError: validateColor(row.hex),
-    }))
-    setRows(checked)
-    const firstInvalid = checked.find((row) => row.nameError || row.hexError)
-    if (firstInvalid) {
-      setOpenKey(firstInvalid.key) // so its error can be seen
-      setFeedback('error')
-      return
-    }
-
-    onSubmit?.(rows.map((row) => ({ name: row.name.trim(), hex: normalizeHex(row.hex) as string })))
-    setFeedback('saved')
-  }
-
-  // Back to idle when the button's own animation ends, so the next Save animates again.
-  function handleFeedbackEnd(event: AnimationEvent<HTMLButtonElement>) {
-    if (!event.pseudoElement) setFeedback('idle')
-  }
-
   return (
-    <form onSubmit={handleSubmit} noValidate aria-label="Colors">
+    <form onSubmit={(event) => event.preventDefault()} noValidate aria-label="Colors">
       {rows.map((row, index) => {
         // Labels follow the position: removing Color 2 turns Color 3 into Color 2.
         const label = `Color ${index + 1}`
@@ -113,7 +97,7 @@ export function ColorsForm({ onSubmit }: ColorsFormProps) {
             key={row.key}
             className="palette-block"
             data-open={isOpen}
-            data-invalid={Boolean(row.nameError || row.hexError)}
+            data-invalid={Boolean(row.hexError)}
           >
             {/* Folded or open, this row always shows the color, its name and its HEX */}
             <button
@@ -149,23 +133,15 @@ export function ColorsForm({ onSubmit }: ColorsFormProps) {
                   id={nameId}
                   type="text"
                   value={row.name}
-                  onChange={(event) => updateRow(row.key, { name: event.target.value, nameError: '' })}
-                  aria-invalid={row.nameError !== ''}
-                  aria-describedby={row.nameError ? `${nameId}-error` : undefined}
-                  style={row.nameError ? { borderColor: 'red' } : undefined}
+                  onChange={(event) => updateRow(row.key, { name: event.target.value })}
                 />
-                {row.nameError && (
-                  <p id={`${nameId}-error`} role="alert">
-                    {row.nameError}
-                  </p>
-                )}
 
                 <ColorPicker
                   label={label}
                   value={row.hex}
                   error={row.hexError}
-                  onChange={(value) => updateRow(row.key, { hex: value, hexError: '' })}
-                  onSelect={(value) => updateRow(row.key, { hex: value, hexError: '' })}
+                  onChange={(value) => updateHex(row.key, value)}
+                  onSelect={(value) => updateHex(row.key, value)}
                   onCommit={() => commitHex(row)}
                 />
 
@@ -201,10 +177,6 @@ export function ColorsForm({ onSubmit }: ColorsFormProps) {
         disabled={rows.length >= MAX_COLORS}
       >
         Add color
-      </button>
-
-      <button type="submit" data-feedback={feedback} onAnimationEnd={handleFeedbackEnd}>
-        Save
       </button>
     </form>
   )

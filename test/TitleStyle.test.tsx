@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { BrandForm } from '../src/components/BrandForm';
 import { renderApp } from './renderApp';
-import { clickSave, fillRequiredCoverFields, pickSwatch, typeTitle } from './coverForm';
+import { pickSwatch, typeTitle } from './coverForm';
 
 // The title color is now the Typography color picker (see ColorPicker.test.tsx).
 const FIELDS = ['Font family', 'Font style', 'Font size'];
@@ -17,12 +17,6 @@ function typeInto(name: string, value: string) {
 function pickOption(name: string, option: string) {
   typeInto(name, option);
   fireEvent.click(screen.getByRole('option', { name: option }));
-}
-
-// Designed by and Logo are required too, so they are filled before every Save.
-function clickSubmit() {
-  fillRequiredCoverFields();
-  clickSave();
 }
 
 // Spec: specs/titlefild.md, Section 2 — Interface + Predefined Options
@@ -104,41 +98,36 @@ describe('Title style – invalid value', () => {
   });
 });
 
-// Spec: specs/titlefild.md, Scenario 3 — Missing Style Selection Validation Failure
-describe('Title style – required fields', () => {
-  it.each(FIELDS)('%s: blocks submit and shows "Required field" when blank', (name) => {
-    // Given: a valid title, but this style field is empty
-    const onSubmit = jest.fn();
-    render(<BrandForm onSubmit={onSubmit} />);
+// Spec: specs/titlefild.md, Scenario 3 — A blank style field keeps the last valid option
+describe('Title style – blank field', () => {
+  it.each(FIELDS)('%s: blank is not an error, and the Cover keeps the last option', (name) => {
+    const onChange = jest.fn();
+    render(<BrandForm onChange={onChange} />);
     typeTitle('My Brand');
+
     typeInto(name, '');
+    fireEvent.blur(getField(name));
 
-    // When
-    clickSubmit();
-
-    // Then
-    expect(onSubmit).not.toHaveBeenCalled();
-    expect(getField(name)).toHaveStyle({ borderColor: 'red' });
-    expect(getField(name)).toHaveAccessibleDescription('Required field');
+    expect(getField(name)).toHaveAttribute('aria-invalid', 'false');
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        style: { fontFamily: 'Roboto', fontStyle: 'Regular', fontSize: 'Medium' },
+      }),
+    );
   });
 });
 
-// Spec: specs/titlefild.md, Scenario 1 — Successful Title Processing
-describe('Title style – successful submit', () => {
+// Spec: specs/titlefild.md, Scenario 1 — Live title style
+describe('Title style – live changes', () => {
   it('sends the title together with the selected style', () => {
-    // Given
-    const onSubmit = jest.fn();
-    render(<BrandForm onSubmit={onSubmit} />);
+    const onChange = jest.fn();
+    render(<BrandForm onChange={onChange} />);
     typeTitle('My Brand');
     pickOption('Font family', 'Open Sans');
     pickOption('Font style', 'Bold Italic');
     pickOption('Font size', 'Large');
 
-    // When
-    clickSubmit();
-
-    // Then
-    expect(onSubmit).toHaveBeenCalledWith(
+    expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({
         title: 'My Brand',
         style: { fontFamily: 'Open Sans', fontStyle: 'Bold Italic', fontSize: 'Large' },
@@ -147,28 +136,26 @@ describe('Title style – successful submit', () => {
   });
 });
 
-// The saved title is drawn on the Cover page of the manual preview.
+// The title is drawn on the Cover page of the manual preview.
 function getCoverTitle() {
   const preview = screen.getByRole('region', { name: 'Manual preview' });
   return within(within(preview).getByRole('article', { name: 'Cover' })).getByText('My Brand');
 }
 
-// Spec: specs/titlefild.md, Scenario 1 — the Cover shows the style after Save
+// Spec: specs/titlefild.md, Scenario 1 — the Cover shows the style as it changes
 // The Cover is a thumbnail, so the title is drawn at half its real size (Large 48px → 24px).
 describe('Title style – cover preview', () => {
   afterEach(() => {
     document.head.querySelectorAll('link[href*="fonts.googleapis.com"]').forEach((l) => l.remove());
   });
 
-  it('applies the style to the Cover when the user clicks Save', () => {
+  it('applies the style to the Cover as soon as it is picked', () => {
     renderApp();
     typeTitle('My Brand');
     pickOption('Font family', 'Open Sans');
     pickSwatch('Typography color', 'Blue');
     pickOption('Font style', 'Bold Italic');
     pickOption('Font size', 'Large');
-
-    clickSubmit();
 
     const title = getCoverTitle();
     expect(title).toHaveStyle({
@@ -180,15 +167,15 @@ describe('Title style – cover preview', () => {
     expect(title.style.fontFamily).toContain('Open Sans');
   });
 
-  it('does not change the Cover before Save (not live)', () => {
+  it('keeps the last valid option while a field is half typed', () => {
     renderApp();
     typeTitle('My Brand');
-    clickSubmit();
-
     pickOption('Font size', 'Large');
 
-    // Still Medium (32px → 16px on the thumbnail)
-    expect(getCoverTitle()).toHaveStyle({ fontSize: '16px' });
+    typeInto('Font size', 'Sma');
+
+    // Still Large (48px → 24px on the thumbnail)
+    expect(getCoverTitle()).toHaveStyle({ fontSize: '24px' });
   });
 
   // Spec: specs/titlefild.md, Scenario 5 — Font Style Is Visibly Applied
@@ -197,10 +184,9 @@ describe('Title style – cover preview', () => {
     renderApp();
     typeTitle('My Brand');
     pickOption('Font family', 'Open Sans');
-    pickOption('Font style', 'Bold Italic');
 
     // When
-    clickSubmit();
+    pickOption('Font style', 'Bold Italic');
 
     // Then: the Cover title is bold italic...
     expect(getCoverTitle()).toHaveStyle({ fontWeight: 'bold', fontStyle: 'italic' });
@@ -217,8 +203,8 @@ describe('Title style – cover preview', () => {
     renderApp();
     typeTitle('My Brand');
     pickOption('Font family', 'Open Sans');
-    clickSubmit();
-    clickSubmit();
+    typeTitle('My Brand 2');
+    typeTitle('My Brand');
 
     const links = document.head.querySelectorAll('link[href*="family=Open+Sans"]:not([href*="text="])');
     expect(links).toHaveLength(1);

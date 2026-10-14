@@ -14,7 +14,7 @@ export const MANUAL_SECTIONS: ManualSection[] = [
 ]
 
 // Parts of the Logo section being built one at a time. A part that is off shows
-// "Coming soon" in the form and on its page, and is not checked on Save.
+// "Coming soon" in the form and on its page, and sends nothing to the preview.
 // When a part is built: set it to true (its form and page are already plugged in).
 export type LogoParts = {
   versions: boolean // Versions group → Logo versions page

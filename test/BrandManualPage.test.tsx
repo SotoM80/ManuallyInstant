@@ -1,6 +1,6 @@
 import { screen, fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
-import { clickSave, fillRequiredCoverFields, pickSwatch, typeTitle } from './coverForm';
+import { fillRequiredCoverFields, pickSwatch, typeTitle } from './coverForm';
 
 // The manual's pages, in order (the Logo section fills pages 2 to 5)
 const ALL_PAGES = [
@@ -23,12 +23,6 @@ function getSections() {
 
 function getCover() {
   return within(getPreview()).getByRole('article', { name: 'Cover' });
-}
-
-// Designed by and Logo are required too, so they are filled before every Save.
-function clickSubmit() {
-  fillRequiredCoverFields();
-  clickSave();
 }
 
 // Spec: specs/brandmanual.md, Scenario 1 — Page Layout
@@ -77,17 +71,16 @@ describe('Brand Manual – preview column', () => {
   });
 });
 
-// Spec: specs/brandmanual.md, Scenario 4 — Cover Shows the Saved Title
+// Spec: specs/brandmanual.md, Scenario 4 — Cover Shows the Title Live
 describe('Brand Manual – cover preview', () => {
-  it('shows the saved title with its style on the Cover', () => {
+  it('shows the title with its style on the Cover as it is typed', () => {
     // Given
     renderApp('/brand-manual');
     expect(getCover()).toHaveTextContent('Your brand manual title');
-    typeTitle('My Brand');
-    pickSwatch('Typography color', 'Blue');
 
     // When
-    clickSubmit();
+    typeTitle('My Brand');
+    pickSwatch('Typography color', 'Blue');
 
     // Then
     const title = within(getCover()).getByText('My Brand');
@@ -95,13 +88,18 @@ describe('Brand Manual – cover preview', () => {
     expect(getCover()).not.toHaveTextContent('Your brand manual title');
   });
 
-  // Spec: specs/brandmanual.md, Scenario 5 — Preview Waits for Save
-  it('does not change the Cover until Save is clicked', () => {
+  // Spec: specs/brandmanual.md, Scenario 5 — Only new images wait for Apply
+  it('puts Apply above the Cover section, disabled until an image is chosen', () => {
     renderApp('/brand-manual');
 
-    typeTitle('My Brand');
+    const apply = within(getSections()).getByRole('button', { name: 'Apply' });
+    const cover = within(getSections()).getByRole('button', { name: '1. Cover' });
+    expect(apply.compareDocumentPosition(cover) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(getPreview()).queryByRole('button', { name: 'Apply' })).not.toBeInTheDocument();
+    expect(apply).toBeDisabled();
 
-    expect(getCover()).toHaveTextContent('Your brand manual title');
+    fillRequiredCoverFields();
+    expect(apply).toBeEnabled();
   });
 });
 

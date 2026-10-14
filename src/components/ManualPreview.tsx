@@ -66,10 +66,10 @@ export function ManualPreview({
     if (page === 'Color palette') return <ColorPalettePage palette={palette} color={textColor} />
     if (page === 'Typography') return <TypographyPage fonts={typography} color={textColor} />
     if (page !== 'Cover') return <p className="manual-page-empty">Coming soon</p>
-    // A new key on every Save (each logo gets a new URL) redraws the cover, so it grows in again
+    // A new key on every applied logo (each one has its own URL) redraws the cover, so it grows in again
     return (
       <CoverPage
-        key={cover?.logo.url ?? 'empty'}
+        key={cover?.logo?.url ?? 'empty'}
         cover={cover}
         titleScale={TITLE_SCALE[previewView]}
       />

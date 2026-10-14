@@ -1,7 +1,7 @@
 import { screen, fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import {
-  clickSave,
+  clickApply,
   fillRequiredCoverFields,
   getColorGroup,
   getHexInput,
@@ -32,7 +32,7 @@ function getCheckedSwatch(field: ColorField) {
 function saveCover() {
   typeTitle('My Brand');
   fillRequiredCoverFields();
-  clickSave();
+  clickApply();
 }
 
 // Spec: specs/colorpicker.md, Section 2 — Interface
@@ -102,7 +102,7 @@ describe('Color picker – HEX field', () => {
 
 // Spec: specs/colorpicker.md, Scenario 3 — Invalid HEX
 describe('Color picker – invalid HEX', () => {
-  it('shows an error on blur and blocks Save', () => {
+  it('shows an error on blur and keeps the last valid color on the pages', () => {
     // Given
     renderApp();
     typeTitle('My Brand');
@@ -118,19 +118,19 @@ describe('Color picker – invalid HEX', () => {
     );
     expect(getHexInput('Background color')).toHaveStyle({ borderColor: 'red' });
 
-    clickSave();
-    expect(getCover()).toHaveTextContent('Your brand manual title');
+    for (const page of getPages()) {
+      expect(page).toHaveStyle({ background: '#FFFFFF' });
+    }
   });
 
-  it('shows "Required field" when the HEX field is empty on Save', () => {
+  it('shows no error when the HEX field is emptied', () => {
     renderApp();
     typeTitle('My Brand');
-    fillRequiredCoverFields();
     typeHex('Typography color', '');
 
-    clickSave();
+    fireEvent.blur(getHexInput('Typography color'));
 
-    expect(getHexInput('Typography color')).toHaveAccessibleDescription('Required field');
+    expect(getHexInput('Typography color')).toHaveAttribute('aria-invalid', 'false');
   });
 });
 
@@ -153,14 +153,14 @@ describe('Color picker – colors on the manual', () => {
     }
   });
 
-  // Spec: specs/colorpicker.md, Scenario 5 — Colors Wait for Save
-  it('does not change the pages before Save', () => {
+  // Spec: specs/colorpicker.md, Scenario 5 — Colors Are Live
+  it('changes the pages as soon as a swatch is picked', () => {
     renderApp();
 
     pickSwatch('Background color', 'Navy');
 
     for (const page of getPages()) {
-      expect(page).not.toHaveAttribute('style');
+      expect(page).toHaveStyle({ background: '#1A237E' });
     }
   });
 });

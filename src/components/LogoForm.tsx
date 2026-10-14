@@ -1,15 +1,21 @@
-import { useRef, useState } from 'react'
-import type { AnimationEvent, FormEvent } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { ImageField } from './ImageField'
 import { DEFAULT_MARK_TYPES, MARK_TYPE_LABELS, MARK_TYPES } from '../data/logoCopy'
 import { LOGO_PARTS } from '../data/manualSections'
 import type { LogoParts } from '../data/manualSections'
 import { keepInPlace } from '../utils/scrollAnchor'
-import { validateImage, validatePositiveNumber, validateText } from '../utils/validation'
-import type { LogoData, MarkType, UploadedImage } from '../types'
-
-// What the Save button shows after a click: a pulse with a check, or a shake.
-type SaveFeedback = 'idle' | 'saved' | 'error'
+import { validateImage, validatePositiveNumber } from '../utils/validation'
+import {
+  NO_IMAGE,
+  chooseFile,
+  isPending,
+  shownFile,
+  toImage,
+  useLiveData,
+  usePendingReport,
+} from '../utils/pendingImage'
+import type { PendingImage } from '../utils/pendingImage'
+import type { LogoData, MarkType } from '../types'
 
 // What is typed in one part of a card (e.g. its Tagline). Everything is optional.
 type PartDraft = {
@@ -17,7 +23,7 @@ type PartDraft = {
   label: string
   name: string
   role: string
-  file: File | null
+  image: PendingImage
   fileError: string
 }
 
@@ -26,12 +32,12 @@ type PartDraft = {
 type CardDraft = {
   name: string
   role: string
-  file: File | null
+  image: PendingImage
   fileError: string
   parts: PartDraft[]
 }
 
-const EMPTY_CARD: CardDraft = { name: '', role: '', file: null, fileError: '', parts: [] }
+const EMPTY_CARD: CardDraft = { name: '', role: '', image: NO_IMAGE, fileError: '', parts: [] }
 
 const MAX_PARTS = 4
 
@@ -39,9 +45,9 @@ const MAX_PARTS = 4
 // The same double names as the mark types (Symbol = Isotype, Wordmark = Logotype).
 const PART_LABELS = [MARK_TYPE_LABELS.Isotype, MARK_TYPE_LABELS.Logotype, 'Tagline']
 
-// A part with nothing typed or chosen is left out when saving.
+// A part with nothing typed or chosen is left out of the preview.
 function isEmptyPart(part: PartDraft) {
-  return !part.label.trim() && !part.name.trim() && !part.role.trim() && !part.file
+  return !part.label.trim() && !part.name.trim() && !part.role.trim() && !part.image.file
 }
 
 // `key` stays the same when other rows are removed, so React keeps each row's state.
@@ -49,53 +55,115 @@ type VariantRow = {
   key: number
   name: string
   usage: string
-  file: File | null
-  nameError: string
-  usageError: string
+  image: PendingImage
   fileError: string
 }
 
 // Form of the Logo section, in four groups that match its four pages:
 // Concept (Brand concept page), Anatomy (Anatomy page), Versions (Logo versions page) and
 // Clear space & size (Clear space page). The versions work like the colors of the Colors section: an accordion.
-// Groups whose part is off (see LOGO_PARTS) show "Coming soon" and are not checked.
+// Groups whose part is off (see LOGO_PARTS) show "Coming soon" and send nothing.
+// Every change reaches the preview at once; new images wait for Apply (see docs/adr/0007).
 type LogoFormProps = {
-  onSubmit?: (logo: LogoData) => void
+  onChange?: (logo: LogoData) => void
+  applyCount?: number // how many times Apply was pressed
+  onPendingChange?: (pending: boolean) => void // a new image is waiting for Apply
   parts?: LogoParts
 }
 
 const MAX_VARIANTS = 4
 
 function newVariant(key: number): VariantRow {
-  return { key, name: '', usage: '', file: null, nameError: '', usageError: '', fileError: '' }
+  return { key, name: '', usage: '', image: NO_IMAGE, fileError: '' }
 }
 
-function toImage(file: File): UploadedImage {
-  return { url: URL.createObjectURL(file), name: file.name }
+// The applied image of a field, ready for the preview (null → none yet).
+function appliedImage(image: PendingImage, applyCount: number, error: string) {
+  const file = shownFile(image, applyCount, error)
+  return file ? toImage(file) : null
 }
 
-export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
+// A number field that is not valid yet sends 0, so the page never shows "NaN".
+function toNumber(value: string) {
+  return validatePositiveNumber(value) ? 0 : Number(value)
+}
+
+export function LogoForm({
+  onChange,
+  applyCount = 0,
+  onPendingChange,
+  parts = LOGO_PARTS,
+}: LogoFormProps) {
   const nextKey = useRef(1)
   const [brandName, setBrandName] = useState('')
-  const [brandNameError, setBrandNameError] = useState('')
   // The brand may use several kinds of mark (at least one); each chosen one gets a card.
   const [markTypes, setMarkTypes] = useState<MarkType[]>(DEFAULT_MARK_TYPES)
-  const [markTypesError, setMarkTypesError] = useState('')
   // A card per mark type, kept while it is unticked so nothing typed is lost.
   const [cards, setCards] = useState<Partial<Record<MarkType, CardDraft>>>({})
   const [concept, setConcept] = useState('')
-  const [conceptError, setConceptError] = useState('')
   const [variants, setVariants] = useState<VariantRow[]>(() => [newVariant(0)])
   const [openKey, setOpenKey] = useState<number | null>(0) // null → every version folded
   const [unit, setUnit] = useState('the height of the letter X')
-  const [unitError, setUnitError] = useState('')
   const [minDigital, setMinDigital] = useState('32')
-  const [minDigitalError, setMinDigitalError] = useState('')
   const [minPrint, setMinPrint] = useState('15')
-  const [minPrintError, setMinPrintError] = useState('')
-  const [gridFile, setGridFile] = useState<File | null>(null)
+  const [grid, setGrid] = useState(NO_IMAGE)
   const [gridError, setGridError] = useState('')
-  const [feedback, setFeedback] = useState<SaveFeedback>('idle')
+
+  // Shown as soon as the value is wrong; a blank text field is not an error.
+  const markTypesError = markTypes.length === 0 ? 'Choose at least one mark type' : ''
+  const minDigitalError = minDigital.trim() ? validatePositiveNumber(minDigital) : ''
+  const minPrintError = minPrint.trim() ? validatePositiveNumber(minPrint) : ''
+
+  const logo = useMemo<LogoData>(
+    () => ({
+      brandName: brandName.trim(),
+      concept: concept.trim(),
+      marks: markTypes.map((type) => {
+        const card = cards[type] ?? EMPTY_CARD
+        return {
+          type,
+          name: card.name.trim(),
+          role: card.role.trim(),
+          image: appliedImage(card.image, applyCount, card.fileError),
+          parts: card.parts
+            .filter((part) => !isEmptyPart(part))
+            .map((part, index) => ({
+              label: part.label.trim() || `Part ${index + 1}`,
+              name: part.name.trim(),
+              role: part.role.trim(),
+              image: appliedImage(part.image, applyCount, part.fileError),
+            })),
+        }
+      }),
+      // A part that is off sends nothing of its own (its page shows "Coming soon")
+      variants: parts.versions
+        ? variants.map((row) => ({
+            name: row.name.trim(),
+            usage: row.usage.trim(),
+            image: appliedImage(row.image, applyCount, row.fileError),
+          }))
+        : [],
+      clearSpaceUnit: unit.trim(),
+      minDigitalPx: toNumber(minDigital),
+      minPrintMm: toNumber(minPrint),
+      grid: parts.clearSpace ? appliedImage(grid, applyCount, gridError) : null,
+    }),
+    [brandName, concept, markTypes, cards, variants, unit, minDigital, minPrint, grid, gridError, applyCount, parts],
+  )
+  useLiveData(logo, onChange)
+
+  // Only images of what is in use count: an unticked card or a part that is off waits silently.
+  const pending =
+    markTypes.some((type) => {
+      const card = cards[type] ?? EMPTY_CARD
+      return (
+        isPending(card.image, applyCount, card.fileError) ||
+        card.parts.some((part) => isPending(part.image, applyCount, part.fileError))
+      )
+    }) ||
+    (parts.versions && variants.some((row) => isPending(row.image, applyCount, row.fileError))) ||
+    (parts.clearSpace && isPending(grid, applyCount, gridError))
+  usePendingReport(pending, onPendingChange)
 
   function takeKey() {
     return nextKey.current++
@@ -112,7 +180,6 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
         ? prev.filter((item) => item !== type)
         : MARK_TYPES.filter((item) => item === type || prev.includes(item)),
     )
-    setMarkTypesError('')
   }
 
   function updateVariant(key: number, changes: Partial<VariantRow>) {
@@ -137,8 +204,13 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
   }
 
   // Card images are optional: only a wrong file is an error, flagged as soon as it is chosen.
+  // A valid one waits for Apply.
   function chooseCardFile(type: MarkType, file: File | null) {
-    updateCard(type, { file, fileError: file ? validateImage(file) : '' })
+    const card = cards[type] ?? EMPTY_CARD
+    updateCard(type, {
+      image: chooseFile(card.image, file, applyCount, card.fileError),
+      fileError: file ? validateImage(file) : '',
+    })
   }
 
   function cardParts(type: MarkType) {
@@ -148,7 +220,7 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
   function addPart(type: MarkType) {
     const parts = cardParts(type)
     if (parts.length >= MAX_PARTS) return
-    const part: PartDraft = { key: takeKey(), label: '', name: '', role: '', file: null, fileError: '' }
+    const part: PartDraft = { key: takeKey(), label: '', name: '', role: '', image: NO_IMAGE, fileError: '' }
     updateCard(type, { parts: [...parts, part] })
   }
 
@@ -162,109 +234,25 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
     })
   }
 
-  function choosePartFile(type: MarkType, key: number, file: File | null) {
-    updatePart(type, key, { file, fileError: file ? validateImage(file) : '' })
+  function choosePartFile(type: MarkType, part: PartDraft, file: File | null) {
+    updatePart(type, part.key, {
+      image: chooseFile(part.image, file, applyCount, part.fileError),
+      fileError: file ? validateImage(file) : '',
+    })
   }
 
-  // A wrong file is flagged as soon as it is chosen, not only on submit.
-  function chooseVariantFile(key: number, file: File | null) {
-    updateVariant(key, { file, fileError: file ? validateImage(file) : '' })
+  // A wrong file is flagged as soon as it is chosen. A valid one waits for Apply.
+  function chooseVariantFile(row: VariantRow, file: File | null) {
+    updateVariant(row.key, {
+      image: chooseFile(row.image, file, applyCount, row.fileError),
+      fileError: file ? validateImage(file) : '',
+    })
   }
 
   // The construction grid is optional: only a wrong file is an error.
   function chooseGridFile(file: File | null) {
-    setGridFile(file)
+    setGrid((prev) => chooseFile(prev, file, applyCount, gridError))
     setGridError(file ? validateImage(file) : '')
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const nextBrandNameError = validateText(brandName)
-    const nextConceptError = validateText(concept)
-    const nextMarkTypesError = markTypes.length === 0 ? 'Choose at least one mark type' : ''
-    const cardsInvalid = markTypes.some(
-      (type) => cards[type]?.fileError || cardParts(type).some((part) => part.fileError),
-    )
-    const checkedVariants = parts.versions
-      ? variants.map((row) => ({
-          ...row,
-          nameError: validateText(row.name),
-          usageError: validateText(row.usage),
-          fileError: validateImage(row.file),
-        }))
-      : variants
-    const nextUnitError = parts.clearSpace ? validateText(unit) : ''
-    const nextMinDigitalError = parts.clearSpace ? validatePositiveNumber(minDigital) : ''
-    const nextMinPrintError = parts.clearSpace ? validatePositiveNumber(minPrint) : ''
-    const nextGridError = parts.clearSpace && gridFile ? validateImage(gridFile) : ''
-
-    setBrandNameError(nextBrandNameError)
-    setConceptError(nextConceptError)
-    setMarkTypesError(nextMarkTypesError)
-    setVariants(checkedVariants)
-    setUnitError(nextUnitError)
-    setMinDigitalError(nextMinDigitalError)
-    setMinPrintError(nextMinPrintError)
-    setGridError(nextGridError)
-
-    const firstInvalidVariant = checkedVariants.find(
-      (row) => row.nameError || row.usageError || row.fileError,
-    )
-    const invalid =
-      nextBrandNameError ||
-      nextConceptError ||
-      nextMarkTypesError ||
-      cardsInvalid ||
-      firstInvalidVariant ||
-      nextUnitError ||
-      nextMinDigitalError ||
-      nextMinPrintError ||
-      nextGridError
-    if (invalid) {
-      if (firstInvalidVariant) setOpenKey(firstInvalidVariant.key) // so its error can be seen
-      setFeedback('error')
-      return
-    }
-
-    onSubmit?.({
-      brandName: brandName.trim(),
-      concept: concept.trim(),
-      marks: markTypes.map((type) => {
-        const card = cards[type] ?? EMPTY_CARD
-        return {
-          type,
-          name: card.name.trim(),
-          role: card.role.trim(),
-          image: card.file ? toImage(card.file) : null,
-          parts: card.parts
-            .filter((part) => !isEmptyPart(part))
-            .map((part, index) => ({
-              label: part.label.trim() || `Part ${index + 1}`,
-              name: part.name.trim(),
-              role: part.role.trim(),
-              image: part.file ? toImage(part.file) : null,
-            })),
-        }
-      }),
-      // A part that is off saves nothing of its own (its page shows "Coming soon")
-      variants: parts.versions
-        ? variants.map((row) => ({
-            name: row.name.trim(),
-            usage: row.usage.trim(),
-            image: toImage(row.file as File),
-          }))
-        : [],
-      clearSpaceUnit: unit.trim(),
-      minDigitalPx: Number(minDigital),
-      minPrintMm: Number(minPrint),
-      grid: parts.clearSpace && gridFile ? toImage(gridFile) : null,
-    })
-    setFeedback('saved')
-  }
-
-  // Back to idle when the button's own animation ends, so the next Save animates again.
-  function handleFeedbackEnd(event: AnimationEvent<HTMLButtonElement>) {
-    if (!event.pseudoElement) setFeedback('idle')
   }
 
   // A text field with its label and error, like the fields of the Cover form.
@@ -299,14 +287,11 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate aria-label="Logo">
+    <form onSubmit={(event) => event.preventDefault()} noValidate aria-label="Logo">
       <fieldset className="logo-form-group">
         <legend>Concept</legend>
 
-        {textField('logo-brand-name', 'Brand name', brandName, brandNameError, (value) => {
-          setBrandName(value)
-          setBrandNameError('')
-        })}
+        {textField('logo-brand-name', 'Brand name', brandName, '', setBrandName)}
 
         <label htmlFor="logo-concept">Concept</label>
         <textarea
@@ -314,19 +299,8 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
           rows={3}
           value={concept}
           placeholder="The idea behind the design"
-          onChange={(event) => {
-            setConcept(event.target.value)
-            setConceptError('')
-          }}
-          aria-invalid={conceptError !== ''}
-          aria-describedby={conceptError ? 'logo-concept-error' : undefined}
-          style={conceptError ? { borderColor: 'red' } : undefined}
+          onChange={(event) => setConcept(event.target.value)}
         />
-        {conceptError && (
-          <p id="logo-concept-error" role="alert">
-            {conceptError}
-          </p>
-        )}
 
       </fieldset>
 
@@ -374,7 +348,7 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
                 id={`logo-mark-${type}-image`}
                 label={`${type} image (optional)`}
                 hideLabel
-                fileName={card.file?.name ?? null}
+                fileName={card.image.file?.name ?? null}
                 error={card.fileError}
                 onChange={(file) => chooseCardFile(type, file)}
               />
@@ -413,9 +387,9 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
                       id={`logo-part-${part.key}-image`}
                       label={`${partLabel} image (optional)`}
                       hideLabel
-                      fileName={part.file?.name ?? null}
+                      fileName={part.image.file?.name ?? null}
                       error={part.fileError}
-                      onChange={(file) => choosePartFile(type, part.key, file)}
+                      onChange={(file) => choosePartFile(type, part, file)}
                     />
                     <div className="logo-mark-card-fields">
                       <input
@@ -475,7 +449,7 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
                   key={row.key}
                   className="palette-block"
                   data-open={isOpen}
-                  data-invalid={Boolean(row.nameError || row.usageError || row.fileError)}
+                  data-invalid={Boolean(row.fileError)}
                 >
                   {/* Folded or open, this row always shows the version's name and its file */}
                   <button
@@ -497,7 +471,7 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
                     <span id={summaryId} className="palette-block-summary">
                       <span className="palette-block-name">{row.name.trim() || 'No name yet'}</span>
                       <span className="palette-block-name logo-version-file">
-                        {row.file?.name ?? 'No image'}
+                        {row.image.file?.name ?? 'No image'}
                       </span>
                     </span>
                     <span className="palette-block-chevron" aria-hidden="true" />
@@ -506,18 +480,18 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
                   {/* Always in the page so it can fold and unfold; inert while folded */}
                   <div id={bodyId} className="palette-block-body" inert={!isOpen}>
                     <div className="palette-block-inner">
-                      {textField(`${id}-name`, `${label} name`, row.name, row.nameError, (value) =>
-                        updateVariant(row.key, { name: value, nameError: '' }),
+                      {textField(`${id}-name`, `${label} name`, row.name, '', (value) =>
+                        updateVariant(row.key, { name: value }),
                       )}
-                      {textField(`${id}-usage`, `${label} use for`, row.usage, row.usageError, (value) =>
-                        updateVariant(row.key, { usage: value, usageError: '' }),
+                      {textField(`${id}-usage`, `${label} use for`, row.usage, '', (value) =>
+                        updateVariant(row.key, { usage: value }),
                       )}
                       <ImageField
                         id={`${id}-image`}
                         label={`${label} image`}
-                        fileName={row.file?.name ?? null}
+                        fileName={row.image.file?.name ?? null}
                         error={row.fileError}
-                        onChange={(file) => chooseVariantFile(row.key, file)}
+                        onChange={(file) => chooseVariantFile(row, file)}
                       />
                       {variants.length > 1 && (
                         <button
@@ -556,19 +530,13 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
           <span className="manual-section-badge logo-form-soon">Coming soon</span>
         ) : (
           <>
-            {textField('logo-unit', 'Unit X', unit, unitError, (value) => {
-              setUnit(value)
-              setUnitError('')
-            })}
+            {textField('logo-unit', 'Unit X', unit, '', setUnit)}
             {textField(
               'logo-min-digital',
               'Min digital size (px)',
               minDigital,
               minDigitalError,
-              (value) => {
-                setMinDigital(value)
-                setMinDigitalError('')
-              },
+              setMinDigital,
               'decimal',
             )}
             {textField(
@@ -576,26 +544,19 @@ export function LogoForm({ onSubmit, parts = LOGO_PARTS }: LogoFormProps) {
               'Min print size (mm)',
               minPrint,
               minPrintError,
-              (value) => {
-                setMinPrint(value)
-                setMinPrintError('')
-              },
+              setMinPrint,
               'decimal',
             )}
             <ImageField
               id="logo-grid"
               label="Construction grid (optional)"
-              fileName={gridFile?.name ?? null}
+              fileName={grid.file?.name ?? null}
               error={gridError}
               onChange={chooseGridFile}
             />
           </>
         )}
       </fieldset>
-
-      <button type="submit" data-feedback={feedback} onAnimationEnd={handleFeedbackEnd}>
-        Save
-      </button>
     </form>
   )
 }

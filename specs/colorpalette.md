@@ -1,7 +1,7 @@
 # Technical Specification: Color Palette (Colors Section)
 
 ## 1. What it does
-The third section of the Brand Manual page is **Colors**. The user builds the brand's color palette: from **1 to 6 colors**, each one with a free-text **name** and a color chosen with the same picker as the Cover (see `colorpicker.md`). For every color the app calculates its **HEX**, **RGB** and **CMYK (approximate)** values. After the user clicks Save, the **Color palette** page of the preview shows every color with its name and its three values. Where they sit on the page depends on the chosen template.
+The third section of the Brand Manual page is **Colors**. The user builds the brand's color palette: from **1 to 6 colors**, each one with a free-text **name** and a color chosen with the same picker as the Cover (see `colorpicker.md`). For every color the app calculates its **HEX**, **RGB** and **CMYK (approximate)** values. As the user edits, the **Color palette** page of the preview shows every color with its name and its three values. Where they sit on the page depends on the chosen template.
 
 ## Out of Scope
 Changing the Typography or Background colors of the manual (they belong to the Cover, see `colorpicker.md`). Reordering colors (drag and drop). Pantone or other color systems. Typing CMYK or RGB values to choose a color (CMYK is only shown, never typed). Accurate, color-managed CMYK (see ADR 0003). Warnings about similar or low-contrast colors. Saving the palette between sessions.
@@ -20,16 +20,17 @@ The form has one block per color, in order (Color 1, Color 2, …), then the but
 
 Under the blocks:
 * **Add color** button: adds a new block at the end. It is disabled when the palette has 6 colors.
-* **Save** button.
 
-The form follows the visual rules of the Cover form (text aligned right, Save button only as wide as its label).
+The section has no Save button: every change reaches the preview at once.
+
+The form follows the visual rules of the Cover form (text aligned right).
 
 ### Accordion
 * Only **one** color is open at a time. The others are folded into their header row, one under the other.
 * Clicking the header of a folded color **opens** it and folds the one that was open. Clicking the header of the open color folds it, leaving every color folded.
 * **Add color** opens the new color and folds the others.
 * After **Remove**, every color is folded.
-* On a **Save** with errors, the first color with an error opens so its error can be seen; every color with an error has a red border, even while folded.
+* Every color with an invalid HEX has a red border, even while folded.
 * **Motion** (same style as the color picker pop-ups, no bounce): the body unfolds from no height to its full height, fast at first and settling slowly (`--ease-smooth`, about 0.5 s), while its fields fade in and glide down a few pixels. Folding is the same motion in reverse, a little faster. The arrow turns with it, and the open color's card gets an accent border and a soft shadow.
 * A folded body can't be reached with the keyboard or by screen readers (`inert`).
 
@@ -48,9 +49,9 @@ From RGB with the naive formula of ADR 0003: `K = 1 − max(R′, G′, B′)`, 
 | `#FFFFFF` | `255, 255, 255` | `0, 0, 0, 0` |
 
 ### Color palette page in the preview
-The page shows the heading **"Color palette"** and, for each saved color in order: a **chip** filled with the color, its **name**, and its values `HEX`, `RGB` and `CMYK ≈`. At the bottom, a small note: **"CMYK values are approximate"**. The text uses the Cover's Typography color (Black until the Cover is saved). The chip has a faint outline, so a color equal to the page background is still visible.
+The page shows the heading **"Color palette"** and, for each color in order: a **chip** filled with the color, its **name**, and its values `HEX`, `RGB` and `CMYK ≈`. At the bottom, a small note: **"CMYK values are approximate"**. The text uses the Cover's Typography color (Black until the Cover's color is changed). The chip has a faint outline, so a color equal to the page background is still visible.
 
-Before the first Save the page shows the placeholder `Your color palette`.
+Until the Colors section is touched, the page shows the placeholder `Your color palette`. A color with an empty name shows its label (`Color 1`, `Color 2`…) on the page.
 
 ### Templates
 ```
@@ -69,21 +70,20 @@ Template 1               Template 2               Template 3
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`), in the Colors section.
-* **Postconditions**: After a valid Save, the Color palette page shows every color with its name, HEX, RGB and CMYK values, placed by the current template.
+* **Postconditions**: The Color palette page always shows every color with its name, HEX, RGB and CMYK values, placed by the current template.
 
 ## 4. Invariants
 * The palette always has between 1 and 6 colors.
 * The values shown in the form always match the color in its picker.
-* The Color palette page changes only when the user clicks this section's Save. Saving the Cover never changes the palette, and saving the palette never changes the Cover.
+* The Color palette page changes at once with every edit in this section. Editing the Cover never changes the palette, and editing the palette never changes the Cover.
+* While a HEX is half typed or not valid, the page keeps the last valid color.
 * The page always shows the colors in the same order as the form.
-* The saved palette is kept when the user moves between pages; refreshing the browser clears it.
+* The palette is kept when the user moves between pages; refreshing the browser clears it.
 * Colors work the same in every template, orientation and preview view, and always stay inside the page.
 
 ## Failure Modes
-On Save, every invalid field shows its error at the same time, with a red border, and nothing is saved:
-* **Name empty** (or only spaces): `"Required field"`.
-* **HEX empty**: `"Required field"`.
-* **HEX not valid**: `"Enter a valid HEX color, like #1E88E5"` (also shown on blur or Enter, as in `colorpicker.md`).
+No field is required. A wrong value is flagged on blur or Enter, with a red border, and the page keeps the last valid color:
+* **HEX not valid**: `"Enter a valid HEX color, like #1E88E5"` (as in `colorpicker.md`). An empty HEX is not an error.
 
 ## 5. Given-When-Then Test Criteria
 
@@ -107,23 +107,23 @@ On Save, every invalid field shows its error at the same time, with a red border
 * **When**: The user clicks Add color.
 * **Then**: There are six colors and Add color is disabled.
 
-### Scenario 5: Saving the Palette
-* **Given**: Color 1 is named "Primary blue" with `#1E88E5`.
-* **When**: The user clicks the Colors Save.
-* **Then**: The Color palette page shows "Primary blue", `#1E88E5`, `30, 136, 229`, `87, 41, 0, 10` and "CMYK values are approximate".
+### Scenario 5: Live Palette
+* **Given**: The user is in the Colors section.
+* **When**: The user names Color 1 "Primary blue" and picks `#1E88E5`.
+* **Then**: The Color palette page shows at once, with no button, "Primary blue", `#1E88E5`, `30, 136, 229`, `87, 41, 0, 10` and "CMYK values are approximate".
 
-### Scenario 6: Required Name
+### Scenario 6: Empty Name
 * **Given**: Color 1 has no name.
-* **When**: The user clicks the Colors Save.
-* **Then**: The name field shows "Required field" with a red border, and the page still shows "Your color palette".
+* **When**: The user picks the "Blue" swatch.
+* **Then**: The page shows "Color 1" with `#1E88E5`, and no error is shown.
 
-### Scenario 7: Palette Waits for Save
-* **Given**: The user saved a palette with "Primary blue".
-* **When**: The user renames it "Sky" without clicking Save.
-* **Then**: The page still shows "Primary blue".
+### Scenario 7: Edits Show at Once
+* **Given**: The page shows "Primary blue".
+* **When**: The user renames it "Sky".
+* **Then**: The page shows "Sky" at once.
 
 ### Scenario 8: Palette Is Kept Between Pages
-* **Given**: The user saved a palette with "Primary blue".
+* **Given**: The page shows a color named "Primary blue".
 * **When**: The user goes to Home and then back to Brand Manual.
 * **Then**: The Color palette page still shows "Primary blue".
 
@@ -137,7 +137,7 @@ On Save, every invalid field shows its error at the same time, with a red border
 * **When**: The user clicks the header of Color 2.
 * **Then**: Color 2 opens, Color 3 folds, and Color 1 stays folded.
 
-### Scenario 11: An Error Opens Its Color
-* **Given**: Color 1 has a name, Color 2 has no name, and Color 1 is open.
-* **When**: The user clicks the Colors Save.
-* **Then**: Color 2 opens and shows "Required field", its card has a red border, and the page does not change.
+### Scenario 11: An Invalid HEX Is Marked
+* **Given**: Color 1 shows `#1E88E5` on the page.
+* **When**: The user types `blue` in its HEX field and leaves it.
+* **Then**: The field shows "Enter a valid HEX color, like #1E88E5", the card has a red border, and the page keeps `#1E88E5`.

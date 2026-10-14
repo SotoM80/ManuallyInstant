@@ -20,12 +20,13 @@ export type Logo = {
   size: LogoSize // how much of its area the logo fills on the Cover
 }
 
-// Everything the Cover section saves. Also reused by the Logo page later.
+// Everything the Cover section shows in the preview. Also reused by the Brand concept page.
+// Text fields may be empty while the user types: the page shows a placeholder for them.
 export type CoverData = {
   title: string
   style: TitleStyle
   designedBy: string
-  logo: Logo
+  logo: Logo | null // null → no logo applied yet
   colors: ManualColors
 }
 
@@ -74,10 +75,10 @@ export type MarkCard = {
 export type LogoVariant = {
   name: string
   usage: string
-  image: UploadedImage
+  image: UploadedImage | null // null → no image applied yet
 }
 
-// Everything the Logo section saves. It fills three pages: Brand concept, Logo versions
+// Everything the Logo section shows in the preview. It fills three pages: Brand concept, Logo versions
 // and Clear space (see specs/logo.md).
 export type LogoData = {
   brandName: string

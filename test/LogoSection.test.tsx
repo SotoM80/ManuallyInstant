@@ -4,17 +4,31 @@ import { LogoVersionsPage } from '../src/components/pages/LogoVersionsPage';
 import { ClearSpacePage } from '../src/components/pages/ClearSpacePage';
 import { renderApp } from './renderApp';
 import type { LogoData } from '../src/types';
-import { clickSave, fillRequiredCoverFields, makeLogo, typeTitle } from './coverForm';
+import type { LogoParts } from '../src/data/manualSections';
+import { clickApply, fillRequiredCoverFields, getApplyButton, makeLogo, typeTitle } from './coverForm';
 
 // Spec: specs/logo.md — Logo section form
 // Every part on, so the whole form can be tested (the app may still have some off).
 const ALL_PARTS = { versions: true, clearSpace: true };
 
-function renderForm() {
-  const onSubmit = jest.fn();
-  render(<LogoForm onSubmit={onSubmit} parts={ALL_PARTS} />);
-  return onSubmit;
+// Renders the form alone. `apply()` does what the Apply button of the preview does.
+function renderForm(parts: LogoParts = ALL_PARTS) {
+  const onChange = jest.fn();
+  const onPendingChange = jest.fn();
+  let applyCount = 0;
+  const view = render(
+    <LogoForm onChange={onChange} applyCount={applyCount} onPendingChange={onPendingChange} parts={parts} />,
+  );
+  function apply() {
+    applyCount += 1;
+    view.rerender(
+      <LogoForm onChange={onChange} applyCount={applyCount} onPendingChange={onPendingChange} parts={parts} />,
+    );
+  }
+  return { onChange, onPendingChange, apply };
 }
+
+const NO_PARTS = { versions: false, clearSpace: false };
 
 function getForm() {
   return screen.getByRole('form', { name: 'Logo' });
@@ -74,14 +88,13 @@ describe('Logo section – form', () => {
     expect(versionHeader(1)).toHaveAttribute('aria-expanded', 'true');
   });
 
-  it('saves everything typed, with the first version as the primary one', () => {
-    const onSubmit = renderForm();
+  it('sends everything typed at once, and the image after Apply', () => {
+    const { onChange, apply } = renderForm();
     fillValidForm();
     toggleMarkType('Isologo');
+    apply();
 
-    click('Save');
-
-    expect(onSubmit).toHaveBeenCalledWith({
+    expect(onChange).toHaveBeenLastCalledWith({
       brandName: 'VOLTA',
       concept: 'Energy that moves cities.',
       marks: [
@@ -98,59 +111,62 @@ describe('Logo section – form', () => {
     });
   });
 
-  it('blocks Save and flags every empty required field', () => {
-    const onSubmit = renderForm();
+  it('sends the text before Apply, with the new image still waiting', () => {
+    const { onChange, onPendingChange } = renderForm();
 
-    click('Save');
+    fillValidForm();
 
-    expect(onSubmit).not.toHaveBeenCalled();
-    expect(within(getForm()).getByLabelText('Brand name')).toHaveAttribute('aria-invalid', 'true');
-    expect(within(getForm()).getByLabelText('Concept')).toHaveAttribute('aria-invalid', 'true');
-    expect(within(getForm()).getByLabelText('Version 1 name')).toHaveAttribute('aria-invalid', 'true');
-    expect(within(getForm()).getByLabelText('Version 1 image', { selector: 'input' })).toHaveAttribute(
-      'aria-invalid',
-      'true',
+    expect(onPendingChange).toHaveBeenLastCalledWith(true);
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        brandName: 'VOLTA',
+        variants: [{ name: 'Horizontal', usage: 'for web', image: null }],
+      }),
     );
   });
 
-  it('opens the first version with an error so it can be seen', () => {
-    renderForm();
-    fillValidForm();
-    click('Add version'); // Version 2 opens, Version 1 folds
-    click('Version 2'); // fold it too
+  it('reports nothing pending once Apply is pressed', () => {
+    const { onPendingChange, apply } = renderForm();
+    upload('Version 1 image', makeLogo('volta-h.png'));
 
-    click('Save');
+    apply();
 
-    expect(versionHeader(2)).toHaveAttribute('aria-expanded', 'true');
+    expect(onPendingChange).toHaveBeenLastCalledWith(false);
   });
 
-  it('flags a size that is not a number greater than 0', () => {
-    const onSubmit = renderForm();
-    fillValidForm();
+  it('shows no "Required field" errors for empty fields', () => {
+    renderForm();
+    type('Brand name', 'VOLTA');
+    type('Brand name', '');
+
+    expect(within(getForm()).queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('flags a size that is not a number greater than 0, as it is typed', () => {
+    renderForm();
+
     type('Min print size (mm)', '0');
 
-    click('Save');
-
-    expect(onSubmit).not.toHaveBeenCalled();
     expect(within(getForm()).getByText('Enter a number greater than 0')).toBeInTheDocument();
   });
 
-  it('flags a wrong image as soon as it is chosen', () => {
-    renderForm();
+  it('flags a wrong image as soon as it is chosen, and does not wait for Apply', () => {
+    const { onPendingChange } = renderForm();
 
     upload('Version 1 image', makeLogo('volta.pdf', 'application/pdf'));
 
     expect(within(getForm()).getByText('Use a PNG, JPG, SVG or WebP image')).toBeInTheDocument();
+    expect(onPendingChange).toHaveBeenLastCalledWith(false);
   });
 
-  it('saves the optional construction grid when one is chosen', () => {
-    const onSubmit = renderForm();
+  it('sends the optional construction grid after Apply', () => {
+    const { onChange, apply } = renderForm();
     fillValidForm();
     upload('Construction grid (optional)', makeLogo('grid.png'));
 
-    click('Save');
+    apply();
 
-    expect(onSubmit).toHaveBeenCalledWith(
+    expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({ grid: { url: 'blob:grid.png', name: 'grid.png' } }),
     );
   });
@@ -171,9 +187,8 @@ describe('Logo section – form', () => {
 
 // Spec: specs/logo.md — Parts built one at a time
 describe('Logo section – parts not built yet', () => {
-  it('shows Versions and Clear space as "Coming soon" and saves with the Concept only', () => {
-    const onSubmit = jest.fn();
-    render(<LogoForm onSubmit={onSubmit} parts={{ versions: false, clearSpace: false }} />);
+  it('shows Versions and Clear space as "Coming soon" and sends the Concept only', () => {
+    const { onChange } = renderForm(NO_PARTS);
 
     for (const name of ['Versions', 'Clear space & size']) {
       const group = within(getForm()).getByRole('group', { name });
@@ -183,9 +198,8 @@ describe('Logo section – parts not built yet', () => {
     expect(within(getForm()).queryByLabelText('Version 1 name')).not.toBeInTheDocument();
 
     fillConcept();
-    click('Save');
 
-    expect(onSubmit).toHaveBeenCalledWith(
+    expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({ brandName: 'VOLTA', variants: [], grid: null }),
     );
   });
@@ -223,14 +237,11 @@ describe('Logo section – mark cards', () => {
   });
 
   it('needs at least one mark type', () => {
-    const onSubmit = jest.fn();
-    render(<LogoForm onSubmit={onSubmit} parts={{ versions: false, clearSpace: false }} />);
+    renderForm(NO_PARTS);
     fillConcept();
+
     toggleMarkType('Imagotype');
 
-    click('Save');
-
-    expect(onSubmit).not.toHaveBeenCalled();
     expect(within(getForm()).getByText('Choose at least one mark type')).toBeInTheDocument();
   });
 
@@ -252,7 +263,7 @@ describe('Logo section – mark cards', () => {
     upload('Isotype image (optional)', makeLogo('symbol.png'));
     type('Isotype name', 'Bolt');
 
-    click('Save');
+    clickApply();
 
     const cards = within(getPage('Anatomy')).getByRole('list', { name: 'Marks of the brand' });
     const imagotype = within(cards).getByRole('listitem', { name: 'Imagotype' });
@@ -261,13 +272,11 @@ describe('Logo section – mark cards', () => {
     expect(within(cards).getByRole('img', { name: 'Bolt' })).toHaveAttribute('src', 'blob:symbol.png');
   });
 
-  it('saves a card with nothing filled in, and shows it with its type only', () => {
+  it('shows a card with nothing filled in with its type only', () => {
     renderApp('/brand-manual');
     openLogoSection();
     type('Brand name', 'VOLTA');
     type('Concept', 'Energy that moves cities.');
-
-    click('Save');
 
     const card = within(getPage('Anatomy')).getByRole('listitem', { name: 'Imagotype' });
     expect(card).toHaveTextContent('Imagotype');
@@ -275,9 +284,8 @@ describe('Logo section – mark cards', () => {
   });
 
   // Spec: specs/logo.md — Parts of a mark (Isotype + Logotype + Tagline = Imagotype)
-  it('adds up to 4 parts to a card, and saves only the ones with something in them', () => {
-    const onSubmit = jest.fn();
-    render(<LogoForm onSubmit={onSubmit} parts={{ versions: false, clearSpace: false }} />);
+  it('adds up to 4 parts to a card, and sends only the ones with something in them', () => {
+    const { onChange, apply } = renderForm(NO_PARTS);
     fillConcept();
 
     click('Add part to Imagotype');
@@ -285,13 +293,13 @@ describe('Logo section – mark cards', () => {
     upload('Imagotype part 1 image (optional)', makeLogo('symbol.png'));
     click('Add part to Imagotype');
     type('Imagotype part 2 name', 'Energy for all'); // no label → "Part 2"
-    click('Add part to Imagotype'); // left empty → not saved
+    click('Add part to Imagotype'); // left empty → not sent
     click('Add part to Imagotype');
     expect(within(getForm()).getByRole('button', { name: 'Add part to Imagotype' })).toBeDisabled();
 
-    click('Save');
+    apply();
 
-    expect(onSubmit).toHaveBeenCalledWith(
+    expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({
         marks: [
           expect.objectContaining({
@@ -323,8 +331,6 @@ describe('Logo section – mark cards', () => {
     type('Imagotype part 1 label', 'Isotype');
     click('Add part to Imagotype');
     type('Imagotype part 2 label', 'Tagline');
-
-    click('Save');
 
     const row = within(getPage('Anatomy')).getByRole('listitem', { name: 'Imagotype' });
     const parts = within(row).getByRole('list', { name: 'Parts of the Imagotype' });
@@ -364,12 +370,10 @@ describe('Logo section – preview pages', () => {
     expect(getPage('Clear space')).toHaveTextContent('Coming soon');
   });
 
-  it('fills the Brand concept page (text) and the Anatomy page (marks) after Save', () => {
+  it('fills the Brand concept page (text) and the Anatomy page (marks) as it is typed', () => {
     renderApp('/brand-manual');
     openLogoSection();
     fillConcept();
-
-    click('Save');
 
     const concept = getPage('Brand concept');
     expect(concept).toHaveTextContent('The identity of VOLTA is built on a clear idea:');
@@ -383,18 +387,17 @@ describe('Logo section – preview pages', () => {
     expect(getPage('Logo versions')).toHaveTextContent('Coming soon');
   });
 
-  it('shows the Cover logo on the Brand concept page, or a box until the Cover is saved', () => {
+  it('shows the Cover logo on the Brand concept page, or a box until it is applied', () => {
     renderApp('/brand-manual');
     typeTitle('VOLTA manual');
-    fillRequiredCoverFields(); // uploads logo.png
+    fillRequiredCoverFields(); // chooses logo.png
     openLogoSection();
     fillConcept();
-    click('Save');
 
-    // The Cover is filled in but not saved yet
+    // The Cover logo is chosen but not applied yet
     expect(within(getPage('Brand concept')).getByText('Logo of the Cover')).toBeInTheDocument();
 
-    clickSave(); // the Cover form
+    clickApply();
 
     expect(within(getPage('Brand concept')).getByRole('img', { name: 'VOLTA logo' })).toHaveAttribute(
       'src',
@@ -409,10 +412,31 @@ describe('Logo section – preview pages', () => {
     fillConcept();
     type('Brand name', longName);
 
-    click('Save');
-
     const brand = within(getPage('Brand concept')).getByTitle(longName);
     expect(brand).toHaveClass('logo-cut');
+  });
+});
+
+// Spec: docs/adr/0007 — one Apply button for every image
+describe('Logo section – Apply button', () => {
+  it('turns Apply on when a card image is chosen, and shows it only after Apply', () => {
+    renderApp('/brand-manual');
+    const sections = screen.getByRole('region', { name: 'Manual sections' });
+    fireEvent.click(within(sections).getByRole('button', { name: '2. Logo' }));
+    fillConcept();
+    expect(getApplyButton()).toBeDisabled();
+
+    upload('Imagotype image (optional)', makeLogo('mark.png'));
+
+    const preview = screen.getByRole('region', { name: 'Manual preview' });
+    const anatomy = within(preview).getByRole('article', { name: 'Anatomy' });
+    expect(getApplyButton()).toBeEnabled();
+    expect(within(anatomy).queryByRole('img')).not.toBeInTheDocument();
+
+    clickApply();
+
+    expect(within(anatomy).getByRole('img', { name: 'Lightning symbol' })).toHaveAttribute('src', 'blob:mark.png');
+    expect(getApplyButton()).toBeDisabled();
   });
 });
 

@@ -1,8 +1,9 @@
 import { screen, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import {
-  clickSave,
+  clickApply,
   fillRequiredCoverFields,
+  getApplyButton,
   getLogoInput,
   getLogoSizeOption,
   makeLogo,
@@ -18,12 +19,8 @@ function getCover() {
   });
 }
 
-function getDesignedByInput() {
-  return screen.getByLabelText('Designed by');
-}
-
 // Spec: specs/cover.md, Section 2 — Interface (placeholders)
-describe('Cover – before the first Save', () => {
+describe('Cover – before anything is typed', () => {
   it('shows the three placeholders, in Template 1', () => {
     renderApp();
 
@@ -33,21 +30,60 @@ describe('Cover – before the first Save', () => {
     expect(getCover()).toHaveTextContent('Your logo');
     expect(getCover()).toHaveTextContent('Designed by …');
   });
+
+  it('has no Save button', () => {
+    renderApp();
+
+    expect(screen.queryByRole('button', { name: /save/i })).not.toBeInTheDocument();
+  });
 });
 
-// Spec: specs/cover.md, Scenario 1 — Successful Save
-describe('Cover – successful save', () => {
-  it('shows the title at the top, the logo in the middle and "Designed by" at the bottom', () => {
-    // Given
+// Spec: specs/cover.md, Scenario 1 — Live preview
+describe('Cover – live preview', () => {
+  it('shows the title and Designed by as they are typed, with no button', () => {
     renderApp();
+
     typeTitle('My Brand');
     typeDesignedBy('  Studio X  ');
+
+    expect(within(getCover()).getByText('My Brand')).toBeInTheDocument();
+    expect(within(getCover()).getByText('Designed by Studio X')).toBeInTheDocument();
+  });
+
+  it('keeps a placeholder for each field that is still empty', () => {
+    renderApp();
+
+    typeTitle('My Brand');
+
+    expect(getCover()).toHaveTextContent('My Brand');
+    expect(getCover()).toHaveTextContent('Your logo');
+    expect(getCover()).toHaveTextContent('Designed by …');
+  });
+
+  it('goes back to the placeholder when a field is emptied', () => {
+    renderApp();
+    typeTitle('My Brand');
+
+    typeTitle('   ');
+
+    expect(getCover()).toHaveTextContent('Your brand manual title');
+  });
+
+  it('shows no "Required field" errors for empty fields', () => {
+    renderApp();
+    typeTitle('My Brand');
+    typeTitle('');
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('draws the title at the top, the logo in the middle and "Designed by" at the bottom', () => {
+    renderApp();
+    typeTitle('My Brand');
+    typeDesignedBy('Studio X');
     uploadLogo(makeLogo('brand.png'));
+    clickApply();
 
-    // When
-    clickSave();
-
-    // Then
     const title = within(getCover()).getByText('My Brand');
     const logo = within(getCover()).getByRole('img', { name: 'Logo' });
     const designedBy = within(getCover()).getByText('Designed by Studio X');
@@ -55,85 +91,77 @@ describe('Cover – successful save', () => {
     expect(logo).toHaveAttribute('src', 'blob:brand.png');
     expect(title.compareDocumentPosition(logo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(logo.compareDocumentPosition(designedBy) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });
 
-// Spec: specs/cover.md, Scenario 2 — Designed By Is Required
-describe('Cover – Designed by is required', () => {
-  it.each([
-    ['empty', ''],
-    ['only spaces', '   '],
-  ])('blocks Save when Designed by is %s', (_, value) => {
-    // Given
+// Spec: specs/cover.md, Scenario 2 — A new logo waits for Apply
+describe('Cover – logo and the Apply button', () => {
+  it('starts with Apply disabled', () => {
     renderApp();
-    typeTitle('My Brand');
+
+    expect(getApplyButton()).toBeDisabled();
+  });
+
+  it('turns Apply on when a logo is chosen, but does not show it yet', () => {
+    renderApp();
+
     uploadLogo();
-    typeDesignedBy(value);
 
-    // When
-    clickSave();
-
-    // Then
-    expect(getDesignedByInput()).toHaveAccessibleDescription('Required field');
-    expect(getDesignedByInput()).toHaveStyle({ borderColor: 'red' });
-    expect(getCover()).toHaveTextContent('Your brand manual title');
-  });
-});
-
-// Spec: specs/cover.md, Scenario 3 — Logo Is Required
-describe('Cover – logo is required', () => {
-  it('blocks Save when no logo is chosen', () => {
-    // Given
-    renderApp();
-    typeTitle('My Brand');
-    typeDesignedBy('Studio X');
-
-    // When
-    clickSave();
-
-    // Then
-    expect(getLogoInput()).toHaveAccessibleDescription('Required field');
-    expect(getLogoInput()).toHaveAttribute('aria-invalid', 'true');
+    expect(getApplyButton()).toBeEnabled();
+    expect(within(getCover()).queryByRole('img', { name: 'Logo' })).not.toBeInTheDocument();
     expect(getCover()).toHaveTextContent('Your logo');
   });
-});
 
-// Spec: specs/cover.md, Failure Modes — all errors at the same time
-describe('Cover – every missing field at once', () => {
-  it('shows "Required field" for the title, Designed by and Logo together', () => {
+  it('shows the logo on Apply and turns Apply off again', () => {
     renderApp();
+    uploadLogo(makeLogo('brand.png'));
 
-    clickSave();
+    clickApply();
 
-    expect(screen.getAllByRole('alert').map((alert) => alert.textContent)).toEqual([
-      'Required field',
-      'Required field',
-      'Required field',
-    ]);
+    expect(within(getCover()).getByRole('img', { name: 'Logo' })).toHaveAttribute('src', 'blob:brand.png');
+    expect(getApplyButton()).toBeDisabled();
+  });
+
+  it('keeps the applied logo until a replacement is applied', () => {
+    renderApp();
+    uploadLogo(makeLogo('first.png'));
+    clickApply();
+
+    uploadLogo(makeLogo('second.png'));
+
+    expect(getApplyButton()).toBeEnabled();
+    expect(within(getCover()).getByRole('img', { name: 'Logo' })).toHaveAttribute('src', 'blob:first.png');
+
+    clickApply();
+
+    expect(within(getCover()).getByRole('img', { name: 'Logo' })).toHaveAttribute('src', 'blob:second.png');
   });
 });
 
-// Spec: specs/cover.md, Scenarios 4 and 5 — Wrong File Type / File Too Big
+// Spec: specs/cover.md, Scenarios 3 and 4 — Wrong File Type / File Too Big
 describe('Cover – invalid logo file', () => {
   it.each([
     ['a PDF', makeLogo('logo.pdf', 'application/pdf'), 'Use a PNG, JPG, SVG or WebP image'],
     ['a PNG over 5 MB', makeLogo('big.png', 'image/png', 5 * 1024 * 1024 + 1), 'The logo must be 5 MB or smaller'],
-  ])('shows an error as soon as %s is chosen, and blocks Save', (_, file, message) => {
-    // Given
+  ])('shows an error as soon as %s is chosen, and keeps Apply off', (_, file, message) => {
     renderApp();
-    typeTitle('My Brand');
-    typeDesignedBy('Studio X');
 
-    // When
     uploadLogo(file);
 
-    // Then: the error shows before Save...
     expect(getLogoInput()).toHaveAccessibleDescription(message);
+    expect(getApplyButton()).toBeDisabled();
+    expect(getCover()).toHaveTextContent('Your logo');
+  });
 
-    // ...and Save is blocked
-    clickSave();
-    expect(getCover()).toHaveTextContent('Your brand manual title');
+  it('keeps the applied logo when a wrong file is chosen after it', () => {
+    renderApp();
+    uploadLogo(makeLogo('brand.png'));
+    clickApply();
+
+    uploadLogo(makeLogo('logo.pdf', 'application/pdf'));
+
+    expect(getApplyButton()).toBeDisabled();
+    expect(within(getCover()).getByRole('img', { name: 'Logo' })).toHaveAttribute('src', 'blob:brand.png');
   });
 
   it.each([
@@ -142,31 +170,15 @@ describe('Cover – invalid logo file', () => {
     ['WebP', 'logo.webp', 'image/webp'],
   ])('accepts a %s logo', (_, name, type) => {
     renderApp();
-    typeTitle('My Brand');
-    typeDesignedBy('Studio X');
     uploadLogo(makeLogo(name, type));
 
-    clickSave();
+    clickApply();
 
     expect(within(getCover()).getByRole('img', { name: 'Logo' })).toHaveAttribute('src', `blob:${name}`);
   });
 });
 
-// Spec: specs/cover.md, Scenario 6 — Cover Waits for Save
-describe('Cover – waits for Save', () => {
-  it('does not show the logo or Designed by before Save', () => {
-    renderApp();
-
-    typeDesignedBy('Studio X');
-    uploadLogo();
-
-    expect(within(getCover()).queryByRole('img', { name: 'Logo' })).not.toBeInTheDocument();
-    expect(getCover()).toHaveTextContent('Your logo');
-    expect(getCover()).toHaveTextContent('Designed by …');
-  });
-});
-
-// Spec: specs/cover.md, Scenario 7 — Logo Size
+// Spec: specs/cover.md, Scenario 5 — Logo Size
 describe('Cover – logo size', () => {
   function getCoverLogoArea() {
     return within(getCover()).getByRole('img', { name: 'Logo' }).parentElement as HTMLElement;
@@ -182,25 +194,24 @@ describe('Cover – logo size', () => {
     ['Small', '0.5'],
     ['Medium', '0.75'],
     ['Large', '1'],
-  ] as const)('draws a %s logo at %s of its area after Save', (size, scale) => {
+  ] as const)('draws a %s logo at %s of its area', (size, scale) => {
     renderApp();
-    typeTitle('My Brand');
     fillRequiredCoverFields();
-    pickLogoSize(size);
+    clickApply();
 
-    clickSave();
+    pickLogoSize(size);
 
     expect(getCoverLogoArea().style.getPropertyValue('--logo-scale')).toBe(scale);
   });
 
-  it('keeps the saved size until Save is clicked again', () => {
+  it('changes the size live, without Apply', () => {
     renderApp();
-    typeTitle('My Brand');
     fillRequiredCoverFields();
-    clickSave();
+    clickApply();
 
     pickLogoSize('Small');
 
-    expect(getCoverLogoArea().style.getPropertyValue('--logo-scale')).toBe('0.75');
+    expect(getApplyButton()).toBeDisabled();
+    expect(getCoverLogoArea().style.getPropertyValue('--logo-scale')).toBe('0.5');
   });
 });

@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import type { AnimationEvent, FormEvent } from 'react'
+import { useMemo, useState } from 'react'
 import { AutocompleteField } from './AutocompleteField'
 import { ColorPicker } from './ColorPicker'
 import { ImageField } from './ImageField'
@@ -11,18 +10,28 @@ import {
   normalizeHex,
 } from '../data/colorPalette'
 import { DEFAULT_LOGO_SIZE, LOGO_SIZES } from '../data/logoOptions'
-import { findOption, validateColor, validateImage, validateOption, validateText } from '../utils/validation'
+import { findOption, validateImage } from '../utils/validation'
+import {
+  NO_IMAGE,
+  chooseFile,
+  isPending,
+  shownFile,
+  toImage,
+  useLiveData,
+  usePendingReport,
+} from '../utils/pendingImage'
 import type { CoverData, LogoSize, ManualColors, TitleStyle } from '../types'
 
 type StyleKey = keyof TitleStyle
 type StyleValues = Record<StyleKey, string>
 type ColorKey = keyof ManualColors
-// What the Save button shows after a click: a pulse with a check, or a shake.
-type SaveFeedback = 'idle' | 'saved' | 'error'
 
 // Form of the Cover section: brand manual title (+ style), colors, Designed by and logo.
+// Every change reaches the preview at once; a new logo waits for Apply (see docs/adr/0007).
 type BrandFormProps = {
-  onSubmit?: (cover: CoverData) => void
+  onChange?: (cover: CoverData) => void
+  applyCount?: number // how many times Apply was pressed
+  onPendingChange?: (pending: boolean) => void // a new logo is waiting for Apply
 }
 
 const NO_STYLE_ERRORS: StyleValues = { fontFamily: '', fontStyle: '', fontSize: '' }
@@ -42,27 +51,43 @@ function validateLogo(file: File | null) {
   return validateImage(file, 'logo')
 }
 
-export function BrandForm({ onSubmit }: BrandFormProps) {
+export function BrandForm({ onChange, applyCount = 0, onPendingChange }: BrandFormProps) {
   const [title, setTitle] = useState('')
-  const [error, setError] = useState('')
   const [designedBy, setDesignedBy] = useState('')
-  const [designedByError, setDesignedByError] = useState('')
-  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logo, setLogo] = useState(NO_IMAGE)
   const [logoError, setLogoError] = useState('')
   const [logoSize, setLogoSize] = useState<LogoSize>(DEFAULT_LOGO_SIZE)
   const [style, setStyle] = useState<StyleValues>(DEFAULT_TITLE_STYLE)
   const [styleErrors, setStyleErrors] = useState<StyleValues>(NO_STYLE_ERRORS)
+  // The last valid style and colors: while a field is half typed, the preview keeps these.
+  const [validStyle, setValidStyle] = useState<TitleStyle>(DEFAULT_TITLE_STYLE)
   const [colors, setColors] = useState<ManualColors>(DEFAULT_COLORS)
   const [colorErrors, setColorErrors] = useState<ManualColors>(NO_COLOR_ERRORS)
-  const [feedback, setFeedback] = useState<SaveFeedback>('idle')
+  const [validColors, setValidColors] = useState<ManualColors>(DEFAULT_COLORS)
+
+  const shownLogo = shownFile(logo, applyCount, logoError)
+  const cover = useMemo<CoverData>(
+    () => ({
+      title: title.trim(),
+      style: validStyle,
+      designedBy: designedBy.trim(),
+      logo: shownLogo ? { ...toImage(shownLogo), size: logoSize } : null,
+      colors: validColors,
+    }),
+    [title, validStyle, designedBy, shownLogo, logoSize, validColors],
+  )
+  useLiveData(cover, onChange)
+  usePendingReport(isPending(logo, applyCount, logoError), onPendingChange)
 
   function updateColor(key: ColorKey, value: string, fieldError = '') {
     setColors((prev) => ({ ...prev, [key]: value }))
     setColorErrors((prev) => ({ ...prev, [key]: fieldError }))
+    const hex = normalizeHex(value)
+    if (hex) setValidColors((prev) => ({ ...prev, [key]: hex }))
   }
 
   // On blur or Enter in the HEX field: tidy a valid value ("1e88e5" → "#1E88E5"), flag the rest.
-  // A blank field is only an error on submit.
+  // A blank field is not an error: the preview keeps the last valid color.
   function commitColor(key: ColorKey) {
     const value = colors[key]
     if (value.trim() === '') return
@@ -73,10 +98,13 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
   function updateStyle(key: StyleKey, value: string, fieldError = '') {
     setStyle((prev) => ({ ...prev, [key]: value }))
     setStyleErrors((prev) => ({ ...prev, [key]: fieldError }))
+    const field = STYLE_FIELDS.find((item) => item.key === key)
+    const match = field && findOption(field.options, value)
+    if (match) setValidStyle((prev) => ({ ...prev, [key]: match }))
   }
 
   // On blur or Enter: snap a case-insensitive match to the option, flag anything else.
-  // A blank field is only an error on submit.
+  // A blank field is not an error: the preview keeps the last valid option.
   function commitStyle(key: StyleKey, options: readonly string[]) {
     const value = style[key]
     if (value.trim() === '') return
@@ -84,84 +112,21 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
     updateStyle(key, match ?? value, match ? '' : 'Select a valid option')
   }
 
-  // A wrong file is flagged as soon as it is chosen, not only on submit.
+  // A wrong file is flagged as soon as it is chosen. A valid one waits for Apply.
   function handleLogoChange(file: File | null) {
-    setLogoFile(file)
+    setLogo((prev) => chooseFile(prev, file, applyCount, logoError))
     setLogoError(file ? validateLogo(file) : '')
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const titleError = validateText(title)
-    const nextDesignedByError = validateText(designedBy)
-    const nextLogoError = validateLogo(logoFile)
-
-    const nextStyleErrors = { ...NO_STYLE_ERRORS }
-    for (const field of STYLE_FIELDS) {
-      nextStyleErrors[field.key] = validateOption(field.options, style[field.key])
-    }
-
-    const nextColorErrors: ManualColors = {
-      typography: validateColor(colors.typography),
-      background: validateColor(colors.background),
-    }
-
-    setError(titleError)
-    setDesignedByError(nextDesignedByError)
-    setLogoError(nextLogoError)
-    setStyleErrors(nextStyleErrors)
-    setColorErrors(nextColorErrors)
-    const invalid =
-      titleError ||
-      nextDesignedByError ||
-      nextLogoError ||
-      !logoFile ||
-      Object.values(nextStyleErrors).some(Boolean) ||
-      Object.values(nextColorErrors).some(Boolean)
-    if (invalid) {
-      setFeedback('error')
-      return
-    }
-
-    const cleanStyle = Object.fromEntries(
-      STYLE_FIELDS.map((field) => [field.key, findOption(field.options, style[field.key])]),
-    ) as TitleStyle
-    onSubmit?.({
-      title: title.trim(),
-      style: cleanStyle,
-      designedBy: designedBy.trim(),
-      logo: { url: URL.createObjectURL(logoFile), name: logoFile.name, size: logoSize },
-      colors: {
-        typography: normalizeHex(colors.typography) as string,
-        background: normalizeHex(colors.background) as string,
-      },
-    })
-    setFeedback('saved')
-  }
-
-  // Back to idle when the button's own animation ends, so the next Save animates again.
-  // The check (::after) has its own animation, which must not end the pulse early.
-  function handleFeedbackEnd(event: AnimationEvent<HTMLButtonElement>) {
-    if (!event.pseudoElement) setFeedback('idle')
-  }
-
   return (
-    <form onSubmit={handleSubmit} noValidate aria-label="Cover">
+    <form onSubmit={(event) => event.preventDefault()} noValidate aria-label="Cover">
       <label htmlFor="brand-title">Brand manual title</label>
       <input
         id="brand-title"
         type="text"
         value={title}
         onChange={(event) => setTitle(event.target.value)}
-        aria-invalid={error !== ''}
-        aria-describedby={error ? 'brand-title-error' : undefined}
-        style={error ? { borderColor: 'red' } : undefined}
       />
-      {error && (
-        <p id="brand-title-error" role="alert">
-          {error}
-        </p>
-      )}
       {STYLE_FIELDS.map((field) => (
         <AutocompleteField
           key={field.key}
@@ -193,20 +158,12 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
         type="text"
         value={designedBy}
         onChange={(event) => setDesignedBy(event.target.value)}
-        aria-invalid={designedByError !== ''}
-        aria-describedby={designedByError ? 'designed-by-error' : undefined}
-        style={designedByError ? { borderColor: 'red' } : undefined}
       />
-      {designedByError && (
-        <p id="designed-by-error" role="alert">
-          {designedByError}
-        </p>
-      )}
 
       <ImageField
         id="logo"
         label="Logo"
-        fileName={logoFile?.name ?? null}
+        fileName={logo.file?.name ?? null}
         error={logoError}
         onChange={handleLogoChange}
       />
@@ -227,10 +184,6 @@ export function BrandForm({ onSubmit }: BrandFormProps) {
           </label>
         ))}
       </fieldset>
-
-      <button type="submit" data-feedback={feedback} onAnimationEnd={handleFeedbackEnd}>
-        Save
-      </button>
     </form>
   )
 }

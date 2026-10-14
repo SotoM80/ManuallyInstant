@@ -2,7 +2,7 @@ import { toFontFamilyCss } from '../../data/fontOptions'
 import type { BrandFonts } from '../../types'
 
 type TypographyPageProps = {
-  fonts: BrandFonts | null // null → nothing saved yet, show the placeholder
+  fonts: BrandFonts | null // null → its section is untouched, show the placeholder
   color: string // the Cover's Typography color
 }
 

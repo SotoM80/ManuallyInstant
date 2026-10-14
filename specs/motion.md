@@ -16,7 +16,7 @@ Moving between pages of the app (Home ↔ Brand Manual). Anything in the exporte
 | `--ease-smooth` | `cubic-bezier(0.16, 1, 0.3, 1)` | color picker pop-ups and controls: settles slowly, never overshoots |
 | `--dur-fast` | 250 ms | hover, press, color changes |
 | `--dur` | 450 ms | pops, pop-ups, swatches |
-| `--dur-slow` | 600 ms | preview, Save feedback |
+| `--dur-slow` | 600 ms | preview, Apply feedback |
 
 Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `pulse` (accent ring that spreads out).
 
@@ -25,7 +25,7 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 |---|---|
 | Nav menu links | hover: lift 2px; press: shrink; the current page's link pops |
 | Home "Start" | hover: lift, shadow and grow a little; press: shrink |
-| Save | hover: lift and shadow; press: shrink. **Not valid** → shakes. **Saved** → accent ring pulses twice and a ✓ pops in next to "Save" (decoration only: the accessible name stays "Save") |
+| Apply (above the Cover section) | hover: lift and shadow; press: shrink. **Disabled** → faded, no motion. **Applied** → accent ring pulses twice and a ✓ pops in next to "Apply" (decoration only: the accessible name stays "Apply") |
 | Logo "Choose file" | **no motion**: only the border color changes on hover |
 | Segmented controls (Orientation, Preview view, Template) | hover tints the options not chosen; press shrinks; the chosen one pops |
 | Autocomplete lists (Font family, Font style, Font size, Primary font, Secondary font) | **no bounce**: on open, the floating list fades in, rises 4px and grows from 96% out of the field (`--ease-smooth`, about 0.45 s); it closes at once. Hovering an option tints it |
@@ -33,7 +33,7 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 
 ### Preview
 * Changing **Template**, **Page orientation** or **Preview view** makes each page and the cover's title, logo and "Designed by" glide from their old place and size to the new ones (browser View Transitions).
-* After each valid **Save**, the cover grows into its page.
+* Each time a new Cover logo is applied, the cover grows into its page. Typing does not replay it.
 * In browsers without View Transitions the preview changes at once, with no animation.
 
 ## 3. Preconditions & Postconditions
@@ -41,9 +41,9 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 * **Postconditions**: every animation ends in exactly the same state the app would have without it.
 
 ## 4. Invariants
-* Motion never changes content, values or what is saved; it only shows changes.
+* Motion never changes content or values; it only shows changes.
 * **Reduced motion**: when the system asks for reduced motion (`prefers-reduced-motion: reduce`), every animation and transition is instant, View Transitions are skipped and the custom picker does not jump. All features keep working.
-* Accessible names never include decorations (the ✓ of Save, the name pop-ups of the swatches).
+* Accessible names never include decorations (the ✓ of Apply, the name pop-ups of the swatches).
 * Hidden pop-ups and folded swatches can't be reached with the keyboard or by screen readers (`inert`).
 
 ## Failure Modes
@@ -51,23 +51,23 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 
 ## 5. Given-When-Then Test Criteria
 
-### Scenario 1: Save Not Valid
-* **Given**: The Cover title is empty.
-* **When**: The user clicks Save.
-* **Then**: The Save button shakes (`data-feedback="error"`) and the cover does not change.
+### Scenario 1: Apply Disabled
+* **Given**: No new image is waiting.
+* **When**: The user looks at Apply.
+* **Then**: It is disabled and faded, and does not move on hover.
 
-### Scenario 2: Save Valid
-* **Given**: Every Cover field is valid.
-* **When**: The user clicks Save.
-* **Then**: The Save button pulses with a ✓ (`data-feedback="saved"`), its accessible name is still "Save", and the cover grows into the page.
+### Scenario 2: Apply
+* **Given**: The user chose a new Cover logo.
+* **When**: The user clicks Apply.
+* **Then**: Apply pulses with a ✓ (`data-feedback="saved"`), its accessible name is still "Apply", and the cover grows into the page with the new logo.
 
 ### Scenario 3: Feedback Can Repeat
-* **Given**: The Save button has just shaken or pulsed.
+* **Given**: Apply has just pulsed.
 * **When**: Its animation ends.
-* **Then**: The button goes back to `data-feedback="idle"`, so the next Save animates again.
+* **Then**: The button goes back to `data-feedback="idle"`, so the next Apply animates again.
 
 ### Scenario 4: Template Change Glides
-* **Given**: The user saved a cover and Template 1 is chosen, in a browser with View Transitions.
+* **Given**: The Cover is filled in and Template 1 is chosen, in a browser with View Transitions.
 * **When**: The user chooses Template 2.
 * **Then**: The title, logo and "Designed by" glide to their Template 2 places.
 

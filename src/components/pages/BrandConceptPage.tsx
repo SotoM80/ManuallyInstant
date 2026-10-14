@@ -2,8 +2,8 @@ import { philosophyText } from '../../data/logoCopy'
 import type { LogoData } from '../../types'
 
 type BrandConceptPageProps = {
-  logo: LogoData | null // null → nothing saved yet, show the placeholder
-  coverLogo: { url: string } | null // the logo uploaded in the Cover section, if saved
+  logo: LogoData | null // null → its section is untouched, show the placeholder
+  coverLogo: { url: string } | null // the logo applied in the Cover section, if any
   color: string // the Cover's Typography color
 }
 
@@ -31,7 +31,7 @@ export function BrandConceptPage({ logo, coverLogo, color }: BrandConceptPagePro
         </p>
       </section>
 
-      {/* The Cover's logo; until the Cover is saved, a faint box shows where it goes */}
+      {/* The Cover's logo; until a Cover logo is applied, a faint box shows where it goes */}
       <figure className="logo-figure concept-logo" data-empty={!coverLogo}>
         {coverLogo ? (
           <img src={coverLogo.url} alt={`${logo.brandName} logo`} />

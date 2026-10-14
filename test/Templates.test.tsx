@@ -1,6 +1,6 @@
 import { screen, fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
-import { clickSave, fillRequiredCoverFields, typeTitle } from './coverForm';
+import { clickApply, fillRequiredCoverFields, typeTitle } from './coverForm';
 
 function getPreview() {
   return screen.getByRole('region', { name: 'Manual preview' });
@@ -21,7 +21,7 @@ function selectTemplate(name: string) {
 function saveCover() {
   typeTitle('My Brand');
   fillRequiredCoverFields();
-  clickSave();
+  clickApply();
 }
 
 // Spec: specs/templates.md, Scenario 1 — Template 1 by Default

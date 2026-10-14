@@ -13,13 +13,11 @@ import './css/App.css'
 
 function App() {
   // Kept here, above the routes, so they survive moving between pages.
-  // `cover` is null until the Cover section is saved for the first time.
+  // Each one is null until its section is touched for the first time; from then on the
+  // forms send every change here, so the preview follows them live.
   const [cover, setCover] = useState<CoverData | null>(null)
-  // `logo` is null until the Logo section is saved for the first time.
   const [logo, setLogo] = useState<LogoData | null>(null)
-  // `palette` is null until the Colors section is saved for the first time.
   const [palette, setPalette] = useState<PaletteColor[] | null>(null)
-  // `typography` is null until the Typography section is saved for the first time.
   const [typography, setTypography] = useState<BrandFonts | null>(null)
   const [orientation, setOrientation] = useState<Orientation>('portrait')
   const [previewView, setPreviewView] = useState<PreviewView>('grid')
@@ -58,13 +56,13 @@ function App() {
                 onPreviewViewChange={setPreviewView}
                 template={template}
                 onTemplateChange={setTemplate}
-                onSubmit={setCover}
+                onCoverChange={setCover}
                 logo={logo}
-                onLogoSubmit={setLogo}
+                onLogoChange={setLogo}
                 palette={palette}
-                onPaletteSubmit={setPalette}
+                onPaletteChange={setPalette}
                 typography={typography}
-                onTypographySubmit={setTypography}
+                onTypographyChange={setTypography}
               />
             }
           />

@@ -18,3 +18,4 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0004](0004-templates-change-layout-not-content.md) | Templates change layout, not content | Accepted | 2026-10-11 |
 | [0005](0005-google-fonts-via-css-api.md) | Load Google Fonts through the CSS API | Accepted | 2026-10-11 |
 | [0006](0006-motion-with-css-and-view-transitions.md) | Motion with CSS and native browser APIs, no animation library | Accepted | 2026-10-11 |
+| [0007](0007-live-preview-with-apply-for-images.md) | Live preview, with one Apply button for new images | Accepted | 2026-10-14 |

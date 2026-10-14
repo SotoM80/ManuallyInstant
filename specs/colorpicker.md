@@ -58,17 +58,17 @@ All the parts always show the same color: clicking a swatch or using the native 
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`), in the Cover section.
-* **Postconditions**: After a valid Save, the text of the Cover uses the Typography color and every page uses the Background color.
+* **Postconditions**: As soon as a valid color is picked or typed, the text of the Cover uses the Typography color and every page uses the Background color.
 
 ## 4. Invariants
 * Typography color and Background color are independent: changing one never changes the other.
-* Colors are applied to the manual only when the user clicks Save (same rule as the rest of the Cover).
+* Colors reach the manual at once (same rule as the rest of the Cover). While a HEX is half typed or not valid, the manual keeps the last valid color.
 * All four pages always share the same Background color.
 * Colors work the same in every template, orientation and preview view.
 
 ## Failure Modes
-* **Invalid HEX on blur or Enter**: the HEX field turns red and shows `"Enter a valid HEX color, like #1E88E5"`. Save is blocked while it is invalid.
-* **Empty HEX on Save**: the HEX field shows `"Required field"` and Save is blocked.
+* **Invalid HEX on blur or Enter**: the HEX field turns red and shows `"Enter a valid HEX color, like #1E88E5"`. The manual keeps the last valid color.
+* **Empty HEX**: not an error; the manual keeps the last valid color.
 
 ## 5. Given-When-Then Test Criteria
 
@@ -84,18 +84,18 @@ All the parts always show the same color: clicking a swatch or using the native 
 
 ### Scenario 3: Invalid HEX
 * **Given**: The user typed `blue` in the Background color HEX field.
-* **When**: The user leaves the field, and then clicks Save.
-* **Then**: The field shows "Enter a valid HEX color, like #1E88E5" with a red border, and the Cover does not change.
+* **When**: The user leaves the field.
+* **Then**: The field shows "Enter a valid HEX color, like #1E88E5" with a red border, and the pages keep their last valid background.
 
 ### Scenario 4: Colors on the Manual
-* **Given**: The user chose White as Typography color and `#1A237E` as Background color, and filled the rest of the Cover.
-* **When**: The user clicks Save.
-* **Then**: The title and "Designed by" are white and all four pages have the `#1A237E` background.
+* **Given**: The user typed a title in the Cover section.
+* **When**: The user chooses White as Typography color and `#1A237E` as Background color.
+* **Then**: At once, the title and "Designed by" are white and all four pages have the `#1A237E` background.
 
-### Scenario 5: Colors Wait for Save
+### Scenario 5: Colors Are Live
 * **Given**: The user is on the Brand Manual page.
-* **When**: The user picks Navy as Background color without clicking Save.
-* **Then**: The pages keep their white background.
+* **When**: The user picks Navy as Background color.
+* **Then**: All the pages get the `#1A237E` background at once, with no button.
 
 ### Scenario 6: Swatches Pop-up
 * **Given**: The Typography color swatches are closed.

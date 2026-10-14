@@ -9,6 +9,59 @@
   text-align: left;
 }
 
+/* Apply: off until a form has a new image waiting, then the accent button of the page */
+.sections-apply {
+  display: block;
+  margin: 0 0 16px auto; /* above Cover, on the right like the form fields */
+  padding: 4px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  background: var(--accent-bg);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform var(--dur) var(--ease-bounce),
+    box-shadow var(--dur) ease,
+    border-color var(--dur-fast) ease,
+    opacity var(--dur-fast) ease;
+}
+
+.sections-apply:hover:not(:disabled) {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.sections-apply:active:not(:disabled) {
+  transform: scale(0.95);
+  transition-duration: var(--dur-fast);
+}
+
+.sections-apply:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.sections-apply:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Applied: a ring spreads out and a check pops in. The "/ ''" keeps the check out of
+   the accessible name, so screen readers still announce "Apply". */
+.sections-apply[data-feedback='saved'] {
+  animation: pulse var(--dur-slow) var(--ease-out) 2;
+}
+
+.sections-apply[data-feedback='saved']::after {
+  content: ' ✓' / '';
+  display: inline-block;
+  margin-left: 4px;
+  animation: pop var(--dur) var(--ease-bounce);
+}
+
 .manual-sections ol {
   list-style: none;
   margin: 0;
@@ -154,57 +207,6 @@
 /* Logo size: only as wide as its three options, on the right like the other fields */
 .manual-section form .logo-size-control {
   justify-self: end;
-}
-
-/* Only as wide as its label, on the right (grid items stretch by default) */
-.manual-section form button[type='submit'] {
-  justify-self: end;
-  padding: 8px 24px;
-  border-radius: 8px;
-  border: 1px solid var(--accent-border);
-  color: var(--accent);
-  background: var(--accent-bg);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    transform var(--dur) var(--ease-bounce),
-    box-shadow var(--dur) ease,
-    border-color var(--dur-fast) ease;
-}
-
-.manual-section form button[type='submit']:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow);
-  transform: translateY(-2px);
-}
-
-.manual-section form button[type='submit']:active {
-  transform: scale(0.95);
-  transition-duration: var(--dur-fast);
-}
-
-.manual-section form button[type='submit']:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Saved: a ring spreads out and a check pops in. The "/ ''" keeps the check out of
-   the accessible name, so screen readers still announce "Save". */
-.manual-section form button[data-feedback='saved'] {
-  animation: pulse var(--dur-slow) var(--ease-out) 2;
-}
-
-.manual-section form button[data-feedback='saved']::after {
-  content: ' ✓' / '';
-  display: inline-block;
-  margin-left: 4px;
-  animation: pop var(--dur) var(--ease-bounce);
-}
-
-/* Not saved: the button shakes "no" */
-.manual-section form button[data-feedback='error'] {
-  animation: shake var(--dur-slow) ease;
 }
 
 /* Logo: "Choose file" button + file name, in English (see BrandForm) */

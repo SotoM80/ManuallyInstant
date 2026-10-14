@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import type { ReactNode } from 'react'
+import { useCallback, useState } from 'react'
+import type { AnimationEvent, ReactNode } from 'react'
 import { BrandForm } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
@@ -19,13 +19,13 @@ type BrandManualPageProps = {
   onPreviewViewChange: (view: PreviewView) => void
   template: TemplateId
   onTemplateChange: (template: TemplateId) => void
-  onSubmit: (cover: CoverData) => void
+  onCoverChange: (cover: CoverData) => void
   logo: LogoData | null
-  onLogoSubmit: (logo: LogoData) => void
+  onLogoChange: (logo: LogoData) => void
   palette: PaletteColor[] | null
-  onPaletteSubmit: (palette: PaletteColor[]) => void
+  onPaletteChange: (palette: PaletteColor[]) => void
   typography: BrandFonts | null
-  onTypographySubmit: (fonts: BrandFonts) => void
+  onTypographyChange: (fonts: BrandFonts) => void
 }
 
 export function BrandManualPage({
@@ -36,13 +36,13 @@ export function BrandManualPage({
   onPreviewViewChange,
   template,
   onTemplateChange,
-  onSubmit,
+  onCoverChange,
   logo,
-  onLogoSubmit,
+  onLogoChange,
   palette,
-  onPaletteSubmit,
+  onPaletteChange,
   typography,
-  onTypographySubmit,
+  onTypographyChange,
 }: BrandManualPageProps) {
   // The sections work like an accordion: only one is open, the others fold into their header.
   // Folded forms stay in the page (inert), so nothing typed in them is lost.
@@ -52,12 +52,35 @@ export function BrandManualPage({
     setOpenSection((prev) => (prev === id ? null : id))
   }
 
+  // The forms send every change to the preview at once, but a new image waits for the
+  // Apply button of the preview (see docs/adr/0007). Each Apply adds one to `applyCount`,
+  // and the forms show every image chosen before it.
+  const [applyCount, setApplyCount] = useState(0)
+  const [coverPending, setCoverPending] = useState(false)
+  const [logoPending, setLogoPending] = useState(false)
+  const applyImages = useCallback(() => setApplyCount((count) => count + 1), [])
+  // A pulse with a check after Apply, like the Save buttons had (see specs/motion.md)
+  const [applied, setApplied] = useState(false)
+  const canApply = coverPending || logoPending
+
+  function handleApply() {
+    applyImages()
+    setApplied(true)
+  }
+
+  // Back to idle when the button's own animation ends; the check (::after) has its own.
+  function handleAppliedEnd(event: AnimationEvent<HTMLButtonElement>) {
+    if (!event.pseudoElement) setApplied(false)
+  }
+
   // Form of each built section. Sections not listed here show "Coming soon".
   const sectionForms: Record<string, ReactNode> = {
-    cover: <BrandForm onSubmit={onSubmit} />,
-    logo: <LogoForm onSubmit={onLogoSubmit} />,
-    colors: <ColorsForm onSubmit={onPaletteSubmit} />,
-    typography: <TypographyForm onSubmit={onTypographySubmit} />,
+    cover: (
+      <BrandForm onChange={onCoverChange} applyCount={applyCount} onPendingChange={setCoverPending} />
+    ),
+    logo: <LogoForm onChange={onLogoChange} applyCount={applyCount} onPendingChange={setLogoPending} />,
+    colors: <ColorsForm onChange={onPaletteChange} />,
+    typography: <TypographyForm onChange={onTypographyChange} />,
   }
 
   return (
@@ -76,6 +99,19 @@ export function BrandManualPage({
       />
 
       <section className="manual-sections" aria-label="Manual sections">
+        {/* Text and colors show at once; a new image waits here (see docs/adr/0007) */}
+        <button
+          type="button"
+          className="sections-apply"
+          disabled={!canApply}
+          onClick={handleApply}
+          data-feedback={applied ? 'saved' : 'idle'}
+          onAnimationEnd={handleAppliedEnd}
+          title={canApply ? 'Show the new image in the manual' : 'Choose a new image to apply it'}
+        >
+          Apply
+        </button>
+
         <ol>
           {MANUAL_SECTIONS.map((section, index) => {
             const isOpen = section.ready && openSection === section.id

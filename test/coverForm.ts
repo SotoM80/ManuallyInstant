@@ -32,7 +32,7 @@ export function pickLogoSize(size: 'Small' | 'Medium' | 'Large') {
   fireEvent.click(getLogoSizeOption(size));
 }
 
-// Designed by and Logo are required, so every successful Save needs them.
+// Fills Designed by and chooses a logo (the logo still waits for Apply).
 export function fillRequiredCoverFields() {
   typeDesignedBy('Studio X');
   uploadLogo();
@@ -57,8 +57,11 @@ export function typeHex(field: ColorField, value: string) {
   fireEvent.change(getHexInput(field), { target: { value } });
 }
 
-// The Colors section has its own Save, so only look inside the Cover form.
-export function clickSave() {
-  const coverForm = screen.getByRole('form', { name: 'Cover' });
-  fireEvent.click(within(coverForm).getByRole('button', { name: /save|print/i }));
+// The Apply button of the preview: it shows the images chosen since the last Apply.
+export function getApplyButton() {
+  return screen.getByRole('button', { name: 'Apply' });
+}
+
+export function clickApply() {
+  fireEvent.click(getApplyButton());
 }

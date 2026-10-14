@@ -13,23 +13,23 @@ The content of the Logo section (it will have its own future spec). The content 
   * **Portrait** (vertical): A4 standing, `210 × 297`. Selected by default.
   * **Landscape** (apaisado): A4 lying down, `297 × 210`.
 
-  Choosing an option changes the shape of all four page thumbnails immediately (no Save needed). The chosen orientation is also the one the PDF export will use (Phase 4).
+  Choosing an option changes the shape of all four page thumbnails immediately. The chosen orientation is also the one the PDF export will use (Phase 4).
 * **Preview View** (next to Page orientation): A group labeled "Preview view" with three options:
   * **Grid**: the four pages as small thumbnails in a 2 × 2 grid. Selected by default.
   * **Overview**: four pages per row, so many pages can be seen at once; when the manual has more pages they continue on the next rows. Each page looks like a Grid thumbnail drawn at half size. The preview stays sticky.
   * **Pages**: a closer look. Each page takes the full width of the left column, one below the other, and the user scrolls down to see them. The cover title is drawn at its real size (in Grid it is drawn at half size). In this view the preview is not sticky, so every page can be reached by scrolling.
 
-  Choosing an option changes the view immediately (no Save needed). It only changes how the preview looks, not the manual or the PDF.
-* **Template** (next to Preview view): A group labeled "Template" with three options: **Template 1** (default), **Template 2** and **Template 3**. It changes where the content sits on every page, immediately (no Save needed). See `templates.md`.
+  Choosing an option changes the view immediately. It only changes how the preview looks, not the manual or the PDF.
+* **Template** (next to Preview view): A group labeled "Template" with three options: **Template 1** (default), **Template 2** and **Template 3**. It changes where the content sits on every page, immediately. See `templates.md`.
 * **Left column — Manual Preview**: A region labeled "Manual preview". It shows the manual's pages as small page thumbnails, in this order:
-  1. **Cover**: shows the saved brand manual title with its style, the logo and "Designed by <name>", placed by the template (see `cover.md`). Before the first Save, it shows the placeholders "Your brand manual title", "Your logo" and "Designed by …".
+  1. **Cover**: shows the brand manual title with its style, the applied logo and "Designed by <name>", placed by the template (see `cover.md`). Each empty slot shows its placeholder: "Your brand manual title", "Your logo" and "Designed by …".
   2. **Logo**
-  3. **Color palette**: shows the saved colors with their name, HEX, RGB and CMYK values (see `colorpalette.md`). Before the first Save, it shows the placeholder "Your color palette".
-  4. **Typography**: shows the two brand fonts with their usage, name, "Aa" and alphabet (see `typography.md`). Before the first Save, it shows the placeholder "Your typography".
+  3. **Color palette**: shows the colors with their name, HEX, RGB and CMYK values (see `colorpalette.md`). Until the Colors section is touched, it shows the placeholder "Your color palette".
+  4. **Typography**: shows the two brand fonts with their usage, name, "Aa" and alphabet (see `typography.md`). Until a font is changed, it shows the placeholder "Your typography".
 
   Pages whose section is not built yet show "Coming soon".
   The preview stays visible while the user scrolls the sections (sticky).
-* **Right column — Manual Sections**: A region labeled "Manual sections". It lists every section needed to create the manual, one below the other, numbered, in this order:
+* **Right column — Manual Sections**: A region labeled "Manual sections". At the top, above the Cover section, the **Apply** button (see *Live Preview and Apply* below). Below it, the region lists every section needed to create the manual, one below the other, numbered, in this order:
   1. **Cover**: brand manual title, Designed by and logo (see `cover.md` and `titlefild.md`).
   2. **Logo**: "Coming soon".
   3. **Colors**: the brand's color palette (see `colorpalette.md`).
@@ -45,6 +45,12 @@ The sections work as an **accordion**, like the colors of the Colors section (se
 * A folded section keeps everything typed in it, and can't be reached with the keyboard or by screen readers (`inert`).
 * **Motion** (no bounce, `--ease-smooth`): the work area unfolds from no height to its full height, settling slowly, while its content fades in and glides down a few pixels; folding is the same in reverse, a little faster. The arrow turns with it, and the open section gets an accent border and a soft shadow.
 
+### Live Preview and Apply
+The sections have no Save buttons. Everything typed, picked or chosen in a section reaches the preview at once, except new images (see ADR 0007):
+* Choosing a new or replacing image (the Cover logo, or any image of the Logo section) turns **Apply** on. The preview keeps the image it had (or its placeholder) until the user clicks Apply.
+* Apply shows every image waiting in every section at once, then is disabled again. It is disabled from the start, and a wrong file never turns it on.
+* It is only as wide as its label and sits on the right. When clicked, an accent ring pulses twice and a ✓ pops in next to "Apply" (decoration only: the accessible name stays "Apply").
+
 ### Adding Sections
 Sections and preview pages come from lists (`src/data/manualSections.ts`). When a section is built, it is marked as ready in the list and its form is plugged in; the layout does not change.
 
@@ -53,19 +59,19 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`).
-* **Postconditions**: After saving the Cover section, the Cover page of the preview shows the title with the selected style, the logo and "Designed by <name>".
+* **Postconditions**: The Cover page of the preview shows what is typed in the Cover section, with the selected style, and the last applied logo.
 
 ## 4. Invariants
 * The preview always shows the four pages, in the same order, whether they have content or not.
 * The sections list always shows every section, in the same order, whether it is built or not.
-* The Cover in the preview changes only when the user clicks Save (same rule as in `titlefild.md` and `cover.md`). The page orientation is the exception: it changes immediately.
+* Every page of the preview changes as soon as its section changes. Only new images wait, for Apply.
 * All four pages always share the same orientation.
 * The chosen orientation is kept when the user moves between pages. It is only reset (to Portrait) when the browser page is refreshed.
 * Both views always show the same four pages, in the same order, with the same orientation.
 * The chosen preview view is kept when the user moves between pages. It is only reset (to Grid) when the browser page is refreshed.
 
 ## Failure Modes
-* **Nothing saved yet**: The Cover shows the placeholders "Your brand manual title", "Your logo" and "Designed by …" instead of an empty page.
+* **Nothing typed yet**: The Cover shows the placeholders "Your brand manual title", "Your logo" and "Designed by …" instead of an empty page.
 
 ## 5. Given-When-Then Test Criteria
 
@@ -84,20 +90,20 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **When**: The user looks at the preview column.
 * **Then**: The pages Cover, Logo, Color palette and Typography are shown in that order.
 
-### Scenario 4: Cover Shows the Saved Title
-* **Given**: The Cover shows "Your brand manual title", and the user types "My Brand", selects the "Blue" swatch in Typography color and fills Designed by and Logo.
-* **When**: The user clicks Save.
-* **Then**: The Cover shows "My Brand" in blue.
+### Scenario 4: Cover Shows the Title Live
+* **Given**: The Cover shows "Your brand manual title".
+* **When**: The user types "My Brand" and selects the "Blue" swatch in Typography color.
+* **Then**: The Cover shows "My Brand" in blue at once, with no button.
 
-### Scenario 5: Preview Waits for Save
-* **Given**: The user is on the Brand Manual page.
-* **When**: The user types "My Brand" without clicking Save.
-* **Then**: The Cover still shows "Your brand manual title".
+### Scenario 5: Only New Images Wait for Apply
+* **Given**: The user is on the Brand Manual page; Apply, above the Cover section, is disabled.
+* **When**: The user chooses a logo in the Cover section.
+* **Then**: Apply turns on, and the Cover still shows "Your logo" until the user clicks it.
 
 ### Scenario 6: Changing the Page Orientation
 * **Given**: The user is on the Brand Manual page and Portrait is selected (default).
 * **When**: The user selects Landscape.
-* **Then**: Landscape is selected and all four page thumbnails become landscape, without clicking Save.
+* **Then**: Landscape is selected and all four page thumbnails become landscape
 
 ### Scenario 7: Orientation Is Kept Between Pages
 * **Given**: The user selected Landscape.
@@ -107,12 +113,12 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ### Scenario 8: Changing the Preview View
 * **Given**: The user is on the Brand Manual page and Grid is selected (default).
 * **When**: The user selects Pages.
-* **Then**: Pages is selected, the preview shows the four pages one below the other, in the same order and orientation, without clicking Save.
+* **Then**: Pages is selected, the preview shows the four pages one below the other, in the same order and orientation
 
 ### Scenario 8b: Overview Shows Four Pages Per Row
 * **Given**: The user is on the Brand Manual page and Grid is selected (default).
 * **When**: The user selects Overview.
-* **Then**: Overview is selected and the preview shows all the pages, in the same order and orientation, four per row, without clicking Save.
+* **Then**: Overview is selected and the preview shows all the pages, in the same order and orientation, four per row
 
 ### Scenario 9: Preview View Is Kept Between Pages
 * **Given**: The user selected Pages.

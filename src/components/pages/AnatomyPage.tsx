@@ -4,7 +4,7 @@ import { MARK_TYPE_LABELS, anatomyText } from '../../data/logoCopy'
 import type { LogoData, UploadedImage } from '../../types'
 
 type AnatomyPageProps = {
-  logo: LogoData | null // null → nothing saved yet, show the placeholder
+  logo: LogoData | null // null → its section is untouched, show the placeholder
   color: string // the Cover's Typography color
 }
 

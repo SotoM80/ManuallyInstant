@@ -1,10 +1,10 @@
 import { screen, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
-import { clickSave, fillRequiredCoverFields, typeTitle } from './coverForm';
+import { clickApply, fillRequiredCoverFields, typeTitle } from './coverForm';
 
 const EMPTY_COVER = 'Your brand manual title';
 
-// The saved title is shown on the Cover page of the manual preview.
+// The title is shown on the Cover page of the manual preview.
 function getCover() {
   return within(screen.getByRole('region', { name: 'Manual preview' })).getByRole('article', {
     name: 'Cover',
@@ -16,78 +16,50 @@ function getCoverTitle() {
   return getCover().querySelector('.cover-title');
 }
 
-// Designed by and Logo are required too, so they are filled before every Save.
+// Fills Designed by and a logo, and applies the logo (text is already live).
 function clickSubmit() {
   fillRequiredCoverFields();
-  clickSave();
+  clickApply();
 }
 
 // Spec: specs/titlefild.md, Scenario 1 — Successful Title Processing
 describe('App – brand title preview', () => {
-  it('shows the brand title on the Cover after a valid submit', () => {
-    // Given: the user has typed a valid title
+  it('shows the clean brand title on the Cover while typing, with no button', () => {
+    // Given
     renderApp();
     expect(getCover()).toHaveTextContent(EMPTY_COVER);
-    typeTitle('  My Brand  ');
 
-    // When: the user clicks the submit action button
-    clickSubmit();
+    // When: the user types
+    typeTitle('  My Brand  ');
 
     // Then: no error, and the clean title populates the Cover
     expect(screen.queryByText('Required field')).not.toBeInTheDocument();
     expect(getCoverTitle()?.textContent).toBe('My Brand');
   });
 
-  it('does not update the Cover while typing, only after clicking', () => {
-    // Given
-    renderApp();
-
-    // When: the user types but does not click
-    typeTitle('My Brand');
-
-    // Then
-    expect(getCover()).toHaveTextContent(EMPTY_COVER);
-  });
-
-  it('replaces the previous title with a new valid one', () => {
+  it('replaces the previous title with a new one', () => {
     // Given: a title is already shown
     renderApp();
     typeTitle('First Brand');
-    clickSubmit();
 
-    // When: the user submits a different title
+    // When: the user types a different title
     typeTitle('Second Brand');
-    clickSubmit();
 
     // Then
     expect(getCoverTitle()?.textContent).toBe('Second Brand');
   });
 });
 
-// Spec: specs/titlefild.md, Scenario 2 — Missing Title Validation Failure
-describe('App – blank title is blocked', () => {
-  it('keeps the Cover empty when the title is blank', () => {
-    renderApp();
-
-    clickSubmit();
-
-    expect(screen.getByText('Required field')).toBeInTheDocument();
-    expect(getCover()).toHaveTextContent(EMPTY_COVER);
-  });
-
-  it('keeps the previous title on the Cover when a blank title is submitted', () => {
-    // Given: a valid title is shown
+// Spec: specs/titlefild.md, Scenario 2 — Blank title
+describe('App – blank title', () => {
+  it('shows the placeholder again, with no error, when the title is cleared', () => {
     renderApp();
     typeTitle('My Brand');
-    clickSubmit();
 
-    // When: the user clears the field and submits
     typeTitle('');
-    clickSubmit();
 
-    // Then: the action is blocked and the Cover is unchanged
-    expect(screen.getByText('Required field')).toBeInTheDocument();
-    expect(getCoverTitle()?.textContent).toBe('My Brand');
+    expect(screen.queryByText('Required field')).not.toBeInTheDocument();
+    expect(getCover()).toHaveTextContent(EMPTY_COVER);
   });
 });
 

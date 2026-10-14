@@ -44,7 +44,7 @@ The page will be responsive: it will adapt to mobile, tablet and desktop screens
 ## 4. Invariants
 * The header (logo + menu) is visible on every page.
 * The menu shows exactly the sections in the list, in the same order.
-* A saved brand title and its style are kept when the user moves between pages. They are only reset when the browser page is refreshed (see `titlefild.md`, Out of Scope).
+* The brand title shown on the Cover and its style are kept when the user moves between pages. They are only reset when the browser page is refreshed (see `titlefild.md`, Out of Scope).
 
 ## Failure Modes
 * **Unknown URL**: If the user opens a URL that does not exist (e.g. `/does-not-exist`), the app redirects to Home.
@@ -67,7 +67,7 @@ The page will be responsive: it will adapt to mobile, tablet and desktop screens
 * **Then**: The Brand Manual page is shown.
 
 ### Scenario 4: Title Is Kept Between Pages
-* **Given**: The user saved the title "My Brand" on the Brand Manual page.
+* **Given**: The user typed the title "My Brand" on the Brand Manual page.
 * **When**: The user goes to Home and then back to Brand Manual.
 * **Then**: Back on Brand Manual, the Cover of the manual preview still shows "My Brand".
 

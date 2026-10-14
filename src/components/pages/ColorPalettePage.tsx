@@ -2,7 +2,7 @@ import { colorValues } from '../../data/colorPalette'
 import type { PaletteColor } from '../../types'
 
 type ColorPalettePageProps = {
-  palette: PaletteColor[] | null // null → nothing saved yet, show the placeholder
+  palette: PaletteColor[] | null // null → the Colors section is untouched, show the placeholder
   color: string // the Cover's Typography color
 }
 
@@ -27,7 +27,7 @@ export function ColorPalettePage({ palette, color }: ColorPalettePageProps) {
             <li key={index} className="palette-color">
               <span className="palette-chip" style={{ background: entry.hex }} />
               <div className="palette-info">
-                <p className="palette-name">{entry.name}</p>
+                <p className="palette-name">{entry.name || `Color ${index + 1}`}</p>
                 <p className="palette-values">
                   {VALUE_ROWS.map((row) => (
                     <span key={row.key}>

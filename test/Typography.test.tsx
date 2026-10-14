@@ -27,14 +27,9 @@ function pickFont(name: FontField, family: string) {
   fireEvent.click(within(getTypographyForm()).getByRole('option', { name: family }));
 }
 
-function clickSaveTypography() {
-  fireEvent.click(within(getTypographyForm()).getByRole('button', { name: 'Save' }));
-}
-
-function saveFonts(primary = 'Playfair Display', secondary = 'Inter') {
+function pickFonts(primary = 'Playfair Display', secondary = 'Inter') {
   pickFont('Primary font', primary);
   pickFont('Secondary font', secondary);
-  clickSaveTypography();
 }
 
 // Spec: specs/typography.md, Section 2 — Loading the fonts
@@ -91,12 +86,12 @@ describe('Typography – options', () => {
   });
 });
 
-// Spec: specs/typography.md, Scenario 3 — Saving the Fonts
-describe('Typography – saving', () => {
+// Spec: specs/typography.md, Scenario 3 — Live Fonts
+describe('Typography – live page', () => {
   it('shows both fonts with their usage, name, "Aa" and alphabet', () => {
     renderApp();
 
-    saveFonts('Playfair Display', 'Inter');
+    pickFonts('Playfair Display', 'Inter');
 
     const page = within(getTypographyPage());
     const [primary, secondary] = page.getAllByRole('listitem');
@@ -111,10 +106,10 @@ describe('Typography – saving', () => {
     expect(within(secondary).getByText('Inter')).toBeInTheDocument();
   });
 
-  it('downloads both saved fonts in regular only', () => {
+  it('downloads both picked fonts in regular only', () => {
     renderApp();
 
-    saveFonts('Bebas Neue', 'Lora');
+    pickFonts('Bebas Neue', 'Lora');
 
     expect(document.head.querySelector(`link[href="${googleFontHref('Bebas Neue', 'regular')}"]`)).not.toBeNull();
     expect(document.head.querySelector(`link[href="${googleFontHref('Lora', 'regular')}"]`)).not.toBeNull();
@@ -132,45 +127,54 @@ describe('Typography – saving', () => {
 
 // Spec: specs/typography.md, Scenario 4 — A Font Not in the List + Failure Modes
 describe('Typography – errors', () => {
-  it('blocks Save for a font that is not in the list', () => {
+  it('flags a font that is not in the list, and leaves the page as it was', () => {
     renderApp();
 
     typeFont('Primary font', 'Comic Sans');
-    clickSaveTypography();
+    fireEvent.blur(getField('Primary font'));
 
     expect(within(getTypographyForm()).getByRole('alert')).toHaveTextContent('Select a valid option');
     expect(getField('Primary font')).toHaveStyle({ borderColor: 'red' });
     expect(within(getTypographyPage()).getByText('Your typography')).toBeInTheDocument();
   });
 
-  it('blocks Save for an empty field', () => {
+  it('shows no error for an empty field', () => {
     renderApp();
 
     typeFont('Secondary font', '');
-    clickSaveTypography();
+    fireEvent.blur(getField('Secondary font'));
 
-    expect(within(getTypographyForm()).getByRole('alert')).toHaveTextContent('Required field');
+    expect(within(getTypographyForm()).queryByRole('alert')).not.toBeInTheDocument();
   });
 });
 
-// Spec: specs/typography.md, Scenario 5 — Fonts Wait for Save
-describe('Typography – waits for Save', () => {
-  it('does not change the page until Save', () => {
+// Spec: specs/typography.md, Scenario 5 — Fonts Change at Once
+describe('Typography – live changes', () => {
+  it('changes the page as soon as another font is picked', () => {
     renderApp();
-    saveFonts('Playfair Display', 'Inter');
+    pickFonts('Playfair Display', 'Inter');
 
     pickFont('Primary font', 'Lora');
 
+    expect(within(getTypographyPage()).getByText('Lora')).toBeInTheDocument();
+    expect(within(getTypographyPage()).queryByText('Playfair Display')).not.toBeInTheDocument();
+  });
+
+  it('keeps the last valid font while a name is half typed', () => {
+    renderApp();
+    pickFonts('Playfair Display', 'Inter');
+
+    typeFont('Primary font', 'Lor');
+
     expect(within(getTypographyPage()).getByText('Playfair Display')).toBeInTheDocument();
-    expect(within(getTypographyPage()).queryByText('Lora')).not.toBeInTheDocument();
   });
 });
 
 // Spec: specs/typography.md, Scenario 6 — Fonts Are Kept Between Pages
 describe('Typography – navigation', () => {
-  it('keeps the saved fonts when going Home and back', () => {
+  it('keeps the fonts when going Home and back', () => {
     renderApp();
-    saveFonts('Playfair Display', 'Inter');
+    pickFonts('Playfair Display', 'Inter');
 
     fireEvent.click(screen.getByRole('link', { name: 'Home' }));
     fireEvent.click(screen.getByRole('link', { name: 'Brand Manual' }));
