@@ -12,6 +12,7 @@ import { DEFAULT_TYPOGRAPHY_COLOR } from '../data/colorPalette'
 import { useRef } from 'react'
 import { withViewTransition } from '../utils/viewTransition'
 import { useReorderGlide } from '../utils/useReorderGlide'
+import type { Guides } from '../utils/guides'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/ManualPreview.css'
 
@@ -28,6 +29,8 @@ type ManualPreviewProps = {
   onTemplateChange: (template: TemplateId) => void
   pages?: string[] // the order to draw the pages in (the open section's pages may come first)
   featured?: string[] // pages moved to the top, marked so the user sees what they are editing
+  guides?: Guides // guides clicked on the construction grid of the Clear space page
+  onGuidesChange?: (guides: Guides) => void
 }
 
 const ORIENTATIONS: { value: Orientation; label: string }[] = [
@@ -59,6 +62,8 @@ export function ManualPreview({
   onTemplateChange,
   pages = MANUAL_PAGES,
   featured = [],
+  guides,
+  onGuidesChange,
 }: ManualPreviewProps) {
   // When a section opens or folds, the pages glide to their new places
   const pageList = useRef<HTMLOListElement>(null)
@@ -72,7 +77,15 @@ export function ManualPreview({
     if (page === 'Logo versions' && LOGO_PARTS.versions)
       return <LogoVersionsPage logo={logo} coverLogo={cover?.logo ?? null} color={textColor} />
     if (page === 'Clear space' && LOGO_PARTS.clearSpace)
-      return <ClearSpacePage logo={logo} coverLogo={cover?.logo ?? null} color={textColor} />
+      return (
+        <ClearSpacePage
+          logo={logo}
+          coverLogo={cover?.logo ?? null}
+          color={textColor}
+          guides={guides}
+          onGuidesChange={onGuidesChange}
+        />
+      )
     if (page === 'Color palette') return <ColorPalettePage palette={palette} color={textColor} />
     if (page === 'Typography') return <TypographyPage fonts={typography} color={textColor} />
     if (page !== 'Cover') return <p className="manual-page-empty">Coming soon</p>

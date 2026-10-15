@@ -7,6 +7,8 @@ import { TypographyForm } from '../components/TypographyForm'
 import { ManualPreview } from '../components/ManualPreview'
 import { LOGO_AREA_PAGES, MANUAL_SECTIONS, SECTION_PAGES, orderPages } from '../data/manualSections'
 import { useAlignOpenSection } from '../utils/useAlignOpenSection'
+import { NO_GUIDES } from '../utils/guides'
+import type { Guides } from '../utils/guides'
 import { useReorderGlide } from '../utils/useReorderGlide'
 import type { TemplateId } from '../templates'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from '../types'
@@ -48,6 +50,9 @@ export function BrandManualPage({
   // The sections work like an accordion: only one is open, the others fold into their header.
   // Folded forms stay in the page (inert), so nothing typed in them is lost.
   const [openSection, setOpenSection] = useState<string | null>('cover')
+  // Guides clicked on the construction grid (Clear space page). They are drawn in the preview,
+  // so they live here rather than in the Logo form.
+  const [guides, setGuides] = useState<Guides>(NO_GUIDES)
   // The open section's pages come first in the preview, so the page being edited is always
   // in view; folding the section puts every page back in its natural order.
   // In the Logo section, the area being worked in decides which of its four pages is the main one
@@ -129,6 +134,8 @@ export function BrandManualPage({
         onTemplateChange={onTemplateChange}
         pages={orderPages(featured)}
         featured={mainPage ? [mainPage] : []}
+        guides={guides}
+        onGuidesChange={setGuides}
       />
 
       <section className="manual-sections" aria-label="Manual sections">

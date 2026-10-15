@@ -1,18 +1,21 @@
 import { GRID_TEXT, clearSpaceText, minSizeRules, versionName } from '../../data/logoCopy'
 import type { LogoData } from '../../types'
+import type { Guides } from '../../utils/guides'
 import { ClearSpaceDiagram } from './ClearSpaceDiagram'
 import { ConstructionGrid } from './ConstructionGrid'
 
 type ClearSpacePageProps = {
   logo: LogoData | null // null → its section is untouched, show the placeholder
   coverLogo: { url: string } | null // the logo applied in the Cover section, if any
-  color: string // the Cover's Typography color
+  color: string
+  guides?: Guides // guides clicked on the construction grid
+  onGuidesChange?: (guides: Guides) => void // the Cover's Typography color
 }
 
 // Chapter 3 of the Logo section: 3.1 Clear space (drawn here from the primary version),
 // 3.2 Construction grid (uploaded, or a placeholder box) and 3.3 Minimum sizes.
 // Same markup for every template; the template's CSS decides where each block sits.
-export function ClearSpacePage({ logo, coverLogo, color }: ClearSpacePageProps) {
+export function ClearSpacePage({ logo, coverLogo, color, guides, onGuidesChange }: ClearSpacePageProps) {
   if (!logo) return <p className="manual-page-empty">Your clear space</p>
 
   // The diagram uses the Primary version; with no image of its own, the Cover's logo
@@ -54,6 +57,8 @@ export function ClearSpacePage({ logo, coverLogo, color }: ClearSpacePageProps) 
               x={logo.gridX}
               rulerTop={logo.rulerTop}
               rulerSide={logo.rulerSide}
+              guides={guides}
+              onGuidesChange={onGuidesChange}
             />
           ) : (
             <span className="clearspace-grid-empty">Construction grid</span>

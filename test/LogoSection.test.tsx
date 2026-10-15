@@ -4,6 +4,7 @@ import { LogoVersionsPage } from '../src/components/pages/LogoVersionsPage';
 import { ClearSpacePage } from '../src/components/pages/ClearSpacePage';
 import { findVisibleBounds } from '../src/utils/visibleBounds';
 import { parseRuler } from '../src/utils/rulers';
+import { gapLabel, guideCuts, snapGuide, toggleGuide } from '../src/utils/guides';
 import { renderApp } from './renderApp';
 import type { LogoData } from '../src/types';
 import type { LogoParts } from '../src/data/manualSections';
@@ -810,6 +811,84 @@ describe('Logo section – grid rulers', () => {
     setup();
     type('Brand name', 'VOLTA');
 
-    expect(getGrid().querySelector('[data-ruler]')).toBeNull();
+    expect(getGrid().querySelector('[data-ruler="top"], [data-ruler="side"]')).toBeNull();
+  });
+});
+
+// Experiment (option 3): guides clicked on the construction grid
+describe('Logo section – clicked guides', () => {
+  function getGrid() {
+    const preview = screen.getByRole('region', { name: 'Manual preview' });
+    const page = within(preview).getByRole('article', { name: 'Clear space' });
+    return within(page).getByRole('img', { name: 'Generated construction grid' });
+  }
+
+  function labels(ruler: 'top' | 'side' | 'width' | 'height') {
+    return Array.from(getGrid().querySelectorAll(`[data-ruler="${ruler}"] text`)).map((t) => t.textContent);
+  }
+
+  // jsdom has no layout: each band is placed on screen 0–160px wide (and tall)
+  function clickBand(band: 'top' | 'side', at: number) {
+    const element = getGrid().querySelector(`[data-band="${band}"]`) as SVGRectElement;
+    element.getBoundingClientRect = () => ({ left: 0, top: 0, width: 160, height: 160 }) as DOMRect;
+    fireEvent.click(element, band === 'top' ? { clientX: at } : { clientY: at });
+  }
+
+  function setup() {
+    renderApp('/brand-manual');
+    uploadCoverLogo('cover.png');
+    clickApply();
+    const sections = screen.getByRole('region', { name: 'Manual sections' });
+    fireEvent.click(within(sections).getByRole('button', { name: '2. Logo' }));
+    type('Brand name', 'VOLTA');
+  }
+
+  it('snaps a guide to half modules and labels each gap in X', () => {
+    expect(snapGuide(3.3, 16)).toBe(3.5);
+    expect(snapGuide(-2, 16)).toBe(0);
+    expect(toggleGuide([2], 6)).toEqual([2, 6]);
+    expect(toggleGuide([2, 6], 2)).toEqual([6]);
+    expect(guideCuts([4, 10], 16, 1)).toEqual([1, 5, 11, 17]);
+    expect(gapLabel(3, 2)).toBe('1.5X');
+    expect(gapLabel(2, 2)).toBe('X');
+  });
+
+  it('adds a guide where the top band is clicked, and labels the gaps of the logo in X', () => {
+    setup();
+
+    // The 16-module band is 160px wide: a click at 40px is 4 modules from the logo's left edge
+    clickBand('top', 40);
+
+    expect(labels('top')).toEqual(['4X', '12X']);
+  });
+
+  it('relabels the gaps when X changes, with the guide in the same place', () => {
+    setup();
+    clickBand('top', 40);
+
+    fireEvent.click(within(within(getForm()).getByRole('group', { name: 'X (modules)' })).getByRole('radio', { name: '2' }));
+
+    expect(labels('top')).toEqual(['2X', '6X']);
+  });
+
+  it('shows the logo\'s overall width and height in X outside the grid', () => {
+    setup();
+
+    // jsdom reads no pixels, so the logo is taken as square: 16 modules wide and tall
+    expect(labels('width')).toEqual(['16X']);
+    expect(labels('height')).toEqual(['16X']);
+
+    fireEvent.click(within(within(getForm()).getByRole('group', { name: 'X (modules)' })).getByRole('radio', { name: '2' }));
+
+    expect(labels('width')).toEqual(['8X']);
+  });
+
+  it('removes a guide when it is clicked', () => {
+    setup();
+    clickBand('top', 40);
+
+    fireEvent.click(getGrid().querySelector('[data-guide="vertical"]') as Element);
+
+    expect(getGrid().querySelector('[data-ruler="top"]')).toBeNull();
   });
 });

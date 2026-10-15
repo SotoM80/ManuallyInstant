@@ -23,7 +23,9 @@ Detecting the shapes of the logo (circles, angles) or measuring its proportions 
 * **3.1 Clear space**: a diagram drawn in the same modules as the grid of 3.2: the visible part of the logo (its transparent margins are ignored), X of free room on every side, the dashed edge of that area and an "X" on each side. Then the sentence "The logo must always be surrounded by a free area… Its width is measured with the base unit X, which equals {Unit X}."
 * **3.2 Construction grid**: a fixed sentence about keeping the proportions, and one of these, in this order:
   1. The **uploaded** grid.
-  2. A grid **drawn by the app** over the Primary logo (the same image as 3.1): square modules fitted to the visible part of the logo (its transparent margins are ignored), *Grid modules* squares wide, with X of margin on every side. The logo is faded so the grid over it can be read. The logo's box is a dashed line, and X is marked with a small dimension line at the top. With rulers, a dimension line runs above the grid (Top ruler) and beside it (Side ruler), starting at the logo's edges: each step is drawn `value × X` long with its label ("X", "1.5X"), and a faint dashed guide crosses the grid at every step. Changing X makes the rulers grow or shrink with it. A ruler longer than the grid is still drawn whole. Lines use the Typography color.
+  2. A grid **drawn by the app** over the Primary logo (the same image as 3.1): square modules fitted to the visible part of the logo (its transparent margins are ignored), *Grid modules* squares wide, with X of margin on every side. The logo is faded so the grid over it can be read. The logo's box is a dashed line, and X is marked with a small dimension line at the top. With rulers, a dimension line runs above the grid (Top ruler) and beside it (Side ruler), starting at the logo's edges: each step is drawn `value × X` long with its label ("X", "1.5X"), and a faint dashed guide crosses the grid at every step. Changing X makes the rulers grow or shrink with it. A ruler longer than the grid is still drawn whole.
+  * **Guides with a click**: a faint band runs above the grid and another beside it. Clicking a band adds a guide there (snapped to half modules), and the ruler of that side then measures the logo from edge to edge, cut at every guide, each gap labelled in X (e.g. `3X 3X 6X`). Clicking a guide removes it. Guides stay on the same part of the logo when X changes; only their labels change. On a side with guides, they replace the typed ruler. Guides last while the Brand Manual page is open (they are not part of the Logo form).
+  * **Overall size**: below the grid, the logo's width in X; on its left, its height in X (rounded to two decimals, e.g. `8.57X`). Always shown with the drawn grid, and they follow X. Lines use the Typography color.
   3. A striped placeholder box, when there is no logo at all.
 * **3.3 Minimum size**: "Digital media: The minimum size is {px} px high…" and "Print media: The minimum size is {mm} mm high…".
 * The template's CSS decides where each block sits.
@@ -117,3 +119,18 @@ No field is required. A wrong value is flagged at once, with a red border, and t
 * **Given**: The top ruler is `X 2X`.
 * **When**: The user changes it to `X 2Y`.
 * **Then**: The field shows "Use steps like X, 1.5X or 2X, separated by spaces", and the grid keeps "X 2X".
+
+### Scenario 14: Guides with a Click
+* **Given**: 3.2 shows the grid drawn by the app, 12 modules wide, X = 1.
+* **When**: The user clicks the top band a quarter and half of the way across.
+* **Then**: The top ruler reads `3X 3X 6X`, with a guide across the grid at each cut. Clicking a guide removes it.
+
+### Scenario 15: Guides Follow X
+* **Given**: One guide splits a 16-module logo into `4X 12X`.
+* **When**: The user chooses **2** in X (modules).
+* **Then**: The guide stays where it was and the ruler reads `2X 6X`.
+
+### Scenario 16: Overall Size
+* **Given**: 3.2 shows the grid drawn by the app.
+* **When**: The user looks at it.
+* **Then**: The logo's width in X is shown below the grid, and its height in X on its left.
