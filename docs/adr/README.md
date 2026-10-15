@@ -20,3 +20,4 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0006](0006-motion-with-css-and-view-transitions.md) | Motion with CSS and native browser APIs, no animation library | Accepted | 2026-10-11 |
 | [0007](0007-live-preview-with-apply-for-images.md) | Live preview, with one Apply button for new images | Accepted | 2026-10-14 |
 | [0008](0008-construction-grid-from-visible-pixels.md) | Construction grid drawn from the logo's visible pixels | Accepted | 2026-10-15 |
+| [0009](0009-skins-drawn-in-svg.md) | Skins drawn in SVG, measured in mm | Proposed | 2026-10-15 |

@@ -31,6 +31,7 @@ Key features:
 - ✅ Every section (Cover, Logo, Colors, Typography), the live preview and the three templates.
 - ✅ Logo pages: Brand concept, Anatomy, Logo versions and Clear space.
 - ✅ A construction grid drawn by the app, fitted to the logo, with guides and measures in X.
+- 🔜 Skins: a decorative layer behind every page, made from two palette colors (Linear, Radial, Dots, Stripes). See the [spec](specs/skins.md).
 - 🔜 The final layout of the 4-page manual (Phase 3).
 - 🔜 Export to two PDFs: one for print (high resolution, CMYK values highlighted) and one for screen (RGB/HEX, lightweight) (Phase 4).
 
@@ -116,6 +117,7 @@ Funciones clave:
 - ✅ Todas las secciones (Cover, Logo, Colors, Typography), la vista previa en vivo y las tres plantillas.
 - ✅ Hojas de Logo: Brand concept, Anatomy, Logo versions y Clear space.
 - ✅ Una retícula de construcción dibujada por la app, ajustada al logo, con guías y medidas en X.
+- 🔜 Skins: una capa decorativa detrás de cada hoja, hecha con dos colores de la paleta (Linear, Radial, Dots, Stripes). Ver el [spec](specs/skins.md).
 - 🔜 El maquetado final del manual de 4 páginas (Fase 3).
 - 🔜 La exportación a dos PDF: uno para imprenta (alta resolución, valores CMYK destacados) y otro para pantalla (RGB/HEX, liviano) (Fase 4).
 

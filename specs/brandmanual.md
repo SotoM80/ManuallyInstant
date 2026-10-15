@@ -34,6 +34,7 @@ The content of the Logo section (it will have its own future spec). The content 
   2. **Logo**: "Coming soon".
   3. **Colors**: the brand's color palette (see `colorpalette.md`).
   4. **Typography**: the brand's primary and secondary fonts (see `typography.md`).
+  5. **Skin**: a decorative layer behind every page, made from the palette (see `skins.md`).
 
   Sections that are not built yet are shown disabled with the label "Coming soon", so the user can see the full path from the start.
 
@@ -54,7 +55,7 @@ The sections have no Save buttons. Everything typed, picked or chosen in a secti
 
 ### The Open Section's Pages Come First
 So the page being edited is always in view without scrolling:
-* Opening a section moves its pages to the **top** of the preview, at the same size as the others, and the rest follow in their natural order. Cover → Cover; Logo → Brand concept, Anatomy, Logo versions, Clear space; Colors → Color palette; Typography → Typography.
+* Opening a section moves its pages to the **top** of the preview, at the same size as the others, and the rest follow in their natural order. Cover → Cover; Logo → Brand concept, Anatomy, Logo versions, Clear space; Colors → Color palette; Typography → Typography; Skin → Cover (the skin is on every page; the Cover shows it best, and since it is already first, only the section moves).
 * Folding the section puts every page back in its natural order. Opening another section moves that section's pages to the top instead.
 * The pages glide softly to their new places, with no bounce: the same timing and easing as the accordion (about 0.5 s, `--ease-smooth`).
 * The pages of the open section get an accent outline, and each page keeps its natural number in its caption (e.g. "7. Typography" while it is first).
@@ -95,7 +96,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ### Scenario 2: All Sections Listed
 * **Given**: The user is on the Brand Manual page.
 * **When**: The user looks at the sections column.
-* **Then**: The sections Cover, Logo, Colors and Typography are listed in that order, and only Logo shows "Coming soon".
+* **Then**: The sections Cover, Logo, Colors, Typography and Skin are listed in that order, and only Logo shows "Coming soon".
 
 ### Scenario 3: All Pages Previewed
 * **Given**: The user is on the Brand Manual page.
@@ -140,7 +141,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ### Scenario 10: Cover Open by Default
 * **Given**: The user opens the Brand Manual page.
 * **When**: The page loads.
-* **Then**: Cover is open, Colors and Typography are folded, and Logo ("Coming soon") can't be opened.
+* **Then**: Cover is open, Colors, Typography and Skin are folded, and Logo ("Coming soon") can't be opened.
 
 ### Scenario 11: Opening Another Section
 * **Given**: Cover is open.
