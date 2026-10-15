@@ -89,6 +89,10 @@ export type LogoData = {
   minDigitalPx: number
   minPrintMm: number
   grid: UploadedImage | null // optional construction grid
+  gridModules: number // squares across the logo in the grid the app draws when none is uploaded
+  gridX: number // how many modules X measures: the clear space (3.1) and the grid margin (3.2)
+  rulerTop: number[] // dimension line above the grid, in multiples of X (e.g. [1, 1.5, 1]); [] → none
+  rulerSide: number[] // dimension line beside the grid, the same way
 }
 
 // The brand's two Google Fonts (Typography section), by family name.

@@ -2,6 +2,8 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { LogoForm } from '../src/components/LogoForm';
 import { LogoVersionsPage } from '../src/components/pages/LogoVersionsPage';
 import { ClearSpacePage } from '../src/components/pages/ClearSpacePage';
+import { findVisibleBounds } from '../src/utils/visibleBounds';
+import { parseRuler } from '../src/utils/rulers';
 import { renderApp } from './renderApp';
 import type { LogoData } from '../src/types';
 import type { LogoParts } from '../src/data/manualSections';
@@ -112,6 +114,10 @@ describe('Logo section – form', () => {
       minDigitalPx: 32,
       minPrintMm: 15,
       grid: null,
+      gridModules: 16,
+      gridX: 1,
+      rulerTop: [],
+      rulerSide: [],
     });
   });
 
@@ -488,6 +494,10 @@ describe('Logo section – Logo versions and Clear space pages', () => {
     minDigitalPx: 32,
     minPrintMm: 15,
     grid: null,
+    gridModules: 16,
+    gridX: 1,
+    rulerTop: [],
+    rulerSide: [],
   };
 
   it('Logo versions shows every version and its usage rule', () => {
@@ -586,7 +596,7 @@ describe('Logo section – Clear space page', () => {
     type('Brand name', 'VOLTA');
 
     const diagram = within(getPage()).getByRole('figure', { name: 'Clear space diagram' });
-    expect(within(diagram).getByRole('img', { name: 'Primary version' })).toHaveAttribute('src', 'blob:cover.png');
+    expect(within(diagram).getByRole('img', { name: 'Primary version' })).toHaveAttribute('href', 'blob:cover.png');
   });
 
   it('shows the construction grid only after Apply', () => {
@@ -599,5 +609,207 @@ describe('Logo section – Clear space page', () => {
 
     clickApply();
     expect(within(getPage()).getByRole('img', { name: 'Construction grid' })).toHaveAttribute('src', 'blob:grid.png');
+  });
+});
+
+// Spec: specs/clearspace.md — 3.2 Construction grid drawn by the app
+describe('Logo section – construction grid', () => {
+  function getPage() {
+    const preview = screen.getByRole('region', { name: 'Manual preview' });
+    return within(preview).getByRole('article', { name: 'Clear space' });
+  }
+
+  function openLogoSection() {
+    const sections = screen.getByRole('region', { name: 'Manual sections' });
+    fireEvent.click(within(sections).getByRole('button', { name: '2. Logo' }));
+  }
+
+  // A 4 × 4 image whose only drawn pixels are the 2 × 1 block at columns 1–2, row 2
+  function pixels() {
+    const data = new Uint8ClampedArray(4 * 4 * 4);
+    for (const [x, y] of [[1, 2], [2, 2]]) data[(y * 4 + x) * 4 + 3] = 255;
+    return data;
+  }
+
+  it('finds the drawn part of a logo, ignoring its transparent margins', () => {
+    expect(findVisibleBounds(pixels(), 4, 4)).toEqual({ x: 0.25, y: 0.5, width: 0.5, height: 0.25, ratio: 1 });
+  });
+
+  it('uses the whole image when nothing is transparent, or nothing is drawn', () => {
+    expect(findVisibleBounds(new Uint8ClampedArray(2 * 1 * 4).fill(255), 2, 1)).toEqual({
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
+      ratio: 2,
+    });
+    expect(findVisibleBounds(new Uint8ClampedArray(4 * 4 * 4), 4, 4)).toEqual({
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
+      ratio: 1,
+    });
+  });
+
+  it('draws a grid over the Cover logo when no grid is uploaded, 16 modules by default', () => {
+    renderApp('/brand-manual');
+    uploadCoverLogo('cover.png');
+    clickApply();
+    openLogoSection();
+    type('Brand name', 'VOLTA');
+
+    const grid = within(getPage()).getByRole('img', { name: 'Generated construction grid' });
+    expect(grid).toHaveAttribute('data-modules', '16');
+  });
+
+  it('changes the density with Grid modules', () => {
+    renderApp('/brand-manual');
+    uploadCoverLogo('cover.png');
+    clickApply();
+    openLogoSection();
+
+    fireEvent.click(within(within(getForm()).getByRole('group', { name: 'Grid modules' })).getByRole('radio', { name: '24' }));
+
+    expect(within(getPage()).getByRole('img', { name: 'Generated construction grid' })).toHaveAttribute(
+      'data-modules',
+      '24',
+    );
+  });
+
+  it('prefers an uploaded grid over the drawn one', () => {
+    renderApp('/brand-manual');
+    uploadCoverLogo('cover.png');
+    clickApply();
+    openLogoSection();
+
+    upload('Construction grid (optional)', makeLogo('grid.png'));
+    clickApply();
+
+    expect(within(getPage()).getByRole('img', { name: 'Construction grid' })).toBeInTheDocument();
+    expect(within(getPage()).queryByRole('img', { name: 'Generated construction grid' })).not.toBeInTheDocument();
+  });
+
+  it('uses the same X for the grid margin (3.2) and the clear space (3.1)', () => {
+    renderApp('/brand-manual');
+    uploadCoverLogo('cover.png');
+    clickApply();
+    openLogoSection();
+
+    fireEvent.click(within(within(getForm()).getByRole('group', { name: 'X (modules)' })).getByRole('radio', { name: '2' }));
+
+    expect(within(getPage()).getByRole('img', { name: 'Generated construction grid' })).toHaveAttribute('data-x', '2');
+    // The clear space diagram is drawn in the same modules, with the same X
+    const diagram = within(getPage()).getByRole('figure', { name: 'Clear space diagram' });
+    expect(diagram.querySelector('svg')).toHaveAttribute('data-x', '2');
+    expect(diagram.querySelector('svg')).toHaveAttribute('viewBox', '0 0 20 20');
+  });
+
+  it('goes back to the drawn grid when the uploaded one is removed', () => {
+    renderApp('/brand-manual');
+    uploadCoverLogo('cover.png');
+    clickApply();
+    openLogoSection();
+    upload('Construction grid (optional)', makeLogo('grid.png'));
+    clickApply();
+
+    click('Remove grid');
+
+    expect(within(getPage()).getByRole('img', { name: 'Generated construction grid' })).toBeInTheDocument();
+    expect(within(getForm()).queryByRole('button', { name: 'Remove grid' })).not.toBeInTheDocument();
+  });
+
+  it('turns Grid modules off while an uploaded grid is shown, and says why', () => {
+    renderApp('/brand-manual');
+    openLogoSection();
+    const modules = within(getForm()).getByRole('group', { name: 'Grid modules' });
+    expect(modules).toBeEnabled();
+    expect(within(getForm()).getByText('Drawn from your logo (Cover or Version 1). No upload needed.')).toBeInTheDocument();
+
+    upload('Construction grid (optional)', makeLogo('grid.png'));
+    expect(within(getForm()).getByText('Click Apply to show this grid instead of the one drawn from your logo.')).toBeInTheDocument();
+
+    clickApply();
+    expect(modules).toBeDisabled();
+    expect(within(getForm()).getByText(/Your uploaded grid is shown/)).toBeInTheDocument();
+
+    click('Remove grid');
+    expect(modules).toBeEnabled();
+  });
+
+  it('shows the striped placeholder when there is no logo at all', () => {
+    renderApp('/brand-manual');
+    openLogoSection();
+    type('Brand name', 'VOLTA');
+
+    expect(within(getPage()).queryByRole('img', { name: 'Generated construction grid' })).not.toBeInTheDocument();
+    expect(getPage()).toHaveTextContent('Construction grid');
+  });
+});
+
+// Spec: specs/clearspace.md — rulers of the construction grid
+describe('Logo section – grid rulers', () => {
+  function getPage() {
+    const preview = screen.getByRole('region', { name: 'Manual preview' });
+    return within(preview).getByRole('article', { name: 'Clear space' });
+  }
+
+  function getGrid() {
+    return within(getPage()).getByRole('img', { name: 'Generated construction grid' });
+  }
+
+  function setup() {
+    renderApp('/brand-manual');
+    uploadCoverLogo('cover.png');
+    clickApply();
+    const sections = screen.getByRole('region', { name: 'Manual sections' });
+    fireEvent.click(within(sections).getByRole('button', { name: '2. Logo' }));
+  }
+
+  it('reads a sequence of steps in X', () => {
+    expect(parseRuler('X 1.5X X 1.5X X')).toEqual([1, 1.5, 1, 1.5, 1]);
+    expect(parseRuler('  2x · 0,5X ')).toEqual([2, 0.5]);
+    expect(parseRuler('')).toEqual([]);
+    expect(parseRuler('X 1.5Y')).toBeNull();
+    expect(parseRuler('0X')).toBeNull();
+  });
+
+  it('draws the top ruler with a label for each step', () => {
+    setup();
+
+    type('Top ruler', 'X 1.5X X');
+
+    const ruler = getGrid().querySelector('[data-ruler="top"]') as SVGElement;
+    expect(Array.from(ruler.querySelectorAll('text')).map((t) => t.textContent)).toEqual(['X', '1.5X', 'X']);
+  });
+
+  it('makes the rulers follow X', () => {
+    setup();
+    type('Side ruler', 'X 1.5X');
+    // How long the side ruler is, in modules
+    const length = () => Number(getGrid().querySelector('[data-ruler="side"]')?.getAttribute('data-length'));
+    expect(length()).toBe(2.5); // X = 1 module: 1 + 1.5
+
+    fireEvent.click(within(within(getForm()).getByRole('group', { name: 'X (modules)' })).getByRole('radio', { name: '2' }));
+
+    expect(length()).toBe(5); // X = 2 modules: the same steps, twice as long
+  });
+
+  it('flags a step it cannot read, and keeps the last valid ruler', () => {
+    setup();
+    type('Top ruler', 'X 2X');
+
+    type('Top ruler', 'X 2Y');
+
+    expect(within(getForm()).getByText('Use steps like X, 1.5X or 2X, separated by spaces')).toBeInTheDocument();
+    const ruler = getGrid().querySelector('[data-ruler="top"]') as SVGElement;
+    expect(Array.from(ruler.querySelectorAll('text')).map((t) => t.textContent)).toEqual(['X', '2X']);
+  });
+
+  it('draws no ruler while its field is empty', () => {
+    setup();
+    type('Brand name', 'VOLTA');
+
+    expect(getGrid().querySelector('[data-ruler]')).toBeNull();
   });
 });

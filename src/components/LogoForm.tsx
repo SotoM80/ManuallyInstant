@@ -1,10 +1,20 @@
 import { useMemo, useRef, useState } from 'react'
 import { ImageField } from './ImageField'
-import { DEFAULT_CLEAR_SPACE_UNIT, DEFAULT_MARK_TYPES, MARK_TYPE_LABELS, MARK_TYPES } from '../data/logoCopy'
+import {
+  DEFAULT_CLEAR_SPACE_UNIT,
+  DEFAULT_GRID_MODULES,
+  DEFAULT_GRID_X,
+  DEFAULT_MARK_TYPES,
+  GRID_MODULES,
+  GRID_X_OPTIONS,
+  MARK_TYPE_LABELS,
+  MARK_TYPES,
+} from '../data/logoCopy'
 import { LOGO_PARTS } from '../data/manualSections'
 import type { LogoParts } from '../data/manualSections'
 import { keepInPlace } from '../utils/scrollAnchor'
 import { validateImage, validatePositiveNumber } from '../utils/validation'
+import { RULER_ERROR, parseRuler } from '../utils/rulers'
 import {
   NO_IMAGE,
   chooseFile,
@@ -106,12 +116,25 @@ export function LogoForm({
   const [validMinDigital, setValidMinDigital] = useState(32)
   const [validMinPrint, setValidMinPrint] = useState(15)
   const [grid, setGrid] = useState(NO_IMAGE)
+  const [gridModules, setGridModules] = useState<number>(DEFAULT_GRID_MODULES)
+  const [gridX, setGridX] = useState<number>(DEFAULT_GRID_X)
+  // The rulers as typed, and the last valid steps the page draws (see utils/rulers.ts)
+  const [rulerTop, setRulerTop] = useState('')
+  const [rulerSide, setRulerSide] = useState('')
+  const [validRulerTop, setValidRulerTop] = useState<number[]>([])
+  const [validRulerSide, setValidRulerSide] = useState<number[]>([])
   const [gridError, setGridError] = useState('')
+
+  // The construction grid: an uploaded one (applied) replaces the one the app draws
+  const gridInUse = parts.clearSpace && shownFile(grid, applyCount, gridError) !== null
+  const gridWaiting = isPending(grid, applyCount, gridError)
 
   // Shown as soon as the value is wrong; a blank text field is not an error.
   const markTypesError = markTypes.length === 0 ? 'Choose at least one mark type' : ''
   const minDigitalError = minDigital.trim() ? validatePositiveNumber(minDigital) : ''
   const minPrintError = minPrint.trim() ? validatePositiveNumber(minPrint) : ''
+  const rulerTopError = parseRuler(rulerTop) ? '' : RULER_ERROR
+  const rulerSideError = parseRuler(rulerSide) ? '' : RULER_ERROR
 
   const logo = useMemo<LogoData>(
     () => ({
@@ -146,8 +169,12 @@ export function LogoForm({
       minDigitalPx: validMinDigital,
       minPrintMm: validMinPrint,
       grid: parts.clearSpace ? appliedImage(grid, applyCount, gridError) : null,
+      gridModules,
+      gridX,
+      rulerTop: validRulerTop,
+      rulerSide: validRulerSide,
     }),
-    [brandName, concept, markTypes, cards, variants, unit, validMinDigital, validMinPrint, grid, gridError, applyCount, parts],
+    [brandName, concept, markTypes, cards, variants, unit, validMinDigital, validMinPrint, grid, gridError, gridModules, gridX, validRulerTop, validRulerSide, applyCount, parts],
   )
   useLiveData(logo, onChange)
 
@@ -169,6 +196,15 @@ export function LogoForm({
     return (value: string) => {
       setValue(value)
       if (!validatePositiveNumber(value)) setValid(Number(value))
+    }
+  }
+
+  // A ruler field: what is typed always shows; only a valid sequence reaches the page
+  function rulerChange(setValue: (value: string) => void, setValid: (steps: number[]) => void) {
+    return (value: string) => {
+      setValue(value)
+      const steps = parseRuler(value)
+      if (steps) setValid(steps)
     }
   }
 
@@ -262,6 +298,12 @@ export function LogoForm({
     setGridError(file ? validateImage(file) : '')
   }
 
+  // Back to the grid the app draws. Removing is not a new image, so it shows at once.
+  function removeGrid() {
+    setGrid(NO_IMAGE)
+    setGridError('')
+  }
+
   // A text field with its label and error, like the fields of the Cover form.
   function textField(
     id: string,
@@ -270,6 +312,7 @@ export function LogoForm({
     error: string,
     onChange: (value: string) => void,
     inputMode?: 'decimal',
+    placeholder?: string,
   ) {
     return (
       <>
@@ -278,6 +321,7 @@ export function LogoForm({
           id={id}
           type="text"
           inputMode={inputMode}
+          placeholder={placeholder}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           aria-invalid={error !== ''}
@@ -555,6 +599,65 @@ export function LogoForm({
               sizeChange(setMinPrint, setValidMinPrint),
               'decimal',
             )}
+            {/* The grid the app draws needs no upload: it uses the Cover logo (or Version 1).
+                An uploaded grid replaces it, so the density is off while one is shown. */}
+            <fieldset className="segmented-control logo-size-control" disabled={gridInUse}>
+              <legend>Grid modules</legend>
+              {GRID_MODULES.map((count) => (
+                <label key={count}>
+                  <input
+                    type="radio"
+                    name="logo-grid-modules"
+                    value={count}
+                    checked={gridModules === count}
+                    onChange={() => setGridModules(count)}
+                  />
+                  <span>{count}</span>
+                </label>
+              ))}
+            </fieldset>
+            {/* X sets the clear space (3.1) and the grid margin (3.2), so it works with an
+                uploaded grid too */}
+            <fieldset className="segmented-control logo-size-control">
+              <legend>X (modules)</legend>
+              {GRID_X_OPTIONS.map((size) => (
+                <label key={size}>
+                  <input
+                    type="radio"
+                    name="logo-grid-x"
+                    value={size}
+                    checked={gridX === size}
+                    onChange={() => setGridX(size)}
+                  />
+                  <span>{size}</span>
+                </label>
+              ))}
+            </fieldset>
+            {textField(
+              'logo-ruler-top',
+              'Top ruler',
+              rulerTop,
+              rulerTopError,
+              rulerChange(setRulerTop, setValidRulerTop),
+              undefined,
+              'e.g. X 1.5X X 1.5X X',
+            )}
+            {textField(
+              'logo-ruler-side',
+              'Side ruler',
+              rulerSide,
+              rulerSideError,
+              rulerChange(setRulerSide, setValidRulerSide),
+              undefined,
+              'e.g. X 1.5X X',
+            )}
+            <p className="logo-form-hint" id="logo-grid-hint">
+              {gridInUse
+                ? 'Your uploaded grid is shown. Remove it to use the grid drawn from your logo.'
+                : gridWaiting
+                  ? 'Click Apply to show this grid instead of the one drawn from your logo.'
+                  : 'Drawn from your logo (Cover or Version 1). No upload needed.'}
+            </p>
             <ImageField
               id="logo-grid"
               label="Construction grid (optional)"
@@ -562,6 +665,11 @@ export function LogoForm({
               error={gridError}
               onChange={chooseGridFile}
             />
+            {(grid.file || grid.shown) && (
+              <button type="button" className="palette-secondary-button" onClick={removeGrid}>
+                Remove grid
+              </button>
+            )}
           </>
         )}
       </fieldset>

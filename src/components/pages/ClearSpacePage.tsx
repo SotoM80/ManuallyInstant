@@ -1,13 +1,13 @@
 import { GRID_TEXT, clearSpaceText, minSizeRules, versionName } from '../../data/logoCopy'
 import type { LogoData } from '../../types'
+import { ClearSpaceDiagram } from './ClearSpaceDiagram'
+import { ConstructionGrid } from './ConstructionGrid'
 
 type ClearSpacePageProps = {
   logo: LogoData | null // null → its section is untouched, show the placeholder
   coverLogo: { url: string } | null // the logo applied in the Cover section, if any
   color: string // the Cover's Typography color
 }
-
-const SIDES = ['top', 'right', 'bottom', 'left'] as const
 
 // Chapter 3 of the Logo section: 3.1 Clear space (drawn here from the primary version),
 // 3.2 Construction grid (uploaded, or a placeholder box) and 3.3 Minimum sizes.
@@ -30,27 +30,31 @@ export function ClearSpacePage({ logo, coverLogo, color }: ClearSpacePageProps) 
 
       <section className="logo-block clearspace-area">
         <p className="logo-block-title">3.1 Clear space</p>
-        {/* The dashed frame is the free area; its padding stands for X on every side */}
         <figure className="clearspace-diagram" aria-label="Clear space diagram">
-          <div className="clearspace-frame">
-            {SIDES.map((side) => (
-              <span key={side} className="clearspace-x" data-side={side} aria-hidden="true">
-                X
-              </span>
-            ))}
-            <div className="logo-figure" data-empty={!primaryImage}>
-              {primaryImage && <img src={primaryImage.url} alt={`${primaryName} version`} />}
-            </div>
-          </div>
+          <ClearSpaceDiagram
+            logo={primaryImage}
+            name={primaryName}
+            modules={logo.gridModules}
+            x={logo.gridX}
+          />
         </figure>
         <p className="logo-text logo-clamp">{clearSpaceText(logo)}</p>
       </section>
 
       <section className="logo-block clearspace-grid">
         <p className="logo-block-title">3.2 Construction grid</p>
-        <figure className="logo-figure" data-empty={!logo.grid}>
+        {/* An uploaded grid first; else one drawn by the app over the Primary logo */}
+        <figure className="logo-figure" data-empty={!logo.grid && !primaryImage}>
           {logo.grid ? (
             <img src={logo.grid.url} alt="Construction grid" />
+          ) : primaryImage ? (
+            <ConstructionGrid
+              logo={primaryImage}
+              modules={logo.gridModules}
+              x={logo.gridX}
+              rulerTop={logo.rulerTop}
+              rulerSide={logo.rulerSide}
+            />
           ) : (
             <span className="clearspace-grid-empty">Construction grid</span>
           )}

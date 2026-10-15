@@ -46,7 +46,11 @@
 }
 
 /* Segmented control: two radio buttons that look like one switch */
+/* position: relative keeps its hidden radios next to their option. Without it they sit at
+   their first spot (outside the Logo scroll area), and clicking an option makes the browser
+   scroll the whole page to show the focused radio. */
 .segmented-control {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;

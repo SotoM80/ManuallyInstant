@@ -164,6 +164,7 @@
 }
 
 .manual-section-inner {
+  position: relative; /* hidden inputs scroll with the form inside Logo, never outside it */
   min-height: 0;
   overflow: hidden;
   opacity: 0;
@@ -224,7 +225,21 @@
 }
 
 /* Logo: "Choose file" button + file name, in English (see BrandForm) */
+/* A short note under a control of the Logo form (e.g. where the construction grid comes from) */
+.logo-form-hint {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* A control that does not apply right now (e.g. Grid modules while an uploaded grid is shown) */
+.manual-section form .segmented-control:disabled {
+  opacity: 0.45;
+}
+
+/* position: relative keeps the hidden file input next to its button (see .segmented-control) */
 .file-field {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-end; /* the Cover form is aligned right */

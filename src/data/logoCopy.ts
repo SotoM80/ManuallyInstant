@@ -86,6 +86,15 @@ export function usageRules(data: LogoData) {
   )
 }
 
+// Densities of the construction grid the app draws: how many squares fit across the logo
+export const GRID_MODULES = [12, 16, 24] as const
+export const DEFAULT_GRID_MODULES = 16
+
+// How many modules X measures. The same X sets the clear space (3.1) and the margin of the
+// grid (3.2), so both blocks show the same measure.
+export const GRID_X_OPTIONS = [1, 1.5, 2, 3] as const
+export const DEFAULT_GRID_X = 1
+
 // What X measures until the user writes their own (also the starting value of the form)
 export const DEFAULT_CLEAR_SPACE_UNIT = 'the height of the letter X'
 

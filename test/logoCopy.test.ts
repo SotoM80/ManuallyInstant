@@ -23,6 +23,10 @@ const volta: LogoData = {
   minDigitalPx: 32,
   minPrintMm: 15,
   grid: null,
+  gridModules: 16,
+  gridX: 1,
+  rulerTop: [],
+  rulerSide: [],
 };
 
 describe('logo copy', () => {
