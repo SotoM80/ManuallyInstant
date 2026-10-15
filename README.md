@@ -12,7 +12,7 @@ A web app that builds a brand's visual identity manual in minutes.
 Design agencies fill in four sections, and the brand manual updates **live** next to the form:
 
 1. **Cover**: manual title (font, style, size), colors, "Designed by" and the main logo.
-2. **Logo**: brand name, the idea behind it, the kinds of mark it uses (Logotype, Isotype, Imagotype, Isologo) and the official versions of the logo (Horizontal, Symbol only…).
+2. **Logo**: brand name, the idea behind it, the kinds of mark it uses (Logotype, Isotype, Imagotype, Isologo), the official versions of the logo (Horizontal, Symbol only…) and its clear space and minimum sizes.
 3. **Colors**: 1 to 6 colors, each with a name and its HEX, RGB and CMYK (approximate) values.
 4. **Typography**: a primary and a secondary font from Google Fonts.
 
@@ -28,8 +28,8 @@ Key features:
 
 ### Status
 - ✅ Every section (Cover, Logo, Colors, Typography), the live preview and the three templates.
-- ✅ Logo pages: Brand concept, Anatomy and Logo versions.
-- 🔜 The Clear space page of the Logo section.
+- ✅ Logo pages: Brand concept, Anatomy, Logo versions and Clear space.
+- 🔜 A construction grid drawn by the app, fitted to the logo (today it is uploaded as an image).
 - 🔜 The final layout of the 4-page manual (Phase 3).
 - 🔜 Export to two PDFs: one for print (high resolution, CMYK values highlighted) and one for screen (RGB/HEX, lightweight) (Phase 4).
 
@@ -96,7 +96,7 @@ Write its spec in `specs/` first, and add its tests in `test/`.
 Las agencias de diseño completan cuatro secciones, y el manual de marca se actualiza **en vivo** al lado del formulario:
 
 1. **Cover** (portada): título del manual (fuente, estilo y tamaño), colores, "Designed by" y el logotipo principal.
-2. **Logo**: nombre de la marca, la idea detrás de ella, los tipos de marca que usa (Logotipo, Isotipo, Imagotipo, Isologo) y las versiones oficiales del logo (Horizontal, Solo símbolo…).
+2. **Logo**: nombre de la marca, la idea detrás de ella, los tipos de marca que usa (Logotipo, Isotipo, Imagotipo, Isologo), las versiones oficiales del logo (Horizontal, Solo símbolo…) y su área de respeto y tamaños mínimos.
 3. **Colors**: de 1 a 6 colores, cada uno con su nombre y sus valores HEX, RGB y CMYK (aproximado).
 4. **Typography**: una fuente principal y una secundaria de Google Fonts.
 
@@ -112,8 +112,8 @@ Funciones clave:
 
 ### Estado
 - ✅ Todas las secciones (Cover, Logo, Colors, Typography), la vista previa en vivo y las tres plantillas.
-- ✅ Hojas de Logo: Brand concept, Anatomy y Logo versions.
-- 🔜 La hoja Clear space de la sección Logo.
+- ✅ Hojas de Logo: Brand concept, Anatomy, Logo versions y Clear space.
+- 🔜 Una retícula de construcción dibujada por la app y ajustada al logo (hoy se sube como imagen).
 - 🔜 El maquetado final del manual de 4 páginas (Fase 3).
 - 🔜 La exportación a dos PDF: uno para imprenta (alta resolución, valores CMYK destacados) y otro para pantalla (RGB/HEX, liviano) (Fase 4).
 
