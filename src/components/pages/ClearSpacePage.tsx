@@ -1,8 +1,9 @@
-import { GRID_TEXT, clearSpaceText, minSizeRules } from '../../data/logoCopy'
+import { GRID_TEXT, clearSpaceText, minSizeRules, versionName } from '../../data/logoCopy'
 import type { LogoData } from '../../types'
 
 type ClearSpacePageProps = {
   logo: LogoData | null // null → its section is untouched, show the placeholder
+  coverLogo: { url: string } | null // the logo applied in the Cover section, if any
   color: string // the Cover's Typography color
 }
 
@@ -11,10 +12,13 @@ const SIDES = ['top', 'right', 'bottom', 'left'] as const
 // Chapter 3 of the Logo section: 3.1 Clear space (drawn here from the primary version),
 // 3.2 Construction grid (uploaded, or a placeholder box) and 3.3 Minimum sizes.
 // Same markup for every template; the template's CSS decides where each block sits.
-export function ClearSpacePage({ logo, color }: ClearSpacePageProps) {
+export function ClearSpacePage({ logo, coverLogo, color }: ClearSpacePageProps) {
   if (!logo) return <p className="manual-page-empty">Your clear space</p>
 
+  // The diagram uses the Primary version; with no image of its own, the Cover's logo
   const primary = logo.variants[0]
+  const primaryName = versionName(primary?.name ?? '', 0)
+  const primaryImage = primary?.image ?? coverLogo
   return (
     <div className="logo-page clearspace-layout" style={{ color }}>
       <header className="logo-page-header">
@@ -34,8 +38,8 @@ export function ClearSpacePage({ logo, color }: ClearSpacePageProps) {
                 X
               </span>
             ))}
-            <div className="logo-figure">
-              {primary.image && <img src={primary.image.url} alt={`${primary.name} version`} />}
+            <div className="logo-figure" data-empty={!primaryImage}>
+              {primaryImage && <img src={primaryImage.url} alt={`${primaryName} version`} />}
             </div>
           </div>
         </figure>

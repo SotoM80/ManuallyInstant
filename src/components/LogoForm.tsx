@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { ImageField } from './ImageField'
-import { DEFAULT_MARK_TYPES, MARK_TYPE_LABELS, MARK_TYPES } from '../data/logoCopy'
+import { DEFAULT_CLEAR_SPACE_UNIT, DEFAULT_MARK_TYPES, MARK_TYPE_LABELS, MARK_TYPES } from '../data/logoCopy'
 import { LOGO_PARTS } from '../data/manualSections'
 import type { LogoParts } from '../data/manualSections'
 import { keepInPlace } from '../utils/scrollAnchor'
@@ -83,10 +83,6 @@ function appliedImage(image: PendingImage, applyCount: number, error: string) {
   return file ? toImage(file) : null
 }
 
-// A number field that is not valid yet sends 0, so the page never shows "NaN".
-function toNumber(value: string) {
-  return validatePositiveNumber(value) ? 0 : Number(value)
-}
 
 export function LogoForm({
   onChange,
@@ -103,9 +99,12 @@ export function LogoForm({
   const [concept, setConcept] = useState('')
   const [variants, setVariants] = useState<VariantRow[]>(() => [newVariant(0)])
   const [openKey, setOpenKey] = useState<number | null>(0) // null → every version folded
-  const [unit, setUnit] = useState('the height of the letter X')
+  const [unit, setUnit] = useState(DEFAULT_CLEAR_SPACE_UNIT)
   const [minDigital, setMinDigital] = useState('32')
   const [minPrint, setMinPrint] = useState('15')
+  // The last valid sizes: while a number is half typed or wrong, the page keeps these
+  const [validMinDigital, setValidMinDigital] = useState(32)
+  const [validMinPrint, setValidMinPrint] = useState(15)
   const [grid, setGrid] = useState(NO_IMAGE)
   const [gridError, setGridError] = useState('')
 
@@ -144,11 +143,11 @@ export function LogoForm({
           }))
         : [],
       clearSpaceUnit: unit.trim(),
-      minDigitalPx: toNumber(minDigital),
-      minPrintMm: toNumber(minPrint),
+      minDigitalPx: validMinDigital,
+      minPrintMm: validMinPrint,
       grid: parts.clearSpace ? appliedImage(grid, applyCount, gridError) : null,
     }),
-    [brandName, concept, markTypes, cards, variants, unit, minDigital, minPrint, grid, gridError, applyCount, parts],
+    [brandName, concept, markTypes, cards, variants, unit, validMinDigital, validMinPrint, grid, gridError, applyCount, parts],
   )
   useLiveData(logo, onChange)
 
@@ -164,6 +163,14 @@ export function LogoForm({
     (parts.versions && variants.some((row) => isPending(row.image, applyCount, row.fileError))) ||
     (parts.clearSpace && isPending(grid, applyCount, gridError))
   usePendingReport(pending, onPendingChange)
+
+  // A size field: what is typed always shows; only a valid number reaches the page
+  function sizeChange(setValue: (value: string) => void, setValid: (value: number) => void) {
+    return (value: string) => {
+      setValue(value)
+      if (!validatePositiveNumber(value)) setValid(Number(value))
+    }
+  }
 
   function takeKey() {
     return nextKey.current++
@@ -537,7 +544,7 @@ export function LogoForm({
               'Min digital size (px)',
               minDigital,
               minDigitalError,
-              setMinDigital,
+              sizeChange(setMinDigital, setValidMinDigital),
               'decimal',
             )}
             {textField(
@@ -545,7 +552,7 @@ export function LogoForm({
               'Min print size (mm)',
               minPrint,
               minPrintError,
-              setMinPrint,
+              sizeChange(setMinPrint, setValidMinPrint),
               'decimal',
             )}
             <ImageField

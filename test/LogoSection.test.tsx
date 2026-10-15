@@ -365,13 +365,13 @@ describe('Logo section – preview pages', () => {
     fireEvent.click(within(sections).getByRole('button', { name: '2. Logo' }));
   }
 
-  it('shows the Brand concept, Anatomy and Logo versions placeholders, and "Coming soon" on Clear space', () => {
+  it('shows the placeholder of every Logo page before the section is touched', () => {
     renderApp('/brand-manual');
 
     expect(getPage('Brand concept')).toHaveTextContent('Your brand concept');
     expect(getPage('Anatomy')).toHaveTextContent('Your anatomy');
     expect(getPage('Logo versions')).toHaveTextContent('Your logo versions');
-    expect(getPage('Clear space')).toHaveTextContent('Coming soon');
+    expect(getPage('Clear space')).toHaveTextContent('Your clear space');
   });
 
   it('fills the Brand concept page (text) and the Anatomy page (marks) as it is typed', () => {
@@ -473,7 +473,7 @@ describe('Logo section – Apply button', () => {
   });
 });
 
-// The Logo versions page, and the Clear space page ready for when its part is turned on.
+// The Logo versions and Clear space pages, drawn on their own
 describe('Logo section – Logo versions and Clear space pages', () => {
   const image = (name: string) => ({ url: `blob:${name}`, name });
   const volta: LogoData = {
@@ -522,12 +522,82 @@ describe('Logo section – Logo versions and Clear space pages', () => {
   });
 
   it('Clear space draws the diagram and states both minimum sizes', () => {
-    const { container } = render(<ClearSpacePage logo={volta} color="#000000" />);
+    const { container } = render(<ClearSpacePage logo={volta} coverLogo={null} color="#000000" />);
 
     expect(screen.getByRole('figure', { name: 'Clear space diagram' })).toBeInTheDocument();
     expect(container).toHaveTextContent('which equals the height of the letter X.');
     expect(container).toHaveTextContent('Construction grid'); // placeholder box, no grid uploaded
     expect(container).toHaveTextContent('32 px');
     expect(container).toHaveTextContent('15 mm');
+  });
+
+  it('Clear space keeps its sentence whole while Unit X is empty', () => {
+    const { container } = render(
+      <ClearSpacePage logo={{ ...volta, clearSpaceUnit: '  ' }} coverLogo={null} color="#000000" />,
+    );
+
+    expect(container).toHaveTextContent('which equals the height of the letter X.');
+  });
+});
+
+// Spec: specs/clearspace.md
+describe('Logo section – Clear space page', () => {
+  function getPage() {
+    const preview = screen.getByRole('region', { name: 'Manual preview' });
+    return within(preview).getByRole('article', { name: 'Clear space' });
+  }
+
+  function openLogoSection() {
+    const sections = screen.getByRole('region', { name: 'Manual sections' });
+    fireEvent.click(within(sections).getByRole('button', { name: '2. Logo' }));
+  }
+
+  it('fills the page as the unit and the sizes are typed', () => {
+    renderApp('/brand-manual');
+    openLogoSection();
+    fillConcept();
+
+    type('Unit X', 'the width of the symbol');
+    type('Min digital size (px)', '48');
+    type('Min print size (mm)', '20');
+
+    expect(getPage()).toHaveTextContent('which equals the width of the symbol.');
+    expect(getPage()).toHaveTextContent('The minimum size is 48 px high.');
+    expect(getPage()).toHaveTextContent('The minimum size is 20 mm high.');
+  });
+
+  it('keeps the last valid size while a size is wrong, and flags the field', () => {
+    renderApp('/brand-manual');
+    openLogoSection();
+    type('Min digital size (px)', '48');
+
+    type('Min digital size (px)', '0');
+
+    expect(within(getForm()).getByText('Enter a number greater than 0')).toBeInTheDocument();
+    expect(getPage()).toHaveTextContent('The minimum size is 48 px high.');
+    expect(getPage()).not.toHaveTextContent('0 px');
+  });
+
+  it('draws the Cover logo in the diagram until the Primary version has its own image', () => {
+    renderApp('/brand-manual');
+    uploadCoverLogo('cover.png');
+    clickApply();
+    openLogoSection();
+    type('Brand name', 'VOLTA');
+
+    const diagram = within(getPage()).getByRole('figure', { name: 'Clear space diagram' });
+    expect(within(diagram).getByRole('img', { name: 'Primary version' })).toHaveAttribute('src', 'blob:cover.png');
+  });
+
+  it('shows the construction grid only after Apply', () => {
+    renderApp('/brand-manual');
+    openLogoSection();
+    type('Brand name', 'VOLTA');
+
+    upload('Construction grid (optional)', makeLogo('grid.png'));
+    expect(within(getPage()).queryByRole('img', { name: 'Construction grid' })).not.toBeInTheDocument();
+
+    clickApply();
+    expect(within(getPage()).getByRole('img', { name: 'Construction grid' })).toHaveAttribute('src', 'blob:grid.png');
   });
 });

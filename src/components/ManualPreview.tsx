@@ -72,7 +72,7 @@ export function ManualPreview({
     if (page === 'Logo versions' && LOGO_PARTS.versions)
       return <LogoVersionsPage logo={logo} coverLogo={cover?.logo ?? null} color={textColor} />
     if (page === 'Clear space' && LOGO_PARTS.clearSpace)
-      return <ClearSpacePage logo={logo} color={textColor} />
+      return <ClearSpacePage logo={logo} coverLogo={cover?.logo ?? null} color={textColor} />
     if (page === 'Color palette') return <ColorPalettePage palette={palette} color={textColor} />
     if (page === 'Typography') return <TypographyPage fonts={typography} color={textColor} />
     if (page !== 'Cover') return <p className="manual-page-empty">Coming soon</p>

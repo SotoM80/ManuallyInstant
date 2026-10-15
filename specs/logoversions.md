@@ -4,7 +4,7 @@
 Part of the **Logo** section. The user lists the official versions of the logo (e.g. Horizontal, Vertical, Symbol only): from **1 to 4**, each with a **name**, what it is **used for** and an **image**. The first one is the **Primary** version. The **Logo versions** page of the preview shows them as chapter 2 of the Logo section, as soon as they are typed.
 
 ## Out of Scope
-Negative and monochrome versions, and colour rules per version. Editing or cropping the images. The Clear space page (still "Coming soon").
+Negative and monochrome versions, and colour rules per version. Editing or cropping the images. The Clear space page (see `clearspace.md`; its diagram uses the Primary version).
 
 ## 2. Interface
 ### Form (group "Versions" of the Logo section)

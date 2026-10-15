@@ -86,9 +86,13 @@ export function usageRules(data: LogoData) {
   )
 }
 
-// 3.1 Clear space
+// What X measures until the user writes their own (also the starting value of the form)
+export const DEFAULT_CLEAR_SPACE_UNIT = 'the height of the letter X'
+
+// 3.1 Clear space. With Unit X empty, the default keeps the sentence whole.
 export function clearSpaceText(data: LogoData) {
-  return `The logo must always be surrounded by a free area that keeps it legible and gives it visual impact. No text, image or edge may enter this area. Its width is measured with the base unit X, which equals ${sentenceEnd(data.clearSpaceUnit)}.`
+  const unit = sentenceEnd(data.clearSpaceUnit) || DEFAULT_CLEAR_SPACE_UNIT
+  return `The logo must always be surrounded by a free area that keeps it legible and gives it visual impact. No text, image or edge may enter this area. Its width is measured with the base unit X, which equals ${unit}.`
 }
 
 // 3.2 Construction grid

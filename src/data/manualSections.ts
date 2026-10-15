@@ -23,7 +23,7 @@ export type LogoParts = {
 
 export const LOGO_PARTS: LogoParts = {
   versions: true,
-  clearSpace: false,
+  clearSpace: true,
 }
 
 // Pages of the manual shown in the preview (left column), in order.
