@@ -120,6 +120,7 @@
   background: #ffffff; /* a printed page is white in light and dark mode */
   box-shadow: var(--shadow);
   overflow: hidden;
+  position: relative; /* the skin layer fills it */
 }
 
 .manual-page[data-orientation='landscape'] {
@@ -140,7 +141,17 @@
   color: var(--accent);
 }
 
+/* The skin: behind the content, edge to edge, and never in the way of a click (specs/skins.md) */
+.skin-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
 .manual-page-content {
+  position: relative; /* over the skin layer */
   box-sizing: border-box; /* padding inside the 100% height, so nothing falls off the page */
   height: 100%;
   display: grid;

@@ -11,6 +11,7 @@ import { NO_GUIDES } from '../utils/guides'
 import type { Guides } from '../utils/guides'
 import { useReorderGlide } from '../utils/useReorderGlide'
 import type { TemplateId } from '../templates'
+import type { Skin } from '../skins/types'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/BrandManualPage.css'
 
@@ -29,6 +30,7 @@ type BrandManualPageProps = {
   onPaletteChange: (palette: PaletteColor[]) => void
   typography: BrandFonts | null
   onTypographyChange: (fonts: BrandFonts) => void
+  skin?: Skin
 }
 
 export function BrandManualPage({
@@ -46,6 +48,7 @@ export function BrandManualPage({
   onPaletteChange,
   typography,
   onTypographyChange,
+  skin,
 }: BrandManualPageProps) {
   // The sections work like an accordion: only one is open, the others fold into their header.
   // Folded forms stay in the page (inert), so nothing typed in them is lost.
@@ -136,6 +139,7 @@ export function BrandManualPage({
         featured={mainPage ? [mainPage] : []}
         guides={guides}
         onGuidesChange={setGuides}
+        skin={skin}
       />
 
       <section className="manual-sections" aria-label="Manual sections">
