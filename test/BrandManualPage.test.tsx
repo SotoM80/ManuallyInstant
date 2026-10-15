@@ -44,7 +44,7 @@ describe('Brand Manual – sections column', () => {
 
     const items = within(getSections()).getAllByRole('listitem');
     const headings = items.map((item) => within(item).getByRole('heading').textContent);
-    expect(headings).toEqual(['1. Cover', '2. Logo', '3. Colors', '4. Typography']);
+    expect(headings).toEqual(['1. Cover', '2. Logo', '3. Colors', '4. Typography', '5. Skin']);
 
     // Built sections open with a click on their title (unbuilt ones have no button)
     for (const [index, item] of items.entries()) {
@@ -233,7 +233,7 @@ describe('Brand Manual – sections accordion', () => {
   }
 
   function expanded() {
-    return ['1. Cover', '2. Logo', '3. Colors', '4. Typography'].map((name) =>
+    return ['1. Cover', '2. Logo', '3. Colors', '4. Typography', '5. Skin'].map((name) =>
       getToggle(name).getAttribute('aria-expanded'),
     );
   }
@@ -241,7 +241,7 @@ describe('Brand Manual – sections accordion', () => {
   it('starts with only Cover open', () => {
     renderApp('/brand-manual');
 
-    expect(expanded()).toEqual(['true', 'false', 'false', 'false']);
+    expect(expanded()).toEqual(['true', 'false', 'false', 'false', 'false']);
   });
 
   it('opens a section with a click on its title and folds the open one', () => {
@@ -249,7 +249,7 @@ describe('Brand Manual – sections accordion', () => {
 
     fireEvent.click(getToggle('3. Colors'));
 
-    expect(expanded()).toEqual(['false', 'false', 'true', 'false']);
+    expect(expanded()).toEqual(['false', 'false', 'true', 'false', 'false']);
     const colorsBody = document.getElementById(getToggle('3. Colors').getAttribute('aria-controls') as string);
     expect(colorsBody).not.toHaveAttribute('inert');
     const coverBody = document.getElementById(getToggle('1. Cover').getAttribute('aria-controls') as string);
@@ -261,7 +261,7 @@ describe('Brand Manual – sections accordion', () => {
 
     fireEvent.click(getToggle('1. Cover'));
 
-    expect(expanded()).toEqual(['false', 'false', 'false', 'false']);
+    expect(expanded()).toEqual(['false', 'false', 'false', 'false', 'false']);
   });
 
   it('keeps what was typed in a section while it is folded', () => {
@@ -401,7 +401,7 @@ describe('Brand Manual – open section beside its page', () => {
 
     openSection('4. Typography');
 
-    expect(sectionOrder()).toEqual(['4. Typography', '1. Cover', '2. Logo', '3. Colors']);
+    expect(sectionOrder()).toEqual(['4. Typography', '1. Cover', '2. Logo', '3. Colors', '5. Skin']);
   });
 
   it('puts every section back in order when it is folded', () => {
@@ -410,7 +410,7 @@ describe('Brand Manual – open section beside its page', () => {
 
     openSection('4. Typography');
 
-    expect(sectionOrder()).toEqual(['1. Cover', '2. Logo', '3. Colors', '4. Typography']);
+    expect(sectionOrder()).toEqual(['1. Cover', '2. Logo', '3. Colors', '4. Typography', '5. Skin']);
   });
 
   it('keeps what was typed when its section moves', () => {

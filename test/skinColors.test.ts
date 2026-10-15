@@ -1,4 +1,4 @@
-import { skinColors } from '../src/skins/colors';
+import { autoColorName, skinColors } from '../src/skins/colors';
 import type { PaletteColor } from '../src/types';
 
 // Spec: specs/skins.md, Section 2 — Colors (Color A and Color B, with Auto)
@@ -39,5 +39,14 @@ describe('skinColors', () => {
 
   it('treats a removed color as Auto (scenario 9)', () => {
     expect(colors([RED, GREEN], BLUE.id, null)).toEqual(['#FF0000', '#00FF00']);
+  });
+});
+
+describe('autoColorName', () => {
+  it('names the palette color Auto is using, or the Cover color that fills in', () => {
+    expect(autoColorName([RED, GREEN], 0)).toBe('Red');
+    expect(autoColorName([RED, { ...GREEN, name: '' }], 1)).toBe('Color 2');
+    expect(autoColorName([RED], 1)).toBe('Background color');
+    expect(autoColorName(null, 0)).toBe('Typography color');
   });
 });

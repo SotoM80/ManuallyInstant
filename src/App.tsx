@@ -8,7 +8,7 @@ import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
 import { loadGoogleFont } from './utils/googleFonts'
 import { DEFAULT_TEMPLATE } from './templates'
 import type { TemplateId } from './templates'
-import { skinFor } from './skins/presets'
+import { NO_SKIN } from './skins/presets'
 import type { Skin } from './skins/types'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from './types'
 import './css/App.css'
@@ -24,9 +24,7 @@ function App() {
   const [orientation, setOrientation] = useState<Orientation>('portrait')
   const [previewView, setPreviewView] = useState<PreviewView>('grid')
   const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
-  // Turned on by hand with Linear until the Skin section exists (specs/skins.md, Build Order).
-  // To turn it off, use NO_SKIN from './skins/presets'.
-  const [skin] = useState<Skin>(() => skinFor('linear'))
+  const [skin, setSkin] = useState<Skin>(NO_SKIN)
 
   const fontFamily = cover?.style.fontFamily ?? DEFAULT_TITLE_STYLE.fontFamily
   useEffect(() => {
@@ -69,6 +67,7 @@ function App() {
                 typography={typography}
                 onTypographyChange={setTypography}
                 skin={skin}
+                onSkinChange={setSkin}
               />
             }
           />

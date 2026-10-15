@@ -4,6 +4,9 @@ import { BrandForm } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
+import { SkinForm } from '../components/SkinForm'
+import { DEFAULT_BACKGROUND_COLOR, DEFAULT_TYPOGRAPHY_COLOR } from '../data/colorPalette'
+import { NO_SKIN } from '../skins/presets'
 import { ManualPreview } from '../components/ManualPreview'
 import { LOGO_AREA_PAGES, MANUAL_SECTIONS, SECTION_PAGES, orderPages } from '../data/manualSections'
 import { useAlignOpenSection } from '../utils/useAlignOpenSection'
@@ -31,6 +34,7 @@ type BrandManualPageProps = {
   typography: BrandFonts | null
   onTypographyChange: (fonts: BrandFonts) => void
   skin?: Skin
+  onSkinChange?: (skin: Skin) => void
 }
 
 export function BrandManualPage({
@@ -48,7 +52,8 @@ export function BrandManualPage({
   onPaletteChange,
   typography,
   onTypographyChange,
-  skin,
+  skin = NO_SKIN,
+  onSkinChange = () => {},
 }: BrandManualPageProps) {
   // The sections work like an accordion: only one is open, the others fold into their header.
   // Folded forms stay in the page (inert), so nothing typed in them is lost.
@@ -120,6 +125,17 @@ export function BrandManualPage({
     logo: <LogoForm onChange={onLogoChange} applyCount={applyCount} onPendingChange={setLogoPending} />,
     colors: <ColorsForm onChange={onPaletteChange} />,
     typography: <TypographyForm onChange={onTypographyChange} />,
+    skin: (
+      <SkinForm
+        skin={skin}
+        onChange={onSkinChange}
+        palette={palette}
+        pageColors={{
+          background: cover?.colors.background ?? DEFAULT_BACKGROUND_COLOR,
+          ink: cover?.colors.typography ?? DEFAULT_TYPOGRAPHY_COLOR,
+        }}
+      />
+    ),
   }
 
   return (

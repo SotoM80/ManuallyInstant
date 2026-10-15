@@ -608,3 +608,96 @@
   font-size: 12px;
   color: var(--text);
 }
+
+/* Skin section (specs/skins.md): a gallery of small pages, then sliders and two colors */
+.skin-gallery {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  text-align: left;
+}
+
+.skin-gallery legend {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.skin-gallery-heading {
+  margin: 0 0 4px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.skin-gallery-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skin-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* The radio stays in the page for keyboard and screen readers; the card is what is drawn */
+.skin-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.skin-card-preview {
+  position: relative; /* the skin layer fills it */
+  width: 48px;
+  aspect-ratio: 210 / 297;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  transition:
+    transform var(--dur-fast) ease,
+    border-color var(--dur-fast) ease;
+}
+
+.skin-card:hover .skin-card-preview {
+  transform: translateY(-2px);
+}
+
+.skin-card input:checked + .skin-card-preview {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent-border);
+  outline-offset: 2px;
+}
+
+.skin-card input:focus-visible + .skin-card-preview {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.skin-control,
+.skin-color {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.skin-control label,
+.skin-color label {
+  margin-right: auto;
+}
+
+.skin-control input[type='range'] {
+  flex: 1;
+  max-width: 160px;
+}
+
+.skin-control output {
+  min-width: 3.5em;
+  font-variant-numeric: tabular-nums;
+}

@@ -11,6 +11,7 @@ export const MANUAL_SECTIONS: ManualSection[] = [
   { id: 'logo', label: 'Logo', ready: true },
   { id: 'colors', label: 'Colors', ready: true },
   { id: 'typography', label: 'Typography', ready: true },
+  { id: 'skin', label: 'Skin', ready: true },
 ]
 
 // Parts of the Logo section being built one at a time. A part that is off shows
@@ -45,6 +46,7 @@ export const SECTION_PAGES: Record<string, string[]> = {
   logo: ['Brand concept', 'Anatomy', 'Logo versions', 'Clear space'],
   colors: ['Color palette'],
   typography: ['Typography'],
+  skin: ['Cover'], // the skin is on every page; the Cover shows it best
 }
 
 // The four areas of the Logo form and the page each one fills. While the user works in an
