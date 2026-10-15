@@ -47,11 +47,11 @@ describe('drawLinear', () => {
 
 describe('drawSkin', () => {
   it('draws Linear with its default angle', () => {
-    expect(drawSkin(skinFor('linear', [0, 1]), AB, portrait)?.kind).toBe('linear');
+    expect(drawSkin(skinFor('linear'), AB, portrait)?.kind).toBe('linear');
   });
 
   it('draws nothing for None or a preset with no drawing', () => {
     expect(drawSkin(NO_SKIN, AB, portrait)).toBeNull();
-    expect(drawSkin({ preset: 'unknown', params: {}, colors: [] }, AB, portrait)).toBeNull();
+    expect(drawSkin({ preset: 'unknown', params: {}, colors: [null, null] }, AB, portrait)).toBeNull();
   });
 });

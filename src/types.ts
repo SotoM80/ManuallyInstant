@@ -37,7 +37,10 @@ export type ManualColors = {
 }
 
 // One color of the brand palette (Colors section), with its HEX as "#RRGGBB".
+// `id` stays the same while the color exists and is never reused, so whatever points
+// at a color (a skin) keeps pointing at it when other colors are removed.
 export type PaletteColor = {
+  id: number
   name: string
   hex: string
 }

@@ -41,7 +41,7 @@ export function ColorsForm({ onChange }: ColorsFormProps) {
   const [openKey, setOpenKey] = useState<number | null>(0) // null → every color folded
 
   const palette = useMemo(
-    () => rows.map((row) => ({ name: row.name.trim(), hex: row.validHex })),
+    () => rows.map((row) => ({ id: row.key, name: row.name.trim(), hex: row.validHex })),
     [rows],
   )
   useLiveData(palette, onChange)

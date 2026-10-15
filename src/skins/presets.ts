@@ -63,14 +63,14 @@ export const SKIN_TYPES: { type: SkinType; label: string }[] = [
 ]
 
 // The plain background of today: no layer at all
-export const NO_SKIN: Skin = { preset: 'none', params: {}, colors: [0, 1] }
+export const NO_SKIN: Skin = { preset: 'none', params: {}, colors: [null, null] }
 
 export function findPreset(id: string) {
   return SKIN_PRESETS.find((preset) => preset.id === id)
 }
 
 // A preset with its default values and the colors already chosen
-export function skinFor(id: string, colors: number[]): Skin {
+export function skinFor(id: string, colors: Skin['colors'] = [null, null]): Skin {
   const preset = findPreset(id)
   return preset ? { preset: id, params: { ...preset.defaults }, colors } : { ...NO_SKIN, colors }
 }

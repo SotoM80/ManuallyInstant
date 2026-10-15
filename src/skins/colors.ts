@@ -1,17 +1,18 @@
 import { normalizeHex } from '../data/colorPalette'
 import type { PaletteColor } from '../types'
+import type { Skin } from './types'
 
-// The colors a skin draws with: the chosen palette colors, in order. With fewer than two
-// (an empty palette, or one color ticked), the page background and the Typography color
-// of the Cover fill in, so a skin always has two colors to work with.
+// The two colors a skin draws with, as HEX (see specs/skins.md, Colors):
+// a chosen palette color → that color; Auto (or a color that was removed) → palette color 1
+// for Color A and 2 for Color B; with no such color → the Typography color for A and the
+// Background color for B. So a skin always has two colors to work with.
 export function skinColors(
   palette: PaletteColor[] | null,
-  indices: number[],
+  [a, b]: Skin['colors'],
   fallback: { background: string; ink: string },
-) {
-  const chosen = indices
-    .map((index) => palette?.[index]?.hex)
-    .filter((hex): hex is string => Boolean(hex && normalizeHex(hex)))
-  const colors = [...chosen, fallback.ink, fallback.background]
-  return colors.slice(0, Math.max(2, chosen.length))
+): [string, string] {
+  const colors = (palette ?? []).filter((color) => normalizeHex(color.hex))
+  const pick = (id: number | null, auto: number, otherwise: string) =>
+    colors.find((color) => color.id === id)?.hex ?? colors[auto]?.hex ?? otherwise
+  return [pick(a, 0, fallback.ink), pick(b, 1, fallback.background)]
 }

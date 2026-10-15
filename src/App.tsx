@@ -26,7 +26,7 @@ function App() {
   const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
   // Turned on by hand with Linear until the Skin section exists (specs/skins.md, Build Order).
   // To turn it off, use NO_SKIN from './skins/presets'.
-  const [skin] = useState<Skin>(() => skinFor('linear', [0, 1]))
+  const [skin] = useState<Skin>(() => skinFor('linear'))
 
   const fontFamily = cover?.style.fontFamily ?? DEFAULT_TITLE_STYLE.fontFamily
   useEffect(() => {
