@@ -20,6 +20,7 @@ Key features:
 - **Live preview**: text, colors and fonts show as you type. A new image waits for the **Apply** button, so it is never swapped in by accident.
 - **Work side by side**: when a section opens, it moves to the top of its column and its page moves to the top of the preview, at the same height. In the Logo section, clicking in an area (Concept, Anatomy, Versions…) makes its page the main one.
 - **Logo scrolls on its own**: the long Logo section scrolls inside, so the preview stays still; at its top or bottom, the page scrolls on.
+- **Construction grid drawn for you**: the app reads the logo's visible pixels and fits a grid of square modules to it (12, 16 or 24 across). X is a setting shared by the clear space and the grid; click the grid's rulers to place guides measured in X, and the logo's overall width and height are shown in X too. Uploading your own grid is still possible.
 - **Colors calculated for you**: pick a color and get its HEX, RGB and CMYK values.
 - **Three templates**: centered (1), aligned left (2) or with a side column (3). They change where the content sits on each page, never the content itself.
 - **Portrait or landscape**, and three ways to view the manual: Grid, Overview and Pages.
@@ -29,7 +30,7 @@ Key features:
 ### Status
 - ✅ Every section (Cover, Logo, Colors, Typography), the live preview and the three templates.
 - ✅ Logo pages: Brand concept, Anatomy, Logo versions and Clear space.
-- 🔜 A construction grid drawn by the app, fitted to the logo (today it is uploaded as an image).
+- ✅ A construction grid drawn by the app, fitted to the logo, with guides and measures in X.
 - 🔜 The final layout of the 4-page manual (Phase 3).
 - 🔜 Export to two PDFs: one for print (high resolution, CMYK values highlighted) and one for screen (RGB/HEX, lightweight) (Phase 4).
 
@@ -38,7 +39,7 @@ Limits: it is frontend only, nothing is saved between sessions (refreshing clear
 ### How it was built
 - **Specs first**: each feature is described before it is coded, with Given-When-Then scenarios, in [`specs/`](specs/).
 - **Decisions on record**: every important choice, with the options weighed, is an Architecture Decision Record in [`docs/adr/`](docs/adr/README.md). For example: [live preview with Apply for images](docs/adr/0007-live-preview-with-apply-for-images.md).
-- **Tested**: around 200 tests with Jest and React Testing Library, written from the spec scenarios.
+- **Tested**: around 230 tests with Jest and React Testing Library, written from the spec scenarios.
 - **One feature at a time**: each change is tried on its own branch and only reaches `main` once it works.
 
 **Tech stack:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint
@@ -104,6 +105,7 @@ Funciones clave:
 - **Vista previa en vivo**: el texto, los colores y las fuentes se ven mientras escribes. Una imagen nueva espera al botón **Apply**, así nunca se cambia por accidente.
 - **Trabajo lado a lado**: al abrir una sección, sube al primer lugar de su columna y su hoja sube al primer lugar del preview, a la misma altura. En la sección Logo, al hacer clic en un área (Concept, Anatomy, Versions…) su hoja pasa a ser la principal.
 - **Logo con su propio scroll**: la sección Logo, que es larga, se desplaza por dentro y el preview no se mueve; al llegar arriba o abajo, sigue moviendo la página.
+- **Retícula de construcción automática**: la app lee los píxeles visibles del logo y le ajusta una retícula de módulos cuadrados (12, 16 o 24 de ancho). X es un ajuste común al área de respeto y a la retícula; con un clic en las reglas de la retícula se colocan guías medidas en X, y también se muestran el ancho y el alto totales del logo en X. Se puede seguir subiendo una retícula propia.
 - **Colores calculados por ti**: eliges un color y obtienes sus valores HEX, RGB y CMYK.
 - **Tres plantillas**: centrada (1), alineada a la izquierda (2) o con columna lateral (3). Cambian dónde se ubica el contenido en cada hoja, nunca el contenido.
 - **Vertical o apaisado**, y tres formas de ver el manual: Grid, Overview y Pages.
@@ -113,7 +115,7 @@ Funciones clave:
 ### Estado
 - ✅ Todas las secciones (Cover, Logo, Colors, Typography), la vista previa en vivo y las tres plantillas.
 - ✅ Hojas de Logo: Brand concept, Anatomy, Logo versions y Clear space.
-- 🔜 Una retícula de construcción dibujada por la app y ajustada al logo (hoy se sube como imagen).
+- ✅ Una retícula de construcción dibujada por la app, ajustada al logo, con guías y medidas en X.
 - 🔜 El maquetado final del manual de 4 páginas (Fase 3).
 - 🔜 La exportación a dos PDF: uno para imprenta (alta resolución, valores CMYK destacados) y otro para pantalla (RGB/HEX, liviano) (Fase 4).
 
@@ -122,7 +124,7 @@ Límites: es solo frontend, no se guarda nada entre sesiones (al recargar se bor
 ### Cómo se construyó
 - **Primero la spec**: cada feature se describe antes de programarla, con escenarios Given-When-Then, en [`specs/`](specs/).
 - **Decisiones registradas**: cada decisión importante, con las opciones que se compararon, es un Architecture Decision Record en [`docs/adr/`](docs/adr/README.md). Por ejemplo: [vista previa en vivo con Apply para las imágenes](docs/adr/0007-live-preview-with-apply-for-images.md).
-- **Con tests**: unos 200 tests con Jest y React Testing Library, escritos a partir de los escenarios de las specs.
+- **Con tests**: unos 230 tests con Jest y React Testing Library, escritos a partir de los escenarios de las specs.
 - **Una feature a la vez**: cada cambio se prueba en su propia rama y solo llega a `main` cuando funciona.
 
 **Tecnologías:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint
