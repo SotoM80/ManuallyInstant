@@ -92,7 +92,7 @@ describe('Export – buttons', () => {
     renderApp();
     touchEverySection();
     fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Download print PDF' })).toHaveTextContent('Creating… 3/7'), {
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Download print PDF' })).toHaveTextContent('Creating… 3/8'), {
       timeout: 5000, // the copy waits until it is drawn before the first page
     });
     expect(screen.getByRole('button', { name: 'Download web PDF' })).toBeDisabled();

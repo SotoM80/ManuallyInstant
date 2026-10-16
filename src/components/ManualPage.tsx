@@ -6,9 +6,11 @@ import { LogoVersionsPage } from './pages/LogoVersionsPage'
 import { ClearSpacePage } from './pages/ClearSpacePage'
 import { ColorPalettePage } from './pages/ColorPalettePage'
 import { TypographyPage } from './pages/TypographyPage'
+import { MockupsPage } from './pages/MockupsPage'
 import { SkinBackdrop } from './pages/SkinBackdrop'
 import type { ExportKind } from '../export/exportSettings'
 import type { Skin } from '../skins/types'
+import type { Mockups } from '../mockups/types'
 import type { Guides } from '../utils/guides'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor } from '../types'
 
@@ -19,6 +21,7 @@ export type ManualData = {
   palette: PaletteColor[] | null
   typography: BrandFonts | null
   skin: Skin
+  mockups: Mockups
 }
 
 type ManualPageProps = ManualData & {
@@ -42,6 +45,7 @@ export function ManualPage({
   palette,
   typography,
   skin,
+  mockups,
   guides,
   onGuidesChange,
   emphasis,
@@ -71,6 +75,7 @@ export function ManualPage({
       )
     if (page === 'Color palette') return <ColorPalettePage palette={palette} color={textColor} emphasis={emphasis} />
     if (page === 'Typography') return <TypographyPage fonts={typography} color={textColor} />
+    if (page === 'Mockups') return <MockupsPage mockups={mockups} logo={logo} cover={cover} color={textColor} />
     if (!isCover) return <p className="manual-page-empty">Coming soon</p>
     // A new key on every applied logo (each one has its own URL) redraws the cover, so it grows in again
     return <CoverPage key={cover?.logo?.url ?? 'empty'} cover={cover} titleScale={titleScale} />

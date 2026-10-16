@@ -16,8 +16,8 @@ const volta: LogoData = {
   concept: 'Energy that moves cities.',
   marks: [{ type: 'Imagotype', name: 'Lightning symbol', role: 'Conveys energy', image: null, parts: [] }],
   variants: [
-    { name: 'Horizontal', usage: 'for web and long stationery.', image },
-    { name: 'Vertical', usage: 'for packaging and social media', image },
+    { id: 0, name: 'Horizontal', usage: 'for web and long stationery.', image },
+    { id: 1, name: 'Vertical', usage: 'for packaging and social media', image },
   ],
   clearSpaceUnit: 'the height of the letter X',
   minDigitalPx: 32,

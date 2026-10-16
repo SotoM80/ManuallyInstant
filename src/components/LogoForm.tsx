@@ -160,6 +160,7 @@ export function LogoForm({
       // A part that is off sends nothing of its own (its page shows "Coming soon")
       variants: parts.versions
         ? variants.map((row) => ({
+            id: row.key,
             name: row.name.trim(),
             usage: row.usage.trim(),
             image: appliedImage(row.image, applyCount, row.fileError),

@@ -10,6 +10,8 @@ import { DEFAULT_TEMPLATE } from './templates'
 import type { TemplateId } from './templates'
 import { NO_SKIN } from './skins/presets'
 import type { Skin } from './skins/types'
+import { DEFAULT_MOCKUPS } from './mockups/mockups'
+import type { Mockups } from './mockups/types'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from './types'
 import './css/App.css'
 
@@ -25,6 +27,7 @@ function App() {
   const [previewView, setPreviewView] = useState<PreviewView>('grid')
   const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
   const [skin, setSkin] = useState<Skin>(NO_SKIN)
+  const [mockups, setMockups] = useState<Mockups>(DEFAULT_MOCKUPS)
 
   const fontFamily = cover?.style.fontFamily ?? DEFAULT_TITLE_STYLE.fontFamily
   useEffect(() => {
@@ -67,6 +70,8 @@ function App() {
                 typography={typography}
                 onTypographyChange={setTypography}
                 skin={skin}
+                mockups={mockups}
+                onMockupsChange={setMockups}
                 onSkinChange={setSkin}
               />
             }

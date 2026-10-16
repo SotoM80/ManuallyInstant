@@ -873,3 +873,52 @@
   justify-content: flex-end;
   gap: 8px;
 }
+
+/* Mockups section (specs/mockups.md): the products as checkboxes by group, then the settings of
+   each ticked one (reusing the palette-block accordion) */
+.mockup-products {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  text-align: left;
+}
+
+.mockup-products legend {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.mockup-group {
+  display: grid;
+  gap: 4px;
+}
+
+.mockup-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.mockup-choice:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mockup-thumb {
+  flex: none;
+  display: grid;
+  width: 34px;
+  height: 26px;
+}
+
+.mockup-thumb .mockup-art {
+  width: 100%;
+  height: 100%;
+}
+
+.mockup-settings .palette-block-header {
+  gap: 8px;
+}

@@ -4,6 +4,8 @@ import { TEMPLATES } from '../templates'
 import type { TemplateId } from '../templates'
 import { NO_SKIN } from '../skins/presets'
 import type { Skin } from '../skins/types'
+import { DEFAULT_MOCKUPS } from '../mockups/mockups'
+import type { Mockups } from '../mockups/types'
 import { useRef } from 'react'
 import { withViewTransition } from '../utils/viewTransition'
 import { useReorderGlide } from '../utils/useReorderGlide'
@@ -27,6 +29,7 @@ type ManualPreviewProps = {
   guides?: Guides // guides clicked on the construction grid of the Clear space page
   onGuidesChange?: (guides: Guides) => void
   skin?: Skin // the decorative layers behind every page (see specs/skins.md)
+  mockups?: Mockups // the products of the Mockups page (see specs/mockups.md)
 }
 
 const ORIENTATIONS: { value: Orientation; label: string }[] = [
@@ -61,6 +64,7 @@ export function ManualPreview({
   guides,
   onGuidesChange,
   skin = NO_SKIN,
+  mockups = DEFAULT_MOCKUPS,
 }: ManualPreviewProps) {
   // When a section opens or folds, the pages glide to their new places
   const pageList = useRef<HTMLOListElement>(null)
@@ -136,6 +140,7 @@ export function ManualPreview({
               palette={palette}
               typography={typography}
               skin={skin}
+              mockups={mockups}
               guides={guides}
               onGuidesChange={onGuidesChange}
               transitionName

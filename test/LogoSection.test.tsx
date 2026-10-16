@@ -109,7 +109,7 @@ describe('Logo section – form', () => {
         { type: 'Isologo', name: '', role: '', image: null, parts: [] },
       ],
       variants: [
-        { name: 'Horizontal', usage: 'for web', image: { url: 'blob:volta-h.png', name: 'volta-h.png' } },
+        { id: 0, name: 'Horizontal', usage: 'for web', image: { url: 'blob:volta-h.png', name: 'volta-h.png' } },
       ],
       clearSpaceUnit: 'the height of the letter X',
       minDigitalPx: 32,
@@ -131,7 +131,7 @@ describe('Logo section – form', () => {
     expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({
         brandName: 'VOLTA',
-        variants: [{ name: 'Horizontal', usage: 'for web', image: null }],
+        variants: [{ id: 0, name: 'Horizontal', usage: 'for web', image: null }],
       }),
     );
   });
@@ -193,6 +193,24 @@ describe('Logo section – form', () => {
     click('Add version');
     click('Add version');
     expect(within(getForm()).getByRole('button', { name: 'Add version' })).toBeDisabled();
+  });
+
+  // Spec: specs/logoversions.md, Invariants — and specs/mockups.md (a mockup points at a version)
+  it('keeps the id of every version when another one is removed', () => {
+    const { onChange } = renderForm();
+    click('Add version');
+    click('Add version');
+    for (const [n, name] of [[1, 'Horizontal'], [2, 'Negative'], [3, 'Symbol']] as const) {
+      fireEvent.change(within(getForm()).getByLabelText(`Version ${n} name`), { target: { value: name } });
+    }
+    const before = onChange.mock.lastCall[0].variants as { id: number; name: string }[];
+    expect(new Set(before.map((variant) => variant.id)).size).toBe(3);
+
+    click('Remove Version 2');
+
+    const after = onChange.mock.lastCall[0].variants as { id: number; name: string }[];
+    expect(after.map((variant) => variant.name)).toEqual(['Horizontal', 'Symbol']);
+    expect(after.map((variant) => variant.id)).toEqual([before[0].id, before[2].id]);
   });
 });
 
@@ -488,8 +506,8 @@ describe('Logo section – Logo versions and Clear space pages', () => {
     concept: 'Energy that moves cities.',
     marks: [{ type: 'Imagotype', name: 'Lightning symbol', role: 'Conveys energy', image: null, parts: [] }],
     variants: [
-      { name: 'Horizontal', usage: 'for web', image: image('volta-h.png') },
-      { name: 'Symbol only', usage: 'for app icons', image: image('volta-s.png') },
+      { id: 0, name: 'Horizontal', usage: 'for web', image: image('volta-h.png') },
+      { id: 1, name: 'Symbol only', usage: 'for app icons', image: image('volta-s.png') },
     ],
     clearSpaceUnit: 'the height of the letter X',
     minDigitalPx: 32,
@@ -514,8 +532,8 @@ describe('Logo section – Logo versions and Clear space pages', () => {
       ...volta,
       brandName: '',
       variants: [
-        { name: '', usage: '', image: null },
-        { name: '', usage: 'for app icons', image: null },
+        { id: 0, name: '', usage: '', image: null },
+        { id: 1, name: '', usage: 'for app icons', image: null },
       ],
     };
     render(<LogoVersionsPage logo={empty} coverLogo={null} color="#000000" />);
@@ -526,7 +544,7 @@ describe('Logo section – Logo versions and Clear space pages', () => {
   });
 
   it('Logo versions shows a placeholder when no version says where it is used', () => {
-    const noUsage: LogoData = { ...volta, variants: [{ name: 'Horizontal', usage: '', image: null }] };
+    const noUsage: LogoData = { ...volta, variants: [{ id: 0, name: 'Horizontal', usage: '', image: null }] };
     render(<LogoVersionsPage logo={noUsage} coverLogo={null} color="#000000" />);
 
     expect(screen.getByText('Where each version is used')).toBeInTheDocument();

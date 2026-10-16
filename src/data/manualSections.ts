@@ -12,6 +12,7 @@ export const MANUAL_SECTIONS: ManualSection[] = [
   { id: 'colors', label: 'Colors', ready: true },
   { id: 'typography', label: 'Typography', ready: true },
   { id: 'skin', label: 'Skin', ready: true },
+  { id: 'mockups', label: 'Mockups', ready: true },
 ]
 
 // Parts of the Logo section being built one at a time. A part that is off shows
@@ -37,6 +38,7 @@ export const MANUAL_PAGES = [
   'Clear space',
   'Color palette',
   'Typography',
+  'Mockups',
 ]
 
 // Pages each section fills. While a section is open, its pages move to the top of the
@@ -47,6 +49,7 @@ export const SECTION_PAGES: Record<string, string[]> = {
   colors: ['Color palette'],
   typography: ['Typography'],
   skin: ['Brand concept'], // the first page the Skin paints (the Cover keeps its own colors)
+  mockups: ['Mockups'],
 }
 
 // The four areas of the Logo form and the page each one fills. While the user works in an

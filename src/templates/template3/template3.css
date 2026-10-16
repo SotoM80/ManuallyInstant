@@ -171,3 +171,7 @@
 .manual-preview[data-template='template3'] .clearspace-layout {
   grid-template-rows: minmax(0, 1fr) minmax(0, 1.2fr) auto;
 }
+
+.manual-preview[data-template='template3'] .mockups-layout {
+  grid-template-rows: minmax(0, 1fr);
+}

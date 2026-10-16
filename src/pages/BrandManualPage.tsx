@@ -15,6 +15,9 @@ import type { Guides } from '../utils/guides'
 import { useReorderGlide } from '../utils/useReorderGlide'
 import type { TemplateId } from '../templates'
 import type { Skin } from '../skins/types'
+import { MockupsForm } from '../components/MockupsForm'
+import { DEFAULT_MOCKUPS } from '../mockups/mockups'
+import type { Mockups } from '../mockups/types'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from '../types'
 import '../css/BrandManualPage.css'
 
@@ -35,6 +38,8 @@ type BrandManualPageProps = {
   onTypographyChange: (fonts: BrandFonts) => void
   skin?: Skin
   onSkinChange?: (skin: Skin) => void
+  mockups?: Mockups
+  onMockupsChange?: (mockups: Mockups) => void
 }
 
 export function BrandManualPage({
@@ -53,6 +58,8 @@ export function BrandManualPage({
   typography,
   onTypographyChange,
   skin = NO_SKIN,
+  mockups = DEFAULT_MOCKUPS,
+  onMockupsChange = () => {},
   onSkinChange = () => {},
 }: BrandManualPageProps) {
   // The sections work like an accordion: only one is open, the others fold into their header.
@@ -128,6 +135,9 @@ export function BrandManualPage({
     skin: (
       <SkinForm skin={skin} onChange={onSkinChange} palette={palette} />
     ),
+    mockups: (
+      <MockupsForm mockups={mockups} onChange={onMockupsChange} logo={logo} cover={cover} palette={palette} />
+    ),
   }
 
   return (
@@ -148,6 +158,7 @@ export function BrandManualPage({
         guides={guides}
         onGuidesChange={setGuides}
         skin={skin}
+        mockups={mockups}
       />
 
       <section className="manual-sections" aria-label="Manual sections">
@@ -159,6 +170,7 @@ export function BrandManualPage({
             palette={palette}
             typography={typography}
             skin={skin}
+            mockups={mockups}
             orientation={orientation}
             template={template}
             guides={guides}

@@ -75,7 +75,10 @@ export type MarkCard = {
 }
 
 // One official version of the logo, e.g. "Horizontal" / "for web and long stationery".
+// `id` stays the same while the version exists and is never reused, so whatever points at a
+// version (a mockup, see specs/mockups.md) keeps pointing at it when others are removed.
 export type LogoVariant = {
+  id: number
   name: string
   usage: string
   image: UploadedImage | null // null → no image applied yet
