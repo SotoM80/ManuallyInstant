@@ -1,170 +1,213 @@
 # Technical Specification: Skins
 
 ## 1. What it does
-A **skin** is a decorative layer drawn behind the content of **every page** of the manual, made from two colors of the brand palette: a gradient or a simple pattern. The user picks one preset in the **Skin** section, sets its few sliders and chooses its two colors. The default is **None**: the plain background of today.
+A **skin** is a stack of decorative **layers** drawn behind the content of **every page** of the manual, made from colors of the brand palette. Each layer is one preset (a gradient, a shape or a pattern) with its own values, its own two colors and its own Intensity. In the **Skin** section the user adds layers, turns each one on or off with a checkbox, and moves them up or down to decide which one sits on top. Layers blend by transparency: a layer shows through the ones above it. With no layers, the page shows its plain Background color, as before.
 
-A skin does not depend on the template: it is the same layer under every layout, so ADR 0004 (templates change layout, not content) still holds. See ADR 0009.
+A skin does not depend on the template: it is the same stack under every layout, so ADR 0004 (templates change layout, not content) still holds. See ADR 0009 (drawn in SVG) and ADR 0010 (a stack of layers).
 
 ## Out of Scope
-* **Later presets**: Shapes (Circles, Diagonal block, Waves) and Textures (Grain, Paper). They will get their own scenarios when they are built; Textures wait for the PDF library (they need `feTurbulence`).
+* **Textures** (Grain, Paper): they need `feTurbulence`, which the PDF may not support. They wait for the PDF library ADR.
+* Moving layers by drag and drop (buttons only, see ADR 0010). Blend modes (Multiply, Screen, Overlay…): layers blend by transparency only.
+* More than **4 layers**. More than two colors per layer.
 * Uploading your own textures or images. A different skin on each page. Animated skins.
-* More than two colors per skin.
 * Real CMYK (the skin is RGB like the rest of the PDF, see ADR 0003).
-* Creating, editing or saving presets. Keeping each preset's values when switching to another one.
+* Creating, editing or saving presets. Copying a layer. Keeping a layer's values when its preset is changed (a layer's preset cannot be changed: remove it and add another).
 * Warnings about low contrast between the skin and the text (as in `colorpalette.md`).
 * The PDF export itself (Phase 4).
 
 ## 2. Interface
 ### Section "5. Skin"
-A new section of the accordion, after Typography (it uses the palette of Colors). Its work area has three parts, from top to bottom:
-* **Gallery**: a card for **None** first (selected by default), then the presets grouped under the headings of `SKIN_TYPES` that have at least one preset: **Gradients** (Linear, Radial) and **Patterns** (Dots, Stripes). Only presets with a drawing in `draw/index.ts` are shown, so a preset that is not built yet never appears. Each card shows the preset's name and a small preview drawn with the same SVG as the pages, using the current colors. Choosing a card applies the preset **with its default values**; the two colors stay as they were.
-* **Controls**: one slider per `control` of the chosen preset, in the order of `presets.ts`, with its label, min, max, step and unit from there, and its value next to it (e.g. `135°`). **Intensity** (5–100 %, step 5, default 30) is always last. With None there are no controls.
-* **Colors**: two selects, **Color A** and **Color B**. Each one offers **Auto** (the default) and every palette color by its swatch and name (or `Color N` when it has no name). What each one draws with:
-  * a chosen palette color → that color;
-  * **Auto** → Color A takes palette color 1, Color B palette color 2;
-  * when that palette color does not exist → Color A takes the **Typography color** and Color B the **Background color** of the Cover.
+The section has a **list of layers**, then the **Add layer** button. The list reads like the layers panel of a design tool: **the first layer of the list is drawn on top**, the last one just over the page Background.
 
-  A short note under them: `Auto uses your first two palette colors. Without them, the Typography and Background colors fill in.` Color A and Color B may be the same color.
+```
+5. Skin
+┌──────────────────────────────────────┐
+│ ☑ [▤] Stripes          ↑  ↓  ✕   ▾  │  ← on top
+│ ☑ [◉] Radial           ↑  ↓  ✕   ▾  │
+│ ☐ [·] Dots             ↑  ↓  ✕   ▾  │  ← hidden: not drawn, keeps its values
+│ ☑ [◢] Linear           ↑  ↓  ✕   ▾  │  ← at the bottom
+└──────────────────────────────────────┘
+                          [ + Add layer ]
+```
+
+**Each layer** has a header row, always shown, and a body:
+* **Checkbox** `Show <name>`: on → the layer is drawn; off → it is not drawn, but keeps its values, its colors and its place. A new layer starts on.
+* **Mini preview**: a small page with the layer drawn at full strength, faded while the layer is hidden.
+* **Name**: the preset's name. When two layers use the same preset, the later ones get a number: `Dots`, `Dots 2`.
+* **↑ Move up** / **↓ Move down**: swap the layer with its neighbour. ↑ is disabled on the first layer and ↓ on the last. The layers glide to their new places (`useReorderGlide`, like the pages), and the focus stays on the button that was pressed.
+* **✕ Remove**: removes the layer at once.
+* **▾**: opens the body: one slider per `control` of its preset (label, min, max, step and unit from `presets.ts`, with the value next to it; **Intensity**, 5–100 % step 5, default 30, is always last), then the layer's **Color A** and **Color B**. The bodies work as an **accordion**, like the colors of the Colors section: only one is open at a time, and a new layer opens and folds the open one.
+
+**Add layer** opens the **gallery** under the button: one card per preset with a drawing, grouped under the headings of `SKIN_TYPES` that have at least one: **Gradients** (Linear, Radial), **Shapes** (Circles, Diagonal block, Waves) and **Patterns** (Dots, Stripes). Each card is a small page with the preset drawn at full strength with Auto colors. Choosing a card adds a layer **at the top of the list**, with the preset's default values, both colors on Auto, on and open, and closes the gallery. Escape or clicking Add layer again closes it with no change. With 4 layers, Add layer is disabled, with the note `Up to 4 layers.`
+
+With no layers, the list shows `No layers yet. The pages show their plain Background color.`
+
+**Colors of a layer**: two selects, **Color A** and **Color B**. Each one offers **Auto** (the default) and every palette color by its name (or `Color N` when it has no name). What each one draws with:
+* a chosen palette color → that color;
+* **Auto** → Color A takes palette color 1, Color B palette color 2; the option says which one it is using, e.g. `Auto · Red`;
+* when that palette color does not exist → Color A takes the **Typography color** and Color B the **Background color** of the Cover (`Auto · Typography color`).
+
+A small chip next to each select shows the color in use. A short note under the colors: `Auto uses your first two palette colors. Without them, the Typography and Background colors fill in.`
 
 Everything is live: there is no Apply, because nothing here is an image (ADR 0007).
 
 Opening the section features the **Cover** (`SECTION_PAGES.skin = ['Cover']`). Since the Cover is already first, the pages do not move; only the section moves to the top of its column (see `brandmanual.md`).
 
 ### On the pages
-* The layer sits **over the Background color** of the Cover section and **under all the content** of the page (title, logo, texts, colors, fonts, the grid of 3.2).
-* Its opacity is **Intensity**. The content itself is never faded.
-* It ignores the mouse (`pointer-events: none`), so the guide bands of 3.2 keep working. It is hidden from screen readers (`aria-hidden="true"`): it is decoration.
+* Every page has **one** SVG behind its content (none when no layer is on), with one group per layer that is on, drawn from the **last** layer of the list to the **first**, so the first one is on top.
+* Each group's opacity is its layer's **Intensity**. The layers blend by transparency only; the content of the page is never faded.
+* The SVG sits **over the Background color** of the Cover section and **under all the content** of the page (title, logo, texts, colors, fonts, the grid of 3.2). It ignores the mouse (`pointer-events: none`), so the guide bands of 3.2 keep working, and it is hidden from screen readers (`aria-hidden="true"`).
 * It covers the whole page, edge to edge, and is clipped to it.
 * Before the Cover section is touched, the page colors are the Cover defaults (`DEFAULT_TYPOGRAPHY_COLOR` black, `DEFAULT_BACKGROUND_COLOR` white, in `src/data/colorPalette.ts`).
 
 ### Geometry
-* Each page's layer is an SVG whose `viewBox` is the A4 page in **mm** for the current orientation: `0 0 210 297` (Portrait) or `0 0 297 210` (Landscape). It scales with the page in every view, Overview (`zoom: 0.5`) included.
-* Parameters in `mm` are real millimetres of the A4 page. Parameters in `%` are a share of the page: Center X/Y of its width/height, Radius of its diagonal.
-* Angles follow CSS: `0°` points **up** and they turn **clockwise**, so a Linear skin at `135°` looks like `linear-gradient(135deg, A, B)`.
-* **Unique ids**: gradients and patterns are referenced by id (`fill="url(#…)"`), and ids are shared by the whole document. Every SVG (seven pages and every gallery card) gets its own ids (React `useId`), so one never paints with another one's definition.
+* The `viewBox` is the A4 page in **mm** for the current orientation: `0 0 210 297` (Portrait) or `0 0 297 210` (Landscape). It scales with the page in every view, Overview (`zoom: 0.5`) included.
+* Parameters in `mm` are real millimetres of the A4 page. Parameters in `%` are a share of the page: Center X/Y of its width/height, Radius of its diagonal, Size of its shorter side, Coverage of its area.
+* Angles follow CSS: `0°` points **up** and they turn **clockwise**, so a Linear layer at `135°` looks like `linear-gradient(135deg, A, B)`.
+* **Unique ids**: gradients and patterns are referenced by id (`fill="url(#…)"`), and ids are shared by the whole document. Every SVG gets its own prefix (React `useId`) and every layer adds its own id to it, so no two layers, pages or previews share a definition.
 
 ### The presets
-Gradients cover the whole page. Patterns only draw their marks: the page Background shows between them.
-* **Linear** — *Angle*: the direction of the gradient, from Color A to Color B. The line is long enough to reach the page's corners, as in CSS: Color A fills one corner and Color B the opposite one. In mm, with `θ` the angle, `L = |w·sin θ| + |h·cos θ|`, and the line runs through the page's center from `center − dir·L/2` to `center + dir·L/2`, where `dir = (sin θ, −cos θ)`.
+**Gradients and Diagonal block / Waves cover the whole page**. **Circles, Dots and Stripes** only draw their marks: what is under them (another layer, or the page Background) shows between them.
+* **Linear** — *Angle*: the direction of the gradient, from Color A to Color B. The line is long enough to reach the page's corners, as in CSS. In mm, with `θ` the angle, `L = |w·sin θ| + |h·cos θ|`, and the line runs through the page's center from `center − dir·L/2` to `center + dir·L/2`, where `dir = (sin θ, −cos θ)`.
 * **Radial** — *Center X*, *Center Y*: where Color A is, as a share of the page. *Radius*: where Color B is reached, as a share of the page's diagonal. Past the radius, Color B fills the page.
+* **Circles** — *Count* (1–8): how many circles. *Size* (10–90 %): the diameter of the first one, as a share of the page's shorter side; each next one is 70 % of the one before. *Direction*: the first circle sits at the page's center and the next ones line up towards that angle, each one diameter further, so the last ones may leave the page. The circles alternate Color A and Color B.
+* **Diagonal block** — the page split in two by a straight edge: Color A below it, Color B above. *Angle* (−60° to 60°): how much the edge leans from horizontal (positive values rise to the right). *Coverage* (10–90 %): the share of the page that Color A covers.
+* **Waves** — horizontal wavy bands that fill the page, alternating Color A and Color B. *Amplitude* (2–40 mm): the height of a wave from its middle to its top. *Frequency* (1–8): how many whole waves fit across the page's width. *Angle*: how the waves are turned. Each band is twice the amplitude plus 10 mm high.
 * **Dots** — round dots in a square grid, alternating Color A and Color B by row. *Scale*: the distance between dots, in mm (each dot is a third of it wide). *Angle*: how the grid is turned.
-* **Stripes** — parallel stripes, alternating Color A and Color B. *Spacing*: from one stripe to the next, in mm. *Thickness*: the width of each stripe, in mm. *Angle*: their direction. Thickness can never pass Spacing: its slider's max is the current Spacing, and lowering Spacing below Thickness lowers Thickness with it.
+* **Stripes** — parallel stripes, alternating Color A and Color B. *Spacing*: from one stripe to the next, in mm. *Thickness*: the width of each stripe, in mm. *Angle*: their direction (0° runs up the page). Thickness can never pass Spacing: its slider's max is the current Spacing, and lowering Spacing below Thickness lowers Thickness with it.
 
 ### In the code
-* `src/skins/presets.ts` lists the presets (ids, defaults, controls); the form is built from it. For the MVP it keeps Linear, Radial, Dots and Stripes; the later presets come back with their drawings.
-* `src/skins/colors.ts` turns Color A and Color B into two HEX values (`skinColors`), following the rules of *Colors* above.
-* **Which color**: the skin stores each color as a palette color **id**, or `null` for Auto. The palette gets a stable `id` per color (the `key` the Colors form already keeps per row), so removing a color never makes the skin point at another one. A skin color whose id is no longer in the palette counts as Auto.
-* `src/skins/draw/<preset>.ts`: one **pure function** per preset, `(params, [a, b], page) → shapes`, where `page` is `{ width, height }` in mm and the result describes the SVG (gradient stops and end points, pattern tile and marks). It has no React and no DOM, so it is unit tested.
-* `src/skins/draw/index.ts`: a map `preset id → drawing function`. The gallery is built from it.
-* `SkinLayer`: a component that calls the drawing function and only turns its result into SVG elements. `ManualPreview` puts one in every page, before the content.
+* `src/skins/types.ts`: a `Skin` is `{ layers: SkinLayer[] }`, in list order (the first is on top). A `SkinLayer` is `{ id, preset, params, colors, visible }`; `id` is stable and never reused, like a palette color's. `NO_SKIN` has no layers.
+* `src/skins/layers.ts`: pure functions for the list: `addLayer`, `removeLayer`, `moveLayer(skin, id, -1 | 1)`, `setVisible`, `setLayerParam` (with `withParam`, so Thickness stays within Spacing), `setLayerColor`, and `layerNames` (`Dots`, `Dots 2`). They are unit tested.
+* `src/skins/presets.ts` lists the presets (ids, defaults, controls); the form is built from it.
+* `src/skins/colors.ts` turns a layer's Color A and Color B into two HEX values (`skinColors`, `autoColorName`). A layer color whose palette id was removed counts as Auto.
+* `src/skins/draw/<preset>.ts`: one **pure function** per preset, `(params, [a, b], page) → shape`. `src/skins/draw/index.ts` maps preset ids to them; the gallery offers only presets listed there.
+* `SkinBackdrop` (the component that was `SkinLayer`): draws the visible layers of a skin in one SVG, bottom first. `ManualPreview` puts one in every page, before the content. The mini previews and gallery cards use it with a one-layer skin.
+* `SkinForm`: the list, the accordion and the gallery.
 * The skin is kept in `App`, above the routes, like the template and the orientation, so it survives moving between pages.
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`).
-* **Postconditions**: Every page of the preview shows the chosen skin, with its values and colors, behind its content. With None, every page shows its plain Background color.
+* **Postconditions**: Every page of the preview shows the layers that are on, in the order of the list (the first on top), each with its values, colors and Intensity, behind the content. With no layer on, every page shows its plain Background color.
 
 ## 4. Invariants
-* All pages always use the same skin.
-* The skin never changes, moves or covers the content of a page; Template, Orientation and Preview view combine freely with every skin.
-* A skin always draws with two valid colors.
-* Removing a palette color never makes the skin use a different palette color: a skin color that pointed to it becomes Auto.
+* All pages always draw the same layers, in the same order.
+* The skin never changes, moves or covers the content of a page; Template, Orientation and Preview view combine freely with it.
+* The first layer of the list is always drawn on top, and the last one just over the Background.
+* A skin has 0 to 4 layers. A hidden layer keeps its values, colors and place.
+* Every layer always draws with two valid colors.
+* Removing a palette color never makes a layer use a different palette color: a color that pointed to it becomes Auto.
 * Every value stays between its control's min and max, and Thickness never passes Spacing.
 * No two SVG definitions on the page share an id.
-* The chosen skin is kept when the user moves between pages. It is only reset (to None) when the browser page is refreshed.
+* The skin is kept when the user moves between pages. It is only reset (to no layers) when the browser page is refreshed.
 
 ## Failure Modes
 Nothing the user does here can be wrong, so there are no error messages. Instead:
-* **Sliders** cannot go past their limits.
-* **A missing color** (empty palette, removed color, invalid HEX still being typed in Colors) is filled in by the Auto rule or the Cover colors, and the page keeps drawing.
-* **A skin id with no drawing** (not expected in the UI) draws nothing, as None.
+* **Sliders** cannot go past their limits; **↑ / ↓** are disabled at the ends of the list; **Add layer** is disabled at 4 layers.
+* **A missing color** (empty palette, removed color) is filled in by the Auto rule or the Cover colors, and the page keeps drawing.
+* **A layer whose preset has no drawing** (not expected in the UI) draws nothing.
 
 ## 5. Given-When-Then Test Criteria
 
-### Scenario 1: None by Default
+### Scenario 1: No Layers by Default
 * **Given**: The user opens the Brand Manual page.
 * **When**: The user opens "5. Skin".
-* **Then**: None is selected, there are no sliders, Color A and Color B are Auto, the pages show their plain Background color, and the Cover stays first.
+* **Then**: The list says "No layers yet…", Add layer is on, the pages show their plain Background color, and the Cover stays first.
 
-### Scenario 2: Only Built Presets in the Gallery
+### Scenario 2: The Gallery
 * **Given**: The Skin section is open.
-* **When**: The user looks at the gallery.
-* **Then**: It shows None, then Gradients (Linear, Radial) and Patterns (Dots, Stripes), and no Shapes or Textures.
+* **When**: The user clicks Add layer.
+* **Then**: The gallery shows Gradients (Linear, Radial), Shapes (Circles, Diagonal block, Waves) and Patterns (Dots, Stripes), and no Textures.
 
-### Scenario 3: Choosing Linear
-* **Given**: The palette has two colors and None is selected.
-* **When**: The user chooses **Linear**.
-* **Then**: Every page has a gradient from palette color 1 to palette color 2 at 135°, at 0.3 opacity, and the sliders Angle (135°) and Intensity (30 %) appear.
+### Scenario 3: Adding a Layer
+* **Given**: No layers, and the palette has two colors.
+* **When**: The user adds **Linear**.
+* **Then**: The list has one layer, "Linear", on and open, with Angle 135° and Intensity 30 %, both colors on Auto; every page has a gradient from palette color 1 to palette color 2 at 0.3 opacity; the gallery is closed.
 
-### Scenario 4: Changing the Angle
-* **Given**: Linear at 135° on a portrait page.
-* **When**: The user sets Angle to 45°.
-* **Then**: The gradient line runs from about `(−21.75, 275.25)` to `(231.75, 21.75)` mm: Color A at the bottom-left corner, Color B at the top-right one.
+### Scenario 4: A New Layer Goes on Top
+* **Given**: The list has Linear.
+* **When**: The user adds **Dots**.
+* **Then**: The list reads Dots, Linear; on every page the dots are drawn over the gradient; Dots is open and Linear is folded.
 
-### Scenario 5: Intensity
-* **Given**: Linear at 30 % intensity.
-* **When**: The user sets Intensity to 80 %.
-* **Then**: The layer is drawn at 0.8 opacity, and the content of the pages is unchanged.
+### Scenario 5: Hiding a Layer
+* **Given**: The list has Dots (on) and Linear (on).
+* **When**: The user unticks "Show Dots".
+* **Then**: The pages only show the gradient. Ticking it again shows the dots with the values they had.
 
-### Scenario 6: Choosing the Colors
-* **Given**: The palette has Red, Green and Blue; both colors are Auto (Red and Green).
-* **When**: The user sets Color A to Blue.
-* **Then**: The skin goes from Blue to Green at once.
+### Scenario 6: Moving a Layer
+* **Given**: The list reads Dots, Linear.
+* **When**: The user clicks "Move down" on Dots.
+* **Then**: The list reads Linear, Dots, the gradient is drawn over the dots, and the focus stays on the Move down button of Dots (now disabled, since Dots is last).
 
-### Scenario 7: An Empty Palette
+### Scenario 7: The Ends of the List
+* **Given**: The list reads Stripes, Radial, Linear.
+* **When**: The user looks at the buttons.
+* **Then**: Move up is disabled on Stripes, Move down is disabled on Linear, and both are on for Radial.
+
+### Scenario 8: Removing a Layer
+* **Given**: The list reads Dots, Linear.
+* **When**: The user clicks "Remove Dots".
+* **Then**: The list has only Linear, and the pages only show the gradient.
+
+### Scenario 9: Up to Four Layers
+* **Given**: The list has 4 layers.
+* **When**: The user looks at Add layer.
+* **Then**: It is disabled, with the note "Up to 4 layers." Removing a layer turns it on again.
+
+### Scenario 10: Two Layers with the Same Preset
+* **Given**: The list has Dots.
+* **When**: The user adds Dots again.
+* **Then**: The list reads Dots 2, Dots, and each one keeps its own values.
+
+### Scenario 11: Each Layer Has Its Own Values
+* **Given**: The list reads Dots, Linear.
+* **When**: The user sets the Intensity of Linear to 80 % and Color A of Dots to Blue.
+* **Then**: The gradient is drawn at 0.8 opacity and the dots at 0.3; only the dots use Blue.
+
+### Scenario 12: Changing the Angle
+* **Given**: A Linear layer at 135° on a portrait page.
+* **When**: The user sets its Angle to 45°.
+* **Then**: The gradient line runs from about `(−21.75, 275.25)` to `(231.75, 21.75)` mm.
+
+### Scenario 13: An Empty Palette
 * **Given**: The palette is empty and the Cover was never touched.
-* **When**: The user chooses Linear.
-* **Then**: The gradient goes from black (Typography) to white (Background).
+* **When**: The user adds Linear.
+* **Then**: The gradient goes from black (Typography) to white (Background), and Color A shows "Auto · Typography color".
 
-### Scenario 8: Removing a Color in the Middle
-* **Given**: The palette has Red, Green and Blue; Color A is Blue, Color B is Red.
-* **When**: The user removes Green in the Colors section.
-* **Then**: The skin still goes from Blue to Red.
+### Scenario 14: Removing a Palette Color
+* **Given**: The palette has Red, Green and Blue; a layer has Color A Blue and Color B Red.
+* **When**: The user removes Green in Colors, and then Blue.
+* **Then**: After Green, the layer still goes from Blue to Red; after Blue, Color A shows Auto and the layer goes from Red to Red.
 
-### Scenario 9: Removing a Chosen Color
-* **Given**: The palette has Red, Green and Blue; Color A is Blue.
-* **When**: The user removes Blue.
-* **Then**: Color A shows Auto, and the skin goes from Red to Green, with no error.
-
-### Scenario 10: Changing the Preset Keeps the Colors
-* **Given**: Linear at 45°, with Color A set to Blue.
-* **When**: The user chooses Stripes and then Linear again.
-* **Then**: Stripes shows its default values with Color A still Blue; back on Linear, the Angle is 135° again.
-
-### Scenario 11: Thickness Never Passes Spacing
-* **Given**: Stripes with Spacing 12 mm and Thickness 10 mm.
+### Scenario 15: Thickness Never Passes Spacing
+* **Given**: A Stripes layer with Spacing 12 mm and Thickness 10 mm.
 * **When**: The user lowers Spacing to 6 mm.
 * **Then**: Thickness becomes 6 mm, and its slider cannot go past 6.
 
-### Scenario 12: Template and Orientation Keep the Skin
-* **Given**: Linear at 135° is chosen.
+### Scenario 16: Template and Orientation Keep the Skin
+* **Given**: The list reads Dots, Linear.
 * **When**: The user selects Template 3 and Landscape.
-* **Then**: Every page still shows the gradient, now in `viewBox="0 0 297 210"`, under the Template 3 layout.
+* **Then**: Every page still draws the dots over the gradient, now in `viewBox="0 0 297 210"`.
 
-### Scenario 13: Unique Ids
-* **Given**: The Skin section is open with Linear chosen.
+### Scenario 17: Unique Ids
+* **Given**: The list reads Dots 2, Dots, Linear, and the gallery is open.
 * **When**: The user looks at the document.
-* **Then**: Every gradient and pattern id in the pages and the gallery is different.
+* **Then**: Every gradient and pattern id in the pages, the mini previews and the gallery is different.
 
-### Scenario 14: The Skin Is Kept Between Pages
-* **Given**: The user chose Dots.
+### Scenario 18: The Skin Is Kept Between Pages
+* **Given**: The list reads Dots, Linear, with Dots hidden.
 * **When**: The user goes to Home and then back to Brand Manual.
-* **Then**: Dots is still selected and drawn, with the same values.
+* **Then**: The list still reads Dots (hidden), Linear, with the same values.
 
-### Scenario 15: Back to None
-* **Given**: Stripes is chosen.
-* **When**: The user chooses **None**.
-* **Then**: The layer is gone from every page and the sliders disappear.
-
-### Scenario 16: The Guides Still Work
-* **Given**: A skin is chosen and 3.2 shows the grid drawn by the app.
+### Scenario 19: The Guides Still Work
+* **Given**: A layer is on and 3.2 shows the grid drawn by the app.
 * **When**: The user clicks the top guide band.
 * **Then**: A guide is added, as without a skin.
 
 ## Build Order
-1. `draw/linear.ts` and its unit test (end points for 0°, 45°, 135°, and landscape).
-2. `SkinLayer` in `ManualPreview`, behind the content, with `useId`.
-3. Skin state in `App`, turned on by hand with Linear, and checked with `npm run dev`.
-4. Stable palette ids, `Skin.colors` as ids or Auto, and `skinColors` with the Auto rule (scenarios 7–9).
-5. The Skin section: gallery, controls and colors, plus `skin` in `MANUAL_SECTIONS` and `SECTION_PAGES`.
-6. Radial, Dots and Stripes, one at a time, each with its unit test.
-7. Later: Shapes, then Textures once the PDF library is chosen, then the skin in both PDFs (Phase 4).
+1. ~~Linear, `SkinLayer`, the section with one preset, Radial, Dots and Stripes~~ (done, one preset at a time).
+2. The layer model: `Skin = { layers }`, `src/skins/layers.ts` and its unit tests.
+3. `SkinBackdrop`: one SVG with a group per visible layer, bottom first, with ids per layer. Checked with `npm run dev` using two layers turned on by hand.
+4. The Skin section as a list: checkbox, mini preview, ↑ ↓ ✕, accordion, Add layer with the gallery, the 4-layer limit.
+5. Shapes: Circles, Diagonal block and Waves, one at a time, each with its unit test.
+6. Later: Textures once the PDF library is chosen; the skin in both PDFs (Phase 4).

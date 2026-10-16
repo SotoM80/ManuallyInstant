@@ -34,7 +34,7 @@ The content of the Logo section (it will have its own future spec). The content 
   2. **Logo**: "Coming soon".
   3. **Colors**: the brand's color palette (see `colorpalette.md`).
   4. **Typography**: the brand's primary and secondary fonts (see `typography.md`).
-  5. **Skin**: a decorative layer behind every page, made from the palette (see `skins.md`).
+  5. **Skin**: decorative layers behind every page, made from the palette, that can be stacked, hidden and reordered (see `skins.md`).
 
   Sections that are not built yet are shown disabled with the label "Coming soon", so the user can see the full path from the start.
 
