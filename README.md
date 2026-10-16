@@ -18,6 +18,7 @@ Design agencies fill in five sections, and the brand manual updates **live** nex
 5. **Skin**: the background and text colors of the inner pages, and up to 4 decorative layers behind them.
 
 Key features:
+- **Two PDFs in one click**: **↓ Print PDF** (300 dpi, CMYK values highlighted) and **↓ Web PDF** (144 dpi, HEX and RGB highlighted, lightweight), next to Apply. Every page, in the chosen template, orientation and skin, looks as in the preview; empty sections are pointed out before downloading.
 - **Live preview**: text, colors and fonts show as you type. A new image waits for the **Apply** button, so it is never swapped in by accident.
 - **Work side by side**: when a section opens, it moves to the top of its column and its page moves to the top of the preview, at the same height. In the Logo section, clicking in an area (Concept, Anatomy, Versions…) makes its page the main one.
 - **Logo scrolls on its own**: the long Logo section scrolls inside, so the preview stays still; at its top or bottom, the page scrolls on.
@@ -35,15 +36,15 @@ Key features:
 - ✅ A construction grid drawn by the app, fitted to the logo, with guides and measures in X.
 - ✅ Skins: page colors and up to 4 layers of gradients, shapes and patterns (see the [spec](specs/skins.md)).
 - 🔜 Skin textures (Grain, Paper), once the PDF library is chosen.
-- 🔜 The final layout of the 4-page manual (Phase 3).
-- 🔜 Export to two PDFs: one for print (high resolution, CMYK values highlighted) and one for screen (RGB/HEX, lightweight) (Phase 4).
+- ✅ Export to two PDFs: one for print (300 dpi, CMYK values highlighted) and one for the web (144 dpi, HEX/RGB, lightweight) (see the [spec](specs/export.md)).
+- 🔜 A last review of the layout of every page (Phase 3), and a vector print PDF with selectable text.
 
 Limits: it is frontend only, nothing is saved between sessions (refreshing clears the manual), and CMYK values are an approximation (the print PDF stays in RGB). See [PLAN.md](PLAN.md) for the full list.
 
 ### How it was built
 - **Specs first**: each feature is described before it is coded, with Given-When-Then scenarios, in [`specs/`](specs/).
 - **Decisions on record**: every important choice, with the options weighed, is an Architecture Decision Record in [`docs/adr/`](docs/adr/README.md). For example: [live preview with Apply for images](docs/adr/0007-live-preview-with-apply-for-images.md).
-- **Tested**: around 290 tests with Jest and React Testing Library, written from the spec scenarios.
+- **Tested**: around 315 tests with Jest and React Testing Library, written from the spec scenarios.
 - **One feature at a time**: each change is tried on its own branch and only reaches `main` once it works.
 
 **Tech stack:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint
@@ -79,6 +80,7 @@ src/
 │   └── pages/         One component per page of the manual (CoverPage, TypographyPage…)
 ├── data/              Lists and options: sections, pages, fonts, colors, texts
 ├── pages/             The app's routes: Home and Brand Manual
+├── export/            The two PDFs: settings, file names and drawing the pages (ADR 0012)
 ├── skins/             Skin presets, layers and their drawings (pure functions in draw/)
 ├── templates/         CSS of Template 1, 2 and 3
 └── utils/             Helpers: validation, Google Fonts, pending images, animations
@@ -108,6 +110,7 @@ Las agencias de diseño completan cinco secciones, y el manual de marca se actua
 5. **Skin**: los colores de fondo y de texto de las hojas interiores, y hasta 4 capas decorativas detrás de ellas.
 
 Funciones clave:
+- **Dos PDF con un clic**: **↓ Print PDF** (300 dpi, valores CMYK destacados) y **↓ Web PDF** (144 dpi, HEX y RGB destacados, liviano), junto a Apply. Todas las hojas, con la plantilla, la orientación y la skin elegidas, se ven como en la vista previa; antes de descargar se avisa si hay secciones vacías.
 - **Vista previa en vivo**: el texto, los colores y las fuentes se ven mientras escribes. Una imagen nueva espera al botón **Apply**, así nunca se cambia por accidente.
 - **Trabajo lado a lado**: al abrir una sección, sube al primer lugar de su columna y su hoja sube al primer lugar del preview, a la misma altura. En la sección Logo, al hacer clic en un área (Concept, Anatomy, Versions…) su hoja pasa a ser la principal.
 - **Logo con su propio scroll**: la sección Logo, que es larga, se desplaza por dentro y el preview no se mueve; al llegar arriba o abajo, sigue moviendo la página.
@@ -125,15 +128,15 @@ Funciones clave:
 - ✅ Una retícula de construcción dibujada por la app, ajustada al logo, con guías y medidas en X.
 - ✅ Skins: colores de página y hasta 4 capas de degradados, formas y patrones (ver el [spec](specs/skins.md)).
 - 🔜 Texturas para la Skin (Grain, Paper), cuando se elija la librería de PDF.
-- 🔜 El maquetado final del manual de 4 páginas (Fase 3).
-- 🔜 La exportación a dos PDF: uno para imprenta (alta resolución, valores CMYK destacados) y otro para pantalla (RGB/HEX, liviano) (Fase 4).
+- ✅ La exportación a dos PDF: uno para imprenta (300 dpi, valores CMYK destacados) y otro para web (144 dpi, HEX/RGB, liviano) (ver el [spec](specs/export.md)).
+- 🔜 Una última revisión del maquetado de cada hoja (Fase 3), y un PDF de imprenta vectorial con texto seleccionable.
 
 Límites: es solo frontend, no se guarda nada entre sesiones (al recargar se borra el manual) y los valores CMYK son una aproximación (el PDF de imprenta sigue en RGB). La lista completa está en [PLAN.md](PLAN.md).
 
 ### Cómo se construyó
 - **Primero la spec**: cada feature se describe antes de programarla, con escenarios Given-When-Then, en [`specs/`](specs/).
 - **Decisiones registradas**: cada decisión importante, con las opciones que se compararon, es un Architecture Decision Record en [`docs/adr/`](docs/adr/README.md). Por ejemplo: [vista previa en vivo con Apply para las imágenes](docs/adr/0007-live-preview-with-apply-for-images.md).
-- **Con tests**: unos 290 tests con Jest y React Testing Library, escritos a partir de los escenarios de las specs.
+- **Con tests**: unos 315 tests con Jest y React Testing Library, escritos a partir de los escenarios de las specs.
 - **Una feature a la vez**: cada cambio se prueba en su propia rama y solo llega a `main` cuando funciona.
 
 **Tecnologías:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint
@@ -169,6 +172,7 @@ src/
 │   └── pages/         Un componente por hoja del manual (CoverPage, TypographyPage…)
 ├── data/              Listas y opciones: secciones, hojas, fuentes, colores, textos
 ├── pages/             Las rutas de la app: Home y Brand Manual
+├── export/            Los dos PDF: ajustes, nombres de archivo y dibujo de las hojas (ADR 0012)
 ├── skins/             Presets, capas y dibujos de la Skin (funciones puras en draw/)
 ├── templates/         CSS de las plantillas 1, 2 y 3
 └── utils/             Ayudantes: validación, Google Fonts, imágenes pendientes, animaciones
