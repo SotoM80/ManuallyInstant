@@ -10,9 +10,73 @@
 }
 
 /* Apply: off until a form has a new image waiting, then the accent button of the page */
+/* Above Cover, on the right like the form fields: the two PDF downloads, then Apply */
+.sections-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.export-buttons {
+  display: contents; /* its buttons sit in the same row as Apply */
+}
+
+.sections-export {
+  padding: 4px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    transform var(--dur) var(--ease-bounce),
+    box-shadow var(--dur) ease,
+    border-color var(--dur-fast) ease;
+}
+
+.sections-export:hover:not(:disabled) {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.sections-export:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.sections-export:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* The warning about empty pages, or a failed PDF: under the buttons, across the row */
+.export-message {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  text-align: right;
+}
+
+.export-message p {
+  margin: 0;
+  flex-basis: 100%;
+}
+
 .sections-apply {
   display: block;
-  margin: 0 0 16px auto; /* above Cover, on the right like the form fields */
+  margin: 0; /* in the row of .sections-actions */
   padding: 4px 20px;
   border-radius: 8px;
   border: 1px solid var(--accent-border);

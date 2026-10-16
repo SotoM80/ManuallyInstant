@@ -183,3 +183,32 @@
     position: static;
   }
 }
+
+/* The copy of the pages drawn into a PDF (specs/export.md): off screen, at A4 size, in the Pages
+   view, with no motion and none of the preview's outlines. Two classes and the attribute beat
+   the sticky and static positions of the preview views. */
+.manual-preview.manual-export[data-view] {
+  position: fixed;
+  top: 0;
+  left: -100000px;
+  pointer-events: none;
+}
+
+.manual-export .manual-pages {
+  display: block;
+}
+
+.manual-export .manual-page {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+.manual-export *,
+.manual-export *::before,
+.manual-export *::after {
+  animation: none !important;
+  transition: none !important;
+}

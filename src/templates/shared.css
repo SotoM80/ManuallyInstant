@@ -144,6 +144,15 @@
   font-weight: 600;
 }
 
+/* In a PDF (specs/export.md): print highlights CMYK, web highlights HEX and RGB */
+.palette-values [data-strength='strong'] {
+  font-weight: 700;
+}
+
+.palette-values [data-strength='soft'] {
+  opacity: 0.6; /* on top of the 0.75 of every value */
+}
+
 .palette-note {
   font-size: 6px;
   opacity: 0.6;

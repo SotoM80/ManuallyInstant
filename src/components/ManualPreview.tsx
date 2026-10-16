@@ -1,14 +1,7 @@
-import { LOGO_PARTS, MANUAL_PAGES } from '../data/manualSections'
+import { MANUAL_PAGES } from '../data/manualSections'
+import { ManualPage } from './ManualPage'
 import { TEMPLATES } from '../templates'
 import type { TemplateId } from '../templates'
-import { CoverPage } from './pages/CoverPage'
-import { BrandConceptPage } from './pages/BrandConceptPage'
-import { AnatomyPage } from './pages/AnatomyPage'
-import { LogoVersionsPage } from './pages/LogoVersionsPage'
-import { ClearSpacePage } from './pages/ClearSpacePage'
-import { ColorPalettePage } from './pages/ColorPalettePage'
-import { TypographyPage } from './pages/TypographyPage'
-import { SkinBackdrop } from './pages/SkinBackdrop'
 import { NO_SKIN } from '../skins/presets'
 import type { Skin } from '../skins/types'
 import { useRef } from 'react'
@@ -73,40 +66,6 @@ export function ManualPreview({
   const pageList = useRef<HTMLOListElement>(null)
   useReorderGlide(pageList, pages.join('|'))
 
-  // The Cover keeps its own colors; every other page takes them from the Skin, and the Cover
-  // only draws the layers marked "Also on the Cover" (see specs/skins.md and ADR 0011)
-  const coverLayers = skin.layers.filter((layer) => layer.onCover)
-
-  function renderPage(page: string) {
-    const textColor = skin.pageText
-    if (page === 'Brand concept')
-      return <BrandConceptPage logo={logo} coverLogo={cover?.logo ?? null} color={textColor} />
-    if (page === 'Anatomy') return <AnatomyPage logo={logo} color={textColor} />
-    if (page === 'Logo versions' && LOGO_PARTS.versions)
-      return <LogoVersionsPage logo={logo} coverLogo={cover?.logo ?? null} color={textColor} />
-    if (page === 'Clear space' && LOGO_PARTS.clearSpace)
-      return (
-        <ClearSpacePage
-          logo={logo}
-          coverLogo={cover?.logo ?? null}
-          color={textColor}
-          guides={guides}
-          onGuidesChange={onGuidesChange}
-        />
-      )
-    if (page === 'Color palette') return <ColorPalettePage palette={palette} color={textColor} />
-    if (page === 'Typography') return <TypographyPage fonts={typography} color={textColor} />
-    if (page !== 'Cover') return <p className="manual-page-empty">Coming soon</p>
-    // A new key on every applied logo (each one has its own URL) redraws the cover, so it grows in again
-    return (
-      <CoverPage
-        key={cover?.logo?.url ?? 'empty'}
-        cover={cover}
-        titleScale={TITLE_SCALE[previewView]}
-      />
-    )
-  }
-
   // data-template is set once here: every page of the manual uses the same template.
   return (
     <section
@@ -168,19 +127,19 @@ export function ManualPreview({
       <ol className="manual-pages" ref={pageList}>
         {pages.map((page) => (
           <li key={page} data-key={page} data-featured={featured.includes(page)}>
-            <article
-              className="manual-page"
-              aria-label={page}
-              data-orientation={orientation}
-              style={{
-                // Named after the page, not its place, so each page keeps its own name when the order changes
-                viewTransitionName: `manual-page-${page.toLowerCase().replace(/ /g, '-')}`,
-                background: page === 'Cover' ? cover?.colors.background : skin.pageBackground,
-              }}
-            >
-              <SkinBackdrop layers={page === 'Cover' ? coverLayers : skin.layers} orientation={orientation} />
-              <div className="manual-page-content">{renderPage(page)}</div>
-            </article>
+            <ManualPage
+              page={page}
+              orientation={orientation}
+              titleScale={TITLE_SCALE[previewView]}
+              cover={cover}
+              logo={logo}
+              palette={palette}
+              typography={typography}
+              skin={skin}
+              guides={guides}
+              onGuidesChange={onGuidesChange}
+              transitionName
+            />
             {/* Always the natural number, so a page moved to the top still reads "7. Typography" */}
             <span className="manual-page-name">
               {MANUAL_PAGES.indexOf(page) + 1}. {page}

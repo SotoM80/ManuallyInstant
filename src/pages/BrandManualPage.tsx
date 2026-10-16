@@ -5,6 +5,7 @@ import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
 import { SkinForm } from '../components/SkinForm'
+import { ExportButtons } from '../components/ExportButtons'
 import { NO_SKIN } from '../skins/presets'
 import { ManualPreview } from '../components/ManualPreview'
 import { LOGO_AREA_PAGES, MANUAL_SECTIONS, SECTION_PAGES, orderPages } from '../data/manualSections'
@@ -150,18 +151,31 @@ export function BrandManualPage({
       />
 
       <section className="manual-sections" aria-label="Manual sections">
-        {/* Text and colors show at once; a new image waits here (see docs/adr/0007) */}
-        <button
-          type="button"
-          className="sections-apply"
-          disabled={!canApply}
-          onClick={handleApply}
-          data-feedback={applied ? 'saved' : 'idle'}
-          onAnimationEnd={handleAppliedEnd}
-          title={canApply ? 'Show the new image in the manual' : 'Choose a new image to apply it'}
-        >
-          Apply
-        </button>
+        <div className="sections-actions">
+          {/* The whole manual as a PDF, for print or for the web (see specs/export.md) */}
+          <ExportButtons
+            cover={cover}
+            logo={logo}
+            palette={palette}
+            typography={typography}
+            skin={skin}
+            orientation={orientation}
+            template={template}
+            guides={guides}
+          />
+          {/* Text and colors show at once; a new image waits here (see docs/adr/0007) */}
+          <button
+            type="button"
+            className="sections-apply"
+            disabled={!canApply}
+            onClick={handleApply}
+            data-feedback={applied ? 'saved' : 'idle'}
+            onAnimationEnd={handleAppliedEnd}
+            title={canApply ? 'Show the new image in the manual' : 'Choose a new image to apply it'}
+          >
+            Apply
+          </button>
+        </div>
 
         <ol ref={sectionList}>
           {sections.map((section) => {
