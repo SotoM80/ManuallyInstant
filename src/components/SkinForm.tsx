@@ -1,5 +1,5 @@
 import { SkinLayer } from './pages/SkinLayer'
-import { NO_SKIN, SKIN_PRESETS, SKIN_TYPES, skinFor } from '../skins/presets'
+import { NO_SKIN, SKIN_PRESETS, SKIN_TYPES, controlMax, skinFor, withParam } from '../skins/presets'
 import { SKIN_DRAWINGS } from '../skins/draw'
 import { autoColorName, skinColors } from '../skins/colors'
 import type { Skin, SkinColor } from '../skins/types'
@@ -35,7 +35,7 @@ export function SkinForm({ skin, onChange, palette, pageColors }: SkinFormProps)
   }
 
   function setParam(key: string, value: number) {
-    onChange({ ...skin, params: { ...skin.params, [key]: value } })
+    onChange({ ...skin, params: withParam(skin.params, key, value) })
   }
 
   function setColor(index: 0 | 1, value: string) {
@@ -98,7 +98,7 @@ export function SkinForm({ skin, onChange, palette, pageColors }: SkinFormProps)
               id={id}
               type="range"
               min={control.min}
-              max={control.max}
+              max={controlMax(control, skin.params)}
               step={control.step}
               value={value}
               onChange={(event) => setParam(control.key, Number(event.target.value))}

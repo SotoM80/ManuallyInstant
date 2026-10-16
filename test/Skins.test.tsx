@@ -40,8 +40,10 @@ describe('Skin – section', () => {
     renderApp();
     const form = openSkin();
     const names = within(form).getAllByRole('radio').map((radio) => radio.getAttribute('value'));
-    expect(names).toEqual(['none', 'linear']);
+    expect(names).toEqual(['none', 'linear', 'radial', 'dots', 'stripes']);
     expect(within(form).getByText('Gradients')).toBeInTheDocument();
+    expect(within(form).getByText('Patterns')).toBeInTheDocument();
+    expect(within(form).queryByText('Shapes')).not.toBeInTheDocument();
     expect(within(form).queryByText('Textures')).not.toBeInTheDocument();
   });
 
@@ -113,6 +115,40 @@ describe('Skin – section', () => {
     fireEvent.click(within(form).getByRole('radio', { name: 'None' }));
     expect(skinLayers().every((layer) => layer === undefined)).toBe(true);
     expect(within(form).queryAllByRole('slider')).toHaveLength(0);
+  });
+});
+
+describe('Skin – presets', () => {
+  it('draws Dots and Stripes as patterns, and Radial as a gradient', () => {
+    renderApp();
+    const form = openSkin();
+    for (const [name, kind] of [['Radial', 'radial'], ['Dots', 'pattern'], ['Stripes', 'pattern']]) {
+      fireEvent.click(within(form).getByRole('radio', { name }));
+      expect(skinLayers()[0]).toHaveAttribute('data-skin', kind);
+    }
+    expect(skinLayers()[0].querySelector('pattern')).toHaveAttribute('patternTransform', 'rotate(45)');
+  });
+
+  it('keeps the colors and resets the values when the preset changes (scenario 10)', () => {
+    renderApp();
+    const form = openSkin();
+    chooseLinear(form);
+    fireEvent.change(within(form).getByRole('slider', { name: 'Angle' }), { target: { value: '45' } });
+    fireEvent.click(within(form).getByRole('radio', { name: 'Stripes' }));
+    expect(within(form).getByRole('slider', { name: 'Spacing' })).toHaveValue('12');
+    chooseLinear(form);
+    expect(within(form).getByRole('slider', { name: 'Angle' })).toHaveValue('135');
+  });
+
+  it('lowers Thickness with Spacing (scenario 11)', () => {
+    renderApp();
+    const form = openSkin();
+    fireEvent.click(within(form).getByRole('radio', { name: 'Stripes' }));
+    const thickness = within(form).getByRole('slider', { name: 'Thickness' });
+    fireEvent.change(thickness, { target: { value: '10' } });
+    fireEvent.change(within(form).getByRole('slider', { name: 'Spacing' }), { target: { value: '6' } });
+    expect(thickness).toHaveValue('6');
+    expect(thickness).toHaveAttribute('max', '6');
   });
 });
 

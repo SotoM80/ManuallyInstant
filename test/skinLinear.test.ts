@@ -8,8 +8,9 @@ const landscape = pageSize('landscape');
 const AB = ['#FF0000', '#0000FF'];
 
 function ends(angle: number, page = portrait) {
-  const { x1, y1, x2, y2 } = drawLinear({ angle }, AB, page);
-  return [x1, y1, x2, y2];
+  const shape = drawLinear({ angle }, AB, page);
+  if (shape.kind !== 'linear') throw new Error('not linear');
+  return [shape.x1, shape.y1, shape.x2, shape.y2];
 }
 
 function expectClose(actual: number[], expected: number[]) {
@@ -38,7 +39,7 @@ describe('drawLinear', () => {
   });
 
   it('puts the first color at 0 and the second at 1', () => {
-    expect(drawLinear({ angle: 135 }, AB, portrait).stops).toEqual([
+    expect(drawLinear({ angle: 135 }, AB, portrait)).toHaveProperty('stops', [
       { offset: 0, color: '#FF0000' },
       { offset: 1, color: '#0000FF' },
     ]);

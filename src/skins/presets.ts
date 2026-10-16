@@ -74,3 +74,19 @@ export function skinFor(id: string, colors: Skin['colors'] = [null, null]): Skin
   const preset = findPreset(id)
   return preset ? { preset: id, params: { ...preset.defaults }, colors } : { ...NO_SKIN, colors }
 }
+
+// The highest value a slider can take now: Thickness never passes Spacing (Stripes)
+export function controlMax(control: SkinControl, params: Skin['params']) {
+  return control.key === 'thickness' && params.scale !== undefined
+    ? Math.min(control.max, params.scale)
+    : control.max
+}
+
+// New values for a skin, kept within each other: lowering Spacing below Thickness lowers it too
+export function withParam(params: Skin['params'], key: string, value: number): Skin['params'] {
+  const next = { ...params, [key]: value }
+  if (next.thickness !== undefined && next.scale !== undefined && next.thickness > next.scale) {
+    next.thickness = next.scale
+  }
+  return next
+}
