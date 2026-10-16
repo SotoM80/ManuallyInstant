@@ -25,7 +25,7 @@ At the top of the sections column, on the right, in this order: **↓ Print PDF*
 
 ### Clicking a button
 1. If a section was never touched (Cover, Logo, Colors or Typography still shows its placeholder), a warning shows under the buttons: `Some pages are still empty: Logo, Typography.` with **Download anyway** and **Cancel**. Cancel closes it; Download anyway goes on.
-2. While the PDF is made, both buttons are disabled and the one pressed reads `Creating… 3/7` (the page being drawn and the number of pages).
+2. While the PDF is made, both buttons are disabled and the one pressed reads `Creating… 3/8` (the page being drawn and the number of pages).
 3. The browser downloads the file. The buttons are enabled again.
 4. If something fails, a message shows under the buttons: `The PDF could not be created. Try again.`
 
@@ -71,7 +71,7 @@ Apply has nothing to do with the export: the PDF shows what the preview shows, s
 ### Scenario 2: A Complete Manual
 * **Given**: Every section was touched; the title is "My Brand".
 * **When**: The user clicks "Download print PDF".
-* **Then**: A PDF named `my-brand-print.pdf` is made at 300 dpi in PNG, with the 7 pages in natural order, and no warning is shown.
+* **Then**: A PDF named `my-brand-print.pdf` is made at 300 dpi in PNG, with the 8 pages in natural order, and no warning is shown.
 
 ### Scenario 3: The Web Version
 * **Given**: Every section was touched.
@@ -101,7 +101,7 @@ Apply has nothing to do with the export: the PDF shows what the preview shows, s
 ### Scenario 8: While a PDF Is Made
 * **Given**: The user clicked "Download print PDF".
 * **When**: The PDF is being made.
-* **Then**: Both buttons are disabled and the print one reads "Creating… n/7"; when it is done, both are enabled again.
+* **Then**: Both buttons are disabled and the print one reads "Creating… n/8"; when it is done, both are enabled again.
 
 ### Scenario 9: A Failure
 * **Given**: Drawing a page fails.

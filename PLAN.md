@@ -32,10 +32,10 @@
 - [ ] Revisit the textures after more use: how dense the grain is and how strong the fibers are (`gain` and `cut` in `src/skins/draw/grain.ts` and `paper.ts`), maybe more textures
 - [ ] Move skin layers by drag and drop, on top of the ↑ ↓ buttons (optional)
 - [ ] Cover title uses the Primary font of the Typography section (today it keeps its own font picker)
-- [ ] Mockups section (once the Logo section and Phases 3–4 are done): a new section and a page "5. Mockups" that shows the logo on products (business card, t-shirt, mug, tote bag, sign, phone screen)
-  - Mockup images saved in `public/mockups/` (free license or own illustrations; same origin, so the PDF export can read them)
-  - Data per mockup in `src/data/mockups.ts`: where the logo goes (% area), rotation/perspective, blend mode (`multiply` so it looks printed)
-  - Reuse the Cover logo, the palette colors (product color) and the brand fonts; same pattern as Colors/Typography (collapsible section + preview page + a layout per template)
-  - Start with CSS (logo `<img>` over the photo, `transform` + `mix-blend-mode`); move to canvas only if a mockup needs a curved logo
-  - To decide: a fixed list vs the user uploading their own mockup photo; which mockups and colors the user can choose; a light/dark version of the logo for dark products
-  - Updates the manual from 4 to 5 pages (CLAUDE.md, specs/brandmanual.md)
+- [ ] Mockups section and page "8. Mockups" (specs/mockups.md, ADR 0013): the logo on up to 4 of 6 products drawn by the app as SVG from plain data, each with its color and logo version
+  - [x] Spec and ADR 0013
+  - [ ] Stable ids for the logo versions (`LogoVariant.id`)
+  - [ ] Data, functions, `MockupArt`, the page, the template CSS and the section with 3 products (Business card, T-shirt, Mug)
+  - [ ] Letterhead, Tote bag and Phone
+  - [ ] README
+  - [ ] Later: Envelope, Cap, Storefront sign, Bottle, Browser

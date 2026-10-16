@@ -43,7 +43,7 @@ Each template has its own folder in `src/templates/` (`template1/`, `template2/`
 * **Postconditions**: After choosing a template, every page of the preview uses its layout.
 
 ## 4. Invariants
-* All four pages always use the same template.
+* All the pages always use the same template.
 * Changing the template never changes, loses or requires saving the content again.
 * Template, page orientation and preview view combine freely: every template works in Portrait and Landscape, in Grid and Pages view.
 * In every combination, the title, logo and "Designed by" stay inside the page, with margins.

@@ -35,6 +35,7 @@ The page never shows a sentence with a gap:
 * **Postconditions**: The Logo versions page shows every version with its name and its last applied image, and the usage of each version that has one.
 
 ## 4. Invariants
+* Every version has a stable id (kept while it exists, never reused), so what points at a version (a mockup, see `mockups.md`) keeps pointing at it when others are removed.
 * There are always between 1 and 4 versions; the first one is always the Primary.
 * Text reaches the page at once; a new image only after Apply.
 * The page keeps the order of the form.

@@ -26,6 +26,9 @@ The content of the Logo section (it will have its own future spec). The content 
   2. **Logo**
   3. **Color palette**: shows the colors with their name, HEX, RGB and CMYK values (see `colorpalette.md`). Until the Colors section is touched, it shows the placeholder "Your color palette".
   4. **Typography**: shows the two brand fonts with their usage, name, "Aa" and alphabet (see `typography.md`). Until a font is changed, it shows the placeholder "Your typography".
+  5. **Mockups**: the logo on up to 4 products (see `mockups.md`).
+
+  (The Logo section fills four pages between the Cover and Color palette, so the manual has 8 pages: Cover, Brand concept, Anatomy, Logo versions, Clear space, Color palette, Typography, Mockups.)
 
   Pages whose section is not built yet show "Coming soon".
   The preview stays visible while the user scrolls the sections (sticky).
@@ -35,6 +38,7 @@ The content of the Logo section (it will have its own future spec). The content 
   3. **Colors**: the brand's color palette (see `colorpalette.md`).
   4. **Typography**: the brand's primary and secondary fonts (see `typography.md`).
   5. **Skin**: the background and text colors of every page but the Cover, and decorative layers behind them that can be stacked, hidden, reordered and also drawn on the Cover (see `skins.md`).
+  6. **Mockups**: up to 4 products showing the logo, each with its color and logo version (see `mockups.md`).
 
   Sections that are not built yet are shown disabled with the label "Coming soon", so the user can see the full path from the start.
 
@@ -55,7 +59,7 @@ The sections have no Save buttons. Everything typed, picked or chosen in a secti
 
 ### The Open Section's Pages Come First
 So the page being edited is always in view without scrolling:
-* Opening a section moves its pages to the **top** of the preview, at the same size as the others, and the rest follow in their natural order. Cover → Cover; Logo → Brand concept, Anatomy, Logo versions, Clear space; Colors → Color palette; Typography → Typography; Skin → Brand concept (the first page it paints; the Cover only gets the layers marked Also on the Cover).
+* Opening a section moves its pages to the **top** of the preview, at the same size as the others, and the rest follow in their natural order. Cover → Cover; Logo → Brand concept, Anatomy, Logo versions, Clear space; Colors → Color palette; Typography → Typography; Skin → Brand concept (the first page it paints; the Cover only gets the layers marked Also on the Cover); Mockups → Mockups.
 * Folding the section puts every page back in its natural order. Opening another section moves that section's pages to the top instead.
 * The pages glide softly to their new places, with no bounce: the same timing and easing as the accordion (about 0.5 s, `--ease-smooth`).
 * The pages of the open section get an accent outline, and each page keeps its natural number in its caption (e.g. "7. Typography" while it is first).
@@ -75,12 +79,12 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Postconditions**: The Cover page of the preview shows what is typed in the Cover section, with the selected style, and the last applied logo.
 
 ## 4. Invariants
-* The preview always shows the four pages, in the same order, whether they have content or not.
+* The preview always shows every page of the manual, in the same order, whether they have content or not.
 * The sections list always shows every section, in the same order, whether it is built or not.
 * Every page of the preview changes as soon as its section changes. Only new images wait, for Apply.
-* All four pages always share the same orientation.
+* All the pages always share the same orientation.
 * The chosen orientation is kept when the user moves between pages. It is only reset (to Portrait) when the browser page is refreshed.
-* Both views always show the same four pages, in the same order, with the same orientation.
+* Every view always shows the same pages, in the same order, with the same orientation.
 * The chosen preview view is kept when the user moves between pages. It is only reset (to Grid) when the browser page is refreshed.
 
 ## Failure Modes
@@ -96,7 +100,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ### Scenario 2: All Sections Listed
 * **Given**: The user is on the Brand Manual page.
 * **When**: The user looks at the sections column.
-* **Then**: The sections Cover, Logo, Colors, Typography and Skin are listed in that order, and only Logo shows "Coming soon".
+* **Then**: The sections Cover, Logo, Colors, Typography, Skin and Mockups are listed in that order, and only Logo shows "Coming soon".
 
 ### Scenario 3: All Pages Previewed
 * **Given**: The user is on the Brand Manual page.
@@ -141,7 +145,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ### Scenario 10: Cover Open by Default
 * **Given**: The user opens the Brand Manual page.
 * **When**: The page loads.
-* **Then**: Cover is open, Colors, Typography and Skin are folded, and Logo ("Coming soon") can't be opened.
+* **Then**: Cover is open, Colors, Typography, Skin and Mockups are folded, and Logo ("Coming soon") can't be opened.
 
 ### Scenario 11: Opening Another Section
 * **Given**: Cover is open.

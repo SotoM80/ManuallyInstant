@@ -24,3 +24,4 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0010](0010-skins-as-a-stack-of-layers.md) | Skins as a stack of layers, reordered with buttons | Accepted | 2026-10-16 |
 | [0011](0011-cover-colors-only-paint-the-cover.md) | The Cover's colors only paint the Cover; the Skin owns its colors | Accepted | 2026-10-16 |
 | [0012](0012-pdf-pages-drawn-as-images.md) | PDF pages drawn as images, with html-to-image and jsPDF | Accepted | 2026-10-16 |
+| [0013](0013-mockups-as-svg-illustrations.md) | Mockups drawn as SVG illustrations from plain data | Proposed | 2026-10-16 |
