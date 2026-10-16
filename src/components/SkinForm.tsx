@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import { SkinBackdrop } from './pages/SkinBackdrop'
+import { SkinColorField } from './SkinColorField'
 import { SKIN_PRESETS, SKIN_TYPES, controlMax, findPreset } from '../skins/presets'
 import { SKIN_DRAWINGS } from '../skins/draw'
-import { autoColorName, skinColors } from '../skins/colors'
+import { newLayerColors } from '../skins/colors'
 import {
   MAX_LAYERS,
   addLayer,
@@ -12,21 +13,23 @@ import {
   removeLayer,
   setLayerColor,
   setLayerParam,
+  setOnCover,
+  setPageColor,
   setVisible,
 } from '../skins/layers'
 import { keepInPlace } from '../utils/scrollAnchor'
 import { useReorderGlide } from '../utils/useReorderGlide'
-import type { Skin, SkinColor, SkinLayer } from '../skins/types'
+import type { Skin, SkinLayer } from '../skins/types'
 import type { PaletteColor } from '../types'
 
-// Form of the Skin section: a list of layers (the first one is drawn on top), each one shown or
-// hidden with a checkbox, moved with ↑ ↓ and opened like the colors of the Colors section, then
-// Add layer with the gallery. Everything reaches the preview at once (see specs/skins.md).
+// Form of the Skin section: the colors of every page but the Cover, a list of layers (the first
+// one is drawn on top), each one shown or hidden with a checkbox, moved with ↑ ↓ and opened like
+// the colors of the Colors section, then Add layer with the gallery. Everything reaches the
+// preview at once (see specs/skins.md).
 type SkinFormProps = {
   skin: Skin
   onChange: (skin: Skin) => void
-  palette: PaletteColor[] | null
-  pageColors: { background: string; ink: string } // the Cover's colors, which fill in for missing ones
+  palette: PaletteColor[] | null // offered as chips that copy a color
 }
 
 // Only presets with a drawing are offered, so one that is not built yet never appears
@@ -41,12 +44,17 @@ const COLOR_FIELDS = [
   { index: 1, label: 'Color B' },
 ] as const
 
+const PAGE_COLOR_FIELDS = [
+  { key: 'pageBackground', label: 'Page background' },
+  { key: 'pageText', label: 'Page text' },
+] as const
+
 // A small page with one layer at full strength, so a preview can still be read
 function previewLayer(layer: Pick<SkinLayer, 'preset' | 'params' | 'colors'>): SkinLayer {
-  return { ...layer, id: 0, params: { ...layer.params, intensity: 100 }, visible: true }
+  return { ...layer, id: 0, params: { ...layer.params, intensity: 100 }, visible: true, onCover: false }
 }
 
-export function SkinForm({ skin, onChange, palette, pageColors }: SkinFormProps) {
+export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
   const [openId, setOpenId] = useState<number | null>(null) // null → every layer folded
   const [galleryOpen, setGalleryOpen] = useState(false)
   const list = useRef<HTMLOListElement>(null)
@@ -54,6 +62,7 @@ export function SkinForm({ skin, onChange, palette, pageColors }: SkinFormProps)
   useReorderGlide(list, skin.layers.map((layer) => layer.id).join('|'))
   const names = layerNames(skin.layers)
   const full = skin.layers.length >= MAX_LAYERS
+  const startColors = newLayerColors(palette, skin) // the colors a new layer gets
 
   // After a move, the focus stays on the button that was pressed (or on the other arrow, when
   // the layer reached the end of the list and that button is now off)
@@ -69,7 +78,7 @@ export function SkinForm({ skin, onChange, palette, pageColors }: SkinFormProps)
 
   // A new layer goes on top and opens; the open one folds
   function add(presetId: string) {
-    onChange(addLayer(skin, presetId))
+    onChange(addLayer(skin, presetId, startColors))
     setOpenId(skin.nextId)
     setGalleryOpen(false)
   }
@@ -85,15 +94,20 @@ export function SkinForm({ skin, onChange, palette, pageColors }: SkinFormProps)
     addButton.current?.focus()
   }
 
-  // A color removed from the palette counts as Auto, so the select shows Auto too
-  function selectValue(color: SkinColor) {
-    return palette?.some((entry) => entry.id === color) ? String(color) : 'auto'
-  }
-
   function layerBody(layer: SkinLayer, name: string) {
-    const colors = skinColors(palette, layer.colors, pageColors)
+    const coverId = `skin-${layer.id}-cover`
     return (
       <>
+        <div className="skin-check">
+          <input
+            id={coverId}
+            type="checkbox"
+            checked={layer.onCover}
+            onChange={(event) => onChange(setOnCover(skin, layer.id, event.target.checked))}
+          />
+          <label htmlFor={coverId}>Also on the Cover</label>
+        </div>
+
         {findPreset(layer.preset)?.controls.map((control) => {
           const id = `skin-${layer.id}-${control.key}`
           const value = layer.params[control.key] ?? control.min
@@ -117,43 +131,34 @@ export function SkinForm({ skin, onChange, palette, pageColors }: SkinFormProps)
           )
         })}
 
-        {COLOR_FIELDS.map((field) => {
-          const id = `skin-${layer.id}-color-${field.index}`
-          return (
-            <div key={field.index} className="skin-color">
-              <label htmlFor={id}>{field.label}</label>
-              <span className="palette-block-chip" style={{ background: colors[field.index] }} aria-hidden="true" />
-              <select
-                id={id}
-                aria-label={`${name} ${field.label}`}
-                value={selectValue(layer.colors[field.index])}
-                onChange={(event) => {
-                  const value = event.target.value
-                  onChange(setLayerColor(skin, layer.id, field.index, value === 'auto' ? null : Number(value)))
-                }}
-              >
-                {/* Auto says which color it is using right now, e.g. "Auto · Red" */}
-                <option value="auto">Auto · {autoColorName(palette, field.index)}</option>
-                {palette?.map((entry, i) => (
-                  <option key={entry.id} value={entry.id}>
-                    {entry.name || `Color ${i + 1}`}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )
-        })}
-        <p className="logo-form-hint">
-          Auto uses your first two palette colors. Without them, the Typography and Background colors fill in.
-        </p>
+        {COLOR_FIELDS.map((field) => (
+          <SkinColorField
+            key={field.index}
+            label={`${name} ${field.label}`}
+            value={layer.colors[field.index]}
+            onChange={(hex) => onChange(setLayerColor(skin, layer.id, field.index, hex))}
+            palette={palette}
+          />
+        ))}
       </>
     )
   }
 
   return (
     <form onSubmit={(event) => event.preventDefault()} noValidate aria-label="Skin">
+      {/* The colors of every page but the Cover, which keeps its own */}
+      {PAGE_COLOR_FIELDS.map((field) => (
+        <SkinColorField
+          key={field.key}
+          label={field.label}
+          value={skin[field.key]}
+          onChange={(hex) => onChange(setPageColor(skin, field.key, hex))}
+          palette={palette}
+        />
+      ))}
+
       {skin.layers.length === 0 ? (
-        <p className="logo-form-hint skin-empty">No layers yet. The pages show their plain Background color.</p>
+        <p className="logo-form-hint skin-empty">No layers yet. The inner pages show their plain Page background.</p>
       ) : (
         <ol className="skin-layers" ref={list} aria-label="Layers">
           {skin.layers.map((layer, index) => {
@@ -185,13 +190,8 @@ export function SkinForm({ skin, onChange, palette, pageColors }: SkinFormProps)
                       setOpenId((prev) => (prev === layer.id ? null : layer.id))
                     }}
                   >
-                    <span className="skin-card-preview" style={{ background: pageColors.background }}>
-                      <SkinBackdrop
-                        layers={[previewLayer(layer)]}
-                        palette={palette}
-                        pageColors={pageColors}
-                        orientation="portrait"
-                      />
+                    <span className="skin-card-preview" style={{ background: skin.pageBackground }}>
+                      <SkinBackdrop layers={[previewLayer(layer)]} orientation="portrait" />
                     </span>
                     <span className="skin-row-name">{name}</span>
                     <span className="palette-block-chevron" aria-hidden="true" />
@@ -263,11 +263,9 @@ export function SkinForm({ skin, onChange, palette, pageColors }: SkinFormProps)
                     aria-label={`Add ${preset.name}`}
                     onClick={() => add(preset.id)}
                   >
-                    <span className="skin-card-preview" style={{ background: pageColors.background }}>
+                    <span className="skin-card-preview" style={{ background: skin.pageBackground }}>
                       <SkinBackdrop
-                        layers={[previewLayer({ preset: preset.id, params: preset.defaults, colors: [null, null] })]}
-                        palette={palette}
-                        pageColors={pageColors}
+                        layers={[previewLayer({ preset: preset.id, params: preset.defaults, colors: startColors })]}
                         orientation="portrait"
                       />
                     </span>

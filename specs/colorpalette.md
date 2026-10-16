@@ -4,7 +4,7 @@
 The third section of the Brand Manual page is **Colors**. The user builds the brand's color palette: from **1 to 6 colors**, each one with a free-text **name** and a color chosen with the same picker as the Cover (see `colorpicker.md`). For every color the app calculates its **HEX**, **RGB** and **CMYK (approximate)** values. As the user edits, the **Color palette** page of the preview shows every color with its name and its three values. Where they sit on the page depends on the chosen template.
 
 ## Out of Scope
-Changing the Typography or Background colors of the manual (they belong to the Cover, see `colorpicker.md`). Reordering colors (drag and drop). Pantone or other color systems. Typing CMYK or RGB values to choose a color (CMYK is only shown, never typed). Accurate, color-managed CMYK (see ADR 0003). Warnings about similar or low-contrast colors. Saving the palette between sessions.
+Changing the background or text colors of the pages (they belong to the Cover and the Skin, see `colorpicker.md` and `skins.md`). Reordering colors (drag and drop). Pantone or other color systems. Typing CMYK or RGB values to choose a color (CMYK is only shown, never typed). Accurate, color-managed CMYK (see ADR 0003). Warnings about similar or low-contrast colors. Saving the palette between sessions.
 
 ## 2. Interface
 ### Section form (inside "3. Colors")
@@ -49,7 +49,7 @@ From RGB with the naive formula of ADR 0003: `K = 1 − max(R′, G′, B′)`, 
 | `#FFFFFF` | `255, 255, 255` | `0, 0, 0, 0` |
 
 ### Color palette page in the preview
-The page shows the heading **"Color palette"** and, for each color in order: a **chip** filled with the color, its **name**, and its values `HEX`, `RGB` and `CMYK ≈`. At the bottom, a small note: **"CMYK values are approximate"**. The text uses the Cover's Typography color (Black until the Cover's color is changed). The chip has a faint outline, so a color equal to the page background is still visible.
+The page shows the heading **"Color palette"** and, for each color in order: a **chip** filled with the color, its **name**, and its values `HEX`, `RGB` and `CMYK ≈`. At the bottom, a small note: **"CMYK values are approximate"**. The text uses the Skin's Page text color (Black until it is changed, see `skins.md`). The chip has a faint outline, so a color equal to the page background is still visible.
 
 Until the Colors section is touched, the page shows the placeholder `Your color palette`. A color with an empty name shows its label (`Color 1`, `Color 2`…) on the page.
 

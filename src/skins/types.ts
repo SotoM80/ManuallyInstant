@@ -4,24 +4,27 @@ export type SkinType = 'gradient' | 'shapes' | 'pattern' | 'texture'
 
 export type SkinParams = Record<string, number>
 
-// One color of a skin: the id of a palette color, or null for Auto (see skinColors)
-export type SkinColor = number | null
-
 // One layer: a preset with its own values and colors. A hidden layer keeps everything.
 export type SkinLayer = {
   id: number // stable while the layer exists, never reused
   preset: string // an id from SKIN_PRESETS
   params: SkinParams
-  colors: [SkinColor, SkinColor] // Color A and Color B
+  colors: [string, string] // Color A and Color B, as "#RRGGBB" (a palette color is copied, ADR 0011)
   visible: boolean
+  onCover: boolean // also drawn on the Cover (the inner pages always draw it)
 }
 
-// The layers in list order: the first one is drawn on top. `nextId` is the id of the next
-// layer added, so a removed layer's id is never given to another one.
+// How every page but the Cover looks: its background, its text and the layers in list order
+// (the first one is drawn on top). `nextId` is the id of the next layer added, so a removed
+// layer's id is never given to another one.
 export type Skin = {
+  pageBackground: string
+  pageText: string
   layers: SkinLayer[]
   nextId: number
 }
+
+export type PageColorKey = 'pageBackground' | 'pageText'
 
 // One slider of a preset, e.g. Angle 0–360°
 export type SkinControl = {

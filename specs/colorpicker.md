@@ -2,8 +2,8 @@
 
 ## 1. What it does
 A custom color picker that lets the user choose colors for the manual. The Cover section has two of them, chosen separately:
-* **Typography color**: the color of the text on the pages (the brand manual title and "Designed by").
-* **Background color**: the background of every page of the manual (the same for all four pages).
+* **Typography color**: the color of the text of the Cover (the brand manual title and "Designed by").
+* **Background color**: the background of the Cover. The other pages take their background and text colors from the Skin section (see `skins.md` and ADR 0011).
 
 Each picker combines **quick swatches** (hidden behind one circle that opens them in a floating pop-up) with **any color** (a native color picker, a HEX field and RGB sliders).
 
@@ -50,7 +50,7 @@ All the parts always show the same color: clicking a swatch or using the native 
 
 ### On the manual
 * The **title** and **"Designed by"** are drawn in the Typography color ("Designed by" a bit softer, 75% opacity). The divider line of Template 3 also uses it, very faint.
-* All four **pages** are painted with the Background color.
+* The **Cover** is painted with the Background color. The other pages are not (they use the Skin's Page background).
 
 ### HEX field rules
 * Accepted: `#RRGGBB` or `#RGB`, with or without `#`, upper or lower case. On blur or Enter the value is tidied to `#RRGGBB` in upper case (e.g. `1e88e5` → `#1E88E5`, `#abc` → `#AABBCC`).
@@ -58,12 +58,12 @@ All the parts always show the same color: clicking a swatch or using the native 
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`), in the Cover section.
-* **Postconditions**: As soon as a valid color is picked or typed, the text of the Cover uses the Typography color and every page uses the Background color.
+* **Postconditions**: As soon as a valid color is picked or typed, the text of the Cover uses the Typography color and the Cover uses the Background color.
 
 ## 4. Invariants
 * Typography color and Background color are independent: changing one never changes the other.
 * Colors reach the manual at once (same rule as the rest of the Cover). While a HEX is half typed or not valid, the manual keeps the last valid color.
-* All four pages always share the same Background color.
+* The Typography and Background colors never paint any page but the Cover.
 * Colors work the same in every template, orientation and preview view.
 
 ## Failure Modes
@@ -90,12 +90,12 @@ All the parts always show the same color: clicking a swatch or using the native 
 ### Scenario 4: Colors on the Manual
 * **Given**: The user typed a title in the Cover section.
 * **When**: The user chooses White as Typography color and `#1A237E` as Background color.
-* **Then**: At once, the title and "Designed by" are white and all four pages have the `#1A237E` background.
+* **Then**: At once, the title and "Designed by" are white and the Cover has the `#1A237E` background; the other pages do not change.
 
 ### Scenario 5: Colors Are Live
 * **Given**: The user is on the Brand Manual page.
 * **When**: The user picks Navy as Background color.
-* **Then**: All the pages get the `#1A237E` background at once, with no button.
+* **Then**: The Cover gets the `#1A237E` background at once, with no button.
 
 ### Scenario 6: Swatches Pop-up
 * **Given**: The Typography color swatches are closed.

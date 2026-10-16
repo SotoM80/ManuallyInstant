@@ -10,7 +10,7 @@ Choosing a template and the layout of each template (see `templates.md`). The Lo
 ### Fields (in this order, all inside the "1. Cover" section)
 1. **Brand manual title**: the text field and its three style fields (Font family, Font style, Font size). All the rules are in `titlefild.md`.
 2. **Typography color**: color picker for the title and "Designed by". Default Black `#000000`.
-3. **Background color**: color picker for the background of every page of the manual. Default White `#FFFFFF`.
+3. **Background color**: color picker for the background of the Cover. Default White `#FFFFFF`. The other pages have their own background, set in the Skin section (see `skins.md`).
 4. **Designed by**: a free-text field (who designed the manual, e.g. a studio or a person).
 5. **Logo**: a file field to upload the brand's logo. Accepted files: PNG, JPG, SVG or WebP, up to 5 MB. It is drawn as a **"Choose file"** button followed by the chosen file's name (or **"No file chosen"**), always in English: the browser's own file button follows the system language, so it is hidden (still used by the keyboard and screen readers).
 6. **Logo size**: three buttons in a row, **Small**, **Medium** and **Large**, with one always chosen (default **Medium**). They scale the logo inside its area on the Cover: Small 50%, Medium 75%, Large 100% (the whole area). It never shows an error.

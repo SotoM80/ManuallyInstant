@@ -2,7 +2,8 @@ import { fireEvent, screen, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import { MANUAL_PAGES } from '../src/data/manualSections';
 
-// Spec: specs/skins.md (a stack of layers, ADR 0010)
+// Spec: specs/skins.md (a stack of layers, ADR 0010; the Skin owns its colors, ADR 0011)
+const INNER_PAGES = MANUAL_PAGES.filter((page) => page !== 'Cover');
 function openSkin() {
   fireEvent.click(screen.getByRole('button', { name: /5\. Skin/ }));
   return screen.getByRole('form', { name: 'Skin' });
@@ -14,14 +15,14 @@ function add(form: HTMLElement, preset: string) {
 }
 
 // The backdrop of a page, or undefined when no layer is drawn on it
-function backdrop(page = 'Cover') {
+function backdrop(page = 'Brand concept') {
   const svgs = screen.getByRole('article', { name: page }).querySelectorAll('svg.skin-layer');
   expect(svgs.length).toBeLessThanOrEqual(1);
   return svgs[0];
 }
 
 // What each page draws, from the bottom group to the top one
-function drawnKinds(page = 'Cover') {
+function drawnKinds(page = 'Brand concept') {
   return [...(backdrop(page)?.querySelectorAll('g') ?? [])].map((group) => group.getAttribute('data-skin'));
 }
 
@@ -31,13 +32,15 @@ function layerNames(form: HTMLElement) {
 }
 
 describe('Skin – layers', () => {
-  it('starts with no layers and plain pages (scenario 1)', () => {
+  it('starts with white pages, black text, no layers and Brand concept first (scenario 1)', () => {
     renderApp();
     const form = openSkin();
+    expect(within(form).getByRole('textbox', { name: 'Page background HEX' })).toHaveValue('#FFFFFF');
+    expect(within(form).getByRole('textbox', { name: 'Page text HEX' })).toHaveValue('#000000');
     expect(within(form).getByText(/No layers yet/)).toBeInTheDocument();
     expect(within(form).getByRole('button', { name: '+ Add layer' })).toBeEnabled();
     expect(MANUAL_PAGES.every((page) => backdrop(page) === undefined)).toBe(true);
-    expect(screen.getAllByRole('article')[0]).toHaveAccessibleName('Cover');
+    expect(screen.getAllByRole('article')[0]).toHaveAccessibleName('Brand concept');
   });
 
   it('offers only the presets that can be drawn (scenario 2)', () => {
@@ -54,7 +57,7 @@ describe('Skin – layers', () => {
     expect(within(gallery).queryByText('Textures')).not.toBeInTheDocument();
   });
 
-  it('adds a layer, on and open, drawn on every page (scenario 3)', () => {
+  it('adds a layer, on and open, drawn on every inner page but not the Cover (scenario 3)', () => {
     renderApp();
     const form = openSkin();
     add(form, 'Linear');
@@ -62,10 +65,12 @@ describe('Skin – layers', () => {
     expect(within(form).getByRole('checkbox', { name: 'Show Linear' })).toBeChecked();
     expect(within(form).getByRole('slider', { name: 'Angle' })).toHaveValue('135');
     expect(within(form).queryByRole('group', { name: 'Add a layer' })).not.toBeInTheDocument();
-    for (const page of MANUAL_PAGES) {
+    expect(within(form).getByRole('checkbox', { name: 'Also on the Cover' })).not.toBeChecked();
+    for (const page of INNER_PAGES) {
       expect(backdrop(page)).toHaveAttribute('aria-hidden', 'true');
       expect(backdrop(page)!.querySelector('g')).toHaveAttribute('opacity', '0.3');
     }
+    expect(backdrop('Cover')).toBeUndefined();
   });
 
   it('puts a new layer on top, and draws it over the others (scenario 4)', () => {
@@ -136,13 +141,13 @@ describe('Skin – layers', () => {
     expect(dots).toHaveAttribute('opacity', '0.3');
   });
 
-  it('uses the Cover colors with an empty palette (scenario 13)', () => {
+  it('uses the Page text and Page background colors with an empty palette (scenario 13)', () => {
     renderApp();
     const form = openSkin();
     add(form, 'Linear');
     const stops = [...backdrop()!.querySelectorAll('stop')].map((stop) => stop.getAttribute('stop-color'));
     expect(stops).toEqual(['#000000', '#FFFFFF']);
-    expect(within(form).getByRole('combobox', { name: 'Linear Color A' })).toHaveDisplayValue('Auto · Typography color');
+    expect(within(form).queryByRole('button', { name: /use / })).not.toBeInTheDocument();
   });
 
   it('keeps the layers with Landscape (scenario 16)', () => {
@@ -151,7 +156,7 @@ describe('Skin – layers', () => {
     add(form, 'Linear');
     add(form, 'Dots');
     fireEvent.click(screen.getByRole('radio', { name: 'Landscape' }));
-    for (const page of MANUAL_PAGES) {
+    for (const page of INNER_PAGES) {
       expect(backdrop(page)).toHaveAttribute('viewBox', '0 0 297 210');
       expect(drawnKinds(page)).toEqual(['linear', 'pattern']);
     }
@@ -193,21 +198,91 @@ describe('Skin – layers', () => {
 });
 
 describe('Skin – colors', () => {
-  it('uses a chosen palette color for one layer only (scenarios 6 and 11 of the colors)', () => {
-    renderApp();
+  function addPaletteColors() {
+    // The Colors section starts with Black; each new color takes the next unused swatch (White, Gray)
     fireEvent.click(screen.getByRole('button', { name: /3\. Colors/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Add color' }));
     fireEvent.click(screen.getByRole('button', { name: 'Add color' }));
+  }
+
+  function hexOf(form: HTMLElement, label: string) {
+    return within(form).getByRole('textbox', { name: `${label} HEX` });
+  }
+
+  it('starts a layer with palette colors 1 and 2, copied (scenarios 3 and 14)', () => {
+    renderApp();
+    addPaletteColors();
+    const form = openSkin();
+    add(form, 'Linear');
+    expect(hexOf(form, 'Linear Color A')).toHaveValue('#000000');
+    expect(hexOf(form, 'Linear Color B')).toHaveValue('#FFFFFF');
+    // A chip copies the palette color into the field
+    fireEvent.click(within(form).getByRole('button', { name: 'Linear Color A: use Color 3' }));
+    const gray = (hexOf(form, 'Linear Color A') as HTMLInputElement).value;
+    expect(gray).not.toBe('#000000');
+    // Removing that color from the palette does not change the layer
+    fireEvent.click(screen.getByRole('button', { name: /3\. Colors/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Color 3' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Remove Color 3' }));
+    const stops = [...backdrop()!.querySelectorAll('stop')].map((stop) => stop.getAttribute('stop-color'));
+    expect(stops).toEqual([gray, '#FFFFFF']);
+  });
+
+  it('gives each layer its own colors (scenario 11)', () => {
+    renderApp();
     const form = openSkin();
     add(form, 'Linear');
     add(form, 'Dots');
-    const colorA = within(form).getByRole('combobox', { name: 'Dots Color A' });
-    const third = within(colorA).getAllByRole('option')[3];
-    fireEvent.change(colorA, { target: { value: third.getAttribute('value') } });
+    fireEvent.change(hexOf(form, 'Dots Color A'), { target: { value: '#1E88E5' } });
     const [linear, dots] = backdrop()!.querySelectorAll('g');
-    const linearStops = [...linear.querySelectorAll('stop')].map((stop) => stop.getAttribute('stop-color'));
-    const dotFills = [...dots.querySelectorAll('circle')].map((dot) => dot.getAttribute('fill'));
-    expect(dotFills[0]).not.toBe(linearStops[0]);
-    expect(dotFills[1]).toBe(linearStops[1]);
+    expect(dots.querySelector('circle')).toHaveAttribute('fill', '#1E88E5');
+    expect(linear.querySelector('stop')).toHaveAttribute('stop-color', '#000000');
+  });
+
+  it('keeps the Cover colors on the Cover only (scenario 20)', () => {
+    renderApp();
+    const background = screen.getByRole('group', { name: 'Background color' });
+    fireEvent.click(within(background).getByRole('button', { name: /swatches/ }));
+    fireEvent.click(within(background).getByRole('radio', { name: 'Navy' }));
+    expect(screen.getByRole('article', { name: 'Cover' })).toHaveStyle({ background: '#1A237E' });
+    for (const page of INNER_PAGES) {
+      expect(screen.getByRole('article', { name: page })).toHaveStyle({ background: '#FFFFFF' });
+    }
+  });
+
+  it('paints the inner pages with the page colors (scenario 21)', () => {
+    renderApp();
+    addPaletteColors(); // so the Color palette page shows its colors, in the Page text color
+    const form = openSkin();
+    fireEvent.change(hexOf(form, 'Page background'), { target: { value: '#F5F0E6' } });
+    fireEvent.change(hexOf(form, 'Page text'), { target: { value: '#2b2d42' } });
+    for (const page of INNER_PAGES) {
+      expect(screen.getByRole('article', { name: page })).toHaveStyle({ background: '#F5F0E6' });
+    }
+    expect(screen.getByRole('article', { name: 'Cover' })).not.toHaveStyle({ background: '#F5F0E6' });
+    expect(screen.getByRole('article', { name: 'Color palette' }).querySelector('.palette-layout')).toHaveStyle({
+      color: '#2B2D42',
+    });
+  });
+
+  it('draws a layer on the Cover when asked (scenario 22)', () => {
+    renderApp();
+    const form = openSkin();
+    add(form, 'Linear');
+    add(form, 'Dots');
+    const linear = within(form).getByRole('button', { name: 'Linear' });
+    fireEvent.click(linear);
+    fireEvent.click(within(linear.closest('li')!).getByRole('checkbox', { name: 'Also on the Cover' }));
+    expect(drawnKinds('Cover')).toEqual(['linear']);
+    expect(drawnKinds()).toEqual(['linear', 'pattern']);
+  });
+
+  it('flags a wrong HEX and keeps the last valid color (scenario 23)', () => {
+    renderApp();
+    const form = openSkin();
+    fireEvent.change(hexOf(form, 'Page background'), { target: { value: 'blue' } });
+    fireEvent.blur(hexOf(form, 'Page background'));
+    expect(hexOf(form, 'Page background')).toHaveAccessibleDescription('Enter a valid HEX color, like #1E88E5');
+    expect(screen.getByRole('article', { name: 'Brand concept' })).toHaveStyle({ background: '#FFFFFF' });
   });
 });

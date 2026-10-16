@@ -1,14 +1,16 @@
 # Technical Specification: Skins
 
 ## 1. What it does
-A **skin** is a stack of decorative **layers** drawn behind the content of **every page** of the manual, made from colors of the brand palette. Each layer is one preset (a gradient, a shape or a pattern) with its own values, its own two colors and its own Intensity. In the **Skin** section the user adds layers, turns each one on or off with a checkbox, and moves them up or down to decide which one sits on top. Layers blend by transparency: a layer shows through the ones above it. With no layers, the page shows its plain Background color, as before.
+A **skin** is how the **inner pages** of the manual look (every page but the Cover): their **Page background**, their **Page text** color and a stack of decorative **layers** drawn behind their content. Each layer is one preset (a gradient, a shape or a pattern) with its own values, its own two colors and its own Intensity. In the **Skin** section the user sets the two page colors, adds layers, turns each one on or off with a checkbox, moves them up or down to decide which one sits on top, and chooses for each layer whether it is **also drawn on the Cover**. Layers blend by transparency: a layer shows through the ones above it. With no layers, the inner pages show their plain Page background.
+
+The Cover keeps its own colors (see `colorpicker.md`): its Background and Typography colors only paint the Cover. All colors of the Skin are its own: they can be picked freely or taken from the palette, and taking one from the palette copies its value (ADR 0011).
 
 A skin does not depend on the template: it is the same stack under every layout, so ADR 0004 (templates change layout, not content) still holds. See ADR 0009 (drawn in SVG) and ADR 0010 (a stack of layers).
 
 ## Out of Scope
 * **Textures** (Grain, Paper): they need `feTurbulence`, which the PDF may not support. They wait for the PDF library ADR.
 * Moving layers by drag and drop (buttons only, see ADR 0010). Blend modes (Multiply, Screen, Overlay…): layers blend by transparency only.
-* More than **4 layers**. More than two colors per layer.
+* More than **4 layers**. More than two colors per layer. Colors that stay linked to the palette (a color taken from it is copied, see ADR 0011).
 * Uploading your own textures or images. A different skin on each page. Animated skins.
 * Real CMYK (the skin is RGB like the rest of the PDF, see ADR 0003).
 * Creating, editing or saving presets. Copying a layer. Keeping a layer's values when its preset is changed (a layer's preset cannot be changed: remove it and add another).
@@ -17,7 +19,9 @@ A skin does not depend on the template: it is the same stack under every layout,
 
 ## 2. Interface
 ### Section "5. Skin"
-The section has a **list of layers**, then the **Add layer** button. The list reads like the layers panel of a design tool: **the first layer of the list is drawn on top**, the last one just over the page Background.
+The section has, from top to bottom, the **page colors**, the **list of layers**, then the **Add layer** button.
+
+**Page colors**: two color fields, **Page background** (default White `#FFFFFF`) and **Page text** (default Black `#000000`). They paint the background and every text of the inner pages: Brand concept, Anatomy, Logo versions, Clear space (its lines and measures too), Color palette and Typography. They never change the Cover. The list reads like the layers panel of a design tool: **the first layer of the list is drawn on top**, the last one just over the page Background.
 
 ```
 5. Skin
@@ -36,29 +40,25 @@ The section has a **list of layers**, then the **Add layer** button. The list re
 * **Name**: the preset's name. When two layers use the same preset, the later ones get a number: `Dots`, `Dots 2`.
 * **↑ Move up** / **↓ Move down**: swap the layer with its neighbour. ↑ is disabled on the first layer and ↓ on the last. The layers glide to their new places (`useReorderGlide`, like the pages), and the focus stays on the button that was pressed, or on the other arrow of the same layer when that button is now disabled.
 * **✕ Remove**: removes the layer at once.
-* **▾**: opens the body: one slider per `control` of its preset (label, min, max, step and unit from `presets.ts`, with the value next to it; **Intensity**, 5–100 % step 5, default 30, is always last), then the layer's **Color A** and **Color B**. The bodies work as an **accordion**, like the colors of the Colors section: only one is open at a time, and a new layer opens and folds the open one.
+* **▾**: opens the body: first the checkbox **Also on the Cover** (off by default: a layer is only drawn on the inner pages until it is ticked), then one slider per `control` of its preset (label, min, max, step and unit from `presets.ts`, with the value next to it; **Intensity**, 5–100 % step 5, default 30, is always last), then the layer's **Color A** and **Color B**. The bodies work as an **accordion**, like the colors of the Colors section: only one is open at a time, and a new layer opens and folds the open one.
 
-**Add layer** opens the **gallery** under the button: one card per preset with a drawing, grouped under the headings of `SKIN_TYPES` that have at least one: **Gradients** (Linear, Radial), **Shapes** (Circles, Diagonal block, Waves) and **Patterns** (Dots, Stripes). Each card is a small page with the preset drawn at full strength with Auto colors. Choosing a card adds a layer **at the top of the list**, with the preset's default values, both colors on Auto, on and open, and closes the gallery. Escape or clicking Add layer again closes it with no change. With 4 layers, Add layer is disabled, with the note `Up to 4 layers.`
+**Add layer** opens the **gallery** under the button: one card per preset with a drawing, grouped under the headings of `SKIN_TYPES` that have at least one: **Gradients** (Linear, Radial), **Shapes** (Circles, Diagonal block, Waves) and **Patterns** (Dots, Stripes). Each card is a small page with the preset drawn at full strength with the colors a new layer would get. Choosing a card adds a layer **at the top of the list**, with the preset's default values, on, not on the Cover, and open, and closes the gallery. Its **Color A** is palette color 1 and its **Color B** palette color 2; when one of them does not exist, the Page text color fills in for A and the Page background for B. These are copied values: changing the palette later never changes the layer. Escape or clicking Add layer again closes it with no change. With 4 layers, Add layer is disabled, with the note `Up to 4 layers.`
 
-With no layers, the list shows `No layers yet. The pages show their plain Background color.`
+With no layers, the list shows `No layers yet. The inner pages show their plain Page background.`
 
-**Colors of a layer**: two selects, **Color A** and **Color B**. Each one offers **Auto** (the default) and every palette color by its name (or `Color N` when it has no name). What each one draws with:
-* a chosen palette color → that color;
-* **Auto** → Color A takes palette color 1, Color B palette color 2; the option says which one it is using, e.g. `Auto · Red`;
-* when that palette color does not exist → Color A takes the **Typography color** and Color B the **Background color** of the Cover (`Auto · Typography color`).
-
-A small chip next to each select shows the color in use. A short note under the colors: `Auto uses your first two palette colors. Without them, the Typography and Background colors fill in.`
+**Color fields** (Page background, Page text, and Color A / Color B of each layer) all work the same way: the **color picker** of the Cover (swatches, RGB sliders, custom picker and HEX field, see `colorpicker.md`), and under it a row of small chips, one per **palette color** (`Use Red`). Clicking a chip copies that color's HEX into the field. A HEX being typed is only used once it is valid; a wrong one is flagged on blur or Enter with `"Enter a valid HEX color, like #1E88E5"`, and the pages keep the last valid color. With an empty palette there are no chips.
 
 Everything is live: there is no Apply, because nothing here is an image (ADR 0007).
 
-Opening the section features the **Cover** (`SECTION_PAGES.skin = ['Cover']`). Since the Cover is already first, the pages do not move; only the section moves to the top of its column (see `brandmanual.md`).
+Opening the section features **Brand concept**, the first inner page (`SECTION_PAGES.skin = ['Brand concept']`), as any section does (see `brandmanual.md`).
 
 ### On the pages
-* Every page has **one** SVG behind its content (none when no layer is on), with one group per layer that is on, drawn from the **last** layer of the list to the **first**, so the first one is on top.
+* **Inner pages**: painted with the **Page background**, their text in the **Page text** color, and one SVG behind their content with one group per layer that is on.
+* **Cover**: painted with the Cover's own Background color, its title and "Designed by" in the Cover's Typography color, and one SVG with only the layers that are on **and** marked **Also on the Cover**.
+* The groups are drawn from the **last** layer of the list to the **first**, so the first one is on top. A page with no layer to draw has no SVG.
 * Each group's opacity is its layer's **Intensity**. The layers blend by transparency only; the content of the page is never faded.
-* The SVG sits **over the Background color** of the Cover section and **under all the content** of the page (title, logo, texts, colors, fonts, the grid of 3.2). It ignores the mouse (`pointer-events: none`), so the guide bands of 3.2 keep working, and it is hidden from screen readers (`aria-hidden="true"`).
+* The SVG sits **over the page's background** and **under all the content** of the page (title, logo, texts, colors, fonts, the grid of 3.2). It ignores the mouse (`pointer-events: none`), so the guide bands of 3.2 keep working, and it is hidden from screen readers (`aria-hidden="true"`).
 * It covers the whole page, edge to edge, and is clipped to it.
-* Before the Cover section is touched, the page colors are the Cover defaults (`DEFAULT_TYPOGRAPHY_COLOR` black, `DEFAULT_BACKGROUND_COLOR` white, in `src/data/colorPalette.ts`).
 
 ### Geometry
 * The `viewBox` is the A4 page in **mm** for the current orientation: `0 0 210 297` (Portrait) or `0 0 297 210` (Landscape). It scales with the page in every view, Overview (`zoom: 0.5`) included.
@@ -77,34 +77,37 @@ Opening the section features the **Cover** (`SECTION_PAGES.skin = ['Cover']`). S
 * **Stripes** — parallel stripes, alternating Color A and Color B. *Spacing*: from one stripe to the next, in mm. *Thickness*: the width of each stripe, in mm. *Angle*: their direction (0° runs up the page). Thickness can never pass Spacing: its slider's max is the current Spacing, and lowering Spacing below Thickness lowers Thickness with it.
 
 ### In the code
-* `src/skins/types.ts`: a `Skin` is `{ layers: SkinLayer[] }`, in list order (the first is on top). A `SkinLayer` is `{ id, preset, params, colors, visible }`; `id` is stable and never reused, like a palette color's. `NO_SKIN` has no layers.
-* `src/skins/layers.ts`: pure functions for the list: `addLayer`, `removeLayer`, `moveLayer(skin, id, -1 | 1)`, `setVisible`, `setLayerParam` (with `withParam`, so Thickness stays within Spacing), `setLayerColor`, and `layerNames` (`Dots`, `Dots 2`). They are unit tested.
+* `src/skins/types.ts`: a `Skin` is `{ pageBackground, pageText, layers, nextId }`, with the layers in list order (the first is on top). A `SkinLayer` is `{ id, preset, params, colors, visible, onCover }`, where `colors` are two HEX values; `id` is stable and never reused (`nextId`). `NO_SKIN` has the default page colors and no layers.
+* `src/skins/layers.ts`: pure functions for the skin: `setPageColor`, `addLayer` (with the colors of `newLayerColors`), `removeLayer`, `moveLayer(skin, id, -1 | 1)`, `setVisible`, `setOnCover`, `setLayerParam` (with `withParam`, so Thickness stays within Spacing), `setLayerColor`, and `layerNames` (`Dots`, `Dots 2`). They are unit tested.
 * `src/skins/presets.ts` lists the presets (ids, defaults, controls); the form is built from it.
-* `src/skins/colors.ts` turns a layer's Color A and Color B into two HEX values (`skinColors`, `autoColorName`). A layer color whose palette id was removed counts as Auto.
+* `src/skins/colors.ts`: `newLayerColors(palette, skin)`, the copied colors of a new layer.
+* `SkinColorField`: the color picker of `colorpicker.md` (`ColorPicker`) with its own HEX being typed, plus the palette chips.
 * `src/skins/draw/<preset>.ts`: one **pure function** per preset, `(params, [a, b], page) → shape`. `src/skins/draw/index.ts` maps preset ids to them; the gallery offers only presets listed there.
-* `SkinBackdrop` (the component that was `SkinLayer`): draws the visible layers of a skin in one SVG, bottom first. `ManualPreview` puts one in every page, before the content. The mini previews and gallery cards use it with a one-layer skin.
+* `SkinBackdrop` (the component that was `SkinLayer`): draws the visible layers of a skin in one SVG, bottom first. `ManualPreview` puts one in every page, before the content: all layers on the inner pages, only those Also on the Cover on the Cover. The mini previews and gallery cards use it with a one-layer skin.
 * `SkinForm`: the list, the accordion and the gallery.
 * The skin is kept in `App`, above the routes, like the template and the orientation, so it survives moving between pages.
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`).
-* **Postconditions**: Every page of the preview shows the layers that are on, in the order of the list (the first on top), each with its values, colors and Intensity, behind the content. With no layer on, every page shows its plain Background color.
+* **Postconditions**: Every inner page shows the Page background, the Page text color and the layers that are on, in the order of the list (the first on top), each with its values, colors and Intensity, behind the content. The Cover shows its own colors and only the layers that are on and Also on the Cover.
 
 ## 4. Invariants
-* All pages always draw the same layers, in the same order.
+* All inner pages always draw the same layers, in the same order, on the same Page background and with the same Page text color.
+* The Cover's Background and Typography colors only paint the Cover; the Skin's colors never paint the Cover, except the layers marked Also on the Cover.
 * The skin never changes, moves or covers the content of a page; Template, Orientation and Preview view combine freely with it.
 * The first layer of the list is always drawn on top, and the last one just over the Background.
 * A skin has 0 to 4 layers. A hidden layer keeps its values, colors and place.
-* Every layer always draws with two valid colors.
-* Removing a palette color never makes a layer use a different palette color: a color that pointed to it becomes Auto.
+* Every color of the Skin is always a valid HEX.
+* Changing or removing a palette color never changes the Skin: colors taken from the palette are copies.
 * Every value stays between its control's min and max, and Thickness never passes Spacing.
 * No two SVG definitions on the page share an id.
 * The skin is kept when the user moves between pages. It is only reset (to no layers) when the browser page is refreshed.
 
 ## Failure Modes
-Nothing the user does here can be wrong, so there are no error messages. Instead:
+Only a typed HEX can be wrong. Otherwise:
 * **Sliders** cannot go past their limits; **↑ / ↓** are disabled at the ends of the list; **Add layer** is disabled at 4 layers.
-* **A missing color** (empty palette, removed color) is filled in by the Auto rule or the Cover colors, and the page keeps drawing.
+* **A wrong HEX** in a color field is flagged with `"Enter a valid HEX color, like #1E88E5"`, and the pages keep the last valid color.
+* **An empty palette**: there are no chips, and a new layer takes the Page text and Page background colors.
 * **A layer whose preset has no drawing** (not expected in the UI) draws nothing.
 
 ## 5. Given-When-Then Test Criteria
@@ -112,7 +115,7 @@ Nothing the user does here can be wrong, so there are no error messages. Instead
 ### Scenario 1: No Layers by Default
 * **Given**: The user opens the Brand Manual page.
 * **When**: The user opens "5. Skin".
-* **Then**: The list says "No layers yet…", Add layer is on, the pages show their plain Background color, and the Cover stays first.
+* **Then**: Page background is White and Page text is Black, the list says "No layers yet…", Add layer is on, the pages show their plain backgrounds, and Brand concept comes first in the preview.
 
 ### Scenario 2: The Gallery
 * **Given**: The Skin section is open.
@@ -122,7 +125,7 @@ Nothing the user does here can be wrong, so there are no error messages. Instead
 ### Scenario 3: Adding a Layer
 * **Given**: No layers, and the palette has two colors.
 * **When**: The user adds **Linear**.
-* **Then**: The list has one layer, "Linear", on and open, with Angle 135° and Intensity 30 %, both colors on Auto; every page has a gradient from palette color 1 to palette color 2 at 0.3 opacity; the gallery is closed.
+* **Then**: The list has one layer, "Linear", on and open, with Angle 135° and Intensity 30 %, Color A palette color 1 and Color B palette color 2; every inner page has that gradient at 0.3 opacity, the Cover has none; the gallery is closed.
 
 ### Scenario 4: A New Layer Goes on Top
 * **Given**: The list has Linear.
@@ -161,7 +164,7 @@ Nothing the user does here can be wrong, so there are no error messages. Instead
 
 ### Scenario 11: Each Layer Has Its Own Values
 * **Given**: The list reads Dots, Linear.
-* **When**: The user sets the Intensity of Linear to 80 % and Color A of Dots to Blue.
+* **When**: The user sets the Intensity of Linear to 80 % and Color A of Dots to Blue (`#1E88E5`).
 * **Then**: The gradient is drawn at 0.8 opacity and the dots at 0.3; only the dots use Blue.
 
 ### Scenario 12: Changing the Angle
@@ -170,14 +173,14 @@ Nothing the user does here can be wrong, so there are no error messages. Instead
 * **Then**: The gradient line runs from about `(−21.75, 275.25)` to `(231.75, 21.75)` mm.
 
 ### Scenario 13: An Empty Palette
-* **Given**: The palette is empty and the Cover was never touched.
+* **Given**: The palette is empty.
 * **When**: The user adds Linear.
-* **Then**: The gradient goes from black (Typography) to white (Background), and Color A shows "Auto · Typography color".
+* **Then**: The gradient goes from black (Page text) to white (Page background), and no palette chips are shown.
 
-### Scenario 14: Removing a Palette Color
-* **Given**: The palette has Red, Green and Blue; a layer has Color A Blue and Color B Red.
-* **When**: The user removes Green in Colors, and then Blue.
-* **Then**: After Green, the layer still goes from Blue to Red; after Blue, Color A shows Auto and the layer goes from Red to Red.
+### Scenario 14: Colors Are Copied from the Palette
+* **Given**: The palette has Red and Green; a Linear layer goes from Red to Green.
+* **When**: The user clicks "Use Green" under its Color A, then changes Green to Blue in Colors and removes Red.
+* **Then**: After the chip, the layer goes from Green to Green; changing and removing palette colors does not change it.
 
 ### Scenario 15: Thickness Never Passes Spacing
 * **Given**: A Stripes layer with Spacing 12 mm and Thickness 10 mm.
@@ -187,7 +190,7 @@ Nothing the user does here can be wrong, so there are no error messages. Instead
 ### Scenario 16: Template and Orientation Keep the Skin
 * **Given**: The list reads Dots, Linear.
 * **When**: The user selects Template 3 and Landscape.
-* **Then**: Every page still draws the dots over the gradient, now in `viewBox="0 0 297 210"`.
+* **Then**: Every inner page still draws the dots over the gradient, now in `viewBox="0 0 297 210"`.
 
 ### Scenario 17: Unique Ids
 * **Given**: The list reads Dots 2, Dots, Linear, and the gallery is open.
@@ -204,10 +207,31 @@ Nothing the user does here can be wrong, so there are no error messages. Instead
 * **When**: The user clicks the top guide band.
 * **Then**: A guide is added, as without a skin.
 
+### Scenario 20: The Cover Keeps Its Own Colors
+* **Given**: The Cover's Background color is Navy and its Typography color is White.
+* **When**: The user looks at the inner pages.
+* **Then**: They are White with Black text (the Skin's defaults); only the Cover is Navy with a white title.
+
+### Scenario 21: Page Colors
+* **Given**: The Skin section is open.
+* **When**: The user picks Beige as Page background and types `#2b2d42` as Page text.
+* **Then**: Every inner page turns Beige with `#2B2D42` text at once (the Clear space lines too); the Cover does not change.
+
+### Scenario 22: A Layer Also on the Cover
+* **Given**: The list reads Dots, Linear; the Cover has no layers.
+* **When**: The user ticks **Also on the Cover** in Linear.
+* **Then**: The Cover draws the gradient (and not the dots), over its own Background color; the inner pages still draw both.
+
+### Scenario 23: A Wrong HEX
+* **Given**: Page background is White.
+* **When**: The user types `blue` in its HEX field and leaves it.
+* **Then**: The field shows "Enter a valid HEX color, like #1E88E5", and the inner pages stay White.
+
 ## Build Order
 1. ~~Linear, `SkinLayer`, the section with one preset, Radial, Dots and Stripes~~ (done, one preset at a time).
-2. The layer model: `Skin = { layers }`, `src/skins/layers.ts` and its unit tests.
-3. `SkinBackdrop`: one SVG with a group per visible layer, bottom first, with ids per layer. Checked with `npm run dev` using two layers turned on by hand.
-4. The Skin section as a list: checkbox, mini preview, ↑ ↓ ✕, accordion, Add layer with the gallery, the 4-layer limit.
-5. Shapes: Circles, Diagonal block and Waves, one at a time, each with its unit test.
-6. Later: Textures once the PDF library is chosen; the skin in both PDFs (Phase 4).
+2. ~~The layer model: `Skin = { layers }`, `src/skins/layers.ts` and its unit tests.~~
+3. ~~`SkinBackdrop`: one SVG with a group per visible layer, bottom first, with ids per layer. Checked with `npm run dev` using two layers turned on by hand.~~
+4. ~~The Skin section as a list: checkbox, mini preview, ↑ ↓ ✕, accordion, Add layer with the gallery, the 4-layer limit.~~
+5. Shapes: Circles, Diagonal block and Waves, one at a time, each with its unit test (after step 6).
+6. Page colors and Also on the Cover: the Cover's colors only paint the Cover (ADR 0011), Page background and Page text in the Skin, and the color fields with palette chips.
+7. Later: Textures once the PDF library is chosen; the skin in both PDFs (Phase 4).

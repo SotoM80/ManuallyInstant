@@ -5,7 +5,6 @@ import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
 import { SkinForm } from '../components/SkinForm'
-import { DEFAULT_BACKGROUND_COLOR, DEFAULT_TYPOGRAPHY_COLOR } from '../data/colorPalette'
 import { NO_SKIN } from '../skins/presets'
 import { ManualPreview } from '../components/ManualPreview'
 import { LOGO_AREA_PAGES, MANUAL_SECTIONS, SECTION_PAGES, orderPages } from '../data/manualSections'
@@ -126,15 +125,7 @@ export function BrandManualPage({
     colors: <ColorsForm onChange={onPaletteChange} />,
     typography: <TypographyForm onChange={onTypographyChange} />,
     skin: (
-      <SkinForm
-        skin={skin}
-        onChange={onSkinChange}
-        palette={palette}
-        pageColors={{
-          background: cover?.colors.background ?? DEFAULT_BACKGROUND_COLOR,
-          ink: cover?.colors.typography ?? DEFAULT_TYPOGRAPHY_COLOR,
-        }}
-      />
+      <SkinForm skin={skin} onChange={onSkinChange} palette={palette} />
     ),
   }
 

@@ -136,7 +136,7 @@ describe('Color picker – invalid HEX', () => {
 
 // Spec: specs/colorpicker.md, Scenario 4 — Colors on the Manual
 describe('Color picker – colors on the manual', () => {
-  it('paints the title and "Designed by" with the Typography color and every page with the Background color', () => {
+  it('paints the title and "Designed by" with the Typography color and only the Cover with the Background color', () => {
     // Given
     renderApp();
     pickSwatch('Typography color', 'White');
@@ -148,19 +148,19 @@ describe('Color picker – colors on the manual', () => {
     // Then
     expect(within(getCover()).getByText('My Brand')).toHaveStyle({ color: '#FFFFFF' });
     expect(getCover().querySelector('.cover-layout')).toHaveStyle({ color: '#FFFFFF' });
-    for (const page of getPages()) {
-      expect(page).toHaveStyle({ background: '#1A237E' });
+    expect(getCover()).toHaveStyle({ background: '#1A237E' });
+    // The other pages take their colors from the Skin (specs/skins.md, ADR 0011)
+    for (const page of getPages().filter((page) => page !== getCover())) {
+      expect(page).toHaveStyle({ background: '#FFFFFF' });
     }
   });
 
   // Spec: specs/colorpicker.md, Scenario 5 — Colors Are Live
-  it('changes the pages as soon as a swatch is picked', () => {
+  it('changes the Cover as soon as a swatch is picked', () => {
     renderApp();
 
     pickSwatch('Background color', 'Navy');
 
-    for (const page of getPages()) {
-      expect(page).toHaveStyle({ background: '#1A237E' });
-    }
+    expect(getCover()).toHaveStyle({ background: '#1A237E' });
   });
 });

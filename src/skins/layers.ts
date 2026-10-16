@@ -1,5 +1,5 @@
 import { findPreset, withParam } from './presets'
-import type { Skin, SkinColor, SkinLayer } from './types'
+import type { PageColorKey, Skin, SkinLayer } from './types'
 
 // The list of layers of a skin (see specs/skins.md). The first layer is drawn on top.
 // Every function returns a new skin, so the form only calls them and passes the result on.
@@ -9,18 +9,24 @@ function update(skin: Skin, id: number, change: (layer: SkinLayer) => SkinLayer)
   return { ...skin, layers: skin.layers.map((layer) => (layer.id === id ? change(layer) : layer)) }
 }
 
-// A new layer goes on top, with the preset's default values, both colors on Auto, and on
-export function addLayer(skin: Skin, presetId: string): Skin {
+export function setPageColor(skin: Skin, key: PageColorKey, hex: string): Skin {
+  return { ...skin, [key]: hex }
+}
+
+// A new layer goes on top, with the preset's default values and the given colors, on, and
+// only on the inner pages
+export function addLayer(skin: Skin, presetId: string, colors: SkinLayer['colors']): Skin {
   const preset = findPreset(presetId)
   if (!preset || skin.layers.length >= MAX_LAYERS) return skin
   const layer: SkinLayer = {
     id: skin.nextId,
     preset: presetId,
     params: { ...preset.defaults },
-    colors: [null, null],
+    colors,
     visible: true,
+    onCover: false,
   }
-  return { layers: [layer, ...skin.layers], nextId: skin.nextId + 1 }
+  return { ...skin, layers: [layer, ...skin.layers], nextId: skin.nextId + 1 }
 }
 
 export function removeLayer(skin: Skin, id: number): Skin {
@@ -41,12 +47,16 @@ export function setVisible(skin: Skin, id: number, visible: boolean): Skin {
   return update(skin, id, (layer) => ({ ...layer, visible }))
 }
 
+export function setOnCover(skin: Skin, id: number, onCover: boolean): Skin {
+  return update(skin, id, (layer) => ({ ...layer, onCover }))
+}
+
 // A slider of a layer, kept within the others (Thickness never passes Spacing)
 export function setLayerParam(skin: Skin, id: number, key: string, value: number): Skin {
   return update(skin, id, (layer) => ({ ...layer, params: withParam(layer.params, key, value) }))
 }
 
-export function setLayerColor(skin: Skin, id: number, index: 0 | 1, color: SkinColor): Skin {
+export function setLayerColor(skin: Skin, id: number, index: 0 | 1, color: string): Skin {
   return update(skin, id, (layer) => {
     const colors: SkinLayer['colors'] = [...layer.colors]
     colors[index] = color

@@ -42,7 +42,7 @@ The page shows the heading **"Typography"** and, for each font (Primary first):
 * a large **"Aa"** in the font;
 * the **alphabet and numbers** in the font: `ABCDEFGHIJKLMNOPQRSTUVWXYZ`, `abcdefghijklmnopqrstuvwxyz`, `0123456789`.
 
-The text uses the Cover's Typography color (Black until the Cover's color is changed). Until a font is changed, the page shows the placeholder `Your typography`.
+The text uses the Skin's Page text color (Black until it is changed, see `skins.md`). Until a font is changed, the page shows the placeholder `Your typography`.
 
 ### Templates
 ```

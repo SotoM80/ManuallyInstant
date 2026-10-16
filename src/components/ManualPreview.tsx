@@ -8,7 +8,6 @@ import { LogoVersionsPage } from './pages/LogoVersionsPage'
 import { ClearSpacePage } from './pages/ClearSpacePage'
 import { ColorPalettePage } from './pages/ColorPalettePage'
 import { TypographyPage } from './pages/TypographyPage'
-import { DEFAULT_BACKGROUND_COLOR, DEFAULT_TYPOGRAPHY_COLOR } from '../data/colorPalette'
 import { SkinBackdrop } from './pages/SkinBackdrop'
 import { NO_SKIN } from '../skins/presets'
 import type { Skin } from '../skins/types'
@@ -74,14 +73,12 @@ export function ManualPreview({
   const pageList = useRef<HTMLOListElement>(null)
   useReorderGlide(pageList, pages.join('|'))
 
-  // Every page draws the same skin, with the Cover's colors (or their defaults) filling in
-  const pageColors = {
-    background: cover?.colors.background ?? DEFAULT_BACKGROUND_COLOR,
-    ink: cover?.colors.typography ?? DEFAULT_TYPOGRAPHY_COLOR,
-  }
+  // The Cover keeps its own colors; every other page takes them from the Skin, and the Cover
+  // only draws the layers marked "Also on the Cover" (see specs/skins.md and ADR 0011)
+  const coverLayers = skin.layers.filter((layer) => layer.onCover)
 
   function renderPage(page: string) {
-    const textColor = cover?.colors.typography ?? DEFAULT_TYPOGRAPHY_COLOR
+    const textColor = skin.pageText
     if (page === 'Brand concept')
       return <BrandConceptPage logo={logo} coverLogo={cover?.logo ?? null} color={textColor} />
     if (page === 'Anatomy') return <AnatomyPage logo={logo} color={textColor} />
@@ -178,15 +175,10 @@ export function ManualPreview({
               style={{
                 // Named after the page, not its place, so each page keeps its own name when the order changes
                 viewTransitionName: `manual-page-${page.toLowerCase().replace(/ /g, '-')}`,
-                background: cover?.colors.background,
+                background: page === 'Cover' ? cover?.colors.background : skin.pageBackground,
               }}
             >
-              <SkinBackdrop
-                layers={skin.layers}
-                palette={palette}
-                pageColors={pageColors}
-                orientation={orientation}
-              />
+              <SkinBackdrop layers={page === 'Cover' ? coverLayers : skin.layers} orientation={orientation} />
               <div className="manual-page-content">{renderPage(page)}</div>
             </article>
             {/* Always the natural number, so a page moved to the top still reads "7. Typography" */}

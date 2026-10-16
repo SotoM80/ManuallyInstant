@@ -2,14 +2,11 @@ import { useId } from 'react'
 import { drawLayer } from '../../skins/draw'
 import { pageSize } from '../../skins/draw/types'
 import type { GradientStop, SkinShape } from '../../skins/draw/types'
-import { skinColors } from '../../skins/colors'
 import type { SkinLayer } from '../../skins/types'
-import type { Orientation, PaletteColor } from '../../types'
+import type { Orientation } from '../../types'
 
 type SkinBackdropProps = {
-  layers: SkinLayer[] // in list order: the first one is on top
-  palette: PaletteColor[] | null
-  pageColors: { background: string; ink: string } // the Cover's colors, which fill in for missing ones
+  layers: SkinLayer[] // in list order: the first one is on top (hidden ones are skipped)
   orientation: Orientation
 }
 
@@ -56,13 +53,13 @@ function paint(shape: SkinShape, id: string) {
 // The layers of a skin behind the content of a page, in one SVG measured in mm of the A4 page,
 // so it looks the same in every view (see specs/skins.md, ADR 0009 and ADR 0010). The first
 // layer of the list is on top, so they are drawn from the last one to the first. Decoration only.
-export function SkinBackdrop({ layers, palette, pageColors, orientation }: SkinBackdropProps) {
+export function SkinBackdrop({ layers, orientation }: SkinBackdropProps) {
   // Ids are shared by the whole document, so every SVG has its own prefix and every layer its own id
   const prefix = useId()
   const page = pageSize(orientation)
   const drawn = layers
     .filter((layer) => layer.visible)
-    .map((layer) => ({ layer, shape: drawLayer(layer, skinColors(palette, layer.colors, pageColors), page) }))
+    .map((layer) => ({ layer, shape: drawLayer(layer, layer.colors, page) }))
     .filter((entry): entry is { layer: SkinLayer; shape: SkinShape } => entry.shape !== null)
     .reverse()
   if (drawn.length === 0) return null

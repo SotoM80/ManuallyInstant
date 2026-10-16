@@ -46,7 +46,7 @@ export const SECTION_PAGES: Record<string, string[]> = {
   logo: ['Brand concept', 'Anatomy', 'Logo versions', 'Clear space'],
   colors: ['Color palette'],
   typography: ['Typography'],
-  skin: ['Cover'], // the skin is on every page; the Cover shows it best
+  skin: ['Brand concept'], // the first page the Skin paints (the Cover keeps its own colors)
 }
 
 // The four areas of the Logo form and the page each one fills. While the user works in an
