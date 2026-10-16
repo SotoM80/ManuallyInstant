@@ -1,7 +1,7 @@
 import { drawLinear } from '../src/skins/draw/linear';
-import { drawSkin } from '../src/skins/draw';
+import { drawLayer } from '../src/skins/draw';
 import { pageSize } from '../src/skins/draw/types';
-import { NO_SKIN, skinFor } from '../src/skins/presets';
+import { findPreset } from '../src/skins/presets';
 
 const portrait = pageSize('portrait');
 const landscape = pageSize('landscape');
@@ -46,13 +46,13 @@ describe('drawLinear', () => {
   });
 });
 
-describe('drawSkin', () => {
+describe('drawLayer', () => {
   it('draws Linear with its default angle', () => {
-    expect(drawSkin(skinFor('linear'), AB, portrait)?.kind).toBe('linear');
+    const params = findPreset('linear')!.defaults;
+    expect(drawLayer({ preset: 'linear', params }, AB, portrait)?.kind).toBe('linear');
   });
 
-  it('draws nothing for None or a preset with no drawing', () => {
-    expect(drawSkin(NO_SKIN, AB, portrait)).toBeNull();
-    expect(drawSkin({ preset: 'unknown', params: {}, colors: [null, null] }, AB, portrait)).toBeNull();
+  it('draws nothing for a preset with no drawing', () => {
+    expect(drawLayer({ preset: 'unknown', params: {} }, AB, portrait)).toBeNull();
   });
 });

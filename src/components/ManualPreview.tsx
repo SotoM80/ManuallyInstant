@@ -9,9 +9,8 @@ import { ClearSpacePage } from './pages/ClearSpacePage'
 import { ColorPalettePage } from './pages/ColorPalettePage'
 import { TypographyPage } from './pages/TypographyPage'
 import { DEFAULT_BACKGROUND_COLOR, DEFAULT_TYPOGRAPHY_COLOR } from '../data/colorPalette'
-import { SkinLayer } from './pages/SkinLayer'
+import { SkinBackdrop } from './pages/SkinBackdrop'
 import { NO_SKIN } from '../skins/presets'
-import { skinColors } from '../skins/colors'
 import type { Skin } from '../skins/types'
 import { useRef } from 'react'
 import { withViewTransition } from '../utils/viewTransition'
@@ -35,7 +34,7 @@ type ManualPreviewProps = {
   featured?: string[] // pages moved to the top, marked so the user sees what they are editing
   guides?: Guides // guides clicked on the construction grid of the Clear space page
   onGuidesChange?: (guides: Guides) => void
-  skin?: Skin // the decorative layer behind every page (see specs/skins.md)
+  skin?: Skin // the decorative layers behind every page (see specs/skins.md)
 }
 
 const ORIENTATIONS: { value: Orientation; label: string }[] = [
@@ -76,10 +75,10 @@ export function ManualPreview({
   useReorderGlide(pageList, pages.join('|'))
 
   // Every page draws the same skin, with the Cover's colors (or their defaults) filling in
-  const skinHexes = skinColors(palette, skin.colors, {
+  const pageColors = {
     background: cover?.colors.background ?? DEFAULT_BACKGROUND_COLOR,
     ink: cover?.colors.typography ?? DEFAULT_TYPOGRAPHY_COLOR,
-  })
+  }
 
   function renderPage(page: string) {
     const textColor = cover?.colors.typography ?? DEFAULT_TYPOGRAPHY_COLOR
@@ -182,7 +181,12 @@ export function ManualPreview({
                 background: cover?.colors.background,
               }}
             >
-              <SkinLayer skin={skin} colors={skinHexes} orientation={orientation} />
+              <SkinBackdrop
+                layers={skin.layers}
+                palette={palette}
+                pageColors={pageColors}
+                orientation={orientation}
+              />
               <div className="manual-page-content">{renderPage(page)}</div>
             </article>
             {/* Always the natural number, so a page moved to the top still reads "7. Typography" */}

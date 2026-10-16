@@ -2,173 +2,212 @@ import { fireEvent, screen, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import { MANUAL_PAGES } from '../src/data/manualSections';
 
-// Spec: specs/skins.md
+// Spec: specs/skins.md (a stack of layers, ADR 0010)
 function openSkin() {
   fireEvent.click(screen.getByRole('button', { name: /5\. Skin/ }));
   return screen.getByRole('form', { name: 'Skin' });
 }
 
-function skinLayers() {
-  return MANUAL_PAGES.map((page) => {
-    const layers = screen.getByRole('article', { name: page }).querySelectorAll('svg.skin-layer');
-    expect(layers.length).toBeLessThanOrEqual(1);
-    return layers[0];
-  });
+function add(form: HTMLElement, preset: string) {
+  fireEvent.click(within(form).getByRole('button', { name: '+ Add layer' }));
+  fireEvent.click(within(form).getByRole('button', { name: `Add ${preset}` }));
 }
 
-function stopColors(layer: Element) {
-  return [...layer.querySelectorAll('stop')].map((stop) => stop.getAttribute('stop-color'));
+// The backdrop of a page, or undefined when no layer is drawn on it
+function backdrop(page = 'Cover') {
+  const svgs = screen.getByRole('article', { name: page }).querySelectorAll('svg.skin-layer');
+  expect(svgs.length).toBeLessThanOrEqual(1);
+  return svgs[0];
 }
 
-function chooseLinear(form: HTMLElement) {
-  fireEvent.click(within(form).getByRole('radio', { name: 'Linear' }));
+// What each page draws, from the bottom group to the top one
+function drawnKinds(page = 'Cover') {
+  return [...(backdrop(page)?.querySelectorAll('g') ?? [])].map((group) => group.getAttribute('data-skin'));
 }
 
-describe('Skin – section', () => {
-  it('starts on None, with no sliders and plain pages (scenario 1)', () => {
+function layerNames(form: HTMLElement) {
+  const list = within(form).queryByRole('list', { name: 'Layers' });
+  return list ? within(list).getAllByRole('listitem').map((item) => item.querySelector('.skin-row-name')!.textContent) : [];
+}
+
+describe('Skin – layers', () => {
+  it('starts with no layers and plain pages (scenario 1)', () => {
     renderApp();
     const form = openSkin();
-    expect(within(form).getByRole('radio', { name: 'None' })).toBeChecked();
-    expect(within(form).queryAllByRole('slider')).toHaveLength(0);
-    expect(within(form).getByLabelText('Color A')).toHaveValue('auto');
-    expect(within(form).getByLabelText('Color B')).toHaveValue('auto');
-    expect(skinLayers().every((layer) => layer === undefined)).toBe(true);
+    expect(within(form).getByText(/No layers yet/)).toBeInTheDocument();
+    expect(within(form).getByRole('button', { name: '+ Add layer' })).toBeEnabled();
+    expect(MANUAL_PAGES.every((page) => backdrop(page) === undefined)).toBe(true);
     expect(screen.getAllByRole('article')[0]).toHaveAccessibleName('Cover');
   });
 
-  it('only offers presets that can be drawn (scenario 2)', () => {
+  it('offers only the presets that can be drawn (scenario 2)', () => {
     renderApp();
     const form = openSkin();
-    const names = within(form).getAllByRole('radio').map((radio) => radio.getAttribute('value'));
-    expect(names).toEqual(['none', 'linear', 'radial', 'dots', 'stripes']);
-    expect(within(form).getByText('Gradients')).toBeInTheDocument();
-    expect(within(form).getByText('Patterns')).toBeInTheDocument();
-    expect(within(form).queryByText('Shapes')).not.toBeInTheDocument();
-    expect(within(form).queryByText('Textures')).not.toBeInTheDocument();
+    fireEvent.click(within(form).getByRole('button', { name: '+ Add layer' }));
+    const gallery = within(form).getByRole('group', { name: 'Add a layer' });
+    expect(within(gallery).getAllByRole('button').map((card) => card.getAttribute('aria-label'))).toEqual([
+      'Add Linear',
+      'Add Radial',
+      'Add Dots',
+      'Add Stripes',
+    ]);
+    expect(within(gallery).queryByText('Textures')).not.toBeInTheDocument();
   });
 
-  it('draws Linear on every page with its sliders (scenario 3)', () => {
+  it('adds a layer, on and open, drawn on every page (scenario 3)', () => {
     renderApp();
     const form = openSkin();
-    chooseLinear(form);
+    add(form, 'Linear');
+    expect(layerNames(form)).toEqual(['Linear']);
+    expect(within(form).getByRole('checkbox', { name: 'Show Linear' })).toBeChecked();
     expect(within(form).getByRole('slider', { name: 'Angle' })).toHaveValue('135');
-    expect(within(form).getByRole('slider', { name: 'Intensity' })).toHaveValue('30');
-    for (const layer of skinLayers()) {
-      expect(layer).toHaveAttribute('aria-hidden', 'true');
-      expect(layer).toHaveAttribute('opacity', '0.3');
-      expect(layer).toHaveAttribute('viewBox', '0 0 210 297');
+    expect(within(form).queryByRole('group', { name: 'Add a layer' })).not.toBeInTheDocument();
+    for (const page of MANUAL_PAGES) {
+      expect(backdrop(page)).toHaveAttribute('aria-hidden', 'true');
+      expect(backdrop(page)!.querySelector('g')).toHaveAttribute('opacity', '0.3');
     }
   });
 
-  it('changes the angle and the intensity at once (scenarios 4 and 5)', () => {
+  it('puts a new layer on top, and draws it over the others (scenario 4)', () => {
     renderApp();
     const form = openSkin();
-    chooseLinear(form);
-    fireEvent.change(within(form).getByRole('slider', { name: 'Angle' }), { target: { value: '45' } });
+    add(form, 'Linear');
+    add(form, 'Dots');
+    expect(layerNames(form)).toEqual(['Dots', 'Linear']);
+    expect(drawnKinds()).toEqual(['linear', 'pattern']); // the last group is on top
+    const toggles = within(form).getAllByRole('button', { expanded: true });
+    expect(toggles.map((toggle) => toggle.textContent)).toEqual(['Dots']);
+  });
+
+  it('hides and shows a layer (scenario 5)', () => {
+    renderApp();
+    const form = openSkin();
+    add(form, 'Linear');
+    add(form, 'Dots');
+    fireEvent.click(within(form).getByRole('checkbox', { name: 'Show Dots' }));
+    expect(drawnKinds()).toEqual(['linear']);
+    fireEvent.click(within(form).getByRole('checkbox', { name: 'Show Dots' }));
+    expect(drawnKinds()).toEqual(['linear', 'pattern']);
+  });
+
+  it('moves a layer and keeps the focus on it (scenarios 6 and 7)', () => {
+    renderApp();
+    const form = openSkin();
+    add(form, 'Linear');
+    add(form, 'Dots');
+    expect(within(form).getByRole('button', { name: 'Move Dots up' })).toBeDisabled();
+    expect(within(form).getByRole('button', { name: 'Move Linear down' })).toBeDisabled();
+    fireEvent.click(within(form).getByRole('button', { name: 'Move Dots down' }));
+    expect(layerNames(form)).toEqual(['Linear', 'Dots']);
+    expect(drawnKinds()).toEqual(['pattern', 'linear']);
+    // Dots is last now, so its Move down is off and the focus goes to its Move up
+    expect(within(form).getByRole('button', { name: 'Move Dots up' })).toHaveFocus();
+  });
+
+  it('removes a layer (scenario 8)', () => {
+    renderApp();
+    const form = openSkin();
+    add(form, 'Linear');
+    add(form, 'Dots');
+    fireEvent.click(within(form).getByRole('button', { name: 'Remove Dots' }));
+    expect(layerNames(form)).toEqual(['Linear']);
+    expect(drawnKinds()).toEqual(['linear']);
+  });
+
+  it('allows up to four layers (scenarios 9 and 10)', () => {
+    renderApp();
+    const form = openSkin();
+    for (const preset of ['Dots', 'Linear', 'Dots', 'Stripes']) add(form, preset);
+    expect(layerNames(form)).toEqual(['Stripes', 'Dots 2', 'Linear', 'Dots']);
+    expect(within(form).getByRole('button', { name: '+ Add layer' })).toBeDisabled();
+    expect(within(form).getByText('Up to 4 layers.')).toBeInTheDocument();
+    fireEvent.click(within(form).getByRole('button', { name: 'Remove Linear' }));
+    expect(within(form).getByRole('button', { name: '+ Add layer' })).toBeEnabled();
+  });
+
+  it('gives each layer its own values (scenario 11)', () => {
+    renderApp();
+    const form = openSkin();
+    add(form, 'Linear');
     fireEvent.change(within(form).getByRole('slider', { name: 'Intensity' }), { target: { value: '80' } });
-    const gradient = skinLayers()[0].querySelector('linearGradient')!;
-    expect(Number(gradient.getAttribute('x1'))).toBeCloseTo(-21.75, 2);
-    expect(Number(gradient.getAttribute('y2'))).toBeCloseTo(21.75, 2);
-    expect(skinLayers()[0]).toHaveAttribute('opacity', '0.8');
-    expect(within(form).getByText('45°')).toBeInTheDocument();
+    add(form, 'Dots');
+    const [linear, dots] = backdrop()!.querySelectorAll('g');
+    expect(linear).toHaveAttribute('opacity', '0.8');
+    expect(dots).toHaveAttribute('opacity', '0.3');
   });
 
-  it('uses the Typography and Background colors with an empty palette (scenario 7)', () => {
+  it('uses the Cover colors with an empty palette (scenario 13)', () => {
     renderApp();
-    chooseLinear(openSkin());
-    expect(stopColors(skinLayers()[0])).toEqual(['#000000', '#FFFFFF']);
+    const form = openSkin();
+    add(form, 'Linear');
+    const stops = [...backdrop()!.querySelectorAll('stop')].map((stop) => stop.getAttribute('stop-color'));
+    expect(stops).toEqual(['#000000', '#FFFFFF']);
+    expect(within(form).getByRole('combobox', { name: 'Linear Color A' })).toHaveDisplayValue('Auto · Typography color');
   });
 
-  it('keeps the skin with Landscape (scenario 12)', () => {
+  it('keeps the layers with Landscape (scenario 16)', () => {
     renderApp();
-    chooseLinear(openSkin());
+    const form = openSkin();
+    add(form, 'Linear');
+    add(form, 'Dots');
     fireEvent.click(screen.getByRole('radio', { name: 'Landscape' }));
-    for (const layer of skinLayers()) {
-      expect(layer).toHaveAttribute('viewBox', '0 0 297 210');
+    for (const page of MANUAL_PAGES) {
+      expect(backdrop(page)).toHaveAttribute('viewBox', '0 0 297 210');
+      expect(drawnKinds(page)).toEqual(['linear', 'pattern']);
     }
   });
 
-  it('gives every gradient its own id, gallery included (scenario 13)', () => {
+  it('gives every gradient and pattern its own id (scenario 17)', () => {
     const { container } = renderApp();
-    chooseLinear(openSkin());
-    const ids = [...container.querySelectorAll('linearGradient')].map((gradient) => gradient.id);
-    expect(ids.length).toBeGreaterThan(MANUAL_PAGES.length);
+    const form = openSkin();
+    add(form, 'Linear');
+    add(form, 'Dots');
+    add(form, 'Dots');
+    fireEvent.click(within(form).getByRole('button', { name: '+ Add layer' }));
+    const ids = [...container.querySelectorAll('linearGradient, radialGradient, pattern')].map((paint) => paint.id);
+    expect(ids.length).toBeGreaterThan(MANUAL_PAGES.length * 3);
     expect(new Set(ids).size).toBe(ids.length);
-    for (const layer of skinLayers()) {
-      const id = layer.querySelector('linearGradient')!.id;
-      expect(layer.querySelector('rect')).toHaveAttribute('fill', `url(#${id})`);
-    }
   });
 
-  it('keeps the skin between pages (scenario 14)', () => {
+  it('keeps the layers between pages (scenario 18)', () => {
     renderApp();
-    chooseLinear(openSkin());
+    const form = openSkin();
+    add(form, 'Linear');
+    add(form, 'Dots');
+    fireEvent.click(within(form).getByRole('checkbox', { name: 'Show Dots' }));
     fireEvent.click(screen.getByRole('link', { name: 'Home' }));
     fireEvent.click(screen.getByRole('link', { name: 'Brand Manual' }));
-    expect(skinLayers().every((layer) => layer !== undefined)).toBe(true);
+    const again = openSkin();
+    expect(layerNames(again)).toEqual(['Dots', 'Linear']);
+    expect(within(again).getByRole('checkbox', { name: 'Show Dots' })).not.toBeChecked();
   });
 
-  it('goes back to plain pages with None (scenario 15)', () => {
+  it('closes the gallery with Escape', () => {
     renderApp();
     const form = openSkin();
-    chooseLinear(form);
-    fireEvent.click(within(form).getByRole('radio', { name: 'None' }));
-    expect(skinLayers().every((layer) => layer === undefined)).toBe(true);
-    expect(within(form).queryAllByRole('slider')).toHaveLength(0);
-  });
-});
-
-describe('Skin – presets', () => {
-  it('draws Dots and Stripes as patterns, and Radial as a gradient', () => {
-    renderApp();
-    const form = openSkin();
-    for (const [name, kind] of [['Radial', 'radial'], ['Dots', 'pattern'], ['Stripes', 'pattern']]) {
-      fireEvent.click(within(form).getByRole('radio', { name }));
-      expect(skinLayers()[0]).toHaveAttribute('data-skin', kind);
-    }
-    expect(skinLayers()[0].querySelector('pattern')).toHaveAttribute('patternTransform', 'rotate(45)');
-  });
-
-  it('keeps the colors and resets the values when the preset changes (scenario 10)', () => {
-    renderApp();
-    const form = openSkin();
-    chooseLinear(form);
-    fireEvent.change(within(form).getByRole('slider', { name: 'Angle' }), { target: { value: '45' } });
-    fireEvent.click(within(form).getByRole('radio', { name: 'Stripes' }));
-    expect(within(form).getByRole('slider', { name: 'Spacing' })).toHaveValue('12');
-    chooseLinear(form);
-    expect(within(form).getByRole('slider', { name: 'Angle' })).toHaveValue('135');
-  });
-
-  it('lowers Thickness with Spacing (scenario 11)', () => {
-    renderApp();
-    const form = openSkin();
-    fireEvent.click(within(form).getByRole('radio', { name: 'Stripes' }));
-    const thickness = within(form).getByRole('slider', { name: 'Thickness' });
-    fireEvent.change(thickness, { target: { value: '10' } });
-    fireEvent.change(within(form).getByRole('slider', { name: 'Spacing' }), { target: { value: '6' } });
-    expect(thickness).toHaveValue('6');
-    expect(thickness).toHaveAttribute('max', '6');
+    fireEvent.click(within(form).getByRole('button', { name: '+ Add layer' }));
+    fireEvent.keyDown(within(form).getByRole('button', { name: 'Add Dots' }), { key: 'Escape' });
+    expect(within(form).queryByRole('group', { name: 'Add a layer' })).not.toBeInTheDocument();
+    expect(within(form).getByRole('button', { name: '+ Add layer' })).toHaveFocus();
   });
 });
 
 describe('Skin – colors', () => {
-  function addPaletteColors(count: number) {
-    fireEvent.click(screen.getByRole('button', { name: /3\. Colors/ }));
-    for (let i = 1; i < count; i++) fireEvent.click(screen.getByRole('button', { name: 'Add color' }));
-  }
-
-  it('uses the first two palette colors on Auto, and a chosen one (scenario 6)', () => {
+  it('uses a chosen palette color for one layer only (scenarios 6 and 11 of the colors)', () => {
     renderApp();
-    addPaletteColors(3); // Black, White, Gray: the first unused quick swatches
+    fireEvent.click(screen.getByRole('button', { name: /3\. Colors/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add color' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add color' }));
     const form = openSkin();
-    chooseLinear(form);
-    const [first, second] = stopColors(skinLayers()[0]);
-    expect([first, second]).toHaveLength(2);
-    const colorA = within(form).getByLabelText('Color A');
+    add(form, 'Linear');
+    add(form, 'Dots');
+    const colorA = within(form).getByRole('combobox', { name: 'Dots Color A' });
     const third = within(colorA).getAllByRole('option')[3];
     fireEvent.change(colorA, { target: { value: third.getAttribute('value') } });
-    expect(stopColors(skinLayers()[0])).not.toEqual([first, second]);
-    expect(stopColors(skinLayers()[0])[1]).toBe(second);
+    const [linear, dots] = backdrop()!.querySelectorAll('g');
+    const linearStops = [...linear.querySelectorAll('stop')].map((stop) => stop.getAttribute('stop-color'));
+    const dotFills = [...dots.querySelectorAll('circle')].map((dot) => dot.getAttribute('fill'));
+    expect(dotFills[0]).not.toBe(linearStops[0]);
+    expect(dotFills[1]).toBe(linearStops[1]);
   });
 });

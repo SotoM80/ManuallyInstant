@@ -34,7 +34,7 @@ The section has a **list of layers**, then the **Add layer** button. The list re
 * **Checkbox** `Show <name>`: on → the layer is drawn; off → it is not drawn, but keeps its values, its colors and its place. A new layer starts on.
 * **Mini preview**: a small page with the layer drawn at full strength, faded while the layer is hidden.
 * **Name**: the preset's name. When two layers use the same preset, the later ones get a number: `Dots`, `Dots 2`.
-* **↑ Move up** / **↓ Move down**: swap the layer with its neighbour. ↑ is disabled on the first layer and ↓ on the last. The layers glide to their new places (`useReorderGlide`, like the pages), and the focus stays on the button that was pressed.
+* **↑ Move up** / **↓ Move down**: swap the layer with its neighbour. ↑ is disabled on the first layer and ↓ on the last. The layers glide to their new places (`useReorderGlide`, like the pages), and the focus stays on the button that was pressed, or on the other arrow of the same layer when that button is now disabled.
 * **✕ Remove**: removes the layer at once.
 * **▾**: opens the body: one slider per `control` of its preset (label, min, max, step and unit from `presets.ts`, with the value next to it; **Intensity**, 5–100 % step 5, default 30, is always last), then the layer's **Color A** and **Color B**. The bodies work as an **accordion**, like the colors of the Colors section: only one is open at a time, and a new layer opens and folds the open one.
 
@@ -137,7 +137,7 @@ Nothing the user does here can be wrong, so there are no error messages. Instead
 ### Scenario 6: Moving a Layer
 * **Given**: The list reads Dots, Linear.
 * **When**: The user clicks "Move down" on Dots.
-* **Then**: The list reads Linear, Dots, the gradient is drawn over the dots, and the focus stays on the Move down button of Dots (now disabled, since Dots is last).
+* **Then**: The list reads Linear, Dots, the gradient is drawn over the dots, and Move down of Dots is now disabled (Dots is last), so the focus moves to its Move up button.
 
 ### Scenario 7: The Ends of the List
 * **Given**: The list reads Stripes, Radial, Linear.

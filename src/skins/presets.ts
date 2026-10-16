@@ -1,4 +1,4 @@
-import type { Skin, SkinControl, SkinPreset, SkinType } from './types'
+import type { Skin, SkinControl, SkinParams, SkinPreset, SkinType } from './types'
 
 // Every preset also has Intensity: how strong the layer is over the page (its opacity).
 // It starts low so the text of the manual stays easy to read.
@@ -62,28 +62,22 @@ export const SKIN_TYPES: { type: SkinType; label: string }[] = [
   { type: 'texture', label: 'Textures' },
 ]
 
-// The plain background of today: no layer at all
-export const NO_SKIN: Skin = { preset: 'none', params: {}, colors: [null, null] }
+// No layers: the plain background of the page
+export const NO_SKIN: Skin = { layers: [], nextId: 1 }
 
 export function findPreset(id: string) {
   return SKIN_PRESETS.find((preset) => preset.id === id)
 }
 
-// A preset with its default values and the colors already chosen
-export function skinFor(id: string, colors: Skin['colors'] = [null, null]): Skin {
-  const preset = findPreset(id)
-  return preset ? { preset: id, params: { ...preset.defaults }, colors } : { ...NO_SKIN, colors }
-}
-
 // The highest value a slider can take now: Thickness never passes Spacing (Stripes)
-export function controlMax(control: SkinControl, params: Skin['params']) {
+export function controlMax(control: SkinControl, params: SkinParams) {
   return control.key === 'thickness' && params.scale !== undefined
     ? Math.min(control.max, params.scale)
     : control.max
 }
 
 // New values for a skin, kept within each other: lowering Spacing below Thickness lowers it too
-export function withParam(params: Skin['params'], key: string, value: number): Skin['params'] {
+export function withParam(params: SkinParams, key: string, value: number): SkinParams {
   const next = { ...params, [key]: value }
   if (next.thickness !== undefined && next.scale !== undefined && next.thickness > next.scale) {
     next.thickness = next.scale

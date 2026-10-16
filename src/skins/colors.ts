@@ -1,6 +1,6 @@
 import { normalizeHex } from '../data/colorPalette'
 import type { PaletteColor } from '../types'
-import type { Skin } from './types'
+import type { SkinLayer } from './types'
 
 // The two colors a skin draws with, as HEX (see specs/skins.md, Colors):
 // a chosen palette color → that color; Auto (or a color that was removed) → palette color 1
@@ -20,7 +20,7 @@ export function autoColorName(palette: PaletteColor[] | null, index: 0 | 1) {
 
 export function skinColors(
   palette: PaletteColor[] | null,
-  [a, b]: Skin['colors'],
+  [a, b]: SkinLayer['colors'],
   fallback: { background: string; ink: string },
 ): [string, string] {
   const colors = usable(palette)

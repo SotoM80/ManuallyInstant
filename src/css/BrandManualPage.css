@@ -609,19 +609,95 @@
   color: var(--text);
 }
 
-/* Skin section (specs/skins.md): a gallery of small pages, then sliders and two colors */
-.skin-gallery {
+/* Skin section (specs/skins.md): a list of layers like the colors of Colors, then Add layer
+   and the gallery. Each layer reuses the palette-block accordion. */
+.skin-layers {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
   padding: 0;
-  border: 0;
+  list-style: none;
   text-align: left;
 }
 
-.skin-gallery legend {
-  margin-bottom: 4px;
+.skin-row-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 6px 12px;
+}
+
+.skin-row-toggle {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-h);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.skin-row-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.skin-row-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: 600;
+}
+
+/* A hidden layer keeps its place, faded */
+.skin-row[data-visible='false'] .skin-card-preview,
+.skin-row[data-visible='false'] .skin-row-name {
+  opacity: 0.4;
+}
+
+.skin-row-button {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform var(--dur-fast) ease;
+}
+
+.skin-row-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.skin-row-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.skin-empty {
+  text-align: left;
+}
+
+.skin-gallery {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: left;
 }
 
 .skin-gallery-heading {
@@ -637,46 +713,42 @@
 }
 
 .skin-card {
-  position: relative;
   display: grid;
   justify-items: center;
   gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-h);
+  font: inherit;
   font-size: 12px;
   cursor: pointer;
 }
 
-/* The radio stays in the page for keyboard and screen readers; the card is what is drawn */
-.skin-card input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
+.skin-card:focus-visible .skin-card-preview {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .skin-card-preview {
   position: relative; /* the skin layer fills it */
-  width: 48px;
+  flex: none;
+  width: 32px;
   aspect-ratio: 210 / 297;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 4px;
   transition:
     transform var(--dur-fast) ease,
-    border-color var(--dur-fast) ease;
+    opacity var(--dur) ease;
+}
+
+.skin-gallery .skin-card-preview {
+  width: 48px;
 }
 
 .skin-card:hover .skin-card-preview {
   transform: translateY(-2px);
-}
-
-.skin-card input:checked + .skin-card-preview {
-  border-color: var(--accent);
-  outline: 2px solid var(--accent-border);
-  outline-offset: 2px;
-}
-
-.skin-card input:focus-visible + .skin-card-preview {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 
 .skin-control,

@@ -1,4 +1,4 @@
-import type { Skin } from '../types'
+import type { SkinLayer } from '../types'
 import { drawLinear } from './linear'
 import { drawRadial } from './radial'
 import { drawDots } from './dots'
@@ -14,8 +14,8 @@ export const SKIN_DRAWINGS: Record<string, DrawSkin> = {
   stripes: drawStripes,
 }
 
-// What to draw for a skin, or null for None (and for an id with no drawing)
-export function drawSkin(skin: Skin, colors: string[], page: Page) {
-  const draw = SKIN_DRAWINGS[skin.preset]
-  return draw ? draw(skin.params, colors, page) : null
+// What to draw for a layer, or null for a preset with no drawing
+export function drawLayer(layer: Pick<SkinLayer, 'preset' | 'params'>, colors: string[], page: Page) {
+  const draw = SKIN_DRAWINGS[layer.preset]
+  return draw ? draw(layer.params, colors, page) : null
 }
