@@ -113,6 +113,19 @@ describe('Skin – layers', () => {
     expect(within(form).getByRole('button', { name: 'Move Dots up' })).toHaveFocus();
   });
 
+  it('brings only the title of a new layer into view, with the focus on it, so a tall layer does not pull the page', () => {
+    const scrollIntoView = jest.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    renderApp();
+    const form = openSkin();
+    add(form, 'Linear');
+    add(form, 'Waves');
+    const waves = within(form).getByRole('button', { name: 'Waves' });
+    expect(waves).toHaveFocus();
+    expect(scrollIntoView).toHaveBeenLastCalledWith(expect.objectContaining({ block: 'nearest' }));
+    expect(scrollIntoView.mock.contexts.at(-1)).toBe(waves.closest('.skin-row-header'));
+  });
+
   it('removes a layer (scenario 8)', () => {
     renderApp();
     const form = openSkin();

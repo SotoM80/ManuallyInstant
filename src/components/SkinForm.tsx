@@ -22,10 +22,10 @@ import { useReorderGlide } from '../utils/useReorderGlide'
 import type { Skin, SkinLayer } from '../skins/types'
 import type { PaletteColor } from '../types'
 
-// Form of the Skin section: the colors of every page but the Cover, a list of layers (the first
-// one is drawn on top), each one shown or hidden with a checkbox, moved with ↑ ↓ and opened like
-// the colors of the Colors section, then Add layer with the gallery. Everything reaches the
-// preview at once (see specs/skins.md).
+// Form of the Skin section: the colors of every page but the Cover, Add layer with its gallery,
+// then the list of layers (the first one is drawn on top), each one shown or hidden with a
+// checkbox, moved with ↑ ↓ and opened like the colors of the Colors section. A new layer appears
+// right under the gallery that was clicked. Everything reaches the preview at once (specs/skins.md).
 type SkinFormProps = {
   skin: Skin
   onChange: (skin: Skin) => void
@@ -65,25 +65,42 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
   const startColors = newLayerColors(palette, skin) // the colors a new layer gets
 
   // After a move, the focus stays on the button that was pressed (or on the other arrow, when
-  // the layer reached the end of the list and that button is now off)
+  // the layer reached the end of the list and that button is now off). preventScroll: focusing
+  // must not scroll the page, the row is already kept in place (see move)
   const moved = useRef<{ id: number; step: -1 | 1 } | null>(null)
+  // A layer just added: it goes on top of the list, right under the gallery that closes, and its
+  // title takes the focus. Only the title is brought into view, never the whole layer: a new
+  // layer opens at once, and a tall one (Shapes have four sliders) would pull the page down to
+  // show its end. The title is already in view, so the page only scrolls on a small screen.
+  const added = useRef<number | null>(null)
   useEffect(() => {
-    if (!moved.current || !list.current) return
-    const { id, step } = moved.current
-    moved.current = null
-    const button = (s: number) => list.current?.querySelector<HTMLButtonElement>(`[data-move="${id}:${s}"]`)
-    const pressed = button(step)
-    ;(pressed && !pressed.disabled ? pressed : button(-step))?.focus()
+    if (moved.current && list.current) {
+      const { id, step } = moved.current
+      moved.current = null
+      const button = (s: number) => list.current?.querySelector<HTMLButtonElement>(`[data-move="${id}:${s}"]`)
+      const pressed = button(step)
+      ;(pressed && !pressed.disabled ? pressed : button(-step))?.focus({ preventScroll: true })
+    }
+    if (added.current !== null && list.current) {
+      const title = list.current.querySelector<HTMLElement>(`[data-key="${added.current}"] .skin-row-header`)
+      added.current = null
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      title?.scrollIntoView?.({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' })
+      title?.querySelector<HTMLButtonElement>('.skin-row-toggle')?.focus({ preventScroll: true })
+    }
   }, [skin.layers])
 
   // A new layer goes on top and opens; the open one folds
   function add(presetId: string) {
+    added.current = skin.nextId
     onChange(addLayer(skin, presetId, startColors))
     setOpenId(skin.nextId)
     setGalleryOpen(false)
   }
 
-  function move(id: number, step: -1 | 1) {
+  // The pressed button stays under the pointer while its row trades places with its neighbour
+  function move(id: number, step: -1 | 1, button: HTMLElement) {
+    keepInPlace(button)
     moved.current = { id, step }
     onChange(moveLayer(skin, id, step))
   }
@@ -157,6 +174,51 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
         />
       ))}
 
+      <button
+        ref={addButton}
+        type="button"
+        className="palette-secondary-button"
+        aria-expanded={galleryOpen}
+        aria-controls="skin-gallery"
+        disabled={full}
+        onClick={(event) => {
+          keepInPlace(event.currentTarget) // the gallery opens or folds right under it
+          setGalleryOpen((open) => !open)
+        }}
+      >
+        + Add layer
+      </button>
+      {full && <p className="logo-form-hint">Up to {MAX_LAYERS} layers.</p>}
+
+      {galleryOpen && !full && (
+        <div id="skin-gallery" className="skin-gallery" role="group" aria-label="Add a layer" onKeyDown={closeGallery}>
+          {GALLERY.map((group) => (
+            <div key={group.type} className="skin-gallery-group">
+              <p className="skin-gallery-heading">{group.label}</p>
+              <div className="skin-gallery-row">
+                {group.presets.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    className="skin-card"
+                    aria-label={`Add ${preset.name}`}
+                    onClick={() => add(preset.id)}
+                  >
+                    <span className="skin-card-preview" style={{ background: skin.pageBackground }}>
+                      <SkinBackdrop
+                        layers={[previewLayer({ preset: preset.id, params: preset.defaults, colors: startColors })]}
+                        orientation="portrait"
+                      />
+                    </span>
+                    <span className="skin-card-name">{preset.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {skin.layers.length === 0 ? (
         <p className="logo-form-hint skin-empty">No layers yet. The inner pages show their plain Page background.</p>
       ) : (
@@ -202,7 +264,7 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
                     aria-label={`Move ${name} up`}
                     data-move={`${layer.id}:-1`}
                     disabled={index === 0}
-                    onClick={() => move(layer.id, -1)}
+                    onClick={(event) => move(layer.id, -1, event.currentTarget)}
                   >
                     ↑
                   </button>
@@ -212,7 +274,7 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
                     aria-label={`Move ${name} down`}
                     data-move={`${layer.id}:1`}
                     disabled={index === skin.layers.length - 1}
-                    onClick={() => move(layer.id, 1)}
+                    onClick={(event) => move(layer.id, 1, event.currentTarget)}
                   >
                     ↓
                   </button>
@@ -234,48 +296,6 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
             )
           })}
         </ol>
-      )}
-
-      <button
-        ref={addButton}
-        type="button"
-        className="palette-secondary-button"
-        aria-expanded={galleryOpen}
-        aria-controls="skin-gallery"
-        disabled={full}
-        onClick={() => setGalleryOpen((open) => !open)}
-      >
-        + Add layer
-      </button>
-      {full && <p className="logo-form-hint">Up to {MAX_LAYERS} layers.</p>}
-
-      {galleryOpen && !full && (
-        <div id="skin-gallery" className="skin-gallery" role="group" aria-label="Add a layer" onKeyDown={closeGallery}>
-          {GALLERY.map((group) => (
-            <div key={group.type} className="skin-gallery-group">
-              <p className="skin-gallery-heading">{group.label}</p>
-              <div className="skin-gallery-row">
-                {group.presets.map((preset) => (
-                  <button
-                    key={preset.id}
-                    type="button"
-                    className="skin-card"
-                    aria-label={`Add ${preset.name}`}
-                    onClick={() => add(preset.id)}
-                  >
-                    <span className="skin-card-preview" style={{ background: skin.pageBackground }}>
-                      <SkinBackdrop
-                        layers={[previewLayer({ preset: preset.id, params: preset.defaults, colors: startColors })]}
-                        orientation="portrait"
-                      />
-                    </span>
-                    <span className="skin-card-name">{preset.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
       )}
     </form>
   )

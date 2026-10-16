@@ -19,30 +19,32 @@ A skin does not depend on the template: it is the same stack under every layout,
 
 ## 2. Interface
 ### Section "5. Skin"
-The section has, from top to bottom, the **page colors**, the **list of layers**, then the **Add layer** button.
+The section has, from top to bottom, the **page colors**, the **Add layer** button with its gallery, then the **list of layers**. Add layer sits above the list so that a new layer, which goes on top of the list, appears right where the user chose it.
 
 **Page colors**: two color fields, **Page background** (default White `#FFFFFF`) and **Page text** (default Black `#000000`). They paint the background and every text of the inner pages: Brand concept, Anatomy, Logo versions, Clear space (its lines and measures too), Color palette and Typography. They never change the Cover. The list reads like the layers panel of a design tool: **the first layer of the list is drawn on top**, the last one just over the page Background.
 
 ```
 5. Skin
+  Page background  [●] #FFFFFF
+  Page text        [●] #000000
+                          [ + Add layer ]   → opens the gallery here; a new layer goes on top of the list
 ┌──────────────────────────────────────┐
 │ ☑ [▤] Stripes          ↑  ↓  ✕   ▾  │  ← on top
 │ ☑ [◉] Radial           ↑  ↓  ✕   ▾  │
 │ ☐ [·] Dots             ↑  ↓  ✕   ▾  │  ← hidden: not drawn, keeps its values
 │ ☑ [◢] Linear           ↑  ↓  ✕   ▾  │  ← at the bottom
 └──────────────────────────────────────┘
-                          [ + Add layer ]
 ```
 
 **Each layer** has a header row, always shown, and a body:
 * **Checkbox** `Show <name>`: on → the layer is drawn; off → it is not drawn, but keeps its values, its colors and its place. A new layer starts on.
 * **Mini preview**: a small page with the layer drawn at full strength, faded while the layer is hidden.
 * **Name**: the preset's name. When two layers use the same preset, the later ones get a number: `Dots`, `Dots 2`.
-* **↑ Move up** / **↓ Move down**: swap the layer with its neighbour. ↑ is disabled on the first layer and ↓ on the last. The layers glide to their new places (`useReorderGlide`, like the pages), and the focus stays on the button that was pressed, or on the other arrow of the same layer when that button is now disabled.
+* **↑ Move up** / **↓ Move down**: swap the layer with its neighbour. ↑ is disabled on the first layer and ↓ on the last. The layers glide to their new places (`useReorderGlide`, like the pages), and the focus stays on the button that was pressed, or on the other arrow of the same layer when that button is now disabled. The page scrolls with the move so the pressed button stays under the pointer: nothing jumps.
 * **✕ Remove**: removes the layer at once.
 * **▾**: opens the body: first the checkbox **Also on the Cover** (off by default: a layer is only drawn on the inner pages until it is ticked), then one slider per `control` of its preset (label, min, max, step and unit from `presets.ts`, with the value next to it; **Intensity**, 5–100 % step 5, default 30, is always last), then the layer's **Color A** and **Color B**. The bodies work as an **accordion**, like the colors of the Colors section: only one is open at a time, and a new layer opens and folds the open one.
 
-**Add layer** opens the **gallery** under the button: one card per preset with a drawing, grouped under the headings of `SKIN_TYPES` that have at least one: **Gradients** (Linear, Radial), **Shapes** (Circles, Diagonal block, Waves) and **Patterns** (Dots, Stripes). Each card is a small page with the preset drawn at full strength with the colors a new layer would get. Choosing a card adds a layer **at the top of the list**, with the preset's default values, on, not on the Cover, and open, and closes the gallery. Its **Color A** is palette color 1 and its **Color B** palette color 2; when one of them does not exist, the Page text color fills in for A and the Page background for B. These are copied values: changing the palette later never changes the layer. Escape or clicking Add layer again closes it with no change. With 4 layers, Add layer is disabled, with the note `Up to 4 layers.`
+**Add layer** opens the **gallery** under the button: one card per preset with a drawing, grouped under the headings of `SKIN_TYPES` that have at least one: **Gradients** (Linear, Radial), **Shapes** (Circles, Diagonal block, Waves) and **Patterns** (Dots, Stripes). Each card is a small page with the preset drawn at full strength with the colors a new layer would get. Choosing a card adds a layer **at the top of the list**, with the preset's default values, on, not on the Cover, and open, and closes the gallery. The Add layer button stays still while the gallery folds and the new layer takes its place right under it, and the layer's title takes the focus; only the layer's title is brought into view, never the whole open layer, so a tall one (a Shape) does not pull the page down; the page only scrolls if the title is not in view (e.g. on a small screen). Opening or folding the gallery never moves Add layer either. Its **Color A** is palette color 1 and its **Color B** palette color 2; when one of them does not exist, the Page text color fills in for A and the Page background for B. These are copied values: changing the palette later never changes the layer. Escape or clicking Add layer again closes it with no change. With 4 layers, Add layer is disabled, with the note `Up to 4 layers.`
 
 With no layers, the list shows `No layers yet. The inner pages show their plain Page background.`
 
