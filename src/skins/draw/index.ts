@@ -3,6 +3,9 @@ import { drawLinear } from './linear'
 import { drawRadial } from './radial'
 import { drawDots } from './dots'
 import { drawStripes } from './stripes'
+import { drawCircles } from './circles'
+import { drawDiagonal } from './diagonal'
+import { drawWaves } from './waves'
 import type { DrawSkin, Page } from './types'
 
 // The drawing of each preset. Only presets listed here are shown in the gallery,
@@ -10,6 +13,9 @@ import type { DrawSkin, Page } from './types'
 export const SKIN_DRAWINGS: Record<string, DrawSkin> = {
   linear: drawLinear,
   radial: drawRadial,
+  circles: drawCircles,
+  diagonal: drawDiagonal,
+  waves: drawWaves,
   dots: drawDots,
   stripes: drawStripes,
 }

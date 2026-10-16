@@ -8,9 +8,9 @@ const DEFAULT_INTENSITY = 30
 
 const angle = (label = 'Angle'): SkinControl => ({ key: 'angle', label, min: 0, max: 360, step: 5, unit: '°' })
 
-// The presets of the first version (the MVP of specs/skins.md), grouped by type in the gallery.
-// Shapes and Textures come back with their drawings. The form is built from
-// their controls, so a new preset only needs an entry here and a way to draw it (draw/).
+// The presets, grouped by type in the gallery (see specs/skins.md); Textures come later.
+// The form is built from their controls, so a new preset only needs an entry here and a way
+// to draw it (draw/).
 const PRESETS: SkinPreset[] = [
   {
     id: 'linear',
@@ -28,6 +28,38 @@ const PRESETS: SkinPreset[] = [
       { key: 'cx', label: 'Center X', min: 0, max: 100, step: 5, unit: '%' },
       { key: 'cy', label: 'Center Y', min: 0, max: 100, step: 5, unit: '%' },
       { key: 'radius', label: 'Radius', min: 20, max: 150, step: 5, unit: '%' },
+    ],
+  },
+  {
+    id: 'circles',
+    name: 'Circles',
+    type: 'shapes',
+    defaults: { count: 3, size: 45, angle: 45 },
+    controls: [
+      { key: 'count', label: 'Count', min: 1, max: 8, step: 1, unit: '' },
+      { key: 'size', label: 'Size', min: 10, max: 90, step: 5, unit: '%' },
+      angle('Direction'),
+    ],
+  },
+  {
+    id: 'diagonal',
+    name: 'Diagonal block',
+    type: 'shapes',
+    defaults: { angle: 20, coverage: 35 },
+    controls: [
+      { key: 'angle', label: 'Angle', min: -60, max: 60, step: 5, unit: '°' },
+      { key: 'coverage', label: 'Coverage', min: 10, max: 90, step: 5, unit: '%' },
+    ],
+  },
+  {
+    id: 'waves',
+    name: 'Waves',
+    type: 'shapes',
+    defaults: { amplitude: 12, frequency: 2, angle: 0 },
+    controls: [
+      { key: 'amplitude', label: 'Amplitude', min: 2, max: 40, step: 1, unit: 'mm' },
+      { key: 'frequency', label: 'Frequency', min: 1, max: 8, step: 1, unit: '' },
+      angle(),
     ],
   },
   {

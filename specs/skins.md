@@ -232,6 +232,6 @@ Only a typed HEX can be wrong. Otherwise:
 2. ~~The layer model: `Skin = { layers }`, `src/skins/layers.ts` and its unit tests.~~
 3. ~~`SkinBackdrop`: one SVG with a group per visible layer, bottom first, with ids per layer. Checked with `npm run dev` using two layers turned on by hand.~~
 4. ~~The Skin section as a list: checkbox, mini preview, ↑ ↓ ✕, accordion, Add layer with the gallery, the 4-layer limit.~~
-5. Shapes: Circles, Diagonal block and Waves, one at a time, each with its unit test (after step 6).
-6. Page colors and Also on the Cover: the Cover's colors only paint the Cover (ADR 0011), Page background and Page text in the Skin, and the color fields with palette chips.
+5. ~~Shapes: Circles, Diagonal block and Waves, one at a time, each with its unit test (after step 6).~~
+6. ~~Page colors and Also on the Cover: the Cover's colors only paint the Cover (ADR 0011), Page background and Page text in the Skin, and the color fields with palette chips.~~
 7. Later: Textures once the PDF library is chosen; the skin in both PDFs (Phase 4).

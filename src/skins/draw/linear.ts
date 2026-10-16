@@ -1,3 +1,4 @@
+import { direction } from './types'
 import type { DrawSkin, GradientStop } from './types'
 
 // The colors spread at even stops, the first at 0 and the last at 1
@@ -9,9 +10,7 @@ export function evenStops(colors: string[]): GradientStop[] {
 // A linear gradient as CSS draws it: the angle points up at 0° and turns clockwise, and the
 // line goes through the center, long enough for the first and last colors to reach the corners.
 export const drawLinear: DrawSkin = (params, colors, page) => {
-  const angle = ((params.angle ?? 0) * Math.PI) / 180
-  const dx = Math.sin(angle)
-  const dy = -Math.cos(angle) // SVG's y grows downwards
+  const { dx, dy } = direction(params.angle ?? 0)
   const half = (Math.abs(page.width * dx) + Math.abs(page.height * dy)) / 2
   const cx = page.width / 2
   const cy = page.height / 2

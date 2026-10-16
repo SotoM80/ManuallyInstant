@@ -23,7 +23,7 @@ function backdrop(page = 'Brand concept') {
 
 // What each page draws, from the bottom group to the top one
 function drawnKinds(page = 'Brand concept') {
-  return [...(backdrop(page)?.querySelectorAll('g') ?? [])].map((group) => group.getAttribute('data-skin'));
+  return [...(backdrop(page)?.querySelectorAll(':scope > g') ?? [])].map((group) => group.getAttribute('data-skin'));
 }
 
 function layerNames(form: HTMLElement) {
@@ -51,9 +51,13 @@ describe('Skin – layers', () => {
     expect(within(gallery).getAllByRole('button').map((card) => card.getAttribute('aria-label'))).toEqual([
       'Add Linear',
       'Add Radial',
+      'Add Circles',
+      'Add Diagonal block',
+      'Add Waves',
       'Add Dots',
       'Add Stripes',
     ]);
+    expect(within(gallery).getByText('Shapes')).toBeInTheDocument();
     expect(within(gallery).queryByText('Textures')).not.toBeInTheDocument();
   });
 
@@ -117,6 +121,18 @@ describe('Skin – layers', () => {
     fireEvent.click(within(form).getByRole('button', { name: 'Remove Dots' }));
     expect(layerNames(form)).toEqual(['Linear']);
     expect(drawnKinds()).toEqual(['linear']);
+  });
+
+  it('draws Shapes on the page, turned around its center', () => {
+    renderApp();
+    const form = openSkin();
+    add(form, 'Waves');
+    add(form, 'Circles');
+    add(form, 'Diagonal block');
+    expect(drawnKinds()).toEqual(['shapes', 'shapes', 'shapes']);
+    const [waves] = backdrop()!.querySelectorAll(':scope > g');
+    expect(waves.querySelector('g')).toHaveAttribute('transform', 'rotate(0 105 148.5)');
+    expect(waves.querySelectorAll('path').length).toBeGreaterThan(3);
   });
 
   it('allows up to four layers (scenarios 9 and 10)', () => {
