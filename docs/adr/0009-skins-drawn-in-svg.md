@@ -1,7 +1,7 @@
 # ADR 0009: Skins drawn in SVG, measured in mm
 
 ## Status
-Proposed — 2026-10-15
+Accepted — 2026-10-16
 
 ## Context
 The manual gets **skins**: a decorative layer behind every page, made from two colors of the brand palette (see `specs/skins.md`). The first version has Linear, Radial, Dots and Stripes; Shapes and Textures come later. A skin must look the same in the preview, in every template, orientation and view, and later in both PDFs (Phase 4). The app is frontend only (ADR 0002).

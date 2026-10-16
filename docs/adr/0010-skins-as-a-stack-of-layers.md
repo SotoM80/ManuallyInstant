@@ -1,7 +1,7 @@
 # ADR 0010: Skins as a stack of layers, reordered with buttons
 
 ## Status
-Proposed — 2026-10-16
+Accepted — 2026-10-16
 
 ## Context
 The first version of skins (ADR 0009, `specs/skins.md`) let the user pick **one** preset. Designers want to combine them: a gradient under a pattern, a shape over both. That needs several layers at once, a way to turn each one on or off, and a way to decide which one sits on top.

@@ -1,7 +1,7 @@
 # ADR 0011: The Cover's colors only paint the Cover; the Skin owns its colors
 
 ## Status
-Proposed — 2026-10-16
+Accepted — 2026-10-16
 
 ## Context
 Until now the Cover section had two colors that reached the whole manual: its **Background color** painted every page, and its **Typography color** colored the text of every page (and the lines of the construction grid). The Skin used them too, as the colors that filled in when the palette had none, and its layers could only use palette colors (by id, with Auto).
