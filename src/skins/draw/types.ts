@@ -16,6 +16,10 @@ export type Mark =
   | { type: 'rect'; x: number; y: number; width: number; height: number; color: string }
   | { type: 'path'; d: string; color: string }
 
+// One color of a texture: it shows where a channel of the noise is high. Its opacity is
+// gain × channel − cut, so a bigger cut leaves fewer, smaller specks.
+export type Tint = { color: string; channel: 'r' | 'g' | 'b'; gain: number; cut: number }
+
 // What a drawing returns: plain numbers and colors, turned into SVG by SkinBackdrop.
 // Gradients cover the page; a pattern only draws its marks, so what is under it shows between
 // them; shapes are marks drawn once on the page, turned by `angle` around its center.
@@ -24,6 +28,9 @@ export type SkinShape =
   | { kind: 'radial'; cx: number; cy: number; r: number; stops: GradientStop[] }
   | { kind: 'pattern'; width: number; height: number; angle: number; marks: Mark[] }
   | { kind: 'shapes'; angle: number; marks: Mark[] }
+  // Noise (feTurbulence) in mm of the page: `frequency` in cycles per mm across and down, over an
+  // optional base color. A fixed seed draws the same noise everywhere, the PDF included.
+  | { kind: 'texture'; frequency: [number, number]; octaves: number; seed: number; base?: string; tints: Tint[] }
 
 // The direction of a CSS angle in SVG: 0° points up, turning clockwise (y grows downwards)
 export function direction(degrees: number) {

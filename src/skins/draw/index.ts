@@ -6,6 +6,8 @@ import { drawStripes } from './stripes'
 import { drawCircles } from './circles'
 import { drawDiagonal } from './diagonal'
 import { drawWaves } from './waves'
+import { drawGrain } from './grain'
+import { drawPaper } from './paper'
 import type { DrawSkin, Page } from './types'
 
 // The drawing of each preset. Only presets listed here are shown in the gallery,
@@ -18,6 +20,8 @@ export const SKIN_DRAWINGS: Record<string, DrawSkin> = {
   waves: drawWaves,
   dots: drawDots,
   stripes: drawStripes,
+  grain: drawGrain,
+  paper: drawPaper,
 }
 
 // What to draw for a layer, or null for a preset with no drawing

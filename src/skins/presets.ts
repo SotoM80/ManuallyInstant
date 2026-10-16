@@ -8,7 +8,7 @@ const DEFAULT_INTENSITY = 30
 
 const angle = (label = 'Angle'): SkinControl => ({ key: 'angle', label, min: 0, max: 360, step: 5, unit: '°' })
 
-// The presets, grouped by type in the gallery (see specs/skins.md); Textures come later.
+// The presets, grouped by type in the gallery (see specs/skins.md).
 // The form is built from their controls, so a new preset only needs an entry here and a way
 // to draw it (draw/).
 const PRESETS: SkinPreset[] = [
@@ -79,6 +79,20 @@ const PRESETS: SkinPreset[] = [
       { key: 'thickness', label: 'Thickness', min: 1, max: 20, step: 1, unit: 'mm' },
       angle(),
     ],
+  },
+  {
+    id: 'grain',
+    name: 'Grain',
+    type: 'texture',
+    defaults: { size: 1 },
+    controls: [{ key: 'size', label: 'Grain size', min: 0.5, max: 4, step: 0.5, unit: '' }],
+  },
+  {
+    id: 'paper',
+    name: 'Paper',
+    type: 'texture',
+    defaults: { size: 2 },
+    controls: [{ key: 'size', label: 'Fiber size', min: 1, max: 6, step: 0.5, unit: '' }],
   },
 ]
 

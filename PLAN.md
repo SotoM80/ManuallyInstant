@@ -28,7 +28,8 @@
 
 ## Future
 - [ ] Vector print PDF (svg2pdf.js): selectable text and embedded fonts (a new ADR)
-- [ ] Skin textures (Grain, Paper), once the PDF library is chosen (`feTurbulence`)
+- [x] Skin textures: Grain and Paper (`feTurbulence`, drawn by the browser in the PDF too)
+- [ ] Revisit the textures after more use: how dense the grain is and how strong the fibers are (`gain` and `cut` in `src/skins/draw/grain.ts` and `paper.ts`), maybe more textures
 - [ ] Move skin layers by drag and drop, on top of the ↑ ↓ buttons (optional)
 - [ ] Cover title uses the Primary font of the Typography section (today it keeps its own font picker)
 - [ ] Mockups section (once the Logo section and Phases 3–4 are done): a new section and a page "5. Mockups" that shows the logo on products (business card, t-shirt, mug, tote bag, sign, phone screen)

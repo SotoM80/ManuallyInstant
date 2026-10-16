@@ -92,10 +92,12 @@ describe('Export – buttons', () => {
     renderApp();
     touchEverySection();
     fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Download print PDF' })).toHaveTextContent('Creating… 3/7'));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Download print PDF' })).toHaveTextContent('Creating… 3/7'), {
+      timeout: 5000, // the copy waits until it is drawn before the first page
+    });
     expect(screen.getByRole('button', { name: 'Download web PDF' })).toBeDisabled();
     finish();
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Download print PDF' })).toBeEnabled());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Download print PDF' })).toBeEnabled(), { timeout: 5000 });
     expect(screen.getByRole('button', { name: 'Download print PDF' })).toHaveTextContent('↓ Print PDF');
   });
 
@@ -104,7 +106,7 @@ describe('Export – buttons', () => {
     renderApp();
     touchEverySection();
     fireEvent.click(screen.getByRole('button', { name: 'Download web PDF' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('The PDF could not be created. Try again.');
+    expect(await screen.findByRole('alert', {}, { timeout: 5000 })).toHaveTextContent('The PDF could not be created. Try again.');
     expect(screen.getByRole('button', { name: 'Download web PDF' })).toBeEnabled();
   });
 
@@ -117,7 +119,7 @@ describe('Export – buttons', () => {
     renderApp();
     touchEverySection();
     fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
-    await waitFor(() => expect(pagesSeen).toHaveLength(MANUAL_PAGES.length));
+    await waitFor(() => expect(pagesSeen).toHaveLength(MANUAL_PAGES.length), { timeout: 5000 });
     await waitFor(() => expect(document.querySelector('.manual-export')).toBeNull());
   });
 });

@@ -1,7 +1,7 @@
-import { useId } from 'react'
+import { Fragment, useId } from 'react'
 import { drawLayer } from '../../skins/draw'
 import { pageSize } from '../../skins/draw/types'
-import type { GradientStop, Mark, SkinShape } from '../../skins/draw/types'
+import type { GradientStop, Mark, SkinShape, Tint } from '../../skins/draw/types'
 import type { SkinLayer } from '../../skins/types'
 import type { Orientation } from '../../types'
 
@@ -27,12 +27,66 @@ function marks(list: Mark[]) {
   })
 }
 
+// The noise channel a tint reads, as the alpha row of a color matrix: alpha = gain × channel − cut
+const CHANNELS: Record<Tint['channel'], number> = { r: 0, g: 1, b: 2 }
+function alphaFrom(tint: Tint) {
+  const row = [0, 0, 0, 0, -tint.cut]
+  row[CHANNELS[tint.channel]] = tint.gain
+  return `0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${row.join(' ')}`
+}
+
+// A texture as an SVG filter over the page, in mm (primitiveUnits): the noise, then each tint
+// painted where its channel is high, merged in order over the optional base color
+function texture(shape: Extract<SkinShape, { kind: 'texture' }>, id: string, page: { width: number; height: number }) {
+  return (
+    <>
+      <defs>
+        <filter
+          id={id}
+          filterUnits="userSpaceOnUse"
+          primitiveUnits="userSpaceOnUse"
+          x={0}
+          y={0}
+          width={page.width}
+          height={page.height}
+          colorInterpolationFilters="sRGB"
+        >
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency={shape.frequency.join(' ')}
+            numOctaves={shape.octaves}
+            seed={shape.seed}
+            result="noise"
+          />
+          {shape.tints.map((tint, i) => (
+            // A Fragment, not a <g>: a filter only takes filter primitives as children
+            <Fragment key={i}>
+              <feColorMatrix in="noise" type="matrix" values={alphaFrom(tint)} result={`mask-${i}`} />
+              <feFlood floodColor={tint.color} result={`color-${i}`} />
+              <feComposite in={`color-${i}`} in2={`mask-${i}`} operator="in" result={`tint-${i}`} />
+            </Fragment>
+          ))}
+          <feMerge>
+            {shape.tints.map((_, i) => (
+              <feMergeNode key={i} in={`tint-${i}`} />
+            ))}
+          </feMerge>
+        </filter>
+      </defs>
+      {shape.base && <rect width={page.width} height={page.height} fill={shape.base} />}
+      <rect width={page.width} height={page.height} filter={`url(#${id})`} />
+    </>
+  )
+}
+
 // How a shape is drawn on the page: shapes are their marks, turned around the page's center;
-// the others are a paint (a gradient or a pattern tile) under `id`, filling the whole page
+// textures are a noise filter; the others are a paint (a gradient or a pattern tile) under `id`,
+// filling the whole page
 function draw(shape: SkinShape, id: string, page: { width: number; height: number }) {
   if (shape.kind === 'shapes') {
     return <g transform={`rotate(${shape.angle} ${page.width / 2} ${page.height / 2})`}>{marks(shape.marks)}</g>
   }
+  if (shape.kind === 'texture') return texture(shape, id, page)
   return (
     <>
       <defs>{paint(shape, id)}</defs>
@@ -42,7 +96,7 @@ function draw(shape: SkinShape, id: string, page: { width: number; height: numbe
 }
 
 // The paint of a gradient or a pattern, under the given id
-function paint(shape: Exclude<SkinShape, { kind: 'shapes' }>, id: string) {
+function paint(shape: Exclude<SkinShape, { kind: 'shapes' | 'texture' }>, id: string) {
   switch (shape.kind) {
     case 'linear':
       return (

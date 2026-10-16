@@ -56,9 +56,11 @@ describe('Skin – layers', () => {
       'Add Waves',
       'Add Dots',
       'Add Stripes',
+      'Add Grain',
+      'Add Paper',
     ]);
     expect(within(gallery).getByText('Shapes')).toBeInTheDocument();
-    expect(within(gallery).queryByText('Textures')).not.toBeInTheDocument();
+    expect(within(gallery).getByText('Textures')).toBeInTheDocument();
   });
 
   it('adds a layer, on and open, drawn on every inner page but not the Cover (scenario 3)', () => {
@@ -146,6 +148,36 @@ describe('Skin – layers', () => {
     const [waves] = backdrop()!.querySelectorAll(':scope > g');
     expect(waves.querySelector('g')).toHaveAttribute('transform', 'rotate(0 105 148.5)');
     expect(waves.querySelectorAll('path').length).toBeGreaterThan(3);
+  });
+
+  it('draws Grain over the layers under it with a fixed noise filter (scenarios 24 and 27)', () => {
+    renderApp();
+    const form = openSkin();
+    add(form, 'Linear');
+    add(form, 'Grain');
+    expect(drawnKinds()).toEqual(['linear', 'texture']);
+    expect(within(form).getByRole('slider', { name: 'Grain size' })).toHaveValue('1');
+    const seeds = INNER_PAGES.map((page) => {
+      const filter = backdrop(page)!.querySelector('filter')!;
+      // Only filter primitives in a filter: a <g> there would be ignored by the browser
+      expect([...filter.children].every((child) => child.tagName.startsWith('fe'))).toBe(true);
+      expect(filter.querySelectorAll('feFlood')).toHaveLength(2);
+      return filter.querySelector('feTurbulence')!.getAttribute('seed');
+    });
+    expect(new Set(seeds).size).toBe(1);
+    const [, grain] = backdrop()!.querySelectorAll(':scope > g');
+    expect(grain.querySelector('rect')).toHaveAttribute('filter', expect.stringMatching(/^url\(#/));
+  });
+
+  it('draws Paper over a base of Color B (scenario 26)', () => {
+    renderApp();
+    const form = openSkin();
+    add(form, 'Paper');
+    const [paper] = backdrop()!.querySelectorAll(':scope > g');
+    const [base, fibers] = paper.querySelectorAll(':scope > rect');
+    expect(base).toHaveAttribute('fill', '#FFFFFF');
+    expect(fibers).toHaveAttribute('filter');
+    expect(paper.querySelector('feTurbulence')).toHaveAttribute('baseFrequency', '0.075 0.6');
   });
 
   it('allows up to four layers (scenarios 9 and 10)', () => {

@@ -8,7 +8,7 @@ The Cover keeps its own colors (see `colorpicker.md`): its Background and Typogr
 A skin does not depend on the template: it is the same stack under every layout, so ADR 0004 (templates change layout, not content) still holds. See ADR 0009 (drawn in SVG) and ADR 0010 (a stack of layers).
 
 ## Out of Scope
-* **Textures** (Grain, Paper): they need `feTurbulence`, which the PDF may not support. They wait for the PDF library ADR.
+* More textures than Grain and Paper (linen, concrete, watercolor…). A random look on every page: the noise is the same on every page and every time (a fixed seed), so the PDF matches the preview.
 * Moving layers by drag and drop (buttons only, see ADR 0010). Blend modes (Multiply, Screen, Overlay…): layers blend by transparency only.
 * More than **4 layers**. More than two colors per layer. Colors that stay linked to the palette (a color taken from it is copied, see ADR 0011).
 * Uploading your own textures or images. A different skin on each page. Animated skins.
@@ -44,7 +44,7 @@ The section has, from top to bottom, the **page colors**, the **Add layer** butt
 * **✕ Remove**: removes the layer at once.
 * **▾**: opens the body: first the checkbox **Also on the Cover** (off by default: a layer is only drawn on the inner pages until it is ticked), then one slider per `control` of its preset (label, min, max, step and unit from `presets.ts`, with the value next to it; **Intensity**, 5–100 % step 5, default 30, is always last), then the layer's **Color A** and **Color B**. The bodies work as an **accordion**, like the colors of the Colors section: only one is open at a time, and a new layer opens and folds the open one.
 
-**Add layer** opens the **gallery** under the button: one card per preset with a drawing, grouped under the headings of `SKIN_TYPES` that have at least one: **Gradients** (Linear, Radial), **Shapes** (Circles, Diagonal block, Waves) and **Patterns** (Dots, Stripes). Each card is a small page with the preset drawn at full strength with the colors a new layer would get. Choosing a card adds a layer **at the top of the list**, with the preset's default values, on, not on the Cover, and open, and closes the gallery. The Add layer button stays still while the gallery folds and the new layer takes its place right under it, and the layer's title takes the focus; only the layer's title is brought into view, never the whole open layer, so a tall one (a Shape) does not pull the page down; the page only scrolls if the title is not in view (e.g. on a small screen). Opening or folding the gallery never moves Add layer either. Its **Color A** is palette color 1 and its **Color B** palette color 2; when one of them does not exist, the Page text color fills in for A and the Page background for B. These are copied values: changing the palette later never changes the layer. Escape or clicking Add layer again closes it with no change. With 4 layers, Add layer is disabled, with the note `Up to 4 layers.`
+**Add layer** opens the **gallery** under the button: one card per preset with a drawing, grouped under the headings of `SKIN_TYPES` that have at least one: **Gradients** (Linear, Radial), **Shapes** (Circles, Diagonal block, Waves), **Patterns** (Dots, Stripes) and **Textures** (Grain, Paper). Each card is a small page with the preset drawn at full strength with the colors a new layer would get. Choosing a card adds a layer **at the top of the list**, with the preset's default values, on, not on the Cover, and open, and closes the gallery. The Add layer button stays still while the gallery folds and the new layer takes its place right under it, and the layer's title takes the focus; only the layer's title is brought into view, never the whole open layer, so a tall one (a Shape) does not pull the page down; the page only scrolls if the title is not in view (e.g. on a small screen). Opening or folding the gallery never moves Add layer either. Its **Color A** is palette color 1 and its **Color B** palette color 2; when one of them does not exist, the Page text color fills in for A and the Page background for B. These are copied values: changing the palette later never changes the layer. Escape or clicking Add layer again closes it with no change. With 4 layers, Add layer is disabled, with the note `Up to 4 layers.`
 
 With no layers, the list shows `No layers yet. The inner pages show their plain Page background.`
 
@@ -69,7 +69,7 @@ Opening the section features **Brand concept**, the first inner page (`SECTION_P
 * **Unique ids**: gradients and patterns are referenced by id (`fill="url(#…)"`), and ids are shared by the whole document. Every SVG gets its own prefix (React `useId`) and every layer adds its own id to it, so no two layers, pages or previews share a definition.
 
 ### The presets
-**Gradients and Diagonal block / Waves cover the whole page**. **Circles, Dots and Stripes** only draw their marks: what is under them (another layer, or the page Background) shows between them.
+**Gradients, Diagonal block, Waves and Paper cover the whole page**. **Circles, Dots, Stripes and Grain** only draw their marks: what is under them (another layer, or the page Background) shows between them.
 * **Linear** — *Angle*: the direction of the gradient, from Color A to Color B. The line is long enough to reach the page's corners, as in CSS. In mm, with `θ` the angle, `L = |w·sin θ| + |h·cos θ|`, and the line runs through the page's center from `center − dir·L/2` to `center + dir·L/2`, where `dir = (sin θ, −cos θ)`.
 * **Radial** — *Center X*, *Center Y*: where Color A is, as a share of the page. *Radius*: where Color B is reached, as a share of the page's diagonal. Past the radius, Color B fills the page.
 * **Circles** — *Count* (1–8): how many circles. *Size* (10–90 %): the diameter of the first one, as a share of the page's shorter side; each next one is 70 % of the one before. *Direction*: the first circle sits at the page's center and the next ones line up towards that angle, each one diameter further, so the last ones may leave the page. The circles alternate Color A and Color B.
@@ -77,6 +77,10 @@ Opening the section features **Brand concept**, the first inner page (`SECTION_P
 * **Waves** — horizontal wavy bands that fill the page, alternating Color A and Color B. *Amplitude* (2–40 mm): the height of a wave from its middle to its top. *Frequency* (1–8): how many whole waves fit across the page's width. *Angle*: how the waves are turned. Each band is twice the amplitude plus 10 mm high.
 * **Dots** — round dots in a square grid, alternating Color A and Color B by row. *Scale*: the distance between dots, in mm (each dot is a third of it wide). *Angle*: how the grid is turned.
 * **Stripes** — parallel stripes, alternating Color A and Color B. *Spacing*: from one stripe to the next, in mm. *Thickness*: the width of each stripe, in mm. *Angle*: their direction (0° runs up the page). Thickness can never pass Spacing: its slider's max is the current Spacing, and lowering Spacing below Thickness lowers Thickness with it.
+* **Grain** — fine specks over the whole page, like film grain or risograph print: some in Color A, some in Color B, and nothing between them, so a Grain layer can sit over any other. *Grain size* (0.5–4, default 1): bigger values give bigger, rarer specks (at 1, each speck is about 1 mm).
+* **Paper** — a sheet of paper: Color B over the whole page, with soft, long fibers of Color A running across it. *Fiber size* (1–6, default 2): bigger values give longer, wider fibers. At the default Intensity (30 %) it reads as a tinted, textured paper.
+
+Grain and Paper are drawn with an SVG noise filter (`feTurbulence`) in mm of the page, with a **fixed seed**: the noise is the same on every page, in the preview and in both PDFs (the PDF is drawn by the browser itself, ADR 0012). Its scale follows the page, so a speck is the same size in mm in every view. Browsers may draw the noise slightly differently.
 
 ### In the code
 * `src/skins/types.ts`: a `Skin` is `{ pageBackground, pageText, layers, nextId }`, with the layers in list order (the first is on top). A `SkinLayer` is `{ id, preset, params, colors, visible, onCover }`, where `colors` are two HEX values; `id` is stable and never reused (`nextId`). `NO_SKIN` has the default page colors and no layers.
@@ -84,7 +88,7 @@ Opening the section features **Brand concept**, the first inner page (`SECTION_P
 * `src/skins/presets.ts` lists the presets (ids, defaults, controls); the form is built from it.
 * `src/skins/colors.ts`: `newLayerColors(palette, skin)`, the copied colors of a new layer.
 * `SkinColorField`: the color picker of `colorpicker.md` (`ColorPicker`) with its own HEX being typed, plus the palette chips.
-* `src/skins/draw/<preset>.ts`: one **pure function** per preset, `(params, [a, b], page) → shape`. `src/skins/draw/index.ts` maps preset ids to them; the gallery offers only presets listed there.
+* `src/skins/draw/<preset>.ts`: one **pure function** per preset, `(params, [a, b], page) → shape`. Textures return a `texture` shape: the noise (frequency in cycles per mm, octaves, seed), an optional base color, and one tint per color with the noise channel it reads and how much it is boosted; `SkinBackdrop` turns it into an SVG filter. `src/skins/draw/index.ts` maps preset ids to them; the gallery offers only presets listed there.
 * `SkinBackdrop` (the component that was `SkinLayer`): draws the visible layers of a skin in one SVG, bottom first. `ManualPreview` puts one in every page, before the content: all layers on the inner pages, only those Also on the Cover on the Cover. The mini previews and gallery cards use it with a one-layer skin.
 * `SkinForm`: the list, the accordion and the gallery.
 * The skin is kept in `App`, above the routes, like the template and the orientation, so it survives moving between pages.
@@ -122,7 +126,7 @@ Only a typed HEX can be wrong. Otherwise:
 ### Scenario 2: The Gallery
 * **Given**: The Skin section is open.
 * **When**: The user clicks Add layer.
-* **Then**: The gallery shows Gradients (Linear, Radial), Shapes (Circles, Diagonal block, Waves) and Patterns (Dots, Stripes), and no Textures.
+* **Then**: The gallery shows Gradients (Linear, Radial), Shapes (Circles, Diagonal block, Waves), Patterns (Dots, Stripes) and Textures (Grain, Paper).
 
 ### Scenario 3: Adding a Layer
 * **Given**: No layers, and the palette has two colors.
@@ -229,6 +233,26 @@ Only a typed HEX can be wrong. Otherwise:
 * **When**: The user types `blue` in its HEX field and leaves it.
 * **Then**: The field shows "Enter a valid HEX color, like #1E88E5", and the inner pages stay White.
 
+### Scenario 24: Grain
+* **Given**: The list has Linear.
+* **When**: The user adds **Grain**.
+* **Then**: Every inner page draws fine specks of Color A and Color B over the gradient, which shows between them, with a *Grain size* slider at 1 and Intensity at 30 %.
+
+### Scenario 25: Grain Size
+* **Given**: A Grain layer with *Grain size* 1.
+* **When**: The user sets *Grain size* to 4.
+* **Then**: The specks are bigger and rarer (the noise frequency is a quarter of what it was).
+
+### Scenario 26: Paper
+* **Given**: No layers.
+* **When**: The user adds **Paper**.
+* **Then**: Every inner page is covered by Color B with soft, long fibers of Color A, at 0.3 opacity, with a *Fiber size* slider at 2.
+
+### Scenario 27: The Same Noise Everywhere
+* **Given**: A Grain layer.
+* **When**: The user looks at two inner pages, and downloads a PDF.
+* **Then**: Both pages, and the PDF, use the same noise (the same frequency and seed), so the grain looks the same.
+
 ## Build Order
 1. ~~Linear, `SkinLayer`, the section with one preset, Radial, Dots and Stripes~~ (done, one preset at a time).
 2. ~~The layer model: `Skin = { layers }`, `src/skins/layers.ts` and its unit tests.~~
@@ -236,4 +260,5 @@ Only a typed HEX can be wrong. Otherwise:
 4. ~~The Skin section as a list: checkbox, mini preview, ↑ ↓ ✕, accordion, Add layer with the gallery, the 4-layer limit.~~
 5. ~~Shapes: Circles, Diagonal block and Waves, one at a time, each with its unit test (after step 6).~~
 6. ~~Page colors and Also on the Cover: the Cover's colors only paint the Cover (ADR 0011), Page background and Page text in the Skin, and the color fields with palette chips.~~
-7. Later: Textures once the PDF library is chosen; the skin in both PDFs (Phase 4).
+7. ~~The skin in both PDFs (Phase 4).~~
+8. Textures: Grain and Paper, with their unit tests (the PDF is drawn by the browser, so `feTurbulence` works there too, ADR 0012).
