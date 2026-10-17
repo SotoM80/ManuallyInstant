@@ -12,6 +12,7 @@ export const MOCKUP_GROUPS: { group: MockupGroup; label: string }[] = [
 // the box where the logo goes (ADR 0013). No <defs> or ids: a product is drawn several times at once.
 export const MOCKUP_PRODUCTS: MockupProduct[] = [
   {
+    kind: 'illustration',
     id: 'business-card',
     name: 'Business card',
     group: 'stationery',
@@ -31,6 +32,7 @@ export const MOCKUP_PRODUCTS: MockupProduct[] = [
     logo: { x: 30, y: 23, width: 40, height: 24 },
   },
   {
+    kind: 'illustration',
     id: 't-shirt',
     name: 'T-shirt',
     group: 'apparel',
@@ -53,6 +55,7 @@ export const MOCKUP_PRODUCTS: MockupProduct[] = [
     logo: { x: 38, y: 28, width: 24, height: 18 },
   },
   {
+    kind: 'illustration',
     id: 'mug',
     name: 'Mug',
     group: 'objects',
@@ -73,6 +76,3 @@ export const MOCKUP_PRODUCTS: MockupProduct[] = [
   },
 ]
 
-export function findMockup(id: string) {
-  return MOCKUP_PRODUCTS.find((product) => product.id === id)
-}

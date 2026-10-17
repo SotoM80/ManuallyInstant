@@ -1,6 +1,7 @@
 import { MockupArt } from './MockupArt'
-import { findMockup } from '../../mockups/products'
-import { mockupLogo, mockupsBrand } from '../../mockups/mockups'
+import { PhotoMockup } from './PhotoMockup'
+import { useMockupCatalog } from '../../mockups/catalog'
+import { mockupLogo, mockupsBrand, settingsFor } from '../../mockups/mockups'
 import type { Mockups } from '../../mockups/types'
 import type { CoverData, LogoData } from '../../types'
 
@@ -15,7 +16,10 @@ type MockupsPageProps = {
 // pages' (so every template places it the same way). See specs/mockups.md.
 export function MockupsPage({ mockups, logo, cover, color }: MockupsPageProps) {
   const brand = mockupsBrand(logo, cover)
-  const products = mockups.chosen.map(findMockup).filter((product) => product !== undefined)
+  const catalog = useMockupCatalog()
+  const products = mockups.chosen
+    .map((id) => catalog.find((item) => item.id === id))
+    .filter((product) => product !== undefined)
   return (
     <div className="logo-page mockups-layout" style={{ color }}>
       {/* A <div>, not a <header>: unlike the Logo pages, this page always has content, and a
@@ -34,14 +38,15 @@ export function MockupsPage({ mockups, logo, cover, color }: MockupsPageProps) {
       ) : (
         <ul className="mockups-grid" data-count={products.length}>
           {products.map((product) => {
-            const settings = mockups.settings[product.id]
+            const settings = settingsFor(mockups, product)
+            const shown = mockupLogo(logo, cover?.logo ?? null, settings.version)
             return (
-              <li key={product.id} className="mockup">
-                <MockupArt
-                  product={product}
-                  color={settings.color}
-                  logo={mockupLogo(logo, cover?.logo ?? null, settings.version)}
-                />
+              <li key={product.id} className="mockup" data-kind={product.kind}>
+                {product.kind === 'photo' ? (
+                  <PhotoMockup template={product} settings={settings} logo={shown} />
+                ) : (
+                  <MockupArt product={product} color={settings.color} logo={shown} />
+                )}
                 <p className="mockup-name">{product.name}</p>
               </li>
             )

@@ -12,6 +12,7 @@ import { NO_SKIN } from './skins/presets'
 import type { Skin } from './skins/types'
 import { DEFAULT_MOCKUPS } from './mockups/mockups'
 import type { Mockups } from './mockups/types'
+import { loadLocalTemplates } from './mockups/catalog'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from './types'
 import './css/App.css'
 
@@ -28,6 +29,11 @@ function App() {
   const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
   const [skin, setSkin] = useState<Skin>(NO_SKIN)
   const [mockups, setMockups] = useState<Mockups>(DEFAULT_MOCKUPS)
+
+  // Photo templates for local tests only, if the file is there (see public/mockups/LICENSES.md)
+  useEffect(() => {
+    loadLocalTemplates()
+  }, [])
 
   const fontFamily = cover?.style.fontFamily ?? DEFAULT_TITLE_STYLE.fontFamily
   useEffect(() => {

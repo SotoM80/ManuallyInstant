@@ -34,8 +34,15 @@
 - [ ] Cover title uses the Primary font of the Typography section (today it keeps its own font picker)
 - [ ] Mockups section and page "8. Mockups" (specs/mockups.md, ADR 0013): the logo on up to 4 of 6 products drawn by the app as SVG from plain data, each with its color and logo version
   - [x] Spec and ADR 0013
-  - [ ] Stable ids for the logo versions (`LogoVariant.id`)
-  - [ ] Data, functions, `MockupArt`, the page, the template CSS and the section with 3 products (Business card, T-shirt, Mug)
+  - [x] Stable ids for the logo versions (`LogoVariant.id`)
+  - [x] Data, functions, `MockupArt`, the page, the template CSS and the section with 3 products (Business card, T-shirt, Mug)
   - [ ] Letterhead, Tote bag and Phone
-  - [ ] README
   - [ ] Later: Envelope, Cap, Storefront sign, Bottle, Browser
+  - [x] Spec and ADR 0014 (photo mockups)
+  - [ ] Photo mockups (ADR 0014): real photos tinted to the brand color, the logo composed in WebGL
+    - [x] Phase 1: templates (Business card photo, from Pexels), tint, Printed/Solid, drag/arrows/Size/Rotation/Reset, PNG at 1500 px with a sharper logo
+    - [x] Template editor: magic wand, brush, eraser, undo, softened mask; the logo area as a grid of points (angles and curves, drawn on a mesh); Use now / Download template; Upload your own photo
+    - [x] Local-only test photos through `public/mockups/local-templates.json` (ignored by git)
+    - [ ] More shipped photos with a commercial license (a plain white t-shirt, a mug at an angle, a tote bag), each with its template made in the editor
+    - [ ] Folds: displacement from the photo's brightness (Amount slider)
+    - [ ] Accept ADRs 0013 and 0014, README, merge to `main`

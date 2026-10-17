@@ -922,3 +922,233 @@
 .mockup-settings .palette-block-header {
   gap: 8px;
 }
+
+/* A photo template's thumbnail, and its tag in the list */
+.mockup-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 3px;
+}
+
+.mockup-tag {
+  margin-left: auto;
+  padding: 0 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* Placing the logo on a photo mockup: the preview, and a handle over the logo to drag it */
+.placement-preview {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.placement-preview .photo-mockup {
+  width: 100%;
+}
+
+.placement-preview .photo-mockup-note {
+  font-size: 12px;
+  padding: 24px;
+}
+
+.placement-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* The logo's outline, along the area's shape: drag it to move the logo */
+.placement-handle {
+  fill: rgb(170 59 255 / 6%);
+  stroke: transparent;
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 4 3;
+  cursor: grab;
+  outline: none;
+  transition: stroke var(--dur-fast) ease;
+}
+
+.placement-handle:hover,
+.placement-handle:focus-visible,
+.placement-handle[data-dragging='true'] {
+  stroke: var(--accent);
+}
+
+.placement-handle[data-dragging='true'] {
+  cursor: grabbing;
+  fill: rgb(170 59 255 / 14%);
+}
+
+/* Upload your own photo: the real file input stays for keyboard and screen readers (see .file-field) */
+.mockup-upload {
+  justify-content: flex-start;
+}
+
+/* The template editor (specs/mockups.md): a large window over the page, the photo on the left
+   and the tools on the right (stacked on narrow screens) */
+.template-editor-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 45%);
+}
+
+.template-editor {
+  width: min(1100px, 100%);
+  max-height: calc(100dvh - 32px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text-h);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  text-align: left;
+}
+
+.template-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.template-editor-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.template-editor-body {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 24px;
+  padding: 20px 24px 24px;
+  overflow: auto;
+}
+
+/* min-width: 0, so the photo shrinks to its column instead of pushing it past the window's edge */
+.template-editor-stage {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.template-editor-canvas {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  touch-action: none;
+}
+
+.template-editor-canvas canvas {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100dvh - 140px);
+  cursor: crosshair;
+}
+
+.template-editor-canvas[data-tool='brush'] canvas,
+.template-editor-canvas[data-tool='erase'] canvas {
+  cursor: cell;
+}
+
+/* Where the logo goes: the area's outline and lines along its curves, and its points to drag */
+.template-editor-area {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.template-editor-area polyline {
+  stroke: var(--accent);
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 5 4;
+}
+
+.template-editor-area circle {
+  fill: #ffffff;
+  stroke: var(--accent);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+  cursor: move;
+  pointer-events: all;
+}
+
+.template-editor-area circle:focus-visible {
+  outline: none;
+  fill: var(--accent);
+}
+
+.template-editor-tools {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+/* The tool and selection pickers wrap inside the column: in one row they are wider than it, and
+   would run past the window's right padding */
+.template-editor-tools .segmented-control {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* Still floated, so it stays inside the border (a legend that does not float sits on it), but
+   on its own line, with the options below */
+.template-editor-tools .segmented-control legend {
+  width: 100%;
+  margin: 0 0 2px;
+}
+
+.template-editor-tools input[type='text'],
+.template-editor-tools select {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  text-align: left;
+}
+
+.template-editor-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.template-editor-preview {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.template-editor-preview .photo-mockup-note {
+  font-size: 12px;
+  padding: 16px;
+}
+
+@media (max-width: 800px) {
+  .template-editor-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

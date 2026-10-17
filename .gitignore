@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Mockup photos for local tests only, without a license to ship them (see public/mockups/LICENSES.md)
+public/mockups/local-templates.json
+public/mockups/t-shirt.jpeg
+public/mockups/pexels-tarjeta.jpg

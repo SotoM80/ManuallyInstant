@@ -67,7 +67,7 @@ describe('DEFAULT_MOCKUPS', () => {
       MOCKUP_PRODUCTS.map((product) => product.id).filter((id) => ['business-card', 't-shirt', 'mug', 'phone'].includes(id)),
     );
     for (const product of MOCKUP_PRODUCTS) {
-      expect(DEFAULT_MOCKUPS.settings[product.id]).toEqual({ color: product.color, version: null });
+      expect(DEFAULT_MOCKUPS.settings[product.id]).toMatchObject({ color: product.color, version: null });
     }
   });
 });
@@ -90,7 +90,7 @@ describe('toggleMockup', () => {
     const red = setMockupVersion(setMockupColor(DEFAULT_MOCKUPS, 'mug', '#E53935'), 'mug', 4);
     const again = toggleMockup(toggleMockup(red, 'mug'), 'mug');
     expect(again.chosen).toContain('mug');
-    expect(again.settings.mug).toEqual({ color: '#E53935', version: 4 });
+    expect(again.settings.mug).toMatchObject({ color: '#E53935', version: 4 });
   });
 });
 

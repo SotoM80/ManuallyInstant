@@ -46,10 +46,31 @@ function settled(root: HTMLElement) {
   })
 }
 
-// Waits until the copied pages are ready to be drawn: fonts loaded, images decoded, and every
-// page done drawing itself
+// Resolves once no photo mockup in `root` is still being composed (they mark themselves with
+// data-rendering, see PhotoMockup), or after MAX_RENDER_MS
+const MAX_RENDER_MS = 15000
+function mockupsDrawn(root: HTMLElement) {
+  return new Promise<void>((done) => {
+    const busy = () => root.querySelector('[data-rendering]') !== null
+    if (!busy()) return done()
+    const limit = setTimeout(finish, MAX_RENDER_MS)
+    const observer = new MutationObserver(() => {
+      if (!busy()) finish()
+    })
+    observer.observe(root, { subtree: true, childList: true, attributes: true })
+    function finish() {
+      observer.disconnect()
+      clearTimeout(limit)
+      done()
+    }
+  })
+}
+
+// Waits until the copied pages are ready to be drawn: fonts loaded, photo mockups composed,
+// images decoded, and every page done drawing itself
 async function pagesReady(root: HTMLElement) {
   await document.fonts?.ready
+  await mockupsDrawn(root)
   const images = Array.from(root.querySelectorAll('img'))
   await Promise.all(images.map((image) => (typeof image.decode === 'function' ? image.decode().catch(() => {}) : null)))
   await settled(root)
