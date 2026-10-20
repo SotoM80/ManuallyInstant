@@ -15,6 +15,7 @@ import type { LogoParts } from '../data/manualSections'
 import { keepInPlace } from '../utils/scrollAnchor'
 import { validateImage, validatePositiveNumber } from '../utils/validation'
 import { RULER_ERROR, parseRuler } from '../utils/rulers'
+import { logoLayers } from '../utils/logoLayers'
 import {
   NO_IMAGE,
   chooseFile,
@@ -45,11 +46,17 @@ type CardDraft = {
   image: PendingImage
   fileError: string
   parts: PartDraft[]
+  layersNote: string // what happened to the layers of the last SVG chosen, '' → nothing to say
 }
 
-const EMPTY_CARD: CardDraft = { name: '', role: '', image: NO_IMAGE, fileError: '', parts: [] }
+const EMPTY_CARD: CardDraft = { name: '', role: '', image: NO_IMAGE, fileError: '', parts: [], layersNote: '' }
 
 const MAX_PARTS = 4
+
+// The hints of a layered SVG (see specs/logolayers.md)
+const LAYERS_KEPT = 'Remove the parts of this card to use the layers of this SVG.'
+const LAYERS_CUT = `Only the first ${MAX_PARTS} layers are used.`
+const LAYERS_UNREADABLE = 'The layers of this SVG could not be read.'
 
 // Suggestions for a part's label; any other label can be typed.
 // The same double names as the mark types (Symbol = Isotype, Wordmark = Logotype).
@@ -101,6 +108,8 @@ export function LogoForm({
   parts = LOGO_PARTS,
 }: LogoFormProps) {
   const nextKey = useRef(1)
+  // The last file chosen in each card: the layers of an older one, read late, are dropped
+  const latestCardFile = useRef<Partial<Record<MarkType, File | null>>>({})
   const [brandName, setBrandName] = useState('')
   // The brand may use several kinds of mark (at least one); each chosen one gets a card.
   const [markTypes, setMarkTypes] = useState<MarkType[]>(DEFAULT_MARK_TYPES)
@@ -251,9 +260,38 @@ export function LogoForm({
   // A valid one waits for Apply.
   function chooseCardFile(type: MarkType, file: File | null) {
     const card = cards[type] ?? EMPTY_CARD
+    const fileError = file ? validateImage(file) : ''
     updateCard(type, {
       image: chooseFile(card.image, file, applyCount, card.fileError),
-      fileError: file ? validateImage(file) : '',
+      fileError,
+      layersNote: '',
+    })
+    latestCardFile.current[type] = file
+    if (file && !fileError) void fillPartsFromLayers(type, file)
+  }
+
+  // A layered SVG gives a card with no parts one part per layer (see specs/logolayers.md).
+  // Its images count as chosen with the card's image, so the same Apply shows them all, even
+  // if Apply is pressed while the file is still being read.
+  async function fillPartsFromLayers(type: MarkType, file: File) {
+    const chosenAt = applyCount
+    const result = await logoLayers(file, MAX_PARTS)
+    if (result.kind === 'none' || latestCardFile.current[type] !== file) return
+    setCards((prev) => {
+      const card = { ...EMPTY_CARD, ...prev[type] }
+      if (result.kind === 'unreadable') return { ...prev, [type]: { ...card, layersNote: LAYERS_UNREADABLE } }
+      if (card.parts.length > 0) return { ...prev, [type]: { ...card, layersNote: LAYERS_KEPT } }
+      const parts = result.parts.map(
+        (part): PartDraft => ({
+          key: takeKey(),
+          label: part.label,
+          name: '',
+          role: '',
+          image: chooseFile(NO_IMAGE, part.file, chosenAt, ''),
+          fileError: '',
+        }),
+      )
+      return { ...prev, [type]: { ...card, parts, layersNote: result.total > MAX_PARTS ? LAYERS_CUT : '' } }
     })
   }
 
@@ -384,6 +422,10 @@ export function LogoForm({
             {markTypesError}
           </p>
         )}
+        <p className="logo-form-hint">
+          Layered logo? Export it from Illustrator as SVG, with Object IDs: Layer Names and the text outlined, and
+          each layer becomes a part.
+        </p>
 
         <datalist id="logo-part-labels">
           {PART_LABELS.map((label) => (
@@ -405,6 +447,11 @@ export function LogoForm({
                 error={card.fileError}
                 onChange={(file) => chooseCardFile(type, file)}
               />
+              {card.layersNote && (
+                <p className="logo-form-hint" role="status">
+                  {card.layersNote}
+                </p>
+              )}
               <div className="logo-mark-card-fields">
                 <input
                   type="text"
