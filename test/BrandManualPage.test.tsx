@@ -447,6 +447,22 @@ describe('Brand Manual – open section beside its page', () => {
       expect(offset()).toBe('80px');
     });
 
+    it('keeps the same offset when the page is scrolled and the preview is stuck', () => {
+      rect.mockImplementation(function (this: Element) {
+        if (this.classList.contains('manual-preview')) return { top: 16, left: 0 } as DOMRect;
+        if (this.classList.contains('manual-pages')) return { top: 156, left: 0 } as DOMRect;
+        if (this.classList.contains('manual-sections')) return { top: -2000, left: 0 } as DOMRect;
+        if (this.parentElement?.classList.contains('manual-sections')) return { top: -1940, left: 0 } as DOMRect;
+        return { top: 0, left: 0 } as DOMRect;
+      });
+      window.scrollBy = jest.fn(); // opening a section scrolled out of view brings it back (jsdom has no scrolling)
+      renderApp('/brand-manual');
+
+      openSection('5. Skin');
+
+      expect(offset()).toBe('80px');
+    });
+
     it('does not align when every section is folded', () => {
       renderApp('/brand-manual');
 

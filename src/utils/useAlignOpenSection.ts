@@ -14,18 +14,24 @@ export function useAlignOpenSection(root: RefObject<HTMLElement | null>, active:
     if (!element) return
     const reset = () => element.style.removeProperty('--sections-offset')
 
+    const preview = element.querySelector('.manual-preview')
     const pages = element.querySelector('.manual-pages')
+    const sectionColumn = element.querySelector('.manual-sections')
     const sections = element.querySelector('.manual-sections ol')
     const sideBySide = window.matchMedia?.(TWO_COLUMNS).matches ?? true
-    if (!active || !pages || !sections || !sideBySide) {
+    if (!active || !preview || !pages || !sectionColumn || !sections || !sideBySide) {
       reset()
       return
     }
 
-    // Both are measured on screen at the same moment, so scrolling does not change the gap.
-    // The list's top does not move with its own padding, so there is no feedback loop.
+    // Each list is measured from the top of its own column. The preview is sticky: once the
+    // page scrolls, it stays on screen while the sections go up, so comparing the two lists
+    // on screen would add the scroll to the gap (and a resize then pushed everything far down).
+    // Both columns start at the same height, and the list's top does not move with its own
+    // padding, so there is no feedback loop.
     function align() {
-      const gap = (pages as Element).getBoundingClientRect().top - (sections as Element).getBoundingClientRect().top
+      const top = (node: Element) => node.getBoundingClientRect().top
+      const gap = top(pages!) - top(preview!) - (top(sections!) - top(sectionColumn!))
       element!.style.setProperty('--sections-offset', `${Math.max(0, Math.round(gap))}px`)
     }
 
