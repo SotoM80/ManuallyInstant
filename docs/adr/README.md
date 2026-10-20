@@ -26,4 +26,4 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0012](0012-pdf-pages-drawn-as-images.md) | PDF pages drawn as images, with html-to-image and jsPDF | Accepted | 2026-10-16 |
 | [0013](0013-mockups-as-svg-illustrations.md) | Mockups drawn as SVG illustrations from plain data | Proposed | 2026-10-16 |
 | [0014](0014-photo-mockups-composed-in-webgl.md) | Photo mockups composed in WebGL, shown as images | Proposed | 2026-10-16 |
-| [0015](0015-logo-layers-from-svg.md) | Logo layers read from SVG in the browser | Proposed | 2026-10-20 |
+| [0015](0015-logo-layers-from-svg.md) | Logo layers read from SVG in the browser | Accepted | 2026-10-20 |

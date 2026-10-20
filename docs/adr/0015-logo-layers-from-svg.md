@@ -1,7 +1,7 @@
 # ADR 0015: Logo layers read from SVG in the browser
 
 ## Status
-Proposed — 2026-10-20
+Accepted — 2026-10-20
 
 ## Context
 Designers build logos in Illustrator with each piece on its own layer (logotype, tagline). The Anatomy group of the Logo section asks for one image per part, so today they must export every piece by hand. They want to upload the logo once and keep its layers (`specs/logolayers.md`).
