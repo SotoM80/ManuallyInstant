@@ -21,6 +21,7 @@ The content of the Logo section (it will have its own future spec). The content 
 
   Choosing an option changes the view immediately. It only changes how the preview looks, not the manual or the PDF.
 * **Template** (next to Preview view): A group labeled "Template" with three options: **Template 1** (default), **Template 2** and **Template 3**. It changes where the content sits on every page, immediately. See `templates.md`.
+* **Full screen** (after Template): a button that shows every page at the size of the screen, without the form. See `fullscreen.md`.
 * **Left column — Manual Preview**: A region labeled "Manual preview". It shows the manual's pages as small page thumbnails, in this order:
   1. **Cover**: shows the brand manual title with its style, the applied logo and "Designed by <name>", placed by the template (see `cover.md`). Each empty slot shows its placeholder: "Your brand manual title", "Your logo" and "Designed by …".
   2. **Logo**
