@@ -9,19 +9,20 @@ A web app that builds a brand's visual identity manual in minutes.
 ## English
 
 ### What it does
-Design agencies fill in six sections, and the brand manual updates **live** next to the form:
+Design agencies fill in seven sections, and the brand manual updates **live** next to the form:
 
 1. **Cover**: manual title (font, style, size), the Cover's own colors, "Designed by" and the main logo.
 2. **Logo**: brand name, the idea behind it, the kinds of mark it uses (Logotype, Isotype, Imagotype, Isologo), the official versions of the logo (Horizontal, Symbol only…) and its clear space and minimum sizes.
-3. **Colors**: 1 to 6 colors, each with a name and its HEX, RGB and CMYK (approximate) values.
-4. **Typography**: a primary and a secondary font from Google Fonts.
-5. **Skin**: the background and text colors of the inner pages, and up to 4 decorative layers behind them.
-6. **Mockups**: the logo on up to 4 products, illustrated by the app or from real photos.
+3. **Usage**: how the brand must and must not be used, with up to 6 examples per page (an image and a description), marked ✓ or ✕.
+4. **Colors**: 1 to 6 colors, each with a name and its HEX, RGB and CMYK (approximate) values.
+5. **Typography**: a primary and a secondary font from Google Fonts.
+6. **Skin**: the background and text colors of the inner pages, and up to 4 decorative layers behind them.
+7. **Mockups**: the logo on up to 4 products, illustrated by the app or from real photos.
 
 Key features:
 - **Two PDFs in one click**: **↓ Print PDF** (300 dpi, CMYK values highlighted) and **↓ Web PDF** (144 dpi, HEX and RGB highlighted, lightweight), next to Apply. Every page, in the chosen template, orientation and skin, looks as in the preview; empty sections are pointed out before downloading.
 - **Live preview**: text, colors and fonts show as you type. A new image waits for the **Apply** button, so it is never swapped in by accident.
-- **Work side by side**: when a section opens, it moves to the top of its column and its page moves to the top of the preview, at the same height. In the Logo section, clicking in an area (Concept, Anatomy, Versions…) makes its page the main one.
+- **Work side by side**: when a section opens, it moves to the top of its column and its page moves to the top of the preview, at the same height. In the Logo and Usage sections, clicking in an area (Concept, Anatomy, Versions…, or Correct use and Incorrect use) makes its page the main one.
 - **Logo scrolls on its own**: the long Logo section scrolls inside, so the preview stays still; at its top or bottom, the page scrolls on.
 - **Construction grid drawn for you**: the app reads the logo's visible pixels and fits a grid of square modules to it (12, 16 or 24 across). X is a setting shared by the clear space and the grid; click the grid's rulers to place guides measured in X, and the logo's overall width and height are shown in X too. Uploading your own grid is still possible.
 - **Layered logos from Illustrator**: export the logo as SVG (Object IDs: Layer Names) and choose it in an Anatomy card. Each layer becomes a part of the mark (up to 4), in reading order, cropped to what it draws. Layers named Isotipo, Logotipo or Tagline get their label on their own.
@@ -34,8 +35,9 @@ Key features:
 <!-- A screenshot of the Brand Manual page can go here. -->
 
 ### Status
-- ✅ Every section (Cover, Logo, Colors, Typography, Skin), the live preview and the three templates.
+- ✅ Every section (Cover, Logo, Usage, Colors, Typography, Skin), the live preview and the three templates.
 - ✅ Logo pages: Brand concept, Anatomy, Logo versions and Clear space.
+- ✅ Usage pages: Correct use and Incorrect use, each with a grid of up to 6 examples (see the [spec](specs/usage.md)). The manual has 10 pages.
 - ✅ Anatomy parts filled from the layers of an SVG exported from Illustrator (see the [spec](specs/logolayers.md)).
 - ✅ A construction grid drawn by the app, fitted to the logo, with guides and measures in X.
 - ✅ Skins: page colors and up to 4 layers of gradients, shapes, patterns and textures (see the [spec](specs/skins.md)).
@@ -48,7 +50,7 @@ Limits: it is frontend only, nothing is saved between sessions (refreshing clear
 ### How it was built
 - **Specs first**: each feature is described before it is coded, with Given-When-Then scenarios, in [`specs/`](specs/).
 - **Decisions on record**: every important choice, with the options weighed, is an Architecture Decision Record in [`docs/adr/`](docs/adr/README.md). For example: [live preview with Apply for images](docs/adr/0007-live-preview-with-apply-for-images.md).
-- **Tested**: around 420 tests with Jest and React Testing Library, written from the spec scenarios.
+- **Tested**: around 430 tests with Jest and React Testing Library, written from the spec scenarios.
 - **One feature at a time**: each change is tried on its own branch and only reaches `main` once it works.
 
 **Tech stack:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint
@@ -106,19 +108,20 @@ Write its spec in `specs/` first, and add its tests in `test/`.
 ## Español
 
 ### Qué hace
-Las agencias de diseño completan seis secciones, y el manual de marca se actualiza **en vivo** al lado del formulario:
+Las agencias de diseño completan siete secciones, y el manual de marca se actualiza **en vivo** al lado del formulario:
 
 1. **Cover** (portada): título del manual (fuente, estilo y tamaño), los colores propios de la portada, "Designed by" y el logotipo principal.
 2. **Logo**: nombre de la marca, la idea detrás de ella, los tipos de marca que usa (Logotipo, Isotipo, Imagotipo, Isologo), las versiones oficiales del logo (Horizontal, Solo símbolo…) y su área de respeto y tamaños mínimos.
-3. **Colors**: de 1 a 6 colores, cada uno con su nombre y sus valores HEX, RGB y CMYK (aproximado).
-4. **Typography**: una fuente principal y una secundaria de Google Fonts.
-5. **Skin**: los colores de fondo y de texto de las hojas interiores, y hasta 4 capas decorativas detrás de ellas.
-6. **Mockups**: el logo en hasta 4 productos, ilustrados por la app o a partir de fotos reales.
+3. **Usage**: cómo se debe y cómo no se debe usar la marca, con hasta 6 ejemplos por hoja (una imagen y una descripción), marcados con ✓ o ✕.
+4. **Colors**: de 1 a 6 colores, cada uno con su nombre y sus valores HEX, RGB y CMYK (aproximado).
+5. **Typography**: una fuente principal y una secundaria de Google Fonts.
+6. **Skin**: los colores de fondo y de texto de las hojas interiores, y hasta 4 capas decorativas detrás de ellas.
+7. **Mockups**: el logo en hasta 4 productos, ilustrados por la app o a partir de fotos reales.
 
 Funciones clave:
 - **Dos PDF con un clic**: **↓ Print PDF** (300 dpi, valores CMYK destacados) y **↓ Web PDF** (144 dpi, HEX y RGB destacados, liviano), junto a Apply. Todas las hojas, con la plantilla, la orientación y la skin elegidas, se ven como en la vista previa; antes de descargar se avisa si hay secciones vacías.
 - **Vista previa en vivo**: el texto, los colores y las fuentes se ven mientras escribes. Una imagen nueva espera al botón **Apply**, así nunca se cambia por accidente.
-- **Trabajo lado a lado**: al abrir una sección, sube al primer lugar de su columna y su hoja sube al primer lugar del preview, a la misma altura. En la sección Logo, al hacer clic en un área (Concept, Anatomy, Versions…) su hoja pasa a ser la principal.
+- **Trabajo lado a lado**: al abrir una sección, sube al primer lugar de su columna y su hoja sube al primer lugar del preview, a la misma altura. En las secciones Logo y Usage, al hacer clic en un área (Concept, Anatomy, Versions…, o Correct use e Incorrect use) su hoja pasa a ser la principal.
 - **Logo con su propio scroll**: la sección Logo, que es larga, se desplaza por dentro y el preview no se mueve; al llegar arriba o abajo, sigue moviendo la página.
 - **Retícula de construcción automática**: la app lee los píxeles visibles del logo y le ajusta una retícula de módulos cuadrados (12, 16 o 24 de ancho). X es un ajuste común al área de respeto y a la retícula; con un clic en las reglas de la retícula se colocan guías medidas en X, y también se muestran el ancho y el alto totales del logo en X. Se puede seguir subiendo una retícula propia.
 - **Logos con capas desde Illustrator**: exporta el logo como SVG (Object IDs: Layer Names) y elígelo en una tarjeta de Anatomy. Cada capa pasa a ser una parte de la marca (hasta 4), en orden de lectura y recortada a lo que dibuja. Las capas llamadas Isotipo, Logotipo o Tagline reciben su etiqueta solas.
@@ -131,8 +134,9 @@ Funciones clave:
 <!-- Aquí puede ir una captura de la página Brand Manual. -->
 
 ### Estado
-- ✅ Todas las secciones (Cover, Logo, Colors, Typography, Skin), la vista previa en vivo y las tres plantillas.
+- ✅ Todas las secciones (Cover, Logo, Usage, Colors, Typography, Skin), la vista previa en vivo y las tres plantillas.
 - ✅ Hojas de Logo: Brand concept, Anatomy, Logo versions y Clear space.
+- ✅ Hojas de Usage: Correct use e Incorrect use, cada una con una grilla de hasta 6 ejemplos (ver el [spec](specs/usage.md)). El manual tiene 10 hojas.
 - ✅ Las partes de Anatomy se llenan con las capas de un SVG exportado desde Illustrator (ver el [spec](specs/logolayers.md)).
 - ✅ Una retícula de construcción dibujada por la app, ajustada al logo, con guías y medidas en X.
 - ✅ Skins: colores de página y hasta 4 capas de degradados, formas, patrones y texturas (ver el [spec](specs/skins.md)).
@@ -145,7 +149,7 @@ Límites: es solo frontend, no se guarda nada entre sesiones (al recargar se bor
 ### Cómo se construyó
 - **Primero la spec**: cada feature se describe antes de programarla, con escenarios Given-When-Then, en [`specs/`](specs/).
 - **Decisiones registradas**: cada decisión importante, con las opciones que se compararon, es un Architecture Decision Record en [`docs/adr/`](docs/adr/README.md). Por ejemplo: [vista previa en vivo con Apply para las imágenes](docs/adr/0007-live-preview-with-apply-for-images.md).
-- **Con tests**: unos 420 tests con Jest y React Testing Library, escritos a partir de los escenarios de las specs.
+- **Con tests**: unos 430 tests con Jest y React Testing Library, escritos a partir de los escenarios de las specs.
 - **Una feature a la vez**: cada cambio se prueba en su propia rama y solo llega a `main` cuando funciona.
 
 **Tecnologías:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint
