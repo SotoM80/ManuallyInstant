@@ -5,7 +5,7 @@ import { MANUAL_PAGES } from '../src/data/manualSections';
 // Spec: specs/skins.md (a stack of layers, ADR 0010; the Skin owns its colors, ADR 0011)
 const INNER_PAGES = MANUAL_PAGES.filter((page) => page !== 'Cover');
 function openSkin() {
-  fireEvent.click(screen.getByRole('button', { name: /5\. Skin/ }));
+  fireEvent.click(screen.getByRole('button', { name: /6\. Skin/ }));
   return screen.getByRole('form', { name: 'Skin' });
 }
 
@@ -261,7 +261,7 @@ describe('Skin – layers', () => {
 describe('Skin – colors', () => {
   function addPaletteColors() {
     // The Colors section starts with Black; each new color takes the next unused swatch (White, Gray)
-    fireEvent.click(screen.getByRole('button', { name: /3\. Colors/ }));
+    fireEvent.click(screen.getByRole('button', { name: /4\. Colors/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Add color' }));
     fireEvent.click(screen.getByRole('button', { name: 'Add color' }));
   }
@@ -282,7 +282,7 @@ describe('Skin – colors', () => {
     const gray = (hexOf(form, 'Linear Color A') as HTMLInputElement).value;
     expect(gray).not.toBe('#000000');
     // Removing that color from the palette does not change the layer
-    fireEvent.click(screen.getByRole('button', { name: /3\. Colors/ }));
+    fireEvent.click(screen.getByRole('button', { name: /4\. Colors/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Color 3' }));
     fireEvent.click(screen.getByRole('button', { name: 'Remove Color 3' }));
     const stops = [...backdrop()!.querySelectorAll('stop')].map((stop) => stop.getAttribute('stop-color'));

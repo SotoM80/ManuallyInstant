@@ -5,17 +5,19 @@ import type { TemplateId } from '../templates'
 import { NO_SKIN } from '../skins/presets'
 import type { Skin } from '../skins/types'
 import { DEFAULT_MOCKUPS } from '../mockups/mockups'
+import { NO_USAGE } from '../data/usageOptions'
 import type { Mockups } from '../mockups/types'
 import { useRef } from 'react'
 import { withViewTransition } from '../utils/viewTransition'
 import { useReorderGlide } from '../utils/useReorderGlide'
 import type { Guides } from '../utils/guides'
-import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from '../types'
+import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView, UsageData } from '../types'
 import '../css/ManualPreview.css'
 
 type ManualPreviewProps = {
   cover: CoverData | null
   logo: LogoData | null
+  usage?: UsageData // the examples of the Usage pages (see specs/usage.md)
   palette: PaletteColor[] | null
   typography: BrandFonts | null
   orientation: Orientation
@@ -51,6 +53,7 @@ const TITLE_SCALE: Record<PreviewView, number> = { grid: 0.5, overview: 0.5, pag
 export function ManualPreview({
   cover,
   logo,
+  usage = NO_USAGE,
   palette,
   typography,
   orientation,
@@ -137,6 +140,7 @@ export function ManualPreview({
               titleScale={TITLE_SCALE[previewView]}
               cover={cover}
               logo={logo}
+              usage={usage}
               palette={palette}
               typography={typography}
               skin={skin}
@@ -145,7 +149,7 @@ export function ManualPreview({
               onGuidesChange={onGuidesChange}
               transitionName
             />
-            {/* Always the natural number, so a page moved to the top still reads "7. Typography" */}
+            {/* Always the natural number, so a page moved to the top still reads "9. Typography" */}
             <span className="manual-page-name">
               {MANUAL_PAGES.indexOf(page) + 1}. {page}
             </span>

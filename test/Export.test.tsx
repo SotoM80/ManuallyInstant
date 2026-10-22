@@ -27,7 +27,12 @@ function sectionsColumn() {
 
 function touchEverySection() {
   typeTitle('My Brand');
-  fireEvent.change(screen.getByLabelText('Brand name'), { target: { value: 'My Brand' } });
+  // Searched inside each form: label queries over the whole app are slow (see coverForm.ts)
+  const logo = within(screen.getByRole('form', { name: 'Logo' }));
+  fireEvent.change(logo.getByLabelText('Brand name'), { target: { value: 'My Brand' } });
+  const usage = within(screen.getByRole('form', { name: 'Usage' }));
+  fireEvent.change(usage.getByLabelText('Correct use example 1 description'), { target: { value: 'On white' } });
+  fireEvent.change(usage.getByLabelText('Incorrect use example 1 description'), { target: { value: "Don't stretch" } });
   fireEvent.click(screen.getByRole('button', { name: 'Add color' }));
   const typography = screen.getByRole('form', { name: 'Typography' });
   fireEvent.change(within(typography).getByRole('combobox', { name: 'Primary font' }), { target: { value: 'Inter' } });
@@ -48,7 +53,7 @@ describe('Export – buttons', () => {
   it('makes a print PDF of every page, in natural order (scenarios 2 and 6)', async () => {
     renderApp();
     touchEverySection();
-    fireEvent.click(screen.getByRole('button', { name: /4\. Typography/ })); // its page comes first
+    fireEvent.click(screen.getByRole('button', { name: /5\. Typography/ })); // its page comes first
     fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     await waitFor(() => expect(mockCreatePdf).toHaveBeenCalledTimes(1), { timeout: 5000 });
@@ -73,7 +78,7 @@ describe('Export – buttons', () => {
     typeTitle('My Brand');
     fireEvent.click(screen.getByRole('button', { name: 'Download web PDF' }));
     const warning = screen.getByRole('alertdialog', { name: 'Empty pages' });
-    expect(warning).toHaveTextContent('Some pages are still empty: Logo, Colors, Typography.');
+    expect(warning).toHaveTextContent('Some pages are still empty: Logo, Usage, Colors, Typography.');
     fireEvent.click(within(warning).getByRole('button', { name: 'Cancel' }));
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     expect(mockCreatePdf).not.toHaveBeenCalled();
@@ -92,7 +97,7 @@ describe('Export – buttons', () => {
     renderApp();
     touchEverySection();
     fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Download print PDF' })).toHaveTextContent('Creating… 3/8'), {
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Download print PDF' })).toHaveTextContent('Creating… 3/10'), {
       timeout: 5000, // the copy waits until it is drawn before the first page
     });
     expect(screen.getByRole('button', { name: 'Download web PDF' })).toBeDisabled();

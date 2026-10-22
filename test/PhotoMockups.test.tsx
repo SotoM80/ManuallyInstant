@@ -23,7 +23,7 @@ function page() {
 }
 
 function openMockups() {
-  fireEvent.click(screen.getByRole('button', { name: /6\. Mockups/ }));
+  fireEvent.click(screen.getByRole('button', { name: /7\. Mockups/ }));
   return screen.getByRole('form', { name: 'Mockups' });
 }
 
@@ -119,7 +119,7 @@ describe('Photo mockups (phase 1)', () => {
     expect(pdf).not.toHaveBeenCalled();
     await act(async () => finish('data:image/jpeg;base64,late'));
     await waitFor(() => expect(pdf).toHaveBeenCalled(), { timeout: 5000 });
-    const mockupsPage = pdf.mock.calls[0][0][7];
+    const mockupsPage = pdf.mock.calls[0][0][9];
     expect(within(mockupsPage).getByRole('img', { name: `${PHOTO} mockup`, hidden: true })).toHaveAttribute(
       'src',
       'data:image/jpeg;base64,late',

@@ -834,6 +834,107 @@
   font-size: 11px;
 }
 
+/* Usage (specs/usage.md): the header, then the examples of Correct use or Incorrect use.
+   12 columns inside: an example spans 6 (two in a row) or 4 (three in a row), so a lone example
+   or a pair can be centred under a full row.
+   ┌─────────────┐  1 → full width        4 → 2 × 2
+   │ [ ✓ ] [ ✓ ] │  2 → two in a row      5 → three, then two centred
+   │    [ ✓ ]    │  3 → two, one centred  6 → 3 × 2
+   └─────────────┘      (landscape: three in a row) */
+.usage-layout {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.usage-grid {
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 6% 5%;
+}
+
+.usage-grid > .usage-example {
+  grid-column: span 4;
+}
+
+.usage-grid:is([data-count='2'], [data-count='4'], [data-count='3'][data-orientation='portrait']) > .usage-example {
+  grid-column: span 6;
+}
+
+.usage-grid[data-count='1'] > .usage-example {
+  grid-column: 1 / -1;
+}
+
+.usage-grid[data-count='3'][data-orientation='portrait'] > .usage-example:nth-child(3) {
+  grid-column: 4 / span 6;
+}
+
+.usage-grid[data-count='5'] > .usage-example:nth-child(4) {
+  grid-column: 3 / span 4;
+}
+
+.usage-grid[data-count='5'] > .usage-example:nth-child(5) {
+  grid-column: 7 / span 4;
+}
+
+.usage-example {
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 4%;
+}
+
+.usage-example .logo-figure {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ✓ or ✕ on a white circle, so it shows on any image or skin; its colors never follow the skin */
+.usage-mark {
+  position: absolute;
+  top: 6%;
+  right: 6%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 12%);
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.usage-example[data-kind='correct'] .usage-mark {
+  color: #2e7d32;
+}
+
+.usage-example[data-kind='incorrect'] .usage-mark {
+  color: #c62828;
+}
+
+.usage-description {
+  font-size: 6px;
+  line-height: 1.3;
+}
+
+.manual-preview[data-view='pages'] .usage-mark {
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+}
+
+.manual-preview[data-view='pages'] .usage-description {
+  font-size: 11px;
+}
+
 /* A photo mockup (specs/mockups.md, Photo mockups): the composed image, kept in the photo's
    proportions inside its cell, with a note while it is made or if it fails */
 .photo-mockup {

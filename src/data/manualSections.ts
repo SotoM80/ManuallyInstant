@@ -9,6 +9,7 @@ export type ManualSection = {
 export const MANUAL_SECTIONS: ManualSection[] = [
   { id: 'cover', label: 'Cover', ready: true },
   { id: 'logo', label: 'Logo', ready: true },
+  { id: 'usage', label: 'Usage', ready: true },
   { id: 'colors', label: 'Colors', ready: true },
   { id: 'typography', label: 'Typography', ready: true },
   { id: 'skin', label: 'Skin', ready: true },
@@ -29,13 +30,16 @@ export const LOGO_PARTS: LogoParts = {
 }
 
 // Pages of the manual shown in the preview (left column), in order.
-// The Logo section fills four pages: Brand concept, Anatomy, Logo versions and Clear space.
+// The Logo section fills four pages: Brand concept, Anatomy, Logo versions and Clear space;
+// the Usage section two: Correct use and Incorrect use.
 export const MANUAL_PAGES = [
   'Cover',
   'Brand concept',
   'Anatomy',
   'Logo versions',
   'Clear space',
+  'Correct use',
+  'Incorrect use',
   'Color palette',
   'Typography',
   'Mockups',
@@ -46,6 +50,7 @@ export const MANUAL_PAGES = [
 export const SECTION_PAGES: Record<string, string[]> = {
   cover: ['Cover'],
   logo: ['Brand concept', 'Anatomy', 'Logo versions', 'Clear space'],
+  usage: ['Correct use', 'Incorrect use'],
   colors: ['Color palette'],
   typography: ['Typography'],
   skin: ['Brand concept'], // the first page the Skin paints (the Cover keeps its own colors)
@@ -59,6 +64,19 @@ export const LOGO_AREA_PAGES: Record<string, string> = {
   anatomy: 'Anatomy',
   versions: 'Logo versions',
   clearSpace: 'Clear space',
+}
+
+// The two groups of the Usage form and their pages: the group being worked in decides the
+// main page, like the areas of the Logo form (see specs/usage.md)
+export const USAGE_AREA_PAGES: Record<string, string> = {
+  correct: 'Correct use',
+  incorrect: 'Incorrect use',
+}
+
+// The areas of each section that has them, and the area a section starts on
+export const SECTION_AREAS: Record<string, { pages: Record<string, string>; first: string }> = {
+  logo: { pages: LOGO_AREA_PAGES, first: 'concept' },
+  usage: { pages: USAGE_AREA_PAGES, first: 'correct' },
 }
 
 // The featured pages first, in the order given, then every other page in its natural order.

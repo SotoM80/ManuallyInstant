@@ -49,7 +49,7 @@ beforeEach(() => {
 });
 
 function openMockups() {
-  fireEvent.click(screen.getByRole('button', { name: /6\. Mockups/ }));
+  fireEvent.click(screen.getByRole('button', { name: /7\. Mockups/ }));
   return screen.getByRole('form', { name: 'Mockups' });
 }
 

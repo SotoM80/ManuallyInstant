@@ -26,11 +26,19 @@ export function pdfFileName(title: string | undefined, kind: ExportKind) {
   return `${slug || 'brand-manual'}-${kind}.pdf`
 }
 
-// The sections never touched, whose pages still show their placeholders
-export function emptySections(data: { cover: unknown; logo: unknown; palette: unknown; typography: unknown }) {
+// The sections never touched, whose pages still show their placeholders. Usage counts while
+// either of its two pages does, since each one waits for its own group (see specs/usage.md).
+export function emptySections(data: {
+  cover: unknown
+  logo: unknown
+  usage: { correct: unknown; incorrect: unknown }
+  palette: unknown
+  typography: unknown
+}) {
   return [
     ['Cover', data.cover],
     ['Logo', data.logo],
+    ['Usage', data.usage.correct === null || data.usage.incorrect === null ? null : data.usage],
     ['Colors', data.palette],
     ['Typography', data.typography],
   ]

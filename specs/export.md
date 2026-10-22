@@ -81,7 +81,7 @@ Apply has nothing to do with the export: the PDF shows what the preview shows, s
 ### Scenario 4: Empty Sections
 * **Given**: Only the Cover was touched.
 * **When**: The user clicks "Download web PDF".
-* **Then**: The warning says "Some pages are still empty: Logo, Colors, Typography." and no PDF is made until "Download anyway" is clicked; "Cancel" closes the warning.
+* **Then**: The warning says "Some pages are still empty: Logo, Usage, Colors, Typography." and no PDF is made until "Download anyway" is clicked; "Cancel" closes the warning.
 
 ### Scenario 5: Highlighted Values
 * **Given**: The palette has one color.

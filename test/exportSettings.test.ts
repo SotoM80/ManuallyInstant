@@ -29,11 +29,14 @@ describe('a4', () => {
 
 describe('emptySections', () => {
   it('lists the sections never touched, in their order (scenario 4)', () => {
-    expect(emptySections({ cover: {}, logo: null, palette: null, typography: null })).toEqual([
+    expect(emptySections({ cover: {}, logo: null, usage: { correct: null, incorrect: null }, palette: null, typography: null })).toEqual([
       'Logo',
+      'Usage',
       'Colors',
       'Typography',
     ]);
-    expect(emptySections({ cover: {}, logo: {}, palette: [], typography: {} })).toEqual([]);
+    expect(emptySections({ cover: {}, logo: {}, usage: { correct: [], incorrect: [] }, palette: [], typography: {} })).toEqual([]);
+    // Usage counts while either of its pages still shows its placeholder (specs/usage.md)
+    expect(emptySections({ cover: {}, logo: {}, usage: { correct: [], incorrect: null }, palette: [], typography: {} })).toEqual(['Usage']);
   });
 });

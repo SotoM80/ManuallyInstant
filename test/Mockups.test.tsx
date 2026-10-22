@@ -22,7 +22,7 @@ function mockupsOnPage() {
 }
 
 function openMockups() {
-  fireEvent.click(screen.getByRole('button', { name: /6\. Mockups/ }));
+  fireEvent.click(screen.getByRole('button', { name: /7\. Mockups/ }));
   return screen.getByRole('form', { name: 'Mockups' });
 }
 
@@ -107,7 +107,7 @@ describe('Mockups – the section', () => {
 
   it('copies a palette color with its chip (scenario 7)', () => {
     renderApp();
-    fireEvent.click(screen.getByRole('button', { name: /3\. Colors/ })); // the palette starts with Black
+    fireEvent.click(screen.getByRole('button', { name: /4\. Colors/ })); // the palette starts with Black
     fireEvent.click(screen.getByRole('button', { name: 'Add color' }));
     const form = openMockups();
     fireEvent.click(within(form).getByRole('button', { name: 'Mug' }));
@@ -141,8 +141,8 @@ describe('Mockups – with the rest of the manual', () => {
     const mock = createPdf as jest.MockedFunction<typeof createPdf>;
     await waitFor(() => expect(mock).toHaveBeenCalled(), { timeout: 5000 });
     const pages = mock.mock.calls[0][0];
-    expect(pages).toHaveLength(8);
-    expect(pages[7]).toHaveAccessibleName('Mockups');
-    expect(within(pages[7]).getAllByRole('img', { hidden: true })).toHaveLength(DEFAULT_NAMES.length);
+    expect(pages).toHaveLength(10);
+    expect(pages[9]).toHaveAccessibleName('Mockups');
+    expect(within(pages[9]).getAllByRole('img', { hidden: true })).toHaveLength(DEFAULT_NAMES.length);
   });
 });

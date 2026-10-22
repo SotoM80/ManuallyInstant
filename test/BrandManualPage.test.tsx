@@ -3,13 +3,15 @@ import { renderApp } from './renderApp';
 import { orderPages } from '../src/data/manualSections';
 import { fillRequiredCoverFields, getApplyButton, pickSwatch, typeTitle } from './coverForm';
 
-// The manual's pages, in order (the Logo section fills pages 2 to 5)
+// The manual's pages, in order (the Logo section fills pages 2 to 5, Usage pages 6 and 7)
 const ALL_PAGES = [
   'Cover',
   'Brand concept',
   'Anatomy',
   'Logo versions',
   'Clear space',
+  'Correct use',
+  'Incorrect use',
   'Color palette',
   'Typography',
   'Mockups',
@@ -45,7 +47,7 @@ describe('Brand Manual – sections column', () => {
 
     const items = within(getSections()).getAllByRole('listitem');
     const headings = items.map((item) => within(item).getByRole('heading').textContent);
-    expect(headings).toEqual(['1. Cover', '2. Logo', '3. Colors', '4. Typography', '5. Skin', '6. Mockups']);
+    expect(headings).toEqual(['1. Cover', '2. Logo', '3. Usage', '4. Colors', '5. Typography', '6. Skin', '7. Mockups']);
 
     // Built sections open with a click on their title (unbuilt ones have no button)
     for (const [index, item] of items.entries()) {
@@ -234,7 +236,7 @@ describe('Brand Manual – sections accordion', () => {
   }
 
   function expanded() {
-    return ['1. Cover', '2. Logo', '3. Colors', '4. Typography', '5. Skin', '6. Mockups'].map((name) =>
+    return ['1. Cover', '2. Logo', '3. Usage', '4. Colors', '5. Typography', '6. Skin', '7. Mockups'].map((name) =>
       getToggle(name).getAttribute('aria-expanded'),
     );
   }
@@ -242,16 +244,16 @@ describe('Brand Manual – sections accordion', () => {
   it('starts with only Cover open', () => {
     renderApp('/brand-manual');
 
-    expect(expanded()).toEqual(['true', 'false', 'false', 'false', 'false', 'false']);
+    expect(expanded()).toEqual(['true', 'false', 'false', 'false', 'false', 'false', 'false']);
   });
 
   it('opens a section with a click on its title and folds the open one', () => {
     renderApp('/brand-manual');
 
-    fireEvent.click(getToggle('3. Colors'));
+    fireEvent.click(getToggle('4. Colors'));
 
-    expect(expanded()).toEqual(['false', 'false', 'true', 'false', 'false', 'false']);
-    const colorsBody = document.getElementById(getToggle('3. Colors').getAttribute('aria-controls') as string);
+    expect(expanded()).toEqual(['false', 'false', 'false', 'true', 'false', 'false', 'false']);
+    const colorsBody = document.getElementById(getToggle('4. Colors').getAttribute('aria-controls') as string);
     expect(colorsBody).not.toHaveAttribute('inert');
     const coverBody = document.getElementById(getToggle('1. Cover').getAttribute('aria-controls') as string);
     expect(coverBody).toHaveAttribute('inert');
@@ -262,14 +264,14 @@ describe('Brand Manual – sections accordion', () => {
 
     fireEvent.click(getToggle('1. Cover'));
 
-    expect(expanded()).toEqual(['false', 'false', 'false', 'false', 'false', 'false']);
+    expect(expanded()).toEqual(['false', 'false', 'false', 'false', 'false', 'false', 'false']);
   });
 
   it('keeps what was typed in a section while it is folded', () => {
     renderApp('/brand-manual');
     typeTitle('My Brand');
 
-    fireEvent.click(getToggle('4. Typography'));
+    fireEvent.click(getToggle('5. Typography'));
     fireEvent.click(getToggle('1. Cover'));
 
     expect(screen.getByLabelText('Brand manual title')).toHaveValue('My Brand');
@@ -295,6 +297,8 @@ describe('Brand Manual – open section first', () => {
       'Cover',
       'Logo versions',
       'Clear space',
+      'Correct use',
+      'Incorrect use',
       'Color palette',
       'Typography',
       'Mockups',
@@ -312,12 +316,12 @@ describe('Brand Manual – open section first', () => {
   it('moves the Typography page to the top when its section opens, keeping its number', () => {
     renderApp('/brand-manual');
 
-    openSection('4. Typography');
+    openSection('5. Typography');
 
     expect(pageOrder()[0]).toBe('Typography');
     const first = within(getPreview()).getAllByRole('listitem')[0];
     expect(first).toHaveAttribute('data-featured', 'true');
-    expect(first).toHaveTextContent('7. Typography');
+    expect(first).toHaveTextContent('9. Typography');
   });
 
   it('moves the four Logo pages to the top, in their order', () => {
@@ -331,18 +335,18 @@ describe('Brand Manual – open section first', () => {
 
   it('puts every page back in its natural order when the section is folded', () => {
     renderApp('/brand-manual');
-    openSection('3. Colors');
+    openSection('4. Colors');
 
-    openSection('3. Colors'); // fold it
+    openSection('4. Colors'); // fold it
 
     expect(pageOrder()).toEqual(ALL_PAGES);
   });
 
   it('swaps the pages at the top when another section opens', () => {
     renderApp('/brand-manual');
-    openSection('3. Colors');
+    openSection('4. Colors');
 
-    openSection('4. Typography');
+    openSection('5. Typography');
 
     expect(pageOrder().slice(0, 2)).toEqual(['Typography', 'Cover']);
   });
@@ -350,7 +354,7 @@ describe('Brand Manual – open section first', () => {
   it('does not use Apply to reorder: Apply stays off while a section is open', () => {
     renderApp('/brand-manual');
 
-    openSection('4. Typography');
+    openSection('5. Typography');
 
     expect(getApplyButton()).toBeDisabled();
   });
@@ -367,12 +371,12 @@ describe('Brand Manual – open section first', () => {
     });
     renderApp('/brand-manual');
 
-    openSection('4. Typography');
+    openSection('5. Typography');
 
-    // Typography went from 7th to 1st: it starts 600px lower and glides up
+    // Typography went from 9th to 1st: it starts 800px lower and glides up
     const typography = within(getPreview()).getAllByRole('listitem')[0];
     const call = animate.mock.calls.find((_, i) => animate.mock.contexts[i] === typography);
-    expect(call?.[0][0]).toEqual({ transform: 'translate(0px, 600px)' });
+    expect(call?.[0][0]).toEqual({ transform: 'translate(0px, 800px)' });
     expect(call?.[1]).toEqual(expect.objectContaining({ duration: 500 }));
 
     rect.mockRestore();
@@ -401,25 +405,25 @@ describe('Brand Manual – open section beside its page', () => {
   it('moves the open section to the top of its column, keeping its number', () => {
     renderApp('/brand-manual');
 
-    openSection('4. Typography');
+    openSection('5. Typography');
 
-    expect(sectionOrder()).toEqual(['4. Typography', '1. Cover', '2. Logo', '3. Colors', '5. Skin', '6. Mockups']);
+    expect(sectionOrder()).toEqual(['5. Typography', '1. Cover', '2. Logo', '3. Usage', '4. Colors', '6. Skin', '7. Mockups']);
   });
 
   it('puts every section back in order when it is folded', () => {
     renderApp('/brand-manual');
-    openSection('4. Typography');
+    openSection('5. Typography');
 
-    openSection('4. Typography');
+    openSection('5. Typography');
 
-    expect(sectionOrder()).toEqual(['1. Cover', '2. Logo', '3. Colors', '4. Typography', '5. Skin', '6. Mockups']);
+    expect(sectionOrder()).toEqual(['1. Cover', '2. Logo', '3. Usage', '4. Colors', '5. Typography', '6. Skin', '7. Mockups']);
   });
 
   it('keeps what was typed when its section moves', () => {
     renderApp('/brand-manual');
     typeTitle('My Brand');
 
-    openSection('3. Colors');
+    openSection('4. Colors');
     openSection('1. Cover');
 
     expect(screen.getByLabelText('Brand manual title')).toHaveValue('My Brand');
@@ -442,7 +446,7 @@ describe('Brand Manual – open section beside its page', () => {
     it('pushes the sections down so the open one starts at the height of its page', () => {
       renderApp('/brand-manual');
 
-      openSection('4. Typography');
+      openSection('5. Typography');
 
       expect(offset()).toBe('80px');
     });
@@ -458,7 +462,7 @@ describe('Brand Manual – open section beside its page', () => {
       window.scrollBy = jest.fn(); // opening a section scrolled out of view brings it back (jsdom has no scrolling)
       renderApp('/brand-manual');
 
-      openSection('5. Skin');
+      openSection('6. Skin');
 
       expect(offset()).toBe('80px');
     });

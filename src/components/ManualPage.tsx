@@ -7,17 +7,19 @@ import { ClearSpacePage } from './pages/ClearSpacePage'
 import { ColorPalettePage } from './pages/ColorPalettePage'
 import { TypographyPage } from './pages/TypographyPage'
 import { MockupsPage } from './pages/MockupsPage'
+import { UsagePage } from './pages/UsagePage'
 import { SkinBackdrop } from './pages/SkinBackdrop'
 import type { ExportKind } from '../export/exportSettings'
 import type { Skin } from '../skins/types'
 import type { Mockups } from '../mockups/types'
 import type { Guides } from '../utils/guides'
-import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor } from '../types'
+import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, UsageData } from '../types'
 
 // Everything the pages of the manual are made of
 export type ManualData = {
   cover: CoverData | null
   logo: LogoData | null
+  usage: UsageData
   palette: PaletteColor[] | null
   typography: BrandFonts | null
   skin: Skin
@@ -42,6 +44,7 @@ export function ManualPage({
   titleScale,
   cover,
   logo,
+  usage,
   palette,
   typography,
   skin,
@@ -73,6 +76,10 @@ export function ManualPage({
           onGuidesChange={onGuidesChange}
         />
       )
+    if (page === 'Correct use' || page === 'Incorrect use') {
+      const kind = page === 'Correct use' ? 'correct' : 'incorrect'
+      return <UsagePage kind={kind} examples={usage[kind]} logo={logo} cover={cover} orientation={orientation} color={textColor} />
+    }
     if (page === 'Color palette') return <ColorPalettePage palette={palette} color={textColor} emphasis={emphasis} />
     if (page === 'Typography') return <TypographyPage fonts={typography} color={textColor} />
     if (page === 'Mockups') return <MockupsPage mockups={mockups} logo={logo} cover={cover} color={textColor} />

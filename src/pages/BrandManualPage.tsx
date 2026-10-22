@@ -5,10 +5,12 @@ import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
 import { SkinForm } from '../components/SkinForm'
+import { UsageForm } from '../components/UsageForm'
 import { ExportButtons } from '../components/ExportButtons'
 import { NO_SKIN } from '../skins/presets'
 import { ManualPreview } from '../components/ManualPreview'
-import { LOGO_AREA_PAGES, MANUAL_SECTIONS, SECTION_PAGES, orderPages } from '../data/manualSections'
+import { MANUAL_SECTIONS, SECTION_AREAS, SECTION_PAGES, orderPages } from '../data/manualSections'
+import { NO_USAGE } from '../data/usageOptions'
 import { useAlignOpenSection } from '../utils/useAlignOpenSection'
 import { NO_GUIDES } from '../utils/guides'
 import type { Guides } from '../utils/guides'
@@ -18,7 +20,7 @@ import type { Skin } from '../skins/types'
 import { MockupsForm } from '../components/MockupsForm'
 import { DEFAULT_MOCKUPS } from '../mockups/mockups'
 import type { Mockups } from '../mockups/types'
-import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from '../types'
+import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView, UsageData } from '../types'
 import '../css/BrandManualPage.css'
 
 type BrandManualPageProps = {
@@ -32,6 +34,8 @@ type BrandManualPageProps = {
   onCoverChange: (cover: CoverData) => void
   logo: LogoData | null
   onLogoChange: (logo: LogoData) => void
+  usage?: UsageData
+  onUsageChange?: (usage: UsageData) => void
   palette: PaletteColor[] | null
   onPaletteChange: (palette: PaletteColor[]) => void
   typography: BrandFonts | null
@@ -53,6 +57,8 @@ export function BrandManualPage({
   onCoverChange,
   logo,
   onLogoChange,
+  usage = NO_USAGE,
+  onUsageChange = () => {},
   palette,
   onPaletteChange,
   typography,
@@ -70,10 +76,12 @@ export function BrandManualPage({
   const [guides, setGuides] = useState<Guides>(NO_GUIDES)
   // The open section's pages come first in the preview, so the page being edited is always
   // in view; folding the section puts every page back in its natural order.
-  // In the Logo section, the area being worked in decides which of its four pages is the main one
-  const [logoArea, setLogoArea] = useState('concept')
+  // In a section with areas (Logo, Usage), the area being worked in decides which of its pages is
+  // the main one; each section starts on its first area every time it opens
+  const [area, setArea] = useState('')
   const sectionPages = openSection ? SECTION_PAGES[openSection] : []
-  const mainPage = openSection === 'logo' ? LOGO_AREA_PAGES[logoArea] : sectionPages[0]
+  const areas = openSection ? SECTION_AREAS[openSection] : undefined
+  const mainPage = areas ? areas.pages[area] ?? areas.pages[areas.first] : sectionPages[0]
   const featured = mainPage ? [mainPage, ...sectionPages.filter((page) => page !== mainPage)] : []
   // The open section also moves to the top of its column, at the height of its page, so
   // the form and its page sit side by side. Folding it puts every section back in order.
@@ -88,16 +96,17 @@ export function BrandManualPage({
   useAlignOpenSection(pageRoot, openSection !== null)
   useReorderGlide(sectionList, sections.map((section) => section.id).join('|'))
 
-  // Clicking in an area of the Logo form (or reaching it with Tab) makes its page the main
-  // one. Scrolling does not: moving through the form and the preview at once fought each other.
-  function handleLogoArea(event: SyntheticEvent<HTMLElement>) {
-    const area = (event.target as Element).closest('[data-area]')?.getAttribute('data-area')
-    if (area) setLogoArea(area)
+  // Clicking in an area of the Logo or Usage form (or reaching it with Tab) makes its page the
+  // main one. Scrolling does not: moving through the form and the preview at once fought each other.
+  function handleArea(event: SyntheticEvent<HTMLElement>) {
+    const clicked = (event.target as Element).closest('[data-area]')?.getAttribute('data-area')
+    if (clicked) setArea(clicked)
   }
 
   function toggleSection(id: string) {
     const opening = openSection !== id
     setOpenSection(opening ? id : null)
+    setArea('')
     // The section and its page are now at the top: bring the top into view if it is above it
     const top = sectionList.current?.getBoundingClientRect().top ?? 0
     if (opening && top < 0) window.scrollBy({ top: top - 16, behavior: 'smooth' })
@@ -109,10 +118,11 @@ export function BrandManualPage({
   const [applyCount, setApplyCount] = useState(0)
   const [coverPending, setCoverPending] = useState(false)
   const [logoPending, setLogoPending] = useState(false)
+  const [usagePending, setUsagePending] = useState(false)
   const applyImages = useCallback(() => setApplyCount((count) => count + 1), [])
   // A pulse with a check after Apply, like the Save buttons had (see specs/motion.md)
   const [applied, setApplied] = useState(false)
-  const canApply = coverPending || logoPending
+  const canApply = coverPending || logoPending || usagePending
 
   function handleApply() {
     applyImages()
@@ -130,6 +140,7 @@ export function BrandManualPage({
       <BrandForm onChange={onCoverChange} applyCount={applyCount} onPendingChange={setCoverPending} />
     ),
     logo: <LogoForm onChange={onLogoChange} applyCount={applyCount} onPendingChange={setLogoPending} />,
+    usage: <UsageForm onChange={onUsageChange} applyCount={applyCount} onPendingChange={setUsagePending} />,
     colors: <ColorsForm onChange={onPaletteChange} />,
     typography: <TypographyForm onChange={onTypographyChange} />,
     skin: (
@@ -145,6 +156,7 @@ export function BrandManualPage({
       <ManualPreview
         cover={cover}
         logo={logo}
+        usage={usage}
         palette={palette}
         typography={typography}
         orientation={orientation}
@@ -167,6 +179,7 @@ export function BrandManualPage({
           <ExportButtons
             cover={cover}
             logo={logo}
+            usage={usage}
             palette={palette}
             typography={typography}
             skin={skin}
@@ -191,7 +204,7 @@ export function BrandManualPage({
 
         <ol ref={sectionList}>
           {sections.map((section) => {
-            // Always the natural number, so a section moved to the top still reads "4. Typography"
+            // Always the natural number, so a section moved to the top still reads "5. Typography"
             const number = MANUAL_SECTIONS.indexOf(section) + 1
             const isOpen = section.ready && openSection === section.id
             const bodyId = `manual-section-${section.id}`
@@ -229,8 +242,8 @@ export function BrandManualPage({
                   <div id={bodyId} className="manual-section-body" inert={!isOpen}>
                     <div
                       className="manual-section-inner"
-                      onClick={section.id === 'logo' ? handleLogoArea : undefined}
-                      onFocus={section.id === 'logo' ? handleLogoArea : undefined}
+                      onClick={SECTION_AREAS[section.id] ? handleArea : undefined}
+                      onFocus={SECTION_AREAS[section.id] ? handleArea : undefined}
                     >
                       {sectionForms[section.id]}
                     </div>

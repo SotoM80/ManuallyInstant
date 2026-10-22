@@ -55,6 +55,20 @@ export type UploadedImage = {
   name: string
 }
 
+// The two pages of the Usage section (see specs/usage.md)
+export type UsageKind = 'correct' | 'incorrect'
+
+// One example of a Usage page. `id` stays the same while it exists and is never reused.
+export type UsageExample = {
+  id: number
+  description: string
+  image: UploadedImage | null
+}
+
+// Each group is null until it is touched, so its page keeps its placeholder until then,
+// whatever happens in the other group
+export type UsageData = Record<UsageKind, UsageExample[] | null>
+
 // One piece a mark is built from, e.g. Tagline / "Energy for all" / "States the promise".
 // Everything is optional; the label falls back to "Part 1", "Part 2"…
 export type MarkPart = {

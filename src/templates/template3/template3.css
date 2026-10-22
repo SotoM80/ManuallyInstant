@@ -175,3 +175,7 @@
 .manual-preview[data-template='template3'] .mockups-layout {
   grid-template-rows: minmax(0, 1fr);
 }
+
+.manual-preview[data-template='template3'] .usage-layout {
+  grid-template-rows: minmax(0, 1fr);
+}

@@ -13,7 +13,8 @@ import type { Skin } from './skins/types'
 import { DEFAULT_MOCKUPS } from './mockups/mockups'
 import type { Mockups } from './mockups/types'
 import { loadLocalTemplates } from './mockups/catalog'
-import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView } from './types'
+import { NO_USAGE } from './data/usageOptions'
+import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView, UsageData } from './types'
 import './css/App.css'
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
   // forms send every change here, so the preview follows them live.
   const [cover, setCover] = useState<CoverData | null>(null)
   const [logo, setLogo] = useState<LogoData | null>(null)
+  const [usage, setUsage] = useState<UsageData>(NO_USAGE) // each group null until touched
   const [palette, setPalette] = useState<PaletteColor[] | null>(null)
   const [typography, setTypography] = useState<BrandFonts | null>(null)
   const [orientation, setOrientation] = useState<Orientation>('portrait')
@@ -71,6 +73,8 @@ function App() {
                 onCoverChange={setCover}
                 logo={logo}
                 onLogoChange={setLogo}
+                usage={usage}
+                onUsageChange={setUsage}
                 palette={palette}
                 onPaletteChange={setPalette}
                 typography={typography}
