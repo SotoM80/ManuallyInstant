@@ -5,7 +5,8 @@ import { ImageField } from './ImageField'
 import { DEFAULT_TITLE_STYLE, STYLE_FIELDS } from '../data/titleOptions'
 import {
   DEFAULT_BACKGROUND_COLOR,
-  DEFAULT_TYPOGRAPHY_COLOR,
+  DEFAULT_TEXT_COLOR,
+  DEFAULT_TITLE_COLOR,
   INVALID_HEX_MESSAGE,
   normalizeHex,
 } from '../data/colorPalette'
@@ -37,13 +38,15 @@ type BrandFormProps = {
 const NO_STYLE_ERRORS: StyleValues = { fontFamily: '', fontStyle: '', fontSize: '' }
 
 const DEFAULT_COLORS: ManualColors = {
-  typography: DEFAULT_TYPOGRAPHY_COLOR,
+  title: DEFAULT_TITLE_COLOR,
+  text: DEFAULT_TEXT_COLOR,
   background: DEFAULT_BACKGROUND_COLOR,
 }
-const NO_COLOR_ERRORS: ManualColors = { typography: '', background: '' }
+const NO_COLOR_ERRORS: ManualColors = { title: '', text: '', background: '' }
 
 const COLOR_FIELDS: { key: ColorKey; label: string }[] = [
-  { key: 'typography', label: 'Typography color' },
+  { key: 'title', label: 'Title color' },
+  { key: 'text', label: 'Text color' },
   { key: 'background', label: 'Background color' },
 ]
 

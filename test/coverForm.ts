@@ -38,7 +38,7 @@ export function fillRequiredCoverFields() {
   uploadLogo();
 }
 
-export type ColorField = 'Typography color' | 'Background color';
+export type ColorField = 'Title color' | 'Text color' | 'Background color';
 
 export function getColorGroup(field: ColorField) {
   return screen.getByRole('group', { name: field });

@@ -3,7 +3,7 @@
 ## 1. What it does
 A **skin** is how the **inner pages** of the manual look (every page but the Cover): their **Page background**, their **Page text** color and a stack of decorative **layers** drawn behind their content. Each layer is one preset (a gradient, a shape or a pattern) with its own values, its own two colors and its own Intensity. In the **Skin** section the user sets the two page colors, adds layers, turns each one on or off with a checkbox, moves them up or down to decide which one sits on top, and chooses for each layer whether it is **also drawn on the Cover**. Layers blend by transparency: a layer shows through the ones above it. With no layers, the inner pages show their plain Page background.
 
-The Cover keeps its own colors (see `colorpicker.md`): its Background and Typography colors only paint the Cover. All colors of the Skin are its own: they can be picked freely or taken from the palette, and taking one from the palette copies its value (ADR 0011).
+The Cover keeps its own colors (see `colorpicker.md`): its Background, Title and Text colors only paint the Cover. All colors of the Skin are its own: they can be picked freely or taken from the palette, and taking one from the palette copies its value (ADR 0011).
 
 A skin does not depend on the template: it is the same stack under every layout, so ADR 0004 (templates change layout, not content) still holds. See ADR 0009 (drawn in SVG) and ADR 0010 (a stack of layers).
 
@@ -56,7 +56,7 @@ Opening the section features **Brand concept**, the first inner page (`SECTION_P
 
 ### On the pages
 * **Inner pages**: painted with the **Page background**, their text in the **Page text** color, and one SVG behind their content with one group per layer that is on.
-* **Cover**: painted with the Cover's own Background color, its title and "Designed by" in the Cover's Typography color, and one SVG with only the layers that are on **and** marked **Also on the Cover**.
+* **Cover**: painted with the Cover's own Background color, its title in the Cover's Title color and "Designed by" in its Text color, and one SVG with only the layers that are on **and** marked **Also on the Cover**.
 * The groups are drawn from the **last** layer of the list to the **first**, so the first one is on top. A page with no layer to draw has no SVG.
 * Each group's opacity is its layer's **Intensity**. The layers blend by transparency only; the content of the page is never faded.
 * The SVG sits **over the page's background** and **under all the content** of the page (title, logo, texts, colors, fonts, the grid of 3.2). It ignores the mouse (`pointer-events: none`), so the guide bands of 3.2 keep working, and it is hidden from screen readers (`aria-hidden="true"`).
@@ -99,7 +99,7 @@ Grain and Paper are drawn with an SVG noise filter (`feTurbulence`) in mm of the
 
 ## 4. Invariants
 * All inner pages always draw the same layers, in the same order, on the same Page background and with the same Page text color.
-* The Cover's Background and Typography colors only paint the Cover; the Skin's colors never paint the Cover, except the layers marked Also on the Cover.
+* The Cover's Background, Title and Text colors only paint the Cover; the Skin's colors never paint the Cover, except the layers marked Also on the Cover.
 * The skin never changes, moves or covers the content of a page; Template, Orientation and Preview view combine freely with it.
 * The first layer of the list is always drawn on top, and the last one just over the Background.
 * A skin has 0 to 4 layers. A hidden layer keeps its values, colors and place.
@@ -214,7 +214,7 @@ Only a typed HEX can be wrong. Otherwise:
 * **Then**: A guide is added, as without a skin.
 
 ### Scenario 20: The Cover Keeps Its Own Colors
-* **Given**: The Cover's Background color is Navy and its Typography color is White.
+* **Given**: The Cover's Background color is Navy and its Title and Text colors are White.
 * **When**: The user looks at the inner pages.
 * **Then**: They are White with Black text (the Skin's defaults); only the Cover is Navy with a white title.
 

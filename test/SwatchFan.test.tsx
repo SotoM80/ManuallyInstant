@@ -5,7 +5,7 @@ import { getColorGroup, typeHex } from './coverForm';
 // The swatches start hidden behind one circle with the current color; a click opens them in a pop-up.
 
 function getToggle() {
-  return within(getColorGroup('Typography color')).getByRole('button', { name: 'Typography color swatches' });
+  return within(getColorGroup('Title color')).getByRole('button', { name: 'Title color swatches' });
 }
 
 function getFan() {
@@ -13,7 +13,7 @@ function getFan() {
 }
 
 function getSwatch(name: string) {
-  return within(getColorGroup('Typography color')).getByRole('radio', { name });
+  return within(getColorGroup('Title color')).getByRole('radio', { name });
 }
 
 describe('Swatches pop-up', () => {
@@ -69,7 +69,7 @@ describe('Swatches pop-up', () => {
   it('shows no color while the HEX is not valid', () => {
     renderApp();
 
-    typeHex('Typography color', '#12');
+    typeHex('Title color', '#12');
 
     expect(getToggle()).toHaveAttribute('data-empty', 'true');
   });

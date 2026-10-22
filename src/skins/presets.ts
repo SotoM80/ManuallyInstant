@@ -1,4 +1,4 @@
-import { DEFAULT_BACKGROUND_COLOR, DEFAULT_TYPOGRAPHY_COLOR } from '../data/colorPalette'
+import { DEFAULT_BACKGROUND_COLOR, DEFAULT_TEXT_COLOR } from '../data/colorPalette'
 import type { Skin, SkinControl, SkinParams, SkinPreset, SkinType } from './types'
 
 // Every preset also has Intensity: how strong the layer is over the page (its opacity).
@@ -112,7 +112,7 @@ export const SKIN_TYPES: { type: SkinType; label: string }[] = [
 // White pages with black text and no layers
 export const NO_SKIN: Skin = {
   pageBackground: DEFAULT_BACKGROUND_COLOR,
-  pageText: DEFAULT_TYPOGRAPHY_COLOR,
+  pageText: DEFAULT_TEXT_COLOR,
   layers: [],
   nextId: 1,
 }

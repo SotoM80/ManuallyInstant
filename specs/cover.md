@@ -4,19 +4,20 @@
 The first section of the Brand Manual page is **Cover** (portada). It collects everything shown on the cover page of the manual: the **brand manual title** (with its style), **Designed by** and the **logo**. The Cover page of the preview shows each of them as soon as it is typed or chosen; a new logo waits for the **Apply** button (see `brandmanual.md` and ADR 0007). Where each one sits on the page depends on the chosen template.
 
 ## Out of Scope
-Choosing a template and the layout of each template (see `templates.md`). The Logo page and section (they will reuse this same logo later). Cropping or editing the logo (the Logo size field only scales it). Styling "Designed by" (font, color, size). Saving anything between sessions.
+Choosing a template and the layout of each template (see `templates.md`). The Logo page and section (they will reuse this same logo later). Cropping or editing the logo (the Logo size field only scales it). The font and size of "Designed by" (its color is the Text color). Saving anything between sessions.
 
 ## 2. Interface
 ### Fields (in this order, all inside the "1. Cover" section)
 1. **Brand manual title**: the text field and its three style fields (Font family, Font style, Font size). All the rules are in `titlefild.md`.
-2. **Typography color**: color picker for the title and "Designed by". Default Black `#000000`.
-3. **Background color**: color picker for the background of the Cover. Default White `#FFFFFF`. The other pages have their own background, set in the Skin section (see `skins.md`).
-4. **Designed by**: a free-text field (who designed the manual, e.g. a studio or a person).
-5. **Logo**: a file field to upload the brand's logo. Accepted files: PNG, JPG, SVG or WebP, up to 5 MB. It is drawn as a **"Choose file"** button followed by the chosen file's name (or **"No file chosen"**), always in English: the browser's own file button follows the system language, so it is hidden (still used by the keyboard and screen readers).
-6. **Logo size**: three buttons in a row, **Small**, **Medium** and **Large**, with one always chosen (default **Medium**). They scale the logo inside its area on the Cover: Small 50%, Medium 75%, Large 100% (the whole area). It never shows an error.
+2. **Title color**: color picker for the brand manual title. Default Black `#000000`.
+3. **Text color**: color picker for the rest of the text of the Cover ("Designed by"). Default Black `#000000`.
+4. **Background color**: color picker for the background of the Cover. Default White `#FFFFFF`. The other pages have their own background, set in the Skin section (see `skins.md`).
+5. **Designed by**: a free-text field (who designed the manual, e.g. a studio or a person).
+6. **Logo**: a file field to upload the brand's logo. Accepted files: PNG, JPG, SVG or WebP, up to 5 MB. It is drawn as a **"Choose file"** button followed by the chosen file's name (or **"No file chosen"**), always in English: the browser's own file button follows the system language, so it is hidden (still used by the keyboard and screen readers).
+7. **Logo size**: three buttons in a row, **Small**, **Medium** and **Large**, with one always chosen (default **Medium**). They scale the logo inside its area on the Cover: Small 50%, Medium 75%, Large 100% (the whole area). It never shows an error.
 The section has no Save button: every change reaches the preview at once.
 
-The two color pickers follow `colorpicker.md`.
+The three color pickers follow `colorpicker.md`.
 
 The form follows the visual rules in `titlefild.md` (text aligned right).
 

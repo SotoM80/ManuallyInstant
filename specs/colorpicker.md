@@ -1,17 +1,18 @@
-# Technical Specification: Color Picker (Typography & Background)
+# Technical Specification: Color Picker (Title, Text & Background)
 
 ## 1. What it does
-A custom color picker that lets the user choose colors for the manual. The Cover section has two of them, chosen separately:
-* **Typography color**: the color of the text of the Cover (the brand manual title and "Designed by").
+A custom color picker that lets the user choose colors for the manual. The Cover section has three of them, chosen separately:
+* **Title color**: the color of the brand manual title.
+* **Text color**: the color of the rest of the text of the Cover ("Designed by", and the divider line of Template 3).
 * **Background color**: the background of the Cover. The other pages take their background and text colors from the Skin section (see `skins.md` and ADR 0011).
 
 Each picker combines **quick swatches** (hidden behind one circle that opens them in a floating pop-up) with **any color** (a native color picker, a HEX field and RGB sliders).
 
 ## Out of Scope
-The brand's color palette (the "Colors" section with names, RGB and CMYK values; see `colorpalette.md`, which reuses this picker). Different colors per page or per text element. Gradients, transparency or background images. Warnings about low contrast between text and background. Saving colors between sessions.
+The brand's color palette (the "Colors" section with names, RGB and CMYK values; see `colorpalette.md`, which reuses this picker). Different colors per page, or for other text elements than the title and the rest of the Cover's text. Gradients, transparency or background images. Warnings about low contrast between text and background. Saving colors between sessions.
 
 ## 2. Interface
-Each picker is a group labeled with its name ("Typography color" or "Background color"). Its first row contains, in this order:
+Each picker is a group labeled with its name ("Title color", "Text color" or "Background color"). Its first row contains, in this order:
 1. **Swatches circle**: a round button (labeled "<name> swatches") filled with the current color, or empty with a dashed border while the HEX is not valid. Clicking it opens or closes the swatches pop-up.
 2. **Custom color**: the browser's native color picker (labeled "<name> custom"). It swells gently when a swatch is chosen, to show it took that color.
 3. **HEX field**: a text field (labeled "<name> HEX") with the color as `#RRGGBB`. It shakes when its value is not valid.
@@ -45,11 +46,13 @@ All the parts always show the same color: clicking a swatch or using the native 
 
 | Picker | Default |
 |---|---|
-| Typography color | Black `#000000` |
+| Title color | Black `#000000` |
+| Text color | Black `#000000` |
 | Background color | White `#FFFFFF` |
 
 ### On the manual
-* The **title** and **"Designed by"** are drawn in the Typography color ("Designed by" a bit softer, 75% opacity). The divider line of Template 3 also uses it, very faint.
+* The **title** is drawn in the Title color.
+* **"Designed by"** is drawn in the Text color (a bit softer, 75% opacity). The divider line of Template 3 also uses it, very faint.
 * The **Cover** is painted with the Background color. The other pages are not (they use the Skin's Page background).
 
 ### HEX field rules
@@ -58,12 +61,12 @@ All the parts always show the same color: clicking a swatch or using the native 
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`), in the Cover section.
-* **Postconditions**: As soon as a valid color is picked or typed, the text of the Cover uses the Typography color and the Cover uses the Background color.
+* **Postconditions**: As soon as a valid color is picked or typed, the title of the Cover uses the Title color, the rest of its text the Text color, and the Cover uses the Background color.
 
 ## 4. Invariants
-* Typography color and Background color are independent: changing one never changes the other.
+* Title color, Text color and Background color are independent: changing one never changes the others.
 * Colors reach the manual at once (same rule as the rest of the Cover). While a HEX is half typed or not valid, the manual keeps the last valid color.
-* The Typography and Background colors never paint any page but the Cover.
+* The Title, Text and Background colors never paint any page but the Cover.
 * Colors work the same in every template, orientation and preview view.
 
 ## Failure Modes
@@ -75,11 +78,11 @@ All the parts always show the same color: clicking a swatch or using the native 
 ### Scenario 1: Picking a Swatch
 * **Given**: The user is in the Cover section, Background color is White.
 * **When**: The user opens the Background color swatches and clicks "Navy".
-* **Then**: The Background color HEX field shows `#1A237E`, Navy is selected, and Typography color is unchanged.
+* **Then**: The Background color HEX field shows `#1A237E`, Navy is selected, and Title color and Text color are unchanged.
 
 ### Scenario 2: Any Color by HEX
 * **Given**: The user is in the Cover section.
-* **When**: The user types `#2b2d42` in the Typography color HEX field and leaves the field.
+* **When**: The user types `#2b2d42` in the Title color HEX field and leaves the field.
 * **Then**: The field shows `#2B2D42`, no error is shown and no swatch is selected.
 
 ### Scenario 3: Invalid HEX
@@ -89,7 +92,7 @@ All the parts always show the same color: clicking a swatch or using the native 
 
 ### Scenario 4: Colors on the Manual
 * **Given**: The user typed a title in the Cover section.
-* **When**: The user chooses White as Typography color and `#1A237E` as Background color.
+* **When**: The user chooses White as Title color, White as Text color and `#1A237E` as Background color.
 * **Then**: At once, the title and "Designed by" are white and the Cover has the `#1A237E` background; the other pages do not change.
 
 ### Scenario 5: Colors Are Live
@@ -98,7 +101,7 @@ All the parts always show the same color: clicking a swatch or using the native 
 * **Then**: The Cover gets the `#1A237E` background at once, with no button.
 
 ### Scenario 6: Swatches Pop-up
-* **Given**: The Typography color swatches are closed.
+* **Given**: The Title color swatches are closed.
 * **When**: The user clicks the swatches circle and then clicks "Blue".
 * **Then**: The swatches pop-up opens, then closes; the circle and the HEX field show `#1E88E5`, and the focus is on the circle.
 
@@ -106,3 +109,8 @@ All the parts always show the same color: clicking a swatch or using the native 
 * **Given**: Background color is White (`#FFFFFF`).
 * **When**: The user opens the RGB pop-up and moves Red to 0.
 * **Then**: The HEX field shows `#00FFFF` and the pop-up shows `rgb(0, 255, 255)`.
+
+### Scenario 8: Title and Text Colors Apart
+* **Given**: The user typed a title and a Designed by in the Cover section.
+* **When**: The user chooses Red as Title color and Gray as Text color.
+* **Then**: The title is red and "Designed by" is gray; choosing another Text color never changes the title, and another Title color never changes "Designed by".

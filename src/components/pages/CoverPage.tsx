@@ -24,15 +24,15 @@ export function CoverPage({ cover, titleScale }: CoverPageProps) {
   const titleCss = toTitleCss(cover.style)
   const pageTitleCss = {
     ...titleCss,
-    color: cover.colors.typography,
+    color: cover.colors.title,
     fontSize: `${parseFloat(String(titleCss.fontSize)) * titleScale}px`,
   }
   // The logo size scales the image inside its area (see .cover-logo img in shared.css)
   const logoCss = { '--logo-scale': LOGO_SCALES[cover.logo?.size ?? 'Medium'] } as CSSProperties
-  // The Typography color is set on the whole layout so "Designed by" (and the
-  // divider of Template 3) take it too.
+  // The Text color is set on the whole layout so "Designed by" (and the divider of
+  // Template 3) take it; the title has its own Title color.
   return (
-    <div className="cover-layout" style={{ color: cover.colors.typography }}>
+    <div className="cover-layout" style={{ color: cover.colors.text }}>
       {cover.title ? (
         <p className="cover-title" style={pageTitleCss}>
           {cover.title}

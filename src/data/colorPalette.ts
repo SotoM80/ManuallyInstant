@@ -14,7 +14,8 @@ export const PALETTE: { name: string; hex: string }[] = [
   { name: 'Purple', hex: '#8E24AA' },
 ]
 
-export const DEFAULT_TYPOGRAPHY_COLOR = '#000000'
+export const DEFAULT_TITLE_COLOR = '#000000'
+export const DEFAULT_TEXT_COLOR = '#000000'
 export const DEFAULT_BACKGROUND_COLOR = '#FFFFFF'
 
 export const INVALID_HEX_MESSAGE = 'Enter a valid HEX color, like #1E88E5'

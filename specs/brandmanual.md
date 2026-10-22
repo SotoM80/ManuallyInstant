@@ -109,7 +109,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 
 ### Scenario 4: Cover Shows the Title Live
 * **Given**: The Cover shows "Your brand manual title".
-* **When**: The user types "My Brand" and selects the "Blue" swatch in Typography color.
+* **When**: The user types "My Brand" and selects the "Blue" swatch in Title color.
 * **Then**: The Cover shows "My Brand" in blue at once, with no button.
 
 ### Scenario 5: Only New Images Wait for Apply

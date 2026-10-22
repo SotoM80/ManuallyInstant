@@ -32,7 +32,8 @@ export type CoverData = {
 
 // Colors of the manual pages, as "#RRGGBB".
 export type ManualColors = {
-  typography: string // title and "Designed by"
+  title: string // the brand manual title
+  text: string // the rest of the Cover's text: "Designed by" (and the divider of Template 3)
   background: string // background of every page
 }
 

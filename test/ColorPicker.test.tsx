@@ -38,7 +38,8 @@ function saveCover() {
 // Spec: specs/colorpicker.md, Section 2 — Interface
 describe('Color picker – interface', () => {
   it.each([
-    ['Typography color', '#000000', 'Black'],
+    ['Title color', '#000000', 'Black'],
+    ['Text color', '#000000', 'Black'],
     ['Background color', '#FFFFFF', 'White'],
   ] as const)('%s starts at %s with the %s swatch selected', (field, hex, swatch) => {
     renderApp();
@@ -60,7 +61,7 @@ describe('Color picker – swatches', () => {
     expect(getHexInput('Background color')).toHaveValue('#1A237E');
     expect(getCheckedSwatch('Background color')).toHaveAccessibleName('Navy');
     // The other picker is not touched
-    expect(getHexInput('Typography color')).toHaveValue('#000000');
+    expect(getHexInput('Title color')).toHaveValue('#000000');
   });
 });
 
@@ -73,21 +74,21 @@ describe('Color picker – HEX field', () => {
   ])('tidies "%s" into "%s" on blur', (typed, expected) => {
     renderApp();
 
-    typeHex('Typography color', typed);
-    fireEvent.blur(getHexInput('Typography color'));
+    typeHex('Title color', typed);
+    fireEvent.blur(getHexInput('Title color'));
 
-    expect(getHexInput('Typography color')).toHaveValue(expected);
-    expect(getHexInput('Typography color')).toHaveAttribute('aria-invalid', 'false');
+    expect(getHexInput('Title color')).toHaveValue(expected);
+    expect(getHexInput('Title color')).toHaveAttribute('aria-invalid', 'false');
   });
 
   it('selects the matching swatch when its HEX is typed, and none for other colors', () => {
     renderApp();
 
-    typeHex('Typography color', '#e53935');
-    expect(getCheckedSwatch('Typography color')).toHaveAccessibleName('Red');
+    typeHex('Title color', '#e53935');
+    expect(getCheckedSwatch('Title color')).toHaveAccessibleName('Red');
 
-    typeHex('Typography color', '#2B2D42');
-    expect(getCheckedSwatch('Typography color')).toBeUndefined();
+    typeHex('Title color', '#2B2D42');
+    expect(getCheckedSwatch('Title color')).toBeUndefined();
   });
 
   it('follows the custom (native) picker', () => {
@@ -126,20 +127,21 @@ describe('Color picker – invalid HEX', () => {
   it('shows no error when the HEX field is emptied', () => {
     renderApp();
     typeTitle('My Brand');
-    typeHex('Typography color', '');
+    typeHex('Title color', '');
 
-    fireEvent.blur(getHexInput('Typography color'));
+    fireEvent.blur(getHexInput('Title color'));
 
-    expect(getHexInput('Typography color')).toHaveAttribute('aria-invalid', 'false');
+    expect(getHexInput('Title color')).toHaveAttribute('aria-invalid', 'false');
   });
 });
 
 // Spec: specs/colorpicker.md, Scenario 4 — Colors on the Manual
 describe('Color picker – colors on the manual', () => {
-  it('paints the title and "Designed by" with the Typography color and only the Cover with the Background color', () => {
+  it('paints the title and "Designed by" with their colors and only the Cover with the Background color', () => {
     // Given
     renderApp();
-    pickSwatch('Typography color', 'White');
+    pickSwatch('Title color', 'White');
+    pickSwatch('Text color', 'White');
     typeHex('Background color', '#1a237e');
 
     // When
@@ -153,6 +155,24 @@ describe('Color picker – colors on the manual', () => {
     for (const page of getPages().filter((page) => page !== getCover())) {
       expect(page).toHaveStyle({ background: '#FFFFFF' });
     }
+  });
+
+  // Spec: specs/colorpicker.md, Scenario 8 — Title and Text Colors Apart
+  it('paints the title with the Title color and "Designed by" with the Text color', () => {
+    renderApp();
+    saveCover();
+
+    pickSwatch('Title color', 'Red');
+    pickSwatch('Text color', 'Gray');
+
+    expect(within(getCover()).getByText('My Brand')).toHaveStyle({ color: '#E53935' });
+    expect(within(getCover()).getByText(/^Designed by /)).toHaveStyle({ color: '#757575' });
+
+    // Each one only changes its own text
+    pickSwatch('Text color', 'Blue');
+    expect(within(getCover()).getByText('My Brand')).toHaveStyle({ color: '#E53935' });
+    pickSwatch('Title color', 'Green');
+    expect(within(getCover()).getByText(/^Designed by /)).toHaveStyle({ color: '#1E88E5' });
   });
 
   // Spec: specs/colorpicker.md, Scenario 5 — Colors Are Live

@@ -82,7 +82,7 @@ describe('Brand Manual – cover preview', () => {
 
     // When
     typeTitle('My Brand');
-    pickSwatch('Typography color', 'Blue');
+    pickSwatch('Title color', 'Blue');
 
     // Then
     const title = within(getCover()).getByText('My Brand');
