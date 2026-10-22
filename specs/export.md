@@ -24,8 +24,8 @@ At the top of the sections column, on the right, in this order: **↓ Print PDF*
 `<title>` is the manual title in lowercase, with every run of characters that are not letters or digits turned into `-` (e.g. `My Brand!` → `my-brand`), or `brand-manual` when there is no title. The print PDF can weigh several MB; the web PDF is a fraction of it.
 
 ### Clicking a button
-1. If a section was never touched (Cover, Logo, Colors or Typography still shows its placeholder), a warning shows under the buttons: `Some pages are still empty: Logo, Typography.` with **Download anyway** and **Cancel**. Cancel closes it; Download anyway goes on.
-2. While the PDF is made, both buttons are disabled and the one pressed reads `Creating… 3/8` (the page being drawn and the number of pages).
+1. If a section was never touched (Cover, Logo, Usage, Colors or Typography still shows its placeholder; Usage counts while either of its pages does, see `usage.md`), a warning shows under the buttons: `Some pages are still empty: Logo, Typography.` with **Download anyway** and **Cancel**. Cancel closes it; Download anyway goes on.
+2. While the PDF is made, both buttons are disabled and the one pressed reads `Creating… 3/10` (the page being drawn and the number of pages).
 3. The browser downloads the file. The buttons are enabled again.
 4. If something fails, a message shows under the buttons: `The PDF could not be created. Try again.`
 
@@ -71,7 +71,7 @@ Apply has nothing to do with the export: the PDF shows what the preview shows, s
 ### Scenario 2: A Complete Manual
 * **Given**: Every section was touched; the title is "My Brand".
 * **When**: The user clicks "Download print PDF".
-* **Then**: A PDF named `my-brand-print.pdf` is made at 300 dpi in PNG, with the 8 pages in natural order, and no warning is shown.
+* **Then**: A PDF named `my-brand-print.pdf` is made at 300 dpi in PNG, with the 10 pages in natural order, and no warning is shown.
 
 ### Scenario 3: The Web Version
 * **Given**: Every section was touched.

@@ -18,7 +18,7 @@ A skin does not depend on the template: it is the same stack under every layout,
 * The PDF export itself (Phase 4).
 
 ## 2. Interface
-### Section "5. Skin"
+### Section "6. Skin"
 The section has, from top to bottom, the **page colors**, the **Add layer** button with its gallery, then the **list of layers**. Add layer sits above the list so that a new layer, which goes on top of the list, appears right where the user chose it.
 
 **Page colors**: two color fields, **Page background** (default White `#FFFFFF`) and **Page text** (default Black `#000000`). They paint the background and every text of the inner pages: Brand concept, Anatomy, Logo versions, Clear space (its lines and measures too), Color palette and Typography. They never change the Cover. The list reads like the layers panel of a design tool: **the first layer of the list is drawn on top**, the last one just over the page Background.
@@ -120,7 +120,7 @@ Only a typed HEX can be wrong. Otherwise:
 
 ### Scenario 1: No Layers by Default
 * **Given**: The user opens the Brand Manual page.
-* **When**: The user opens "5. Skin".
+* **When**: The user opens "6. Skin".
 * **Then**: Page background is White and Page text is Black, the list says "No layers yet…", Add layer is on, the pages show their plain backgrounds, and Brand concept comes first in the preview.
 
 ### Scenario 2: The Gallery

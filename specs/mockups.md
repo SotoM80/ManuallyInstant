@@ -15,7 +15,7 @@ A **Mockups** section and a new page, **8. Mockups**, that show the brand's logo
 * Saving the choice between sessions (ADR 0002).
 
 ## 2. Interface
-### Section "6. Mockups"
+### Section "7. Mockups"
 A new section of the accordion, after Skin (it uses the logo versions of Logo and the palette of Colors). From top to bottom:
 
 **Products**: the 6 products as checkboxes, grouped under four headings, each with its name and a small drawing of the product (decoration only: hidden from screen readers, the checkbox already says the name):
@@ -85,7 +85,7 @@ Every product is drawn on its own `viewBox` (in its own units, not mm), from sha
 * `MockupArt`: draws one product in SVG from its data, with colors and opacities as **attributes** (never CSS classes), so the PDF copy draws it as is (ADR 0012).
 * `MockupsPage` (the page, with a `.mockups-layout` inside `.logo-page`) and `MockupsForm` (the section, controlled like `SkinForm`). The choice is kept in `App`, above the routes, like the Skin.
 * **Template CSS**: `.mockups-grid` and its captions in `src/templates/shared.css` (with sizes for the Grid and Pages views), and a `.mockups-layout` rule in `src/templates/template3/template3.css` like the ones of the other Logo pages (`anatomy-layout`, `versions-layout`, `clearspace-layout`), so it uses the side column.
-* `MANUAL_SECTIONS` gets `mockups` (6th), `MANUAL_PAGES` gets `Mockups` (8th). Both PDFs include it, since they draw every page (`export.md`). The export's warning about empty sections never lists Mockups: it always has content (its defaults), and an empty Logo section is already listed.
+* `MANUAL_SECTIONS` gets `mockups` (7th, after Usage), `MANUAL_PAGES` gets `Mockups` (10th, after Usage's two pages). Both PDFs include it, since they draw every page (`export.md`). The export's warning about empty sections never lists Mockups: it always has content (its defaults), and an empty Logo section is already listed.
 
 ### Photo mockups (ADR 0014)
 Built in three phases, each one usable on its own.
@@ -152,7 +152,7 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **Then**: It shows "My Brand", the heading "Mockups", and the Business card, T-shirt, Mug and Phone in two rows of two, each with its caption and named for screen readers ("Business card mockup"…).
 
 ### Scenario 2: The Section
-* **Given**: The user opens "6. Mockups".
+* **Given**: The user opens "7. Mockups".
 * **When**: The section unfolds.
 * **Then**: The Mockups page comes first in the preview; the 6 products are listed under Stationery, Apparel & bags, Objects and Screens; Business card, T-shirt, Mug and Phone are ticked, and their four blocks are below, folded.
 
@@ -224,7 +224,7 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 ### Scenario 16: In the PDF
 * **Given**: Four mockups are ticked and a logo is applied.
 * **When**: The user downloads a PDF.
-* **Then**: It has 8 pages, the last one the Mockups page as in the preview, with the logos visible and the products in their colors.
+* **Then**: It has 10 pages, the last one the Mockups page as in the preview, with the logos visible and the products in their colors.
 
 ### Scenario 17: A Photo Template (phase 1)
 * **Given**: The list has a photo template "T-shirt (photo)" and a logo is applied.

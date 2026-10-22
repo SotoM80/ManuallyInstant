@@ -24,21 +24,23 @@ The content of the Logo section (it will have its own future spec). The content 
 * **Left column — Manual Preview**: A region labeled "Manual preview". It shows the manual's pages as small page thumbnails, in this order:
   1. **Cover**: shows the brand manual title with its style, the applied logo and "Designed by <name>", placed by the template (see `cover.md`). Each empty slot shows its placeholder: "Your brand manual title", "Your logo" and "Designed by …".
   2. **Logo**
-  3. **Color palette**: shows the colors with their name, HEX, RGB and CMYK values (see `colorpalette.md`). Until the Colors section is touched, it shows the placeholder "Your color palette".
-  4. **Typography**: shows the two brand fonts with their usage, name, "Aa" and alphabet (see `typography.md`). Until a font is changed, it shows the placeholder "Your typography".
-  5. **Mockups**: the logo on up to 4 products (see `mockups.md`).
+  3. **Usage**: the Correct use and Incorrect use pages, each with its examples in a grid (see `usage.md`).
+  4. **Color palette**: shows the colors with their name, HEX, RGB and CMYK values (see `colorpalette.md`). Until the Colors section is touched, it shows the placeholder "Your color palette".
+  5. **Typography**: shows the two brand fonts with their usage, name, "Aa" and alphabet (see `typography.md`). Until a font is changed, it shows the placeholder "Your typography".
+  6. **Mockups**: the logo on up to 4 products (see `mockups.md`).
 
-  (The Logo section fills four pages between the Cover and Color palette, so the manual has 8 pages: Cover, Brand concept, Anatomy, Logo versions, Clear space, Color palette, Typography, Mockups.)
+  (The Logo section fills four pages between the Cover and Color palette, and the Usage section two pages after them, so the manual has 10 pages: Cover, Brand concept, Anatomy, Logo versions, Clear space, Correct use, Incorrect use, Color palette, Typography, Mockups.)
 
   Pages whose section is not built yet show "Coming soon".
   The preview stays visible while the user scrolls the sections (sticky).
 * **Right column — Manual Sections**: A region labeled "Manual sections". At the top, above the Cover section, the **Apply** button (see *Live Preview and Apply* below). Below it, the region lists every section needed to create the manual, one below the other, numbered, in this order:
   1. **Cover**: brand manual title, Designed by and logo (see `cover.md` and `titlefild.md`).
   2. **Logo**: "Coming soon".
-  3. **Colors**: the brand's color palette (see `colorpalette.md`).
-  4. **Typography**: the brand's primary and secondary fonts (see `typography.md`).
-  5. **Skin**: the background and text colors of every page but the Cover, and decorative layers behind them that can be stacked, hidden, reordered and also drawn on the Cover (see `skins.md`).
-  6. **Mockups**: up to 4 products showing the logo, each with its color and logo version (see `mockups.md`).
+  3. **Usage**: examples of the correct and incorrect use of the brand (see `usage.md`).
+  4. **Colors**: the brand's color palette (see `colorpalette.md`).
+  5. **Typography**: the brand's primary and secondary fonts (see `typography.md`).
+  6. **Skin**: the background and text colors of every page but the Cover, and decorative layers behind them that can be stacked, hidden, reordered and also drawn on the Cover (see `skins.md`).
+  7. **Mockups**: up to 4 products showing the logo, each with its color and logo version (see `mockups.md`).
 
   Sections that are not built yet are shown disabled with the label "Coming soon", so the user can see the full path from the start.
 
@@ -59,14 +61,14 @@ The sections have no Save buttons. Everything typed, picked or chosen in a secti
 
 ### The Open Section's Pages Come First
 So the page being edited is always in view without scrolling:
-* Opening a section moves its pages to the **top** of the preview, at the same size as the others, and the rest follow in their natural order. Cover → Cover; Logo → Brand concept, Anatomy, Logo versions, Clear space; Colors → Color palette; Typography → Typography; Skin → Brand concept (the first page it paints; the Cover only gets the layers marked Also on the Cover); Mockups → Mockups.
+* Opening a section moves its pages to the **top** of the preview, at the same size as the others, and the rest follow in their natural order. Cover → Cover; Logo → Brand concept, Anatomy, Logo versions, Clear space; Usage → Correct use, Incorrect use (the group being worked in decides which one comes first, like the Logo areas; see `usage.md`); Colors → Color palette; Typography → Typography; Skin → Brand concept (the first page it paints; the Cover only gets the layers marked Also on the Cover); Mockups → Mockups.
 * Folding the section puts every page back in its natural order. Opening another section moves that section's pages to the top instead.
 * The pages glide softly to their new places, with no bounce: the same timing and easing as the accordion (about 0.5 s, `--ease-smooth`).
-* The pages of the open section get an accent outline, and each page keeps its natural number in its caption (e.g. "7. Typography" while it is first).
+* The pages of the open section get an accent outline, and each page keeps its natural number in its caption (e.g. "9. Typography" while it is first).
 * Apply has nothing to do with the order: it only shows waiting images.
 * With Cover open (as on start) nothing moves, because Cover is already first.
 * **Logo areas**: the Logo section has four areas, each with its page: Concept → Brand concept, Anatomy → Anatomy, Versions → Logo versions, Clear space & size → Clear space. The area being worked in decides the **main page**: it comes first, with the accent outline, followed by the other Logo pages. An area becomes the one being worked in when the user clicks anywhere in it (a field, its title or an empty spot) or reaches it with the keyboard. Scrolling inside Logo does not change it, so the form and the preview never move at the same time. When Logo opens, Concept is the first one.
-* The open **section** moves too: it goes to the top of the right column (keeping its number, e.g. "4. Typography") and the column is pushed down so it starts at the same height as its page. The form and its page sit side by side. Folding it puts every section back in order. The sections glide like the pages. If the top of the column is above the screen when a section opens, the page scrolls smoothly up to it. On narrow screens (one column) the sections move but are not pushed down.
+* The open **section** moves too: it goes to the top of the right column (keeping its number, e.g. "5. Typography") and the column is pushed down so it starts at the same height as its page. The form and its page sit side by side. Folding it puts every section back in order. The sections glide like the pages. If the top of the column is above the screen when a section opens, the page scrolls smoothly up to it. On narrow screens (one column) the sections move but are not pushed down.
 
 ### Adding Sections
 Sections and preview pages come from lists (`src/data/manualSections.ts`). When a section is built, it is marked as ready in the list and its form is plugged in; the layout does not change.
@@ -149,7 +151,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 
 ### Scenario 11: Opening Another Section
 * **Given**: Cover is open.
-* **When**: The user clicks "3. Colors".
+* **When**: The user clicks "4. Colors".
 * **Then**: Colors opens and Cover folds.
 
 ### Scenario 12: Folding Keeps the Work
@@ -160,7 +162,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ### Scenario 13: The Open Section's Page Comes First
 * **Given**: The user is on the Brand Manual page, with Cover open and the pages in their natural order.
 * **When**: The user opens Typography.
-* **Then**: The Typography page is first in the preview, with an accent outline and the caption "7. Typography". Apply stays off.
+* **Then**: The Typography page is first in the preview, with an accent outline and the caption "9. Typography". Apply stays off.
 
 ### Scenario 14: Folding Puts the Pages Back
 * **Given**: Colors is open and the Color palette page is first.
@@ -175,7 +177,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ### Scenario 16: The Open Section Moves Beside Its Page
 * **Given**: Cover is open.
 * **When**: The user opens Typography.
-* **Then**: "4. Typography" glides to the top of the sections column, at the same height as the Typography page at the top of the preview, so both are seen side by side. Folding it puts the sections back in their order.
+* **Then**: "5. Typography" glides to the top of the sections column, at the same height as the Typography page at the top of the preview, so both are seen side by side. Folding it puts the sections back in their order.
 
 ### Scenario 17: The Logo Area Decides the Main Page
 * **Given**: Logo is open, and Brand concept is the main page.

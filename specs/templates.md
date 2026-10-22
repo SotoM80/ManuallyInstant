@@ -28,7 +28,7 @@ Template 1             Template 2               Template 3
 
 ### Template 3 on every page
 Template 3 is built on a side column, so it looks different from Templates 1 and 2 (which stack everything from top to bottom). Every page is split into a narrow column on the left (30%) and a wide one on the right, with a faint vertical line between them:
-* **Left**: what the page is about: the title and "Designed by" on the Cover, the heading (and the CMYK note) on Color palette and Typography, the brand name and heading on the Logo pages.
+* **Left**: what the page is about: the title and "Designed by" on the Cover, the heading (and the CMYK note) on Color palette and Typography, the brand name and heading on the Logo pages, and on the Correct use and Incorrect use pages (whose grid of examples is on the right; see `usage.md`).
 * **Right**: the content: the logo, the colors, the fonts, or the numbered blocks of the Logo pages (1.1, 2.1, 2.2…).
 
 See `colorpalette.md` and `typography.md` for their diagrams.

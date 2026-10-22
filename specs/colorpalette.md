@@ -1,13 +1,13 @@
 # Technical Specification: Color Palette (Colors Section)
 
 ## 1. What it does
-The third section of the Brand Manual page is **Colors**. The user builds the brand's color palette: from **1 to 6 colors**, each one with a free-text **name** and a color chosen with the same picker as the Cover (see `colorpicker.md`). For every color the app calculates its **HEX**, **RGB** and **CMYK (approximate)** values. As the user edits, the **Color palette** page of the preview shows every color with its name and its three values. Where they sit on the page depends on the chosen template.
+The fourth section of the Brand Manual page is **Colors**. The user builds the brand's color palette: from **1 to 6 colors**, each one with a free-text **name** and a color chosen with the same picker as the Cover (see `colorpicker.md`). For every color the app calculates its **HEX**, **RGB** and **CMYK (approximate)** values. As the user edits, the **Color palette** page of the preview shows every color with its name and its three values. Where they sit on the page depends on the chosen template.
 
 ## Out of Scope
 Changing the background or text colors of the pages (they belong to the Cover and the Skin, see `colorpicker.md` and `skins.md`). Reordering colors (drag and drop). Pantone or other color systems. Typing CMYK or RGB values to choose a color (CMYK is only shown, never typed). Accurate, color-managed CMYK (see ADR 0003). Warnings about similar or low-contrast colors. Saving the palette between sessions.
 
 ## 2. Interface
-### Section form (inside "3. Colors")
+### Section form (inside "4. Colors")
 The form has one block per color, in order (Color 1, Color 2, …), then the buttons. The blocks work as an **accordion** (see below): each one has a header row that is always shown, and a body with its fields that is shown only while it is open.
 
 **Header row** (a button labeled `Color N`): the color as a small chip, `Color N`, the color's name (or `No name yet`) and its HEX (or `—` while it is not valid), and an arrow that points down when folded and up when open.

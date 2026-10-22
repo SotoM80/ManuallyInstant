@@ -1,13 +1,13 @@
 # Technical Specification: Typography (Brand Fonts)
 
 ## 1. What it does
-The fourth section of the Brand Manual page is **Typography**. The user picks the brand's two fonts from a curated list of Google Fonts: a **Primary font** (for headings) and a **Secondary font** (for body text). As soon as a font is picked, the **Typography** page of the preview shows both fonts with their usage, their name, a large "Aa" and the alphabet with numbers. Where they sit on the page depends on the chosen template.
+The fifth section of the Brand Manual page is **Typography**. The user picks the brand's two fonts from a curated list of Google Fonts: a **Primary font** (for headings) and a **Secondary font** (for body text). As soon as a font is picked, the **Typography** page of the preview shows both fonts with their usage, their name, a large "Aa" and the alphabet with numbers. Where they sit on the page depends on the chosen template.
 
 ## Out of Scope
 The font of the Cover title, which keeps its own picker (see `titlefild.md`). Using the Primary font on the Cover title is a future idea (see `PLAN.md`). Fonts outside the list below, or typing any Google Font. Font weights, sizes or line heights chosen by the user. Uploading font files. Saving the fonts between sessions.
 
 ## 2. Interface
-### Section form (inside "4. Typography")
+### Section form (inside "5. Typography")
 1. **Primary font**: an autocomplete field, like the title's Font family (see `titlefild.md`). Each option in its list is drawn **in its own font**, so the user sees how it looks before choosing. The list floats under the field like every autocomplete list (see `titlefild.md`): about six fonts at a time, with scroll.
 2. **Secondary font**: the same, for the body text.
 
