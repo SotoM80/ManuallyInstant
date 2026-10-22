@@ -2,21 +2,28 @@ import { screen, fireEvent, within } from '@testing-library/react';
 
 // Helpers to fill the Cover section form (spec: specs/cover.md).
 
+// Label queries compare every label with every field of the page, so they grow much faster than
+// the page itself: a search of the whole app took ~0.8–1.7 s. Searching inside the Cover form
+// alone keeps every test that types a title fast.
+export function coverForm() {
+  return within(screen.getByRole('form', { name: 'Cover' }));
+}
+
 export function typeTitle(value: string) {
-  fireEvent.change(screen.getByLabelText('Brand manual title'), { target: { value } });
+  fireEvent.change(coverForm().getByLabelText('Brand manual title'), { target: { value } });
 }
 
 export function typeDesignedBy(value: string) {
-  fireEvent.change(screen.getByLabelText('Designed by'), { target: { value } });
+  fireEvent.change(coverForm().getByLabelText('Designed by'), { target: { value } });
 }
 
 export function makeLogo(name = 'logo.png', type = 'image/png', bytes = 1) {
   return new File([new Uint8Array(bytes)], name, { type });
 }
 
-// `selector`: the preview also has a page labeled "Logo", so only look at inputs.
+// `selector`: only the file field, not the "Logo size" group
 export function getLogoInput() {
-  return screen.getByLabelText('Logo', { selector: 'input' });
+  return coverForm().getByLabelText('Logo', { selector: 'input' });
 }
 
 export function uploadLogo(file: File = makeLogo()) {

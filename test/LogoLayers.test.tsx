@@ -50,8 +50,10 @@ function partLabels() {
     .map((input) => (input as HTMLInputElement).value);
 }
 
+// Reading a file is asynchronous: under the load of the whole suite it can take more than the
+// default second
 async function waitForParts(count: number) {
-  await waitFor(() => expect(partLabels()).toHaveLength(count));
+  await waitFor(() => expect(partLabels()).toHaveLength(count), { timeout: 5000 });
 }
 
 describe('Logo layers from SVG', () => {
@@ -95,7 +97,7 @@ describe('Logo layers from SVG', () => {
 
     chooseImagotype(svgFile('logo.svg', layer('Isotipo', 5), layer('Tagline', 70)));
 
-    expect(await screen.findByText('Remove the parts of this card to use the layers of this SVG.')).toBeInTheDocument();
+    expect(await screen.findByText('Remove the parts of this card to use the layers of this SVG.', {}, { timeout: 5000 })).toBeInTheDocument();
     expect(partLabels()).toEqual(['Monogram']);
   });
 
@@ -171,7 +173,7 @@ describe('Logo layers from SVG', () => {
 
     chooseImagotype(new File(['not an svg'], 'logo.svg', { type: 'image/svg+xml' }));
 
-    expect(await screen.findByText('The layers of this SVG could not be read.')).toBeInTheDocument();
+    expect(await screen.findByText('The layers of this SVG could not be read.', {}, { timeout: 5000 })).toBeInTheDocument();
     expect(partLabels()).toEqual([]);
   });
 
