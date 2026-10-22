@@ -3,7 +3,7 @@ import { BrandForm } from '../src/components/BrandForm';
 import { renderApp } from './renderApp';
 import { pickSwatch, typeTitle } from './coverForm';
 
-// The title color is now the Typography color picker (see ColorPicker.test.tsx).
+// The title color is now the Title color picker (see ColorPicker.test.tsx).
 const FIELDS = ['Font family', 'Font style', 'Font size'];
 
 function getField(name: string) {
@@ -153,7 +153,7 @@ describe('Title style – cover preview', () => {
     renderApp();
     typeTitle('My Brand');
     pickOption('Font family', 'Open Sans');
-    pickSwatch('Typography color', 'Blue');
+    pickSwatch('Title color', 'Blue');
     pickOption('Font style', 'Bold Italic');
     pickOption('Font size', 'Large');
 
@@ -176,6 +176,19 @@ describe('Title style – cover preview', () => {
 
     // Still Large (48px → 24px on the thumbnail)
     expect(getCoverTitle()).toHaveStyle({ fontSize: '24px' });
+  });
+
+  // Spec: specs/titlefild.md, Scenario 6 — Large Titles Keep Their Lines Apart
+  it('keeps the lines of the title apart with a proportional line height, at every size', () => {
+    renderApp();
+    typeTitle('My Brand');
+
+    // Unitless, so it is 1.15 times this title's own size, not a length inherited from the page
+    expect(getCoverTitle().style.lineHeight).toBe('1.15'); // Medium, the default
+    for (const size of ['Large', 'Small']) {
+      pickOption('Font size', size);
+      expect(getCoverTitle().style.lineHeight).toBe('1.15');
+    }
   });
 
   // Spec: specs/titlefild.md, Scenario 5 — Font Style Is Visibly Applied

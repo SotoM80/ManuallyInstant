@@ -22,17 +22,22 @@ export const DEFAULT_TITLE_STYLE: TitleStyle = {
   fontSize: 'Medium',
 }
 
-// The title color is not here: it is the Typography color of the Cover (see colorPalette.ts).
+// The title color is not here: it is the Title color of the Cover (see colorPalette.ts).
 export const STYLE_FIELDS: { key: keyof TitleStyle; label: string; options: readonly string[] }[] = [
   { key: 'fontFamily', label: 'Font family', options: FONT_FAMILIES },
   { key: 'fontStyle', label: 'Font style', options: Object.keys(FONT_STYLES) },
   { key: 'fontSize', label: 'Font size', options: Object.keys(FONT_SIZES) },
 ]
 
+export const TITLE_LINE_HEIGHT = 1.15
+
 export function toTitleCss(style: TitleStyle): CSSProperties {
   return {
     fontFamily: `'${style.fontFamily}', sans-serif`,
     fontSize: FONT_SIZES[style.fontSize],
+    // A proportion, never a length: the page inherits the site's 145% as a fixed 26px, which
+    // made the lines of a Large title overlap (specs/titlefild.md, Scenario 6)
+    lineHeight: TITLE_LINE_HEIGHT,
     ...FONT_STYLES[style.fontStyle],
   }
 }

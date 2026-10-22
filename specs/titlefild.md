@@ -2,7 +2,7 @@
 # Technical Specification: Brand Manual Title Input & Preview
 
 ## 1. What it does
-Allows the user to enter the brand manual title and instantly display it on the Cover page of the manual preview (see `brandmanual.md`) while it is typed, with no button, and include options to change fonts, font styles, or text sizes. The title's color is the **Typography color** of the Cover (see `colorpicker.md`).
+Allows the user to enter the brand manual title and instantly display it on the Cover page of the manual preview (see `brandmanual.md`) while it is typed, with no button, and include options to change fonts, font styles, or text sizes. The title's color is the **Title color** of the Cover (see `colorpicker.md`).
 
 This field is part of the **Cover** section, together with "Designed by" and the logo (see `cover.md`). Where the title sits on the Cover depends on the template; in the default template it is at the top of the page.
 
@@ -27,7 +27,7 @@ Each style field is an autocomplete input that starts with its default value alr
 | Font Size | Small `24px`, Medium `32px`, Large `48px` | Medium |
 
 * **Font Size** follows the same rules as Font Family and Font Style (Failure Modes, Scenarios 3 and 4).
-* The old "Font color" field was replaced by the **Typography color** picker (see `colorpicker.md`).
+* The old "Font color" field was replaced by the **Title color** picker ("Designed by" has its own **Text color**) (see `colorpicker.md`).
 * The explicit error message for an invalid value is: `"Select a valid option"`.
 * The selected style is applied to the Cover as soon as a valid option is picked or typed. While a field is half typed or not valid, the Cover keeps the last valid option.
 * **Font loading**: Each Font Family is requested from Google Fonts with all four variants needed by Font Style: regular 400, bold 700, italic 400 and bold italic 700 (`family=<Font>:ital,wght@0,400;0,700;1,400;1,700`). Each font is requested only once per session.
@@ -39,6 +39,7 @@ Each style field is an autocomplete input that starts with its default value alr
 
 ## 4. Invariants
 * The Cover page keeps its size and position whether it is empty or populated.
+* The lines of a long title never touch or overlap, whatever its Font Size: the line height is always **1.15 times the title's font size** (a proportion, so it grows with Small, Medium and Large and with the size of the preview).
 * Bold, Italic and Bold Italic must be drawn with the real font files from Google Fonts, never faked by the browser (the app uses `font-synthesis: none`). Choosing any Font Style must visibly change the Cover title compared to Regular.
 
 ##  Failure Modes
@@ -79,3 +80,8 @@ Each style field is an autocomplete input that starts with its default value alr
 * **Given**: The user has typed `"My Brand"`, selected Font Family `"Open Sans"` and Font Style `"Bold Italic"`.
 * **When**: The last option is picked.
 * **Then**: The Cover shows the title in bold italic, and the Google Fonts stylesheet for Open Sans includes the bold and italic variants (`ital,wght@0,400;0,700;1,400;1,700`)...
+
+### Scenario 6: Large Titles Keep Their Lines Apart
+* **Given**: The user has typed a title long enough to wrap onto two or more lines.
+* **When**: The user picks Font Size `"Large"`.
+* **Then**: The Cover shows each line 1.15 times the font size below the one above, so the letters of one line never touch the letters of the next.
