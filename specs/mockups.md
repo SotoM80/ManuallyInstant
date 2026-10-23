@@ -13,6 +13,7 @@ A **Mockups** section and a new page, **8. Mockups**, that show the brand's logo
 * More than 4 mockups, a page per mockup, or choosing their order (they follow the order of the list).
 * Text on the products (a name or a phone number on the business card), or the brand fonts on them.
 * Saving the choice between sessions (ADR 0002).
+* For **generated photos** (ADR 0016): generating the logo itself, editing a photo with the generator, choosing the provider in the app, and keeping the API key between sessions.
 
 ## 2. Interface
 ### Section "7. Mockups"
@@ -126,6 +127,16 @@ A window over the page, opened with **Edit template** in a photo mockup's block,
 
 **Upload your own photo** in the Mockups section opens the same editor with that photo; its template lives in this session (ADR 0002).
 
+#### Generated photos (ADR 0016)
+Next to **Upload your own photo**, a **Generate a photo** button opens a small panel:
+* **API key**: a password field. The key lives only in memory: it is never stored, logged, exported or sent anywhere but the provider, and it is gone when the page is refreshed. A line says who the provider is and that the agency pays for its images.
+* **Product**: free text, up to 100 characters (`ceramic mug`, `tote bag hanging on a hook`).
+* **Generate**: disabled until both fields have text. The app sends the product followed by a fixed suffix: `, blank, unbranded, plain white product, no logo, no text, front view, studio lighting, plain light background`. The suffix keeps the photo light and empty, so the tint works and no fake logo appears.
+* While it works, the button reads `Generating…` and a **Cancel** button stops the request.
+* The answer (base64) becomes a Blob and an object URL, and then follows **exactly the path of an uploaded photo**: the template editor opens with it, named after the product, and its template lives in this session; Download template saves the photo with its JSON.
+* The panel keeps the key and the product after a photo is made, so another try is one click.
+
+
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`).
 * **Postconditions**: The Mockups page shows the ticked products, in the order of the list, each in its color and with its logo, and both PDFs have it as page 8.
@@ -142,7 +153,7 @@ A window over the page, opened with **Edit template** in a photo mockup's block,
 * The choice is kept when the user moves between pages; it is only reset (to the four defaults, with default colors and the Primary) when the browser page is refreshed.
 
 ## Failure Modes
-For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn` when it fails (no WebGL, a photo that does not load), and in the editor a photo that is not an image or is over 10 MB is refused with `Use a JPG or PNG photo, up to 10 MB`. Otherwise, only a typed HEX can be wrong: it is flagged with `"Enter a valid HEX color, like #1E88E5"`, and the page keeps the last valid color. Everything else falls back: a missing logo to the next one in the chain, a removed version to the Primary, a 5th product to a disabled checkbox, a missing brand name to the Cover title or to no brand line.
+For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn` when it fails (no WebGL, a photo that does not load), and in the editor a photo that is not an image or is over 10 MB is refused with `Use a JPG or PNG photo, up to 10 MB`. For generated photos, the panel shows one line and keeps its fields: `The API key was not accepted` (401/403), `Too many requests or no credit left with the provider` (429), `The provider refused this description; try other words` (content refused), `Could not reach the provider; check the connection` (network or CORS error), or `The photo could not be generated` (anything else). Otherwise, only a typed HEX can be wrong: it is flagged with `"Enter a valid HEX color, like #1E88E5"`, and the page keeps the last valid color. Everything else falls back: a missing logo to the next one in the chain, a removed version to the Primary, a 5th product to a disabled checkbox, a missing brand name to the Cover title or to no brand line.
 
 ## 5. Given-When-Then Test Criteria
 
@@ -276,6 +287,31 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **When**: The user downloads the print PDF.
 * **Then**: Page 8 shows the four as in the preview; the PDF waits until the photo mockups are drawn.
 
+### Scenario 27: Generating a Photo
+* **Given**: The user opens Generate a photo, types a key and `ceramic mug`.
+* **When**: They click Generate and the provider answers with an image.
+* **Then**: The template editor opens with that image, named "ceramic mug", as with an uploaded photo.
+
+### Scenario 28: The Prompt
+* **Given**: The product field reads `tote bag`.
+* **When**: The user clicks Generate.
+* **Then**: The request's prompt is `tote bag` followed by the fixed suffix, and its key is the one typed.
+
+### Scenario 29: The Key Is Never Kept
+* **Given**: The user has typed a key and generated a photo.
+* **When**: The page is refreshed, or the storage and the downloaded template are inspected.
+* **Then**: The key is in none of them; the API key field is empty.
+
+### Scenario 30: A Refused Key
+* **Given**: The provider answers 401.
+* **When**: The user clicks Generate.
+* **Then**: The panel shows "The API key was not accepted", keeps both fields, and no editor opens.
+
+### Scenario 31: Cancel
+* **Given**: A photo is being generated.
+* **When**: The user clicks Cancel.
+* **Then**: The request is stopped, no error is shown, and Generate can be clicked again.
+
 ## Build Order
 1. This spec and ADR 0013.
 2. Stable ids for the logo versions (`LogoVariant.id`), with a test that removing a version keeps the others' ids.
@@ -288,3 +324,8 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
    2. Phase 2: four-corner perspective and shading.
    3. The template editor (magic wand, brush, area points with angles and curves) and uploads, brought forward after trying phase 1.
    4. Later: the folds (displacement).
+8. **Generated photos** (ADR 0016):
+   1. Spike: a `fetch` from `localhost` to each candidate provider with a real key; keep the first that answers without a CORS error, and record it in ADR 0016 (or rewrite the ADR for a proxy).
+   2. `src/mockups/generate/` (the `PhotoGenerator` interface, the chosen adapter, `buildPrompt`) with unit tests on a fake `fetch`.
+   3. The panel in the Mockups section, sharing one `openPhoto` path with Upload your own photo; scenarios 27–31.
+   4. README.
