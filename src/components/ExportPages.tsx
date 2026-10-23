@@ -36,18 +36,24 @@ export const ExportPages = forwardRef<HTMLElement, ExportPagesProps>(function Ex
       <ol className="manual-pages">
         {MANUAL_PAGES.map((page) => (
           <li key={page}>
-            {/* No onGuidesChange: the guides are drawn, their clickable bands are not */}
-            <ManualPage
-              page={page}
-              orientation={orientation}
-              titleScale={1}
-              guides={guides}
-              emphasis={kind}
-              {...data}
-            />
+            <PrintedPage page={page} orientation={orientation} guides={guides} emphasis={kind} {...data} />
           </li>
         ))}
       </ol>
     </section>
   )
 })
+
+type PrintedPageProps = ManualData & {
+  page: string
+  orientation: Orientation
+  guides?: Guides
+  emphasis?: ExportKind
+}
+
+// A page as the PDF draws it: inside a parent laid out like the Pages view at A4 size, with the
+// title at its real size, and the guides drawn but not clickable (no onGuidesChange). Shared by
+// the PDF copy and the full screen view (specs/fullscreen.md), so both show the same page.
+export function PrintedPage({ page, orientation, guides, emphasis, ...data }: PrintedPageProps) {
+  return <ManualPage page={page} orientation={orientation} titleScale={1} guides={guides} emphasis={emphasis} {...data} />
+}

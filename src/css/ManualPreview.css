@@ -212,3 +212,96 @@
   animation: none !important;
   transition: none !important;
 }
+
+/* Full screen view (specs/fullscreen.md): every page, scaled in FullscreenView to fit the screen
+   (24px around, and a 28px caption under each one: keep in step with utils/fullscreen.ts).
+   Two classes and the attribute beat the sticky and static positions of the preview views. */
+.manual-preview.fullscreen-view[data-view] {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain; /* the page behind never scrolls */
+  background: #111114;
+  animation: fullscreen-in 200ms ease; /* instant with reduced motion (index.css) */
+}
+
+@keyframes fullscreen-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.fullscreen-pages {
+  margin: 0;
+  padding: 24px;
+  list-style: none;
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+}
+
+.fullscreen-item {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+/* The scaled page: its box is the scaled size, the page inside is A4 and scaled down or up */
+.fullscreen-page {
+  overflow: hidden;
+}
+
+.fullscreen-view .manual-page {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+/* Like the PDF: no motion inside the pages */
+.fullscreen-page *,
+.fullscreen-page *::before,
+.fullscreen-page *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+.fullscreen-caption {
+  height: 20px;
+  line-height: 20px;
+  font-size: 13px;
+  color: #e6e6e6;
+}
+
+/* Floating on the top right; it fades while the mouse rests, unless it has the keyboard focus */
+.fullscreen-exit {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1;
+  padding: 8px 14px;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 999px;
+  background: rgb(17 17 20 / 80%);
+  color: #ffffff;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: opacity var(--dur) ease;
+}
+
+.fullscreen-view[data-idle='true'] .fullscreen-exit:not(:focus-visible) {
+  opacity: 0.15;
+}
+
+.fullscreen-exit:hover {
+  opacity: 1;
+}
+
+.fullscreen-exit:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

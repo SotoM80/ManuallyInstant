@@ -7,7 +7,9 @@ import type { Skin } from '../skins/types'
 import { DEFAULT_MOCKUPS } from '../mockups/mockups'
 import { NO_USAGE } from '../data/usageOptions'
 import type { Mockups } from '../mockups/types'
-import { useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import { FullscreenView } from './FullscreenView'
+import { openFullscreen } from '../utils/fullscreen'
 import { withViewTransition } from '../utils/viewTransition'
 import { useReorderGlide } from '../utils/useReorderGlide'
 import type { Guides } from '../utils/guides'
@@ -73,6 +75,12 @@ export function ManualPreview({
   const pageList = useRef<HTMLOListElement>(null)
   useReorderGlide(pageList, pages.join('|'))
 
+  // Every page at the size of the screen (specs/fullscreen.md). Stable, so the view's own
+  // effects run once per opening.
+  const [fullscreen, setFullscreen] = useState(false)
+  const fullscreenButton = useRef<HTMLButtonElement>(null)
+  const closeFullscreen = useCallback(() => setFullscreen(false), [])
+
   // data-template is set once here: every page of the manual uses the same template.
   return (
     <section
@@ -129,6 +137,18 @@ export function ManualPreview({
             </label>
           ))}
         </fieldset>
+
+        <button
+          ref={fullscreenButton}
+          type="button"
+          className="palette-secondary-button preview-fullscreen"
+          onClick={() => {
+            openFullscreen() // during the click, or the browser refuses it
+            setFullscreen(true)
+          }}
+        >
+          <span aria-hidden="true">⤢ </span>Full screen
+        </button>
       </div>
 
       <ol className="manual-pages" ref={pageList}>
@@ -156,6 +176,23 @@ export function ManualPreview({
           </li>
         ))}
       </ol>
+
+      {fullscreen && (
+        <FullscreenView
+          cover={cover}
+          logo={logo}
+          usage={usage}
+          palette={palette}
+          typography={typography}
+          skin={skin}
+          mockups={mockups}
+          orientation={orientation}
+          template={template}
+          guides={guides}
+          onClose={closeFullscreen}
+          returnFocus={fullscreenButton}
+        />
+      )}
     </section>
   )
 }
