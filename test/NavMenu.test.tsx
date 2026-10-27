@@ -1,6 +1,7 @@
 import { screen, fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import { NAV_ITEMS } from '../src/data/navItems';
+import { STUDIO } from '../src/data/landing';
 import { clickApply, fillRequiredCoverFields, typeTitle } from './coverForm';
 
 function getMenu() {
@@ -46,7 +47,7 @@ describe('NavMenu – opening the app', () => {
     renderApp('/');
 
     // Then
-    expect(screen.getByRole('heading', { name: 'ManuallyInstant' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: STUDIO.name })).toBeInTheDocument();
     expect(getMenuLink('Home')).toHaveAttribute('aria-current', 'page');
     expect(getMenuLink('Brand Manual')).not.toHaveAttribute('aria-current');
   });
@@ -70,7 +71,7 @@ describe('NavMenu – going to the Brand Manual', () => {
 
 // Spec: specs/navmenu.md, Scenario 3 — Starting from Home
 describe('NavMenu – starting from Home', () => {
-  it('opens the Brand Manual from the welcome link', () => {
+  it('opens the Brand Manual from the Hero link', () => {
     // Given
     renderApp('/');
 
@@ -123,7 +124,7 @@ describe('Header – logo', () => {
     fireEvent.click(getLogoLink());
 
     // Then
-    expect(screen.getByRole('heading', { name: 'ManuallyInstant' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: STUDIO.name })).toBeInTheDocument();
     expect(screen.queryByLabelText('Brand manual title')).not.toBeInTheDocument();
   });
 });
@@ -133,7 +134,7 @@ describe('NavMenu – unknown URL', () => {
   it('redirects to Home', () => {
     renderApp('/does-not-exist');
 
-    expect(screen.getByRole('heading', { name: 'ManuallyInstant' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: STUDIO.name })).toBeInTheDocument();
     expect(getMenuLink('Home')).toHaveAttribute('aria-current', 'page');
   });
 });
