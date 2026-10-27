@@ -1,9 +1,12 @@
-/* Studio landing page (specs/landing.md). Hybrid: the structure of a product page with a
-   Swiss editorial look: a 12-column grid, thin rules, white space and one accent color.
-   It uses the app's own colors, so it follows light and dark mode. --display is set by
-   HomePage.tsx; scroll motion in CSS (ADR 0017). */
+/* Studio landing page (specs/landing.md). Mixed: an expressive opening (Hero and the band of
+   words, in poster type on strong color), then a Swiss editorial page: a 12-column grid,
+   thin rules, white space and one accent color, in the app's own colors (light and dark mode).
+   --poster and --display are set by HomePage.tsx; scroll motion in CSS (ADR 0017). */
 .landing {
   --landing-accent: #e8361d;
+  --landing-lime: #d4ff3a;
+  --landing-ink: #111;
+  --landing-paper: #f2efe8;
   --landing-rule: var(--text-h);
   --landing-gutter: clamp(16px, 4vw, 64px);
   --landing-max: 1320px;
@@ -20,7 +23,6 @@
 }
 
 .landing-section,
-.landing-hero,
 .landing-footer {
   box-sizing: border-box;
   width: 100%;
@@ -100,38 +102,54 @@
   color: #fff;
 }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero (expressive) ---------- */
 .landing-hero {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  align-items: center;
-  gap: 24px;
   min-height: calc(100svh - 80px); /* the screen, minus the header */
-  padding-block: 48px;
-}
-
-.landing-hero-text {
-  grid-column: 1 / span 7;
-  display: grid;
-  justify-items: start;
-  gap: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 32px;
+  box-sizing: border-box;
+  /* full width, with its text on the same edge as the sections below */
+  padding: 48px max(var(--landing-gutter), (100% - var(--landing-max)) / 2) 64px;
+  background: var(--landing-lime);
+  color: var(--landing-ink);
 }
 
 .landing-hero-title {
   margin: 0;
-  font-family: var(--display);
-  font-size: clamp(56px, 9vw, 148px);
-  font-weight: 700;
-  line-height: 0.92;
-  letter-spacing: -0.045em;
+  font-family: var(--poster);
+  font-size: clamp(64px, 17vw, 300px);
+  font-weight: 400;
+  line-height: 0.86;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
   color: inherit;
 }
 
+.landing-hero-word {
+  display: inline-block;
+  white-space: nowrap;
+  margin-right: 0.18em;
+}
+
+.landing-hero-letter {
+  display: inline-block;
+  animation: landing-letter var(--dur-slow) var(--ease-bounce) both;
+  animation-delay: calc(var(--i) * 45ms + 100ms);
+}
+
+@keyframes landing-letter {
+  from {
+    opacity: 0;
+    transform: translateY(60%) rotate(6deg);
+  }
+}
+
 .landing-hero-claim {
-  max-width: 36ch;
-  color: var(--text);
-  font-size: clamp(19px, 1.8vw, 24px);
-  line-height: 1.35;
+  max-width: 34ch;
+  font-size: clamp(20px, 2.4vw, 32px);
+  line-height: 1.25;
 }
 
 .landing-hero-actions {
@@ -140,11 +158,17 @@
   gap: 12px;
 }
 
-.landing-hero .landing-manual {
-  grid-column: 9 / span 4;
+/* On lime, the buttons stay ink in light and dark mode */
+.landing-hero .landing-button {
+  border-color: var(--landing-ink);
 }
 
-/* ---------- The manual drawn in CSS (Hero) ---------- */
+.landing-hero .landing-button-solid {
+  background: var(--landing-ink);
+  color: var(--landing-paper);
+}
+
+/* ---------- The manual drawn in CSS (Tool) ---------- */
 .landing-manual {
   position: relative;
   width: 100%;
@@ -235,20 +259,43 @@
   transform: rotate(-12deg) translateX(-5%);
 }
 
-/* ---------- Disciplines strip ---------- */
-.landing-disciplines {
+/* ---------- Marquee (expressive) ---------- */
+.landing-marquee {
+  overflow: hidden;
+  padding: 18px 0;
+  background: var(--landing-ink);
+  color: var(--landing-paper);
+}
+
+.landing-marquee-track {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px 24px;
-  /* the gutter on small screens, centered at the max width on large ones */
-  margin-inline: max(var(--landing-gutter), (100% - var(--landing-max)) / 2);
-  padding: 20px 0;
-  border-block: 1px solid var(--landing-rule);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  width: max-content;
+  animation: landing-marquee 28s linear infinite;
+}
+
+.landing-marquee-group {
+  display: flex;
+}
+
+.landing-marquee-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding-right: 0.6em;
+  font-family: var(--poster);
+  font-size: clamp(28px, 5vw, 64px);
+  line-height: 1;
   text-transform: uppercase;
+}
+
+.landing-marquee-star {
+  color: var(--landing-accent);
+}
+
+@keyframes landing-marquee {
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* ---------- About ---------- */
@@ -464,11 +511,24 @@
 }
 
 /* ---------- Tool (ManuallyInstant) ---------- */
+.landing-tool-head {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: center;
+  gap: 24px;
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
 .landing-tool-intro {
+  grid-column: 1 / span 6;
   display: grid;
   gap: 16px;
   max-width: 40ch;
-  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.landing-tool-head .landing-manual {
+  grid-column: 8 / span 5;
+  max-width: 340px;
 }
 
 .landing-tool-intro p:last-child {
@@ -675,10 +735,12 @@
   transform: translateY(24px);
 }
 
-/* Reduced motion: everything visible at once.
+/* Reduced motion: everything visible at once and the marquee stands still.
    Scroll-driven animations ignore the durations set in index.css, so they are removed here. */
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  .reveal,
+  .landing-marquee-track,
+  .landing-hero-letter {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
@@ -699,21 +761,15 @@
 
 /* ---------- Narrow screens ---------- */
 @media (max-width: 768px) {
-  .landing-hero {
-    min-height: 0;
-    padding-block: 56px 72px;
-  }
-
-  .landing-hero-text,
-  .landing-hero .landing-manual,
+  .landing-tool-intro,
+  .landing-tool-head .landing-manual,
   .landing-contact-links,
   .landing-form {
     grid-column: 1 / -1;
   }
 
-  .landing-hero .landing-manual {
-    max-width: 320px;
-    margin-top: 24px;
+  .landing-tool-head .landing-manual {
+    max-width: 280px;
   }
 
   .landing-service-list,

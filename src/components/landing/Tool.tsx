@@ -1,4 +1,5 @@
 import { Link } from 'react-router'
+import { ManualMockup } from './ManualMockup'
 import { SectionLabel } from './SectionLabel'
 
 const STEPS = [
@@ -12,9 +13,12 @@ export function Tool() {
   return (
     <section id="tool" className="landing-section landing-tool" aria-label="ManuallyInstant">
       <SectionLabel number={4}>Built in-house</SectionLabel>
-      <div className="landing-tool-intro reveal">
-        <p className="landing-section-title">ManuallyInstant</p>
-        <p>Our own tool for visual identity manuals, from a blank page to two PDFs in minutes.</p>
+      <div className="landing-tool-head">
+        <div className="landing-tool-intro reveal">
+          <p className="landing-section-title">ManuallyInstant</p>
+          <p>Our own tool for visual identity manuals, from a blank page to two PDFs in minutes.</p>
+        </div>
+        <ManualMockup />
       </div>
       <ol className="landing-steps">
         {STEPS.map((step, index) => (
