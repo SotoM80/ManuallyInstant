@@ -24,7 +24,8 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 | Element | Motion |
 |---|---|
 | Nav menu links | hover: lift 2px; press: shrink; the current page's link pops |
-| Home "Start" | hover: lift, shadow and grow a little; press: shrink |
+| Landing links and buttons (Start your brand manual, See our work, Send) | hover: lift, shadow and grow a little; press: shrink |
+| Menu button (mobile) | its three lines turn into an ✕ when open; the menu panel slides down with `--ease-smooth` |
 | Apply (above the Cover section) | hover: lift and shadow; press: shrink. **Disabled** → faded, no motion. **Applied** → accent ring pulses twice and a ✓ pops in next to "Apply" (decoration only: the accessible name stays "Apply") |
 | Logo "Choose file" | **no motion**: only the border color changes on hover |
 | Segmented controls (Orientation, Preview view, Template) | hover tints the options not chosen; press shrinks; the chosen one pops |
@@ -36,6 +37,20 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 * Each time a new Cover logo is applied, the cover grows into its page. Typing does not replay it.
 * Opening or folding a section makes the pages and the sections glide to their new order, softly and with no bounce, like the accordion (500 ms, `--ease-smooth`). Only the two lists move (FLIP with the Web Animations API, `src/utils/useReorderGlide.ts`), not the whole page as a View Transition would, so the accordion keeps unfolding underneath.
 * In browsers without View Transitions the preview changes at once, with no animation.
+
+### Landing (Home)
+Expressive, driven by scrolling (see `landing.md` and ADR 0017). Scrolling itself is the browser's own; menu anchors scroll smoothly.
+
+| Element | Motion |
+|---|---|
+| Hero studio name | on load, its letters rise into place one after another |
+| Marquee | the band of words slides sideways in an endless loop |
+| Section headings and blocks | rise and fade in as they enter the screen |
+| About manifesto | each word goes from faint to full color as it crosses the screen |
+| Services rows | hover: the row fills with an accent color from the left |
+| Work projects | rise into view one after another; hover: the image grows a little and the title appears over a color layer |
+
+* In browsers without scroll-driven animations, the same reveals play once when each element enters the screen.
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: none; motion applies on every page of the app.

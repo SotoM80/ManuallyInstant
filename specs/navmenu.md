@@ -5,8 +5,8 @@ Adds a menu to the header so the user can move between the **Home** page and the
 
 ## Out of Scope
 Login. (Note: deferred for future iterations.)
-More sections such as **Contact** or **About Us** are not built yet, but the menu is designed to grow (see "Adding Sections" below).
-Dedicated mobile and tablet versions are not built yet, but the page is planned to be fully responsive (see "Responsive Design" below).
+Highlighting the section link of the part of Home being read (scroll spy).
+A dedicated tablet layout for the forms and the manual pages.
 
 ## 2. Interface
 ### UI Elements
@@ -14,27 +14,30 @@ Dedicated mobile and tablet versions are not built yet, but the page is planned 
 * **Logo**: The ManuallyInstant logo (image with alt text "ManuallyInstant"). It is a link to Home (`/`). Until the final logo is designed, a placeholder image is used (`src/assets/logo.svg`); replacing that file changes the logo everywhere.
 * **Main Menu**: A navigation landmark labeled "Main", on the right side of the header.
   * **Home** link → URL `/`
+  * **About**, **Services**, **Work**, **Contact** (section links) → `/#about`, `/#services`, `/#work`, `/#contact`: they open Home and scroll to that section (see `landing.md`).
   * **Brand Manual** link → URL `/brand-manual`
-  * The link of the current page is highlighted and marked as the current page (`aria-current="page"`).
-* **Home Page**: A welcome section with the title "ManuallyInstant", one sentence describing the app, and a link "Start your brand manual" that opens the Brand Manual page.
+  * The link of the current page is highlighted and marked as the current page (`aria-current="page"`). Section links are never marked: they point to a part of Home, not to a page.
+* **Home Page**: the studio landing page described in `landing.md`.
 * **Brand Manual Page**: The brand title form described in `titlefild.md`.
 
 ### Adding Sections
-The menu is built from a single list of sections (`src/data/navItems.ts`), shown in the same order as the list. Adding a section such as Contact or About Us means:
-1. Add `{ label, path }` to the list (e.g. `{ label: 'Contact', path: '/contact' }`).
-2. Create its page in `src/pages/` and its styles in `src/css/`.
-3. Add its route in `src/App.tsx`.
+The menu is built from a single list (`src/data/navItems.ts`), shown in the same order as the list. Each item is a **page** or a **section** of Home.
+* Adding a **page** (e.g. Pricing):
+  1. Add `{ label: 'Pricing', path: '/pricing', kind: 'page' }` to the list.
+  2. Create its page in `src/pages/` and its styles in `src/css/`.
+  3. Add its route in `src/App.tsx`.
+* Adding a **section** of Home: add `{ label, path: '/#<id>', kind: 'section' }` and give the section that `id` on the landing.
 
 The menu component itself does not change.
 
 ### Responsive Design
 The page will be responsive: it will adapt to mobile, tablet and desktop screens.
 
-* **Today**: The logo (left) and the menu (right) stay on one row on every screen size.
-* **Future**:
-  * **Mobile**: The menu collapses into a "hamburger" button that opens and closes the list of sections, so it keeps working when more sections (Contact, About Us…) are added.
-  * **Tablet**: Layout adjusted for medium screens, between mobile and desktop.
-  * **Other formats**: The rest of the pages (forms and the 4-page manual template) also adapt to each screen size.
+* **Wide screens** (more than 768 px): the logo (left) and the menu (right) stay on one row.
+* **Narrow screens** (768 px or less): the menu folds into a **Menu** button (three lines) on the right of the header.
+  * The button is labelled "Menu" and says whether the list is open (`aria-expanded`).
+  * Clicking it opens the list below the header; clicking it again, pressing Esc or choosing a link closes it.
+  * While closed, the list cannot be reached with the keyboard or by screen readers.
 * Whatever the screen size, the menu keeps the same sections from the list, the same order and the same behavior (links, current page highlight).
 
 ## 3. Preconditions & Postconditions
@@ -80,3 +83,13 @@ The page will be responsive: it will adapt to mobile, tablet and desktop screens
 * **Given**: The user is on the Brand Manual page.
 * **When**: The user clicks the logo in the header.
 * **Then**: The Home page is shown.
+
+### Scenario 7: Section Link
+* **Given**: The user is on the Brand Manual page.
+* **When**: The user clicks "Contact" in the menu.
+* **Then**: Home is shown, scrolled to the Contact section, and only the Home link is marked as the current page.
+
+### Scenario 8: Menu Button on a Narrow Screen
+* **Given**: The screen is 375 px wide and the menu list is closed.
+* **When**: The user clicks "Menu", then "Work".
+* **Then**: The list opens (`aria-expanded="true"`), then Home scrolls to Work and the list closes again.
