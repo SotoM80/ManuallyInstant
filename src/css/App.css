@@ -1,5 +1,6 @@
 /* One row: logo (left) | menu (right) */
 .preview-header {
+  position: relative; /* the menu's list drops below it on narrow screens (NavMenu.css) */
   min-height: 80px;
   display: flex;
   align-items: center;
@@ -9,7 +10,7 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* Future mobile/tablet versions are planned (see specs/navmenu.md, "Responsive Design"). */
+/* On narrow screens the menu folds into a Menu button (specs/navmenu.md, "Responsive Design"). */
 
 main {
   padding: 32px 16px;

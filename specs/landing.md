@@ -11,7 +11,7 @@ A backend or a third-party form service: the contact form only opens the user's 
 ## 2. Interface
 
 ### Sections, in order
-Every section with an `id` is a region named after its heading, and can be reached from the menu with `/#<id>`.
+Every section with an `id` can be reached with `/#<id>`. About, Services, Work, Tool and Contact are regions named "About", "Services", "Work", "ManuallyInstant" and "Contact"; each also shows a small label in brackets, e.g. "(About us)".
 
 | # | Section | `id` | Content |
 |---|---|---|---|
@@ -20,7 +20,7 @@ Every section with an `id` is a region named after its heading, and can be reach
 | 3 | **About** | `about` | A large manifesto (2–3 sentences) whose words light up one after another while scrolling; 3 numbers (e.g. years, projects, clients) with their labels; the team (initials or photo, name and role) |
 | 4 | **Services** | `services` | A numbered list in big type ("01 Brand identity", "02 Visual identity manuals"…), each with one short line. Hovering a row fills it with color. **Visual identity manuals** links to `/brand-manual` |
 | 5 | **Work** | `work` | 6 projects in an asymmetric grid: image, client, category and year. Hovering a project grows its image a little and shows its title over a color layer; on touch screens the title is always shown |
-| 6 | **Tool** | `tool` | "Built in-house: ManuallyInstant": one sentence about the app, an image of a manual, and the link **Start your brand manual** |
+| 6 | **Tool** | `tool` | "Built in-house: ManuallyInstant": one sentence about the app, three manual pages drawn in CSS (decoration only), and the link **Try ManuallyInstant** (→ `/brand-manual`) |
 | 7 | **Contact** | `contact` | "Let's talk" in giant type; the contact form; the studio email as a `mailto:` link; links to the studio's social networks (each opens in a new tab) |
 | 8 | **Footer** | — | © year and studio name, links to the sections and **Back to top** (→ `#top`) |
 
@@ -67,7 +67,7 @@ See `motion.md` (Landing) and ADR 0017.
 ### Scenario 1: Every Section
 * **Given**: The user opens `/`.
 * **When**: The page loads.
-* **Then**: The studio name is the only `h1`, and the regions About, Services, Work, Tool and Contact are shown, in that order.
+* **Then**: The studio name is the only `h1`, and the regions About, Services, Work, ManuallyInstant and Contact are shown, in that order.
 
 ### Scenario 2: Menu to a Section
 * **Given**: The user is on the Brand Manual page.

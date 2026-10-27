@@ -1,9 +1,9 @@
-.nav-menu {
+.nav-menu-list {
   display: flex;
   gap: 4px;
 }
 
-.nav-menu a {
+.nav-menu-list a {
   padding: 6px 12px;
   border-radius: 6px;
   color: var(--text);
@@ -16,20 +16,104 @@
     color var(--dur-fast) ease;
 }
 
-.nav-menu a:hover {
+.nav-menu-list a:hover {
   color: var(--text-h);
   background: var(--accent-bg);
   transform: translateY(-2px);
 }
 
-.nav-menu a:active {
+.nav-menu-list a:active {
   transform: scale(0.94);
 }
 
 /* NavLink marks the link of the current page with aria-current="page" */
-.nav-menu a[aria-current='page'] {
+.nav-menu-list a[aria-current='page'] {
   color: var(--accent);
   background: var(--accent-bg);
   font-weight: 600;
   animation: pop var(--dur) var(--ease-bounce);
+}
+
+/* Only on narrow screens */
+.nav-menu-toggle {
+  display: none;
+}
+
+/* Same width as NARROW in NavMenu.tsx */
+@media (max-width: 768px) {
+  .nav-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text-h);
+    cursor: pointer;
+  }
+
+  .nav-menu-toggle-bars {
+    display: grid;
+    gap: 5px;
+    width: 20px;
+  }
+
+  .nav-menu-toggle-bars span {
+    display: block;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition:
+      transform var(--dur-fast) var(--ease-smooth),
+      opacity var(--dur-fast) ease;
+  }
+
+  /* Three lines → ✕ */
+  .nav-menu[data-open='true'] .nav-menu-toggle-bars span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .nav-menu[data-open='true'] .nav-menu-toggle-bars span:nth-child(2) {
+    opacity: 0;
+  }
+  .nav-menu[data-open='true'] .nav-menu-toggle-bars span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* The list drops below the header, over the page */
+  .nav-menu-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 16px 16px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    text-align: left;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+      opacity var(--dur-fast) ease,
+      transform var(--dur) var(--ease-smooth),
+      visibility 0s linear var(--dur);
+  }
+
+  .nav-menu[data-open='true'] .nav-menu-list {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition-delay: 0s;
+  }
+
+  .nav-menu-list a {
+    font-size: 18px;
+    padding: 10px 12px;
+  }
 }

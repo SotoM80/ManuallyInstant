@@ -75,6 +75,11 @@ body {
   margin: 0;
 }
 
+/* The menu's section links (/#work) glide to their section */
+html {
+  scroll-behavior: smooth;
+}
+
 h1,
 h2 {
   font-family: var(--heading);
@@ -139,6 +144,10 @@ code {
 
 /* The user asked the system for less motion: keep every state change, drop the movement */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after,

@@ -1,40 +1,756 @@
-.home-page {
-  max-width: 560px;
-  margin: 48px auto;
-  text-align: center;
+/* Studio landing page (specs/landing.md). Expressive: giant display type, blocks of strong
+   color and scroll motion in CSS (ADR 0017). --display is set by HomePage.tsx. */
+.landing {
+  --landing-red: #ff4d2e;
+  --landing-blue: #1f3bff;
+  --landing-lime: #d4ff3a;
+  --landing-ink: #111;
+  --landing-paper: #f2efe8;
+  --landing-gutter: clamp(16px, 4vw, 56px);
+
+  /* Full width: cancels the padding of <main> (App.css) */
+  margin: -32px -16px;
+  text-align: left;
+  overflow-x: clip;
+  color: var(--text-h);
 }
 
-.home-page h1 {
-  margin: 0 0 12px;
-  font-size: 32px;
+.landing [id] {
+  scroll-margin-top: 16px;
 }
 
-.home-page p {
-  margin: 0 0 24px;
+.landing-section {
+  padding: clamp(64px, 10vw, 140px) var(--landing-gutter);
 }
 
-.home-page-start {
-  display: inline-block;
-  padding: 10px 20px;
-  border-radius: 8px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 1px solid var(--accent-border);
+/* Small uppercase label above each section, like "(About us)" on studio sites */
+.landing-label {
+  margin: 0 0 32px;
+  font-family: var(--sans);
+  font-size: 14px;
   font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: inherit;
+}
+
+.landing-label::before {
+  content: '(';
+}
+
+.landing-label::after {
+  content: ')';
+}
+
+/* ---------- Buttons ---------- */
+.landing-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: 600 16px/1 var(--sans);
   text-decoration: none;
+  cursor: pointer;
   transition:
     transform var(--dur) var(--ease-bounce),
     box-shadow var(--dur) ease,
-    border-color var(--dur-fast) ease;
+    background-color var(--dur-fast) ease,
+    color var(--dur-fast) ease;
 }
 
-.home-page-start:hover {
-  border-color: var(--accent);
+.landing-button:hover {
   box-shadow: var(--shadow);
   transform: translateY(-3px) scale(1.04);
 }
 
-.home-page-start:active {
+.landing-button:active {
   transform: scale(0.96);
   transition-duration: var(--dur-fast);
+}
+
+.landing-button-solid {
+  border-color: var(--landing-ink);
+  background: var(--landing-ink);
+  color: var(--landing-paper);
+}
+
+/* ---------- Hero ---------- */
+.landing-hero {
+  min-height: calc(100svh - 80px); /* the screen, minus the header */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 32px;
+  padding: 48px var(--landing-gutter) 64px;
+  background: var(--landing-lime);
+  color: var(--landing-ink);
+}
+
+.landing-hero-title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(64px, 17vw, 300px);
+  font-weight: 400;
+  line-height: 0.86;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: inherit;
+}
+
+.landing-hero-word {
+  display: inline-block;
+  white-space: nowrap;
+  margin-right: 0.18em;
+}
+
+.landing-hero-letter {
+  display: inline-block;
+  animation: landing-letter var(--dur-slow) var(--ease-bounce) both;
+  animation-delay: calc(var(--i) * 45ms + 100ms);
+}
+
+@keyframes landing-letter {
+  from {
+    opacity: 0;
+    transform: translateY(60%) rotate(6deg);
+  }
+}
+
+.landing-hero-claim {
+  max-width: 34ch;
+  font-size: clamp(20px, 2.4vw, 32px);
+  line-height: 1.25;
+}
+
+.landing-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ---------- Marquee ---------- */
+.landing-marquee {
+  overflow: hidden;
+  padding: 18px 0;
+  background: var(--landing-ink);
+  color: var(--landing-paper);
+}
+
+.landing-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: landing-marquee 28s linear infinite;
+}
+
+.landing-marquee-group {
+  display: flex;
+}
+
+.landing-marquee-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding-right: 0.6em;
+  font-family: var(--display);
+  font-size: clamp(28px, 5vw, 64px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.landing-marquee-star {
+  color: var(--landing-red);
+}
+
+@keyframes landing-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- About ---------- */
+.landing-manifesto {
+  max-width: 22ch;
+  margin: 0 0 clamp(48px, 8vw, 96px);
+  font-family: var(--display);
+  font-size: clamp(36px, 6.4vw, 96px);
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+
+.landing-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+  margin: 0 0 clamp(48px, 8vw, 96px);
+}
+
+.landing-stat {
+  display: flex;
+  flex-direction: column-reverse;
+  padding-top: 16px;
+  border-top: 2px solid currentColor;
+}
+
+.landing-stat dd {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(56px, 8vw, 120px);
+  line-height: 1;
+}
+
+.landing-stat:nth-child(1) dd {
+  color: var(--landing-red);
+}
+.landing-stat:nth-child(2) dd {
+  color: var(--landing-blue);
+}
+
+.landing-team {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-member {
+  display: grid;
+  gap: 4px;
+}
+
+.landing-member-initials {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  aspect-ratio: 1;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: var(--landing-blue);
+  color: var(--landing-paper);
+  font-family: var(--display);
+  font-size: 36px;
+}
+
+.landing-member:nth-child(2) .landing-member-initials {
+  background: var(--landing-red);
+}
+.landing-member:nth-child(3) .landing-member-initials {
+  background: var(--landing-lime);
+  color: var(--landing-ink);
+}
+
+.landing-member-name {
+  font-weight: 600;
+}
+
+/* ---------- Services ---------- */
+.landing-services {
+  background: var(--landing-blue);
+  color: var(--landing-paper);
+}
+
+.landing-service-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid currentColor;
+}
+
+.landing-service {
+  border-bottom: 2px solid currentColor;
+}
+
+.landing-service-row {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 3ch 1fr minmax(0, 32ch) 1.5em;
+  align-items: baseline;
+  gap: 24px;
+  padding: 24px 8px;
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--dur-fast) ease;
+}
+
+/* Hover: the row fills with color from the left */
+.landing-service-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--landing-lime);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur) var(--ease-smooth);
+}
+
+.landing-service-row:hover {
+  color: var(--landing-ink);
+}
+
+.landing-service-row:hover::before {
+  transform: scaleX(1);
+}
+
+.landing-service-number {
+  font-weight: 600;
+}
+
+.landing-service-title {
+  font-family: var(--display);
+  font-size: clamp(32px, 5.4vw, 80px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.landing-service-arrow {
+  font-size: 32px;
+  transition: transform var(--dur) var(--ease-bounce);
+}
+
+.landing-service-row:hover .landing-service-arrow {
+  transform: translateX(8px);
+}
+
+/* ---------- Work ---------- */
+.landing-projects {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(16px, 3vw, 40px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Asymmetric grid: wide, narrow and offset projects, from their place in the list */
+.landing-project:nth-child(6n + 1) {
+  grid-column: 1 / span 7;
+}
+.landing-project:nth-child(6n + 2) {
+  grid-column: 9 / span 4;
+  margin-top: 20%;
+}
+.landing-project:nth-child(6n + 3) {
+  grid-column: 2 / span 5;
+}
+.landing-project:nth-child(6n + 4) {
+  grid-column: 7 / span 6;
+  margin-top: -10%;
+}
+.landing-project:nth-child(6n + 5) {
+  grid-column: 1 / span 6;
+}
+.landing-project:nth-child(6n + 6) {
+  grid-column: 7 / span 6;
+  margin-top: 12%;
+}
+
+.landing-project figure {
+  margin: 0;
+}
+
+.landing-project-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.landing-project-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform var(--dur-slow) var(--ease-smooth);
+}
+
+.landing-project-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+  background: color-mix(in srgb, var(--landing-red) 88%, transparent);
+  color: var(--landing-ink);
+  font-family: var(--display);
+  font-size: clamp(24px, 3vw, 44px);
+  line-height: 1;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity var(--dur-fast) ease;
+}
+
+.landing-project:hover .landing-project-image img {
+  transform: scale(1.06);
+}
+
+.landing-project:hover .landing-project-overlay {
+  opacity: 1;
+}
+
+.landing-project figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 12px;
+}
+
+.landing-project-client {
+  font-weight: 600;
+}
+
+.landing-project-meta {
+  color: var(--text);
+}
+
+/* Touch screens have no hover: the title is always shown under the image */
+@media (hover: none) {
+  .landing-project-overlay {
+    position: static;
+    padding: 12px 0 0;
+    background: none;
+    color: inherit;
+    font-size: 22px;
+    opacity: 1;
+  }
+}
+
+/* ---------- Tool (ManuallyInstant) ---------- */
+.landing-tool {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(32px, 6vw, 96px);
+  background: var(--landing-red);
+  color: var(--landing-ink);
+}
+
+.landing-tool-text {
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+  max-width: 48ch;
+}
+
+.landing-tool-text .landing-label {
+  margin: 0;
+}
+
+.landing-tool-title {
+  font-family: var(--display);
+  font-size: clamp(44px, 7vw, 110px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+/* Three pages of a manual, fanned out */
+.landing-tool-manual {
+  position: relative;
+  aspect-ratio: 1;
+  max-width: 460px;
+  width: 100%;
+  justify-self: center;
+}
+
+.landing-tool-page {
+  position: absolute;
+  width: 62%;
+  aspect-ratio: 210 / 297;
+  border-radius: 6px;
+  background: var(--landing-paper);
+  box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.45);
+  transition: transform var(--dur-slow) var(--ease-bounce);
+}
+
+.landing-tool-page-type {
+  top: 0;
+  right: 0;
+  transform: rotate(9deg);
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-size: clamp(56px, 9vw, 120px);
+}
+
+.landing-tool-page-colors {
+  top: 6%;
+  left: 19%;
+  transform: rotate(-3deg);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 12%;
+  box-sizing: border-box;
+}
+
+.landing-tool-page-colors span {
+  border-radius: 4px;
+  background: var(--landing-blue);
+}
+.landing-tool-page-colors span:nth-child(2) {
+  background: var(--landing-lime);
+}
+.landing-tool-page-colors span:nth-child(3) {
+  background: var(--landing-ink);
+}
+.landing-tool-page-colors span:nth-child(4) {
+  background: var(--landing-red);
+}
+
+.landing-tool-page-cover {
+  bottom: 0;
+  left: 0;
+  transform: rotate(-11deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12%;
+  box-sizing: border-box;
+  background: var(--landing-ink);
+  color: var(--landing-paper);
+}
+
+.landing-tool-cover-logo {
+  width: 36%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--landing-lime);
+}
+
+.landing-tool-cover-title {
+  font-family: var(--display);
+  font-size: clamp(22px, 3vw, 38px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.landing-tool-manual:hover .landing-tool-page-type {
+  transform: rotate(16deg) translateX(6%);
+}
+.landing-tool-manual:hover .landing-tool-page-cover {
+  transform: rotate(-17deg) translateX(-6%);
+}
+
+/* ---------- Contact ---------- */
+.landing-contact {
+  background: var(--landing-ink);
+  color: var(--landing-paper);
+}
+
+.landing-contact-title {
+  margin: 0 0 clamp(40px, 6vw, 80px);
+  font-family: var(--display);
+  font-size: clamp(72px, 16vw, 260px);
+  line-height: 0.86;
+  text-transform: uppercase;
+  color: var(--landing-lime);
+}
+
+.landing-contact-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: clamp(40px, 6vw, 96px);
+}
+
+.landing-form {
+  display: grid;
+  gap: 24px;
+  justify-items: start;
+}
+
+.landing-field {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.landing-field label {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.landing-field input,
+.landing-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 2px solid color-mix(in srgb, var(--landing-paper) 50%, transparent);
+  background: transparent;
+  color: inherit;
+  font: 22px/1.3 var(--sans);
+  resize: vertical;
+  transition: border-color var(--dur-fast) ease;
+}
+
+.landing-field input:focus,
+.landing-field textarea:focus {
+  outline: none;
+  border-bottom-color: var(--landing-lime);
+}
+
+.landing-field [aria-invalid='true'] {
+  border-bottom-color: var(--landing-red);
+  animation: shake var(--dur) ease;
+}
+
+.landing-field-error {
+  color: var(--landing-red);
+  font-size: 15px;
+}
+
+.landing-contact .landing-button-solid {
+  border-color: var(--landing-lime);
+  background: var(--landing-lime);
+  color: var(--landing-ink);
+}
+
+.landing-form-status:empty {
+  display: none;
+}
+
+.landing-contact-links {
+  display: grid;
+  align-content: start;
+  gap: 24px;
+}
+
+.landing-contact-links a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--dur-fast) ease;
+}
+
+.landing-contact-links a:hover {
+  color: var(--landing-lime);
+}
+
+.landing-contact-email {
+  font-family: var(--display);
+  font-size: clamp(24px, 3vw, 40px);
+  overflow-wrap: anywhere;
+}
+
+.landing-contact-links ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 20px;
+}
+
+/* ---------- Footer ---------- */
+.landing-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px var(--landing-gutter);
+  border-top: 1px solid color-mix(in srgb, var(--landing-paper) 20%, transparent);
+  background: var(--landing-ink);
+  color: var(--landing-paper);
+  font-size: 15px;
+}
+
+.landing-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.landing-footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.landing-footer a:hover {
+  color: var(--landing-lime);
+}
+
+/* ---------- Scroll motion (ADR 0017) ---------- */
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+}
+
+@keyframes landing-word {
+  from {
+    opacity: 0.15;
+  }
+}
+
+/* Browsers with scroll-driven animations: tied to each element's place on the screen */
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: landing-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 80%;
+  }
+
+  .landing-manifesto-word {
+    animation: landing-word linear both;
+    animation-timeline: view();
+    animation-range: cover 15% cover 45%;
+  }
+}
+
+/* Other browsers: useReveal marks each element, and a transition plays the same rise */
+.reveal[data-reveal] {
+  transition:
+    opacity var(--dur-slow) ease,
+    transform var(--dur-slow) var(--ease-smooth);
+}
+
+.reveal[data-reveal='pending'] {
+  opacity: 0;
+  transform: translateY(48px);
+}
+
+/* Reduced motion: everything visible at once and the marquee stands still.
+   Scroll-driven animations ignore the durations set in index.css, so they are removed here. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .landing-manifesto-word,
+  .landing-marquee-track,
+  .landing-hero-letter {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 768px) {
+  .landing-service-row {
+    grid-template-columns: 3ch 1fr;
+    gap: 8px 16px;
+  }
+
+  .landing-service-text {
+    grid-column: 2;
+  }
+
+  .landing-service-arrow {
+    display: none;
+  }
+
+  .landing-project:nth-child(n) {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+
+  .landing-tool,
+  .landing-contact-grid {
+    grid-template-columns: 1fr;
+  }
 }
