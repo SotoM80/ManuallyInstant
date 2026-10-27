@@ -1,10 +1,11 @@
 import { Link } from 'react-router'
 import { SERVICES } from '../../data/landing'
+import { SectionLabel } from './SectionLabel'
 
 export function Services() {
   return (
     <section id="services" className="landing-section landing-services" aria-label="Services">
-      <h2 className="landing-label reveal">What we do</h2>
+      <SectionLabel number={2}>What we do</SectionLabel>
       <ol className="landing-service-list">
         {SERVICES.map((service, index) => {
           const content = (

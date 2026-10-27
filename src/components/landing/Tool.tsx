@@ -1,35 +1,33 @@
 import { Link } from 'react-router'
+import { SectionLabel } from './SectionLabel'
 
-// The studio's own tool. The manual on the right is drawn in CSS (a cover, a palette and
-// a type page), so it needs no image file; it is decoration only.
+const STEPS = [
+  { title: 'Fill in your brand', text: 'Cover, logo, usage, colors with HEX, RGB and CMYK, fonts and mockups.' },
+  { title: 'Choose a template and a skin', text: 'Three layouts and a background of gradients, shapes or textures.' },
+  { title: 'Export the PDFs', text: 'One for print, one for screen: a 10-page manual, ready to send.' },
+]
+
+// The studio's own tool, shown as a product: how it works in three steps.
 export function Tool() {
   return (
     <section id="tool" className="landing-section landing-tool" aria-label="ManuallyInstant">
-      <div className="landing-tool-text reveal">
-        <h2 className="landing-label">Built in-house</h2>
-        <p className="landing-tool-title">ManuallyInstant</p>
-        <p>
-          Our own tool for visual identity manuals: cover, logo, usage, colors, typography and
-          mockups, exported as print and screen PDFs in minutes.
-        </p>
-        <Link className="landing-button landing-button-solid" to="/brand-manual">
-          Try ManuallyInstant
-        </Link>
+      <SectionLabel number={4}>Built in-house</SectionLabel>
+      <div className="landing-tool-intro reveal">
+        <p className="landing-section-title">ManuallyInstant</p>
+        <p>Our own tool for visual identity manuals, from a blank page to two PDFs in minutes.</p>
       </div>
-
-      <div className="landing-tool-manual reveal" aria-hidden="true">
-        <div className="landing-tool-page landing-tool-page-type">Aa</div>
-        <div className="landing-tool-page landing-tool-page-colors">
-          <span />
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className="landing-tool-page landing-tool-page-cover">
-          <span className="landing-tool-cover-logo" />
-          <span className="landing-tool-cover-title">Brand Manual</span>
-        </div>
-      </div>
+      <ol className="landing-steps">
+        {STEPS.map((step, index) => (
+          <li key={step.title} className="landing-step reveal">
+            <span className="landing-step-number">{index + 1}</span>
+            <span className="landing-step-title">{step.title}</span>
+            <span className="landing-step-text">{step.text}</span>
+          </li>
+        ))}
+      </ol>
+      <Link className="landing-button landing-button-solid reveal" to="/brand-manual">
+        Try ManuallyInstant
+      </Link>
     </section>
   )
 }

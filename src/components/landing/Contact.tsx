@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { SOCIAL_LINKS, STUDIO } from '../../data/landing'
+import { SectionLabel } from './SectionLabel'
 import { buildMailto, openMailto, validateContact } from '../../utils/mailto'
 import type { ContactMessage } from '../../utils/mailto'
 
@@ -35,11 +36,25 @@ export function Contact() {
 
   return (
     <section id="contact" className="landing-section landing-contact" aria-label="Contact">
-      <h2 className="landing-label reveal">Contact</h2>
-      <p className="landing-contact-title reveal">Let's talk</p>
-
+      <SectionLabel number={5}>Contact</SectionLabel>
       <div className="landing-contact-grid">
-        <form ref={formRef} className="landing-form" noValidate onSubmit={handleSubmit}>
+        <div className="landing-contact-links reveal">
+          <p className="landing-section-title">Let's talk</p>
+          <a className="landing-contact-email" href={`mailto:${STUDIO.email}`}>
+            {STUDIO.email}
+          </a>
+          <ul>
+            {SOCIAL_LINKS.map((link) => (
+              <li key={link.label}>
+                <a href={link.url} target="_blank" rel="noreferrer">
+                  {link.label} ↗
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <form ref={formRef} className="landing-form reveal" noValidate onSubmit={handleSubmit}>
           {FIELDS.map((field) => {
             const id = `contact-${field.name}`
             const error = errors[field.name]
@@ -72,21 +87,6 @@ export function Contact() {
             {sent && `Your email app should open now. If it doesn't, write to ${STUDIO.email}.`}
           </p>
         </form>
-
-        <div className="landing-contact-links">
-          <a className="landing-contact-email" href={`mailto:${STUDIO.email}`}>
-            {STUDIO.email}
-          </a>
-          <ul>
-            {SOCIAL_LINKS.map((link) => (
-              <li key={link.label}>
-                <a href={link.url} target="_blank" rel="noreferrer">
-                  {link.label} ↗
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
     </section>
   )

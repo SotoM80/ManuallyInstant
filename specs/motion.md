@@ -39,16 +39,14 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 * In browsers without View Transitions the preview changes at once, with no animation.
 
 ### Landing (Home)
-Expressive, driven by scrolling (see `landing.md` and ADR 0017). Scrolling itself is the browser's own; menu anchors scroll smoothly.
+Subtle, driven by scrolling (see `landing.md` and ADR 0017). Scrolling itself is the browser's own; menu anchors scroll smoothly.
 
 | Element | Motion |
 |---|---|
-| Hero studio name | on load, its letters rise into place one after another |
-| Marquee | the band of words slides sideways in an endless loop |
-| Section headings and blocks | rise and fade in as they enter the screen |
-| About manifesto | each word goes from faint to full color as it crosses the screen |
-| Services rows | hover: the row fills with an accent color from the left |
-| Work projects | rise into view one after another; hover: the image grows a little and the title appears over a color layer |
+| Section labels, blocks, cards and projects | fade in and rise 24px as they enter the screen |
+| Hero manual pages | hover: the pages fan out a little more |
+| Services cards | hover: lift 4px, the top rule turns to the accent color |
+| Work projects | hover: the image grows a little |
 
 * In browsers without scroll-driven animations, the same reveals play once when each element enters the screen.
 

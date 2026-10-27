@@ -1,7 +1,7 @@
 # Technical Specification: Landing Page (Home)
 
 ## 1. What it does
-Turns the Home page (`/`) into the landing page of a graphic design studio, in an **expressive** style: giant display type, blocks of strong color, a moving band of words and content that rises into view while scrolling. The studio introduces itself (About), lists what it does (Services), shows its projects (Work) and invites people to write (Contact). ManuallyInstant appears as one of the studio's services and tools, with links to the Brand Manual page.
+Turns the Home page (`/`) into the landing page of a graphic design studio, in a **hybrid** style: the clear structure of a product page (a hero with the product, cards, steps, a repeated call to action) with a Swiss editorial look (a strict 12-column grid, thin rules, plenty of white space, black and white with one accent color, numbered sections) and subtle motion. The studio introduces itself (About), lists what it does (Services), shows its projects (Work) and invites people to write (Contact). ManuallyInstant appears as one of the studio's services and tools, with links to the Brand Manual page.
 
 All the text, numbers, projects, links and the email live in one data file, `src/data/landing.ts`, filled with **placeholders** until the real content is ready. Changing the content never needs a change in the components.
 
@@ -15,13 +15,13 @@ Every section with an `id` can be reached with `/#<id>`. About, Services, Work, 
 
 | # | Section | `id` | Content |
 |---|---|---|---|
-| 1 | **Hero** | `top` | The studio name, as the page's only `h1`, in giant display type that fills the width of the screen; a claim of one sentence; two links: **See our work** (→ `#work`) and **Start your brand manual** (→ `/brand-manual`) |
-| 2 | **Marquee** | — | A band of strong color with words that scroll sideways in a loop (Branding · Identity · Packaging · Type · …). Decoration only: hidden from screen readers |
-| 3 | **About** | `about` | A large manifesto (2–3 sentences) whose words light up one after another while scrolling; 3 numbers (e.g. years, projects, clients) with their labels; the team (initials or photo, name and role) |
-| 4 | **Services** | `services` | A numbered list in big type ("01 Brand identity", "02 Visual identity manuals"…), each with one short line. Hovering a row fills it with color. **Visual identity manuals** links to `/brand-manual` |
-| 5 | **Work** | `work` | 6 projects in an asymmetric grid: image, client, category and year. Hovering a project grows its image a little and shows its title over a color layer; on touch screens the title is always shown |
-| 6 | **Tool** | `tool` | "Built in-house: ManuallyInstant": one sentence about the app, three manual pages drawn in CSS (decoration only), and the link **Try ManuallyInstant** (→ `/brand-manual`) |
-| 7 | **Contact** | `contact` | "Let's talk" in giant type; the contact form; the studio email as a `mailto:` link; links to the studio's social networks (each opens in a new tab) |
+| 1 | **Hero** | `top` | Two columns. Left: the studio name, as the page's only `h1`, in large bold type; a claim of one sentence; two links: **See our work** (→ `#work`) and **Start your brand manual** (→ `/brand-manual`). Right: three pages of a manual drawn in CSS (decoration only) |
+| 2 | **Disciplines** | — | A still strip between two thin rules with the studio's disciplines (Branding · Identity · Packaging · Type · …). Decoration only: hidden from screen readers |
+| 3 | **About** | `about` | The section number and label on the left, a manifesto (2–3 sentences) on the right; 3 numbers (e.g. years, projects, clients) with their labels, separated by rules; the team (initials or photo, name and role) |
+| 4 | **Services** | `services` | Numbered cards in a grid ("01 Brand identity", "02 Visual identity manuals"…), each with one short line. Hovering a card lifts it and turns its rule to the accent color. **Visual identity manuals** links to `/brand-manual` |
+| 5 | **Work** | `work` | 6 projects in a regular grid (3 columns on wide screens), all images at the same proportion: image, client, title, category and year. Hovering a project grows its image a little |
+| 6 | **Tool** | `tool` | "Built in-house: ManuallyInstant": one sentence about the app, how it works in 3 numbered steps (fill in your brand, choose a template and a skin, export the PDFs), and the link **Try ManuallyInstant** (→ `/brand-manual`) |
+| 7 | **Contact** | `contact` | Two columns: "Let's talk" in large type, the studio email and the social networks on the left; the contact form on the right; the studio email as a `mailto:` link; links to the studio's social networks (each opens in a new tab) |
 | 8 | **Footer** | — | © year and studio name, links to the sections and **Back to top** (→ `#top`) |
 
 ### Contact form
@@ -38,9 +38,10 @@ Every section with an `id` can be reached with `/#<id>`. About, Services, Work, 
 * Choosing a section from any page opens Home and scrolls to that section.
 
 ### Look
-* A display font from Google Fonts for the big type (loaded once, see ADR 0005); the rest of the page keeps the app's font.
-* Three strong accent colors for the blocks of color, defined once as tokens.
-* Responsive: on mobile the display type shrinks with the width of the screen, the Work grid becomes one column and the menu folds into a menu button (see `navmenu.md`).
+* A grotesque font from Google Fonts for the headings (Inter Tight, bold; loaded once, see ADR 0005); the rest of the page keeps the app's font.
+* The app's own background, text and border colors (so it follows light and dark mode), plus **one** accent color, defined once as a token.
+* Each section starts with its number and label ("01 — About us") over a thin rule.
+* Responsive: on mobile the headings shrink with the width of the screen, the Hero, About and Contact become one column, the Work and Services grids become one column and the menu folds into a menu button (see `navmenu.md`).
 
 ### Motion
 See `motion.md` (Landing) and ADR 0017.
@@ -53,7 +54,7 @@ See `motion.md` (Landing) and ADR 0017.
 * Every text, number, image, link and email on the landing comes from `src/data/landing.ts`.
 * The page has exactly one `h1` (the studio name), and each section has its own heading.
 * The page never has a horizontal scroll, whatever the screen size.
-* With reduced motion, every piece of content is visible and nothing moves (the marquee stands still).
+* With reduced motion, every piece of content is visible and nothing moves.
 * All content is visible even when the browser cannot run scroll animations.
 
 ## Failure Modes
@@ -97,4 +98,4 @@ See `motion.md` (Landing) and ADR 0017.
 ### Scenario 7: Reduced Motion
 * **Given**: The system asks for reduced motion.
 * **When**: The user scrolls the landing.
-* **Then**: All content is visible at once and the marquee does not move.
+* **Then**: All content is visible at once, without rising into view.

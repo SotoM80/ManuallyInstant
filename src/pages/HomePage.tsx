@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import type { CSSProperties } from 'react'
 import { useLocation } from 'react-router'
 import { Hero } from '../components/landing/Hero'
-import { Marquee } from '../components/landing/Marquee'
+import { Disciplines } from '../components/landing/Disciplines'
 import { About } from '../components/landing/About'
 import { Services } from '../components/landing/Services'
 import { Work } from '../components/landing/Work'
@@ -13,8 +13,8 @@ import { loadGoogleFont } from '../utils/googleFonts'
 import { useReveal } from '../utils/useReveal'
 import '../css/HomePage.css'
 
-// The big type of the landing. One weight is enough: Anton is already heavy.
-const DISPLAY_FONT = 'Anton'
+// The headings of the landing: a tight grotesque, in bold (loaded with every variant)
+const DISPLAY_FONT = 'Inter Tight'
 
 // The studio landing page (specs/landing.md). Its content lives in src/data/landing.ts.
 export function HomePage() {
@@ -23,7 +23,7 @@ export function HomePage() {
   useReveal(rootRef)
 
   useEffect(() => {
-    loadGoogleFont(DISPLAY_FONT, 'regular')
+    loadGoogleFont(DISPLAY_FONT)
   }, [])
 
   // React Router does not scroll to "#work" by itself. `key` changes on every click,
@@ -39,7 +39,7 @@ export function HomePage() {
   return (
     <div ref={rootRef} className="landing" style={{ '--display': `'${DISPLAY_FONT}', var(--heading)` } as CSSProperties}>
       <Hero />
-      <Marquee />
+      <Disciplines />
       <About />
       <Services />
       <Work />
