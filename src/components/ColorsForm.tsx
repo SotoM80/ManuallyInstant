@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { ColorPicker } from './ColorPicker'
+import { useCmyk } from '../utils/cmykValues'
 import { INVALID_HEX_MESSAGE, PALETTE, colorValues, normalizeHex } from '../data/colorPalette'
 import { keepInPlace } from '../utils/scrollAnchor'
 import { useLiveData } from '../utils/pendingImage'
@@ -39,6 +40,7 @@ export function ColorsForm({ onChange }: ColorsFormProps) {
   const nextKey = useRef(1)
   const [rows, setRows] = useState<ColorRow[]>(() => [newRow(0, [])])
   const [openKey, setOpenKey] = useState<number | null>(0) // null → every color folded
+  const { valuesOf } = useCmyk()
 
   const palette = useMemo(
     () => rows.map((row) => ({ id: row.key, name: row.name.trim(), hex: row.validHex })),
@@ -88,7 +90,8 @@ export function ColorsForm({ onChange }: ColorsFormProps) {
         const label = `Color ${index + 1}`
         const nameId = `palette-color-${row.key}-name`
         const hex = normalizeHex(row.hex)
-        const values = hex ? colorValues(hex) : null
+        const cmyk = hex ? valuesOf(hex) : null
+        const values = hex && cmyk ? colorValues(hex, cmyk.cmyk) : null
         const isOpen = openKey === row.key
         const bodyId = `palette-color-${row.key}-body`
         const summaryId = `palette-color-${row.key}-summary`
@@ -148,7 +151,9 @@ export function ColorsForm({ onChange }: ColorsFormProps) {
                 <p className="palette-block-values">
                   <span>HEX {values?.hex ?? '—'}</span>
                   <span>RGB {values?.rgb ?? '—'}</span>
-                  <span>CMYK ≈ {values?.cmyk ?? '—'}</span>
+                  <span>
+                    {cmyk?.exact ? 'CMYK' : 'CMYK ≈'} {values?.cmyk ?? '—'}
+                  </span>
                 </p>
 
                 {rows.length > 1 && (

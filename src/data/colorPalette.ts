@@ -53,9 +53,15 @@ export function rgbToCmyk({ r, g, b }: Rgb): Cmyk {
   return { c: ink(red), m: ink(green), y: ink(blue), k: Math.round(k * 100) }
 }
 
+// { c: 76, m: 42, y: 0, k: 0 } → "76, 42, 0, 0"
+export function formatCmyk({ c, m, y, k }: Cmyk) {
+  return `${c}, ${m}, ${y}, ${k}`
+}
+
 // The three values shown for a palette color, as text ("#1E88E5", "30, 136, 229", "87, 41, 0, 10").
-export function colorValues(hex: string) {
+// `cmyk` is the CMYK server's value for the color when there is one (specs/colorpalette.md);
+// without it, the approximate one.
+export function colorValues(hex: string, cmyk: Cmyk = rgbToCmyk(hexToRgb(hex))) {
   const rgb = hexToRgb(hex)
-  const { c, m, y, k } = rgbToCmyk(rgb)
-  return { hex, rgb: `${rgb.r}, ${rgb.g}, ${rgb.b}`, cmyk: `${c}, ${m}, ${y}, ${k}` }
+  return { hex, rgb: `${rgb.r}, ${rgb.g}, ${rgb.b}`, cmyk: formatCmyk(cmyk) }
 }

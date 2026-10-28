@@ -6,5 +6,7 @@ export default {
   moduleNameMapper: {
     '\\.(css)$': '<rootDir>/test/styleMock.js',
     '\\.(svg|png|jpe?g|gif|webp)$': '<rootDir>/test/fileMock.js',
+    // Jest cannot read import.meta.env, so the server's address comes from a stand-in
+    '/export/cmykServerUrl$': '<rootDir>/test/cmykServerUrlMock.ts',
   },
 };

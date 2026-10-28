@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import type { AnimationEvent, ReactNode, SyntheticEvent } from 'react'
 import { BrandForm } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
@@ -7,6 +7,7 @@ import { TypographyForm } from '../components/TypographyForm'
 import { SkinForm } from '../components/SkinForm'
 import { UsageForm } from '../components/UsageForm'
 import { ExportButtons } from '../components/ExportButtons'
+import { CmykProvider } from '../components/CmykProvider'
 import { NO_SKIN } from '../skins/presets'
 import { ManualPreview } from '../components/ManualPreview'
 import { MANUAL_SECTIONS, SECTION_AREAS, SECTION_PAGES, orderPages } from '../data/manualSections'
@@ -135,6 +136,9 @@ export function BrandManualPage({
   }
 
   // Form of each built section. Sections not listed here show "Coming soon".
+  // The palette's colors, for their CMYK values from the server (specs/colorpalette.md)
+  const paletteHexes = useMemo(() => (palette ?? []).map((color) => color.hex), [palette])
+
   const sectionForms: Record<string, ReactNode> = {
     cover: (
       <BrandForm onChange={onCoverChange} applyCount={applyCount} onPendingChange={setCoverPending} />
@@ -151,109 +155,112 @@ export function BrandManualPage({
     ),
   }
 
+  // The form, the preview, full screen and the export share the profile values (specs/colorpalette.md)
   return (
-    <div className="brand-manual-page" ref={pageRoot}>
-      <ManualPreview
-        cover={cover}
-        logo={logo}
-        usage={usage}
-        palette={palette}
-        typography={typography}
-        orientation={orientation}
-        onOrientationChange={onOrientationChange}
-        previewView={previewView}
-        onPreviewViewChange={onPreviewViewChange}
-        template={template}
-        onTemplateChange={onTemplateChange}
-        pages={orderPages(featured)}
-        featured={mainPage ? [mainPage] : []}
-        guides={guides}
-        onGuidesChange={setGuides}
-        skin={skin}
-        mockups={mockups}
-      />
+    <CmykProvider hexes={paletteHexes}>
+      <div className="brand-manual-page" ref={pageRoot}>
+        <ManualPreview
+          cover={cover}
+          logo={logo}
+          usage={usage}
+          palette={palette}
+          typography={typography}
+          orientation={orientation}
+          onOrientationChange={onOrientationChange}
+          previewView={previewView}
+          onPreviewViewChange={onPreviewViewChange}
+          template={template}
+          onTemplateChange={onTemplateChange}
+          pages={orderPages(featured)}
+          featured={mainPage ? [mainPage] : []}
+          guides={guides}
+          onGuidesChange={setGuides}
+          skin={skin}
+          mockups={mockups}
+        />
 
-      <section className="manual-sections" aria-label="Manual sections">
-        <div className="sections-actions">
-          {/* The whole manual as a PDF, for print or for the web (see specs/export.md) */}
-          <ExportButtons
-            cover={cover}
-            logo={logo}
-            usage={usage}
-            palette={palette}
-            typography={typography}
-            skin={skin}
-            mockups={mockups}
-            orientation={orientation}
-            template={template}
-            guides={guides}
-          />
-          {/* Text and colors show at once; a new image waits here (see docs/adr/0007) */}
-          <button
-            type="button"
-            className="sections-apply"
-            disabled={!canApply}
-            onClick={handleApply}
-            data-feedback={applied ? 'saved' : 'idle'}
-            onAnimationEnd={handleAppliedEnd}
-            title={canApply ? 'Show the new image in the manual' : 'Choose a new image to apply it'}
-          >
-            Apply
-          </button>
-        </div>
+        <section className="manual-sections" aria-label="Manual sections">
+          <div className="sections-actions">
+            {/* The whole manual as a PDF, for print or for the web (see specs/export.md) */}
+            <ExportButtons
+              cover={cover}
+              logo={logo}
+              usage={usage}
+              palette={palette}
+              typography={typography}
+              skin={skin}
+              mockups={mockups}
+              orientation={orientation}
+              template={template}
+              guides={guides}
+            />
+            {/* Text and colors show at once; a new image waits here (see docs/adr/0007) */}
+            <button
+              type="button"
+              className="sections-apply"
+              disabled={!canApply}
+              onClick={handleApply}
+              data-feedback={applied ? 'saved' : 'idle'}
+              onAnimationEnd={handleAppliedEnd}
+              title={canApply ? 'Show the new image in the manual' : 'Choose a new image to apply it'}
+            >
+              Apply
+            </button>
+          </div>
 
-        <ol ref={sectionList}>
-          {sections.map((section) => {
-            // Always the natural number, so a section moved to the top still reads "5. Typography"
-            const number = MANUAL_SECTIONS.indexOf(section) + 1
-            const isOpen = section.ready && openSection === section.id
-            const bodyId = `manual-section-${section.id}`
-            return (
-              <li
-                key={section.id}
-                className="manual-section"
-                data-key={section.id}
-                data-section={section.id}
-                aria-disabled={section.ready ? undefined : 'true'}
-                data-open={isOpen}
-              >
-                <div className="manual-section-header">
-                  <h2>
-                    {section.ready ? (
-                      <button
-                        type="button"
-                        className="manual-section-toggle"
-                        aria-expanded={isOpen}
-                        aria-controls={bodyId}
-                        onClick={() => toggleSection(section.id)}
-                      >
-                        {number}. {section.label}
-                        <span className="manual-section-chevron" aria-hidden="true" />
-                      </button>
-                    ) : (
-                      <>
-                        {number}. {section.label}
-                      </>
-                    )}
-                  </h2>
-                  {!section.ready && <span className="manual-section-badge">Coming soon</span>}
-                </div>
-                {section.ready && (
-                  <div id={bodyId} className="manual-section-body" inert={!isOpen}>
-                    <div
-                      className="manual-section-inner"
-                      onClick={SECTION_AREAS[section.id] ? handleArea : undefined}
-                      onFocus={SECTION_AREAS[section.id] ? handleArea : undefined}
-                    >
-                      {sectionForms[section.id]}
-                    </div>
+          <ol ref={sectionList}>
+            {sections.map((section) => {
+              // Always the natural number, so a section moved to the top still reads "5. Typography"
+              const number = MANUAL_SECTIONS.indexOf(section) + 1
+              const isOpen = section.ready && openSection === section.id
+              const bodyId = `manual-section-${section.id}`
+              return (
+                <li
+                  key={section.id}
+                  className="manual-section"
+                  data-key={section.id}
+                  data-section={section.id}
+                  aria-disabled={section.ready ? undefined : 'true'}
+                  data-open={isOpen}
+                >
+                  <div className="manual-section-header">
+                    <h2>
+                      {section.ready ? (
+                        <button
+                          type="button"
+                          className="manual-section-toggle"
+                          aria-expanded={isOpen}
+                          aria-controls={bodyId}
+                          onClick={() => toggleSection(section.id)}
+                        >
+                          {number}. {section.label}
+                          <span className="manual-section-chevron" aria-hidden="true" />
+                        </button>
+                      ) : (
+                        <>
+                          {number}. {section.label}
+                        </>
+                      )}
+                    </h2>
+                    {!section.ready && <span className="manual-section-badge">Coming soon</span>}
                   </div>
-                )}
-              </li>
-            )
-          })}
-        </ol>
-      </section>
-    </div>
+                  {section.ready && (
+                    <div id={bodyId} className="manual-section-body" inert={!isOpen}>
+                      <div
+                        className="manual-section-inner"
+                        onClick={SECTION_AREAS[section.id] ? handleArea : undefined}
+                        onFocus={SECTION_AREAS[section.id] ? handleArea : undefined}
+                      >
+                        {sectionForms[section.id]}
+                      </div>
+                    </div>
+                  )}
+                </li>
+              )
+            })}
+          </ol>
+        </section>
+      </div>
+    </CmykProvider>
   )
 }
