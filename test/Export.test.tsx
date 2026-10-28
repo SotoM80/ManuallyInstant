@@ -3,11 +3,19 @@ import { renderApp } from './renderApp';
 import { typeTitle } from './coverForm';
 import { MANUAL_PAGES } from '../src/data/manualSections';
 import { ColorPalettePage } from '../src/components/pages/ColorPalettePage';
-import { createPdf } from '../src/export/createPdf';
+import { createCmykPdf, createPdf } from '../src/export/createPdf';
+import { checkServer, CmykServerError, fetchCmykColors } from '../src/export/cmykClient';
+import { setCmykServerUrl } from './cmykServerUrlMock';
 
 // Spec: specs/export.md. jsdom cannot draw pages, so the drawing is mocked (ADR 0012) and the
-// tests check which pages, settings and file name it gets.
-jest.mock('../src/export/createPdf', () => ({ createPdf: jest.fn() }));
+// tests check which pages, settings and file name it gets. The CMYK server is mocked too; its
+// errors stay real, since the buttons tell them apart.
+jest.mock('../src/export/createPdf', () => ({ createPdf: jest.fn(), createCmykPdf: jest.fn() }));
+jest.mock('../src/export/cmykClient', () => ({
+  ...jest.requireActual('../src/export/cmykClient'),
+  checkServer: jest.fn(),
+  fetchCmykColors: jest.fn(),
+}));
 
 // Each test fills the whole app before exporting, which takes a few seconds when the suites
 // run side by side
@@ -164,5 +172,123 @@ describe('Export – highlighted values (scenario 5)', () => {
       ['RGB', null],
       ['CMYK ≈', null],
     ]);
+  });
+});
+
+// Spec: specs/export.md, "The print PDF with a CMYK server" (Scenarios 12–16)
+describe('Export – the print PDF with a CMYK server', () => {
+  const mockCreateCmykPdf = createCmykPdf as jest.MockedFunction<typeof createCmykPdf>;
+  const mockCheckServer = checkServer as jest.MockedFunction<typeof checkServer>;
+  const mockFetchColors = fetchCmykColors as jest.MockedFunction<typeof fetchCmykColors>;
+  const PROFILE = { id: 'FOGRA39', name: 'ISO Coated v2 (ECI)' };
+
+  beforeEach(() => {
+    setCmykServerUrl('http://cmyk.test');
+    mockCreateCmykPdf.mockReset().mockResolvedValue(undefined);
+    mockCheckServer.mockReset().mockResolvedValue({ profile: PROFILE });
+    mockFetchColors.mockReset().mockImplementation(async (_server, hexes) => ({
+      profile: PROFILE,
+      colors: hexes.map((hex) => ({ hex, cmyk: { c: 1, m: 2, y: 3, k: 4 } })),
+    }));
+  });
+  afterEach(() => setCmykServerUrl(null));
+
+  function dialog() {
+    return screen.queryByRole('alertdialog', { name: 'CMYK server unavailable' });
+  }
+
+  it('draws, then converts, every page (Scenario 12)', async () => {
+    let finish: () => void = () => {};
+    mockCreateCmykPdf.mockImplementation(async (_pages, _orientation, _name, _server, onStep) => {
+      onStep?.({ phase: 'drawing', done: 3 });
+      onStep?.({ phase: 'converting', done: 3 });
+      await new Promise<void>((done) => (finish = done));
+    });
+    renderApp();
+    touchEverySection();
+    fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
+
+    await waitFor(
+      () => expect(screen.getByRole('button', { name: 'Download print PDF' })).toHaveTextContent('Converting to CMYK… 3/10'),
+      { timeout: 5000 },
+    );
+    expect(screen.getByRole('button', { name: 'Download web PDF' })).toBeDisabled();
+    const [pages, orientation, name, server] = mockCreateCmykPdf.mock.calls[0];
+    expect(pages.map((page) => page.getAttribute('aria-label'))).toEqual(MANUAL_PAGES);
+    expect([orientation, name, server]).toEqual(['portrait', 'my-brand-print.pdf', 'http://cmyk.test']);
+    expect(mockCreatePdf).not.toHaveBeenCalled();
+    finish();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Download print PDF' })).toHaveTextContent('↓ Print PDF'));
+  });
+
+  it('offers the RGB PDF when the server cannot be reached, before drawing anything (Scenario 13)', async () => {
+    mockCheckServer.mockRejectedValue(new CmykServerError('unreachable', 'no answer'));
+    renderApp();
+    touchEverySection();
+    fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
+
+    const offer = await screen.findByRole('alertdialog', { name: 'CMYK server unavailable' }, { timeout: 5000 });
+    expect(offer).toHaveTextContent('The CMYK server cannot be reached, so the print PDF cannot be made in CMYK. Download it in RGB instead?');
+    expect(mockCreateCmykPdf).not.toHaveBeenCalled();
+    expect(mockCreatePdf).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Download print PDF' })).toBeEnabled();
+
+    fireEvent.click(within(offer).getByRole('button', { name: 'Cancel' }));
+    expect(dialog()).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
+    fireEvent.click(within(await screen.findByRole('alertdialog', {}, { timeout: 5000 })).getByRole('button', { name: 'Download RGB PDF' }));
+    await waitFor(() => expect(mockCreatePdf).toHaveBeenCalledTimes(1), { timeout: 5000 });
+    expect(mockCreatePdf.mock.calls[0].slice(1, 4)).toEqual(['print', 'portrait', 'my-brand-print.pdf']);
+    expect(dialog()).not.toBeInTheDocument();
+  });
+
+  it('makes no PDF when the server stops during the export (Scenario 14)', async () => {
+    mockCreateCmykPdf.mockRejectedValue(new CmykServerError('unreachable', 'gone on page 4'));
+    renderApp();
+    touchEverySection();
+    fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
+
+    expect(await screen.findByRole('alertdialog', { name: 'CMYK server unavailable' }, { timeout: 5000 })).toBeInTheDocument();
+    expect(mockCreatePdf).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Download print PDF' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Download web PDF' })).toBeEnabled();
+  });
+
+  it('shows the usual failure when the server refuses a page', async () => {
+    mockCreateCmykPdf.mockRejectedValue(new CmykServerError('rejected', 'The page is larger than 40 MB.'));
+    renderApp();
+    touchEverySection();
+    fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
+
+    expect(await screen.findByRole('alert', {}, { timeout: 5000 })).toHaveTextContent('The PDF could not be created. Try again.');
+    expect(dialog()).not.toBeInTheDocument();
+  });
+
+  it('never uses the server for the web PDF (Scenario 15)', async () => {
+    renderApp();
+    touchEverySection();
+    fireEvent.click(screen.getByRole('button', { name: 'Download web PDF' }));
+
+    await waitFor(() => expect(mockCreatePdf).toHaveBeenCalledTimes(1), { timeout: 5000 });
+    expect(mockCreatePdf.mock.calls[0][1]).toBe('web');
+    expect(mockCheckServer).not.toHaveBeenCalled();
+    expect(mockCreateCmykPdf).not.toHaveBeenCalled();
+  });
+
+  it('puts the profile values on the Color palette page before drawing it (Scenario 16)', async () => {
+    let palettePage: HTMLElement | undefined;
+    mockCreateCmykPdf.mockImplementation(async (pages) => {
+      palettePage = pages.find((page) => page.getAttribute('aria-label') === 'Color palette');
+    });
+    renderApp();
+    touchEverySection();
+    fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
+
+    await waitFor(() => expect(palettePage).toBeDefined(), { timeout: 5000 });
+    const labels = [...palettePage!.querySelectorAll('.palette-label')].map((label) => label.textContent);
+    expect(labels.filter((label) => label?.startsWith('CMYK'))).toEqual(['CMYK', 'CMYK']);
+    expect(palettePage).toHaveTextContent('1, 2, 3, 4');
+    expect(palettePage).toHaveTextContent('CMYK values for ISO Coated v2 (ECI)');
   });
 });

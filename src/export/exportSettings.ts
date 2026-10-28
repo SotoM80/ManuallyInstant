@@ -10,6 +10,14 @@ export const EXPORT_SETTINGS: Record<ExportKind, { dpi: number; image: 'png' | '
   web: { dpi: 144, image: 'jpeg', quality: 0.82 },
 }
 
+// Where a PDF is: drawing its pages, or sending them to the CMYK server (specs/export.md)
+export type ExportStep = { phase: 'drawing' | 'converting'; done: number }
+
+// { phase: 'converting', done: 3 }, 10 → "Converting to CMYK… 3/10"
+export function progressLabel({ phase, done }: ExportStep, total: number) {
+  return `${phase === 'drawing' ? 'Creating…' : 'Converting to CMYK…'} ${done}/${total}`
+}
+
 // A4 in mm and in CSS pixels, standing or lying down
 export function a4(orientation: 'portrait' | 'landscape') {
   const mm = orientation === 'landscape' ? { width: 297, height: 210 } : { width: 210, height: 297 }

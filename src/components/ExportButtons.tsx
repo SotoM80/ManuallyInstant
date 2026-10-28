@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import { ExportPages } from './ExportPages'
 import type { ManualData } from './ManualPage'
 import { MANUAL_PAGES } from '../data/manualSections'
-import { createPdf } from '../export/createPdf'
-import { emptySections, pdfFileName } from '../export/exportSettings'
+import { checkServer, CmykServerError } from '../export/cmykClient'
+import { cmykServerUrl } from '../export/cmykServerUrl'
+import { createCmykPdf, createPdf } from '../export/createPdf'
+import { emptySections, pdfFileName, progressLabel } from '../export/exportSettings'
 import { inlineSvgStyles } from '../export/inlineSvgStyles'
-import type { ExportKind } from '../export/exportSettings'
+import type { ExportKind, ExportStep } from '../export/exportSettings'
+import { useCmyk } from '../utils/cmykValues'
 import type { TemplateId } from '../templates'
 import type { Guides } from '../utils/guides'
 import type { Orientation } from '../types'
@@ -20,6 +23,9 @@ const BUTTONS: { kind: ExportKind; label: string; name: string }[] = [
   { kind: 'print', label: '↓ Print PDF', name: 'Download print PDF' },
   { kind: 'web', label: '↓ Web PDF', name: 'Download web PDF' },
 ]
+
+// The PDF being made; `cmyk` sends the print one through the CMYK server (specs/export.md)
+type Job = { kind: ExportKind; cmyk: boolean }
 
 // How long the copy must stay unchanged to count as drawn, and the longest wait for it
 const SETTLED_MS = 300
@@ -76,26 +82,39 @@ async function pagesReady(root: HTMLElement) {
   await settled(root)
 }
 
+// A server that cannot be reached, or stays busy, leads to the RGB offer; one that refuses a page
+// is a real failure (specs/export.md)
+function serverDown(error: unknown) {
+  return error instanceof CmykServerError && error.kind !== 'rejected'
+}
+
 // The two download buttons next to Apply (see specs/export.md): a warning first when some
-// sections are still empty, "Creating… n/7" while the PDF is made, and a message if it fails.
+// sections are still empty, "Creating… n/10" (then "Converting to CMYK… n/10") while the PDF is
+// made, a dialog when the CMYK server cannot be reached, and a message if it fails.
 export function ExportButtons({ orientation, template, guides, ...data }: ExportButtonsProps) {
   const [warning, setWarning] = useState<{ kind: ExportKind; empty: string[] } | null>(null)
-  const [job, setJob] = useState<ExportKind | null>(null) // the PDF being made
-  const [progress, setProgress] = useState(0)
+  const [job, setJob] = useState<Job | null>(null)
+  const [step, setStep] = useState<ExportStep>({ phase: 'drawing', done: 0 })
   const [failed, setFailed] = useState(false)
+  const [offline, setOffline] = useState(false) // the CMYK server did not answer
   const copy = useRef<HTMLElement>(null)
+  const cmyk = useCmyk()
+  const server = cmykServerUrl()
 
   function ask(kind: ExportKind) {
     setFailed(false)
+    setOffline(false)
     const empty = emptySections(data)
     if (empty.length > 0) setWarning({ kind, empty })
     else start(kind)
   }
 
-  function start(kind: ExportKind) {
+  // Only the print PDF goes through the CMYK server, and only when the app has one
+  function start(kind: ExportKind, useServer = kind === 'print' && server !== null) {
     setWarning(null)
-    setProgress(0)
-    setJob(kind)
+    setOffline(false)
+    setStep({ phase: 'drawing', done: 0 })
+    setJob({ kind, cmyk: useServer })
   }
 
   // Once the copy of the pages is in the page, draw them and download the PDF
@@ -105,13 +124,25 @@ export function ExportButtons({ orientation, template, guides, ...data }: Export
     let cancelled = false
     ;(async () => {
       try {
+        if (job.cmyk && server) {
+          // Before drawing anything: is the server there, and are the palette's values on the page?
+          await checkServer(server)
+          await cmyk.ready((data.palette ?? []).map((color) => color.hex))
+        }
         await pagesReady(root)
         if (cancelled) return
         inlineSvgStyles(root) // the construction grid and the clear space are styled by CSS
         const pages = Array.from(root.querySelectorAll<HTMLElement>('article.manual-page'))
-        await createPdf(pages, job, orientation, pdfFileName(data.cover?.title, job), setProgress)
-      } catch {
-        if (!cancelled) setFailed(true)
+        const fileName = pdfFileName(data.cover?.title, job.kind)
+        if (job.cmyk && server) {
+          await createCmykPdf(pages, orientation, fileName, server, setStep)
+        } else {
+          await createPdf(pages, job.kind, orientation, fileName, (done) => setStep({ phase: 'drawing', done }))
+        }
+      } catch (error) {
+        if (cancelled) return
+        if (serverDown(error)) setOffline(true)
+        else setFailed(true)
       } finally {
         if (!cancelled) setJob(null)
       }
@@ -134,7 +165,7 @@ export function ExportButtons({ orientation, template, guides, ...data }: Export
           disabled={job !== null}
           onClick={() => ask(button.kind)}
         >
-          {job === button.kind ? `Creating… ${progress}/${MANUAL_PAGES.length}` : button.label}
+          {job?.kind === button.kind ? progressLabel(step, MANUAL_PAGES.length) : button.label}
         </button>
       ))}
 
@@ -149,13 +180,24 @@ export function ExportButtons({ orientation, template, guides, ...data }: Export
           </button>
         </div>
       )}
+      {offline && (
+        <div className="export-message" role="alertdialog" aria-label="CMYK server unavailable">
+          <p>The CMYK server cannot be reached, so the print PDF cannot be made in CMYK. Download it in RGB instead?</p>
+          <button type="button" className="palette-secondary-button" onClick={() => start('print', false)}>
+            Download RGB PDF
+          </button>
+          <button type="button" className="palette-secondary-button" onClick={() => setOffline(false)}>
+            Cancel
+          </button>
+        </div>
+      )}
       {failed && (
         <p className="export-message" role="alert">
           The PDF could not be created. Try again.
         </p>
       )}
 
-      {job && <ExportPages ref={copy} kind={job} orientation={orientation} template={template} guides={guides} {...data} />}
+      {job && <ExportPages ref={copy} kind={job.kind} orientation={orientation} template={template} guides={guides} {...data} />}
     </div>
   )
 }

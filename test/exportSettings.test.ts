@@ -1,4 +1,12 @@
-import { EXPORT_SETTINGS, a4, emptySections, pdfFileName } from '../src/export/exportSettings';
+import { EXPORT_SETTINGS, a4, emptySections, pdfFileName, progressLabel } from '../src/export/exportSettings';
+
+// Spec: specs/export.md, "The print PDF with a CMYK server"
+describe('progressLabel', () => {
+  it('names the page being drawn, then the page being converted', () => {
+    expect(progressLabel({ phase: 'drawing', done: 3 }, 10)).toBe('Creating… 3/10');
+    expect(progressLabel({ phase: 'converting', done: 3 }, 10)).toBe('Converting to CMYK… 3/10');
+  });
+});
 
 // Spec: specs/export.md
 describe('pdfFileName', () => {
