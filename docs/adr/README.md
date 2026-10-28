@@ -27,3 +27,5 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0013](0013-mockups-as-svg-illustrations.md) | Mockups drawn as SVG illustrations from plain data | Proposed | 2026-10-16 |
 | [0014](0014-photo-mockups-composed-in-webgl.md) | Photo mockups composed in WebGL, shown as images | Proposed | 2026-10-16 |
 | [0015](0015-logo-layers-from-svg.md) | Logo layers read from SVG in the browser | Accepted | 2026-10-20 |
+| [0018](0018-optional-stateless-cmyk-server.md) | An optional, stateless server, only for CMYK | Proposed | 2026-10-28 |
+| [0019](0019-real-cmyk-with-icc-profile.md) | Real CMYK with an ICC profile, one page per request | Proposed | 2026-10-28 |

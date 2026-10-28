@@ -1,10 +1,10 @@
 # Technical Specification: Color Palette (Colors Section)
 
 ## 1. What it does
-The fourth section of the Brand Manual page is **Colors**. The user builds the brand's color palette: from **1 to 6 colors**, each one with a free-text **name** and a color chosen with the same picker as the Cover (see `colorpicker.md`). For every color the app calculates its **HEX**, **RGB** and **CMYK (approximate)** values. As the user edits, the **Color palette** page of the preview shows every color with its name and its three values. Where they sit on the page depends on the chosen template.
+The fourth section of the Brand Manual page is **Colors**. The user builds the brand's color palette: from **1 to 6 colors**, each one with a free-text **name** and a color chosen with the same picker as the Cover (see `colorpicker.md`). For every color the app calculates its **HEX**, **RGB** and **CMYK** values. CMYK comes from the CMYK server's ICC profile when the app has one (`cmykserver.md`), and is approximate otherwise. As the user edits, the **Color palette** page of the preview shows every color with its name and its three values. Where they sit on the page depends on the chosen template.
 
 ## Out of Scope
-Changing the background or text colors of the pages (they belong to the Cover and the Skin, see `colorpicker.md` and `skins.md`). Reordering colors (drag and drop). Pantone or other color systems. Typing CMYK or RGB values to choose a color (CMYK is only shown, never typed). Accurate, color-managed CMYK (see ADR 0003). Warnings about similar or low-contrast colors. Saving the palette between sessions.
+Changing the background or text colors of the pages (they belong to the Cover and the Skin, see `colorpicker.md` and `skins.md`). Reordering colors (drag and drop). Pantone or other color systems. Typing CMYK or RGB values to choose a color (CMYK is only shown, never typed). Choosing the CMYK profile in the app (the server has one, see ADR 0019). Warnings about similar or low-contrast colors. Saving the palette between sessions.
 
 ## 2. Interface
 ### Section form (inside "4. Colors")
@@ -15,7 +15,7 @@ The form has one block per color, in order (Color 1, Color 2, …), then the but
 **Body** (only while open):
 1. **Name**: a text field labeled `Color N name` (e.g. "Primary blue").
 2. **Color**: a color picker labeled `Color N`, exactly like the Cover pickers (swatches, custom, HEX field and RGB pop-up, same HEX rules).
-3. **Values**: the color's values as text, always matching the picker: `HEX #1E88E5`, `RGB 30, 136, 229` and `CMYK ≈ 87, 41, 0, 10`. While the HEX is not valid, the values show `—`.
+3. **Values**: the color's values as text, always matching the picker: `HEX #1E88E5`, `RGB 30, 136, 229` and `CMYK ≈ 87, 41, 0, 10`. While the HEX is not valid, the values show `—`. With a CMYK server, the CMYK line becomes `CMYK 80, 42, 0, 0` (the profile's values, no `≈`) about 300 ms after the color stops changing, and shows `CMYK ≈ …` until then.
 4. **Remove** button (labeled `Remove Color N`). It is not shown while there is only one color.
 
 Under the blocks:
@@ -40,7 +40,18 @@ The form follows the visual rules of the Cover form (text aligned right).
 * Numbers are positions: after removing Color 2, the old Color 3 becomes Color 2.
 
 ### CMYK calculation
-From RGB with the naive formula of ADR 0003: `K = 1 − max(R′, G′, B′)`, then `C = (1 − R′ − K) / (1 − K)` (same for M with G′ and Y with B′), where `R′ = R / 255`. Pure black is `0, 0, 0, 100`. Values are percentages rounded to whole numbers.
+Every CMYK value comes from one of two sources:
+
+| Source | When | Label | Example for `#1E88E5` |
+|---|---|---|---|
+| **Profile** | The app has a CMYK server and it answered for this color | `CMYK` | `80, 42, 0, 0` (illustrative; the server's profile decides) |
+| **Approximate** | No server, the server has not answered yet, or it failed | `CMYK ≈` | `87, 41, 0, 10` |
+
+* The app asks the server about a color 300 ms after it stops changing (so dragging the picker sends one request), and keeps every answer until the page is refreshed.
+* If the server fails, the values stay approximate, with no message; the export has its own dialog (`export.md`).
+* The server converts with the same profile as the CMYK print PDF, so the values and the printed colors agree (ADR 0019).
+
+The approximate values use the naive formula of ADR 0003: `K = 1 − max(R′, G′, B′)`, then `C = (1 − R′ − K) / (1 − K)` (same for M with G′ and Y with B′), where `R′ = R / 255`. Pure black is `0, 0, 0, 100`. Values are percentages rounded to whole numbers.
 
 | HEX | RGB | CMYK ≈ |
 |---|---|---|
@@ -49,7 +60,7 @@ From RGB with the naive formula of ADR 0003: `K = 1 − max(R′, G′, B′)`, 
 | `#FFFFFF` | `255, 255, 255` | `0, 0, 0, 0` |
 
 ### Color palette page in the preview
-The page shows the heading **"Color palette"** and, for each color in order: a **chip** filled with the color, its **name**, and its values `HEX`, `RGB` and `CMYK ≈`. At the bottom, a small note: **"CMYK values are approximate"**. The text uses the Skin's Page text color (Black until it is changed, see `skins.md`). The chip has a faint outline, so a color equal to the page background is still visible.
+The page shows the heading **"Color palette"** and, for each color in order: a **chip** filled with the color, its **name**, and its values `HEX`, `RGB` and `CMYK ≈` (or `CMYK`, for a color with profile values). At the bottom, a small note: **"CMYK values are approximate"**, or **"CMYK values for ISO Coated v2 (ECI)"** (the server's profile name) when **every** color has profile values. The text uses the Skin's Page text color (Black until it is changed, see `skins.md`). The chip has a faint outline, so a color equal to the page background is still visible.
 
 Until the Colors section is touched, the page shows the placeholder `Your color palette`. A color with an empty name shows its label (`Color 1`, `Color 2`…) on the page.
 
@@ -141,3 +152,18 @@ No field is required. A wrong value is flagged on blur or Enter, with a red bord
 * **Given**: Color 1 shows `#1E88E5` on the page.
 * **When**: The user types `blue` in its HEX field and leaves it.
 * **Then**: The field shows "Enter a valid HEX color, like #1E88E5", the card has a red border, and the page keeps `#1E88E5`.
+
+### Scenario 12: Profile Values
+* **Given**: The app has a CMYK server with the FOGRA39 profile.
+* **When**: The user picks `#1E88E5` for Color 1, the only color, and waits a moment.
+* **Then**: The form shows `CMYK` with the server's values instead of `CMYK ≈ 87, 41, 0, 10`, and the page shows the label `CMYK` and the note "CMYK values for ISO Coated v2 (ECI)".
+
+### Scenario 13: Mixed Sources
+* **Given**: The app has a CMYK server; Color 1 has profile values.
+* **When**: The user adds Color 2, and the server has not answered for it yet.
+* **Then**: Color 1 shows `CMYK`, Color 2 shows `CMYK ≈`, and the note says "CMYK values are approximate".
+
+### Scenario 14: The Server Fails
+* **Given**: The app has a CMYK server address, but the server does not answer.
+* **When**: The user picks `#1E88E5`.
+* **Then**: The values stay `CMYK ≈ 87, 41, 0, 10`, the note says "CMYK values are approximate", and no error is shown.
