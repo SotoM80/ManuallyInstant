@@ -27,3 +27,6 @@ dist-ssr
 public/mockups/local-templates.json
 public/mockups/t-shirt.jpeg
 public/mockups/pexels-tarjeta.jpg
+
+# Playwright MCP screenshots and snapshots
+.playwright-mcp/

@@ -36,6 +36,7 @@ export function CoverPage({ cover, titleScale }: CoverPageProps) {
       {cover.title ? (
         <p className="cover-title" style={pageTitleCss}>
           {cover.title}
+          {cover.title}
         </p>
       ) : (
         <p className="cover-title manual-page-empty">Your brand manual title</p>
