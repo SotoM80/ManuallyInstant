@@ -8,7 +8,7 @@ A small, optional server converts to **real CMYK** with an ICC profile (ADRs 001
 * Building the PDF: the browser does it (see `export.md`).
 * Saving manuals, pages or colors.
 * Choosing the profile in the app: the server has one profile, set when it starts.
-* Rendering intents other than Perceptual; output intents or PDF/X.
+* Rendering intents other than Relative Colorimetric; output intents or PDF/X.
 * The web PDF, which never uses the server.
 
 ## 2. Interface
@@ -25,11 +25,14 @@ A small, optional server converts to **real CMYK** with an ICC profile (ADRs 001
 | `CMYK_PROFILE_PATH` | `profiles/ISOcoated_v2_eci.icc` | The ICC profile file |
 | `CMYK_PROFILE_ID` | `FOGRA39` | Short id of the profile |
 | `CMYK_PROFILE_NAME` | `ISO Coated v2 (ECI)` | Name shown in the manual |
+| `CMYK_BLACK_POINT_COMPENSATION` | `true` | Black point compensation, as in Adobe's apps |
 | `MAX_PAGE_MB` | `40` | Largest page accepted |
 | `MAX_PAGE_PIXELS` | `25000000` | Largest page in pixels |
 | `MAX_CONCURRENT` | `2` | Pages converted at the same time |
 
-The profile file is downloaded from eci.org by the studio and is not kept in git (`server/profiles/README.md` says where to get it). At start, the server checks that the file is a CMYK output profile. If the file is missing, it uses sharp's built-in `cmyk` profile, named `Generic CMYK (built-in)`, and prints a warning. If the file exists but is not a CMYK output profile, the server does not start.
+The profile file is downloaded from eci.org by the studio (or taken from Adobe's `CoatedFOGRA39.icc`) and is not kept in git (`server/profiles/README.md` says where to get it). At start, the server checks that the file is a CMYK output profile. If the file is missing, or is not a CMYK output profile, the server does not start and says why: a print PDF must never use a profile nobody chose.
+
+Every conversion goes from sRGB to the profile with the **Relative Colorimetric** intent and, unless it is turned off, black point compensation (ADR 0019).
 
 ### Common rules
 * Every route is under `/v1`. Every answer has `Cache-Control: no-store`.
@@ -41,7 +44,8 @@ The profile file is downloaded from eci.org by the studio and is not kept in git
 `200`:
 ```json
 { "ok": true, "api": 1,
-  "profile": { "id": "FOGRA39", "name": "ISO Coated v2 (ECI)", "builtIn": false },
+  "profile": { "id": "FOGRA39", "name": "ISO Coated v2 (ECI)" },
+  "conversion": { "intent": "relative", "blackPointCompensation": true },
   "limits": { "maxPageBytes": 41943040, "maxPagePixels": 25000000, "maxColors": 64 } }
 ```
 
@@ -50,8 +54,8 @@ Body (`application/json`, 8 KB at most): `{ "colors": ["#1E88E5", "#000000"] }`,
 
 `200`: the colors in the same order, with whole percentages (0 = no ink):
 ```json
-{ "profile": { "id": "FOGRA39", "name": "ISO Coated v2 (ECI)", "builtIn": false },
-  "colors": [ { "hex": "#1E88E5", "cmyk": { "c": 80, "m": 42, "y": 0, "k": 0 } } ] }
+{ "profile": { "id": "FOGRA39", "name": "ISO Coated v2 (ECI)" },
+  "colors": [ { "hex": "#1E88E5", "cmyk": { "c": 76, "m": 42, "y": 0, "k": 0 } } ] }
 ```
 (The numbers are an example; the real ones come from the profile.)
 
@@ -73,8 +77,8 @@ Body (`image/png`): one page drawn by the app.
 
 ### In the code
 * `server/src/config.ts`: reads the settings. Pure, unit tested.
-* `server/src/profile.ts`: finds and checks the profile, or falls back to the built-in one.
-* `server/src/convert.ts`: `pageToCmyk(png)` and `colorsToCmyk(hexes)`, both with `withIccProfile(profile).raw()`, never `toColourspace('cmyk')` (ADR 0019).
+* `server/src/profile.ts`: reads and checks the profile, and creates the one lcms transform (sRGB → profile, Relative Colorimetric, black point compensation) used by every request.
+* `server/src/convert.ts`: `pageToCmyk(png)` decodes the PNG with sharp, puts it on white and converts its pixels with the transform; `colorsToCmyk(hexes)` converts colors with the same transform (ADR 0019).
 * `server/src/limit.ts`: the limit of pages converted at the same time.
 * `server/src/app.ts`: the routes, CORS and errors. `server/src/index.ts` starts it.
 * In the app, `src/export/cmykServerUrl.ts` is the only place that reads `VITE_CMYK_SERVER_URL`, and `src/export/cmykClient.ts` is the only place that calls the server.
@@ -91,8 +95,7 @@ Body (`image/png`): one page drawn by the app.
 * Nothing received is written to disk or logged.
 
 ## Failure Modes
-* **No profile file**: the server starts with the built-in profile and says so in `/v1/health` (`builtIn: true`); the manual names it `Generic CMYK (built-in)`.
-* **A profile that is not a CMYK output profile**: the server does not start, and says why.
+* **No profile file, or a profile that is not a CMYK output profile**: the server does not start, and says why. The app then finds no server and works as without one.
 * **Bad requests**: the errors in the table above. What the app does with them is in `export.md` and `colorpalette.md`.
 
 ## 5. Given-When-Then Test Criteria
@@ -100,12 +103,12 @@ Body (`image/png`): one page drawn by the app.
 ### Scenario 1: Health
 * **Given**: The server started with the FOGRA39 profile.
 * **When**: The app calls `GET /v1/health`.
-* **Then**: It answers `ok: true`, `api: 1` and the profile `FOGRA39`, `ISO Coated v2 (ECI)`, `builtIn: false`.
+* **Then**: It answers `ok: true`, `api: 1`, the profile `FOGRA39`, `ISO Coated v2 (ECI)`, and the conversion `relative` with black point compensation.
 
 ### Scenario 2: No Profile File
-* **Given**: `CMYK_PROFILE_PATH` points to a file that does not exist.
+* **Given**: `CMYK_PROFILE_PATH` points to a file that does not exist, or to an RGB profile.
 * **When**: The server starts.
-* **Then**: It prints a warning, starts, and `/v1/health` shows `Generic CMYK (built-in)` with `builtIn: true`.
+* **Then**: It does not start, and prints which file it looked for and why it cannot use it.
 
 ### Scenario 3: Colors
 * **Given**: The server is running.
@@ -143,6 +146,11 @@ Body (`image/png`): one page drawn by the app.
 * **Then**: The first gets `Access-Control-Allow-Origin` and the exposed `X-Cmyk-*` headers; the second gets no CORS headers.
 
 ### Scenario 10: The Profile Matches ColorSync
-* **Given**: The server uses the FOGRA39 file.
-* **When**: The app converts `#1E88E5`, `#E53935` and `#000000`.
-* **Then**: Each value is within 1 of what macOS ColorSync Utility's calculator gives for the same profile, with the Perceptual intent. (This test only runs where the profile file is present.)
+* **Given**: The server uses the FOGRA39 file, with black point compensation off.
+* **When**: The app converts `#1E88E5`, `#E53935`, `#FFD600`, `#00A86B` and `#000000`.
+* **Then**: Each value is within 1 of what macOS ColorSync gives for the same profile with the Relative Colorimetric intent. (This test only runs where the profile file is present.)
+
+### Scenario 11: The Profile Matches Illustrator (checked by hand, once)
+* **Given**: Illustrator's Color Settings use Coated FOGRA39, Relative Colorimetric and black point compensation, and the server uses the same profile with its defaults.
+* **When**: The studio types `#1E88E5`, `#E53935` and `#00A86B` in Illustrator's color picker and reads their CMYK.
+* **Then**: Each value is within 2 of the server's.

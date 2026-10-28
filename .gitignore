@@ -30,3 +30,8 @@ public/mockups/pexels-tarjeta.jpg
 
 # Playwright MCP screenshots and snapshots
 .playwright-mcp/
+
+# ICC profiles may not be shared freely, and server settings (see server/profiles/README.md)
+server/profiles/*.icc
+server/profiles/*.icm
+server/.env

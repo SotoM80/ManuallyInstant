@@ -15,7 +15,7 @@ The form has one block per color, in order (Color 1, Color 2, …), then the but
 **Body** (only while open):
 1. **Name**: a text field labeled `Color N name` (e.g. "Primary blue").
 2. **Color**: a color picker labeled `Color N`, exactly like the Cover pickers (swatches, custom, HEX field and RGB pop-up, same HEX rules).
-3. **Values**: the color's values as text, always matching the picker: `HEX #1E88E5`, `RGB 30, 136, 229` and `CMYK ≈ 87, 41, 0, 10`. While the HEX is not valid, the values show `—`. With a CMYK server, the CMYK line becomes `CMYK 80, 42, 0, 0` (the profile's values, no `≈`) about 300 ms after the color stops changing, and shows `CMYK ≈ …` until then.
+3. **Values**: the color's values as text, always matching the picker: `HEX #1E88E5`, `RGB 30, 136, 229` and `CMYK ≈ 87, 41, 0, 10`. While the HEX is not valid, the values show `—`. With a CMYK server, the CMYK line becomes `CMYK 76, 42, 0, 0` (the profile's values, no `≈`) about 300 ms after the color stops changing, and shows `CMYK ≈ …` until then.
 4. **Remove** button (labeled `Remove Color N`). It is not shown while there is only one color.
 
 Under the blocks:
@@ -44,7 +44,7 @@ Every CMYK value comes from one of two sources:
 
 | Source | When | Label | Example for `#1E88E5` |
 |---|---|---|---|
-| **Profile** | The app has a CMYK server and it answered for this color | `CMYK` | `80, 42, 0, 0` (illustrative; the server's profile decides) |
+| **Profile** | The app has a CMYK server and it answered for this color | `CMYK` | `76, 42, 0, 0` (FOGRA39) |
 | **Approximate** | No server, the server has not answered yet, or it failed | `CMYK ≈` | `87, 41, 0, 10` |
 
 * The app asks the server about a color 300 ms after it stops changing (so dragging the picker sends one request), and keeps every answer until the page is refreshed.
