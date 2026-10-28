@@ -8,10 +8,22 @@
   },
   "scripts": {
     "dev": "node --watch --env-file-if-exists=.env src/index.ts",
-    "start": "node --env-file-if-exists=.env src/index.ts"
+    "start": "node --env-file-if-exists=.env src/index.ts",
+    "test": "node --test 'test/**/*.test.ts'",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
     "lcms-wasm": "^1.0.5",
     "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.19.2",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.3.1",
+    "typescript": "~6.0.2"
   }
 }

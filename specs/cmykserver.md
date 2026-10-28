@@ -73,6 +73,7 @@ Body (`image/png`): one page drawn by the app.
 | 422 | `not_an_image` | The body is not a PNG |
 | 422 | `too_many_pixels` | The page is bigger than `MAX_PAGE_PIXELS` |
 | 503 | `busy` | `MAX_CONCURRENT` pages are already being converted (with `Retry-After: 2`) |
+| 404 | `not_found` | A route that does not exist |
 | 500 | `conversion_failed` | The conversion failed or did not give 4 channels |
 
 ### In the code
@@ -81,6 +82,7 @@ Body (`image/png`): one page drawn by the app.
 * `server/src/convert.ts`: `pageToCmyk(png)` decodes the PNG with sharp, puts it on white and converts its pixels with the transform; `colorsToCmyk(hexes)` converts colors with the same transform (ADR 0019).
 * `server/src/limit.ts`: the limit of pages converted at the same time.
 * `server/src/app.ts`: the routes, CORS and errors. `server/src/index.ts` starts it.
+* `server/test/`: tests with Node's test runner (`npm run test:server`), on real images and a real profile. lcms-wasm is only published as an ES module, which Jest loads only behind an experimental flag.
 * In the app, `src/export/cmykServerUrl.ts` is the only place that reads `VITE_CMYK_SERVER_URL`, and `src/export/cmykClient.ts` is the only place that calls the server.
 
 ## 3. Preconditions & Postconditions
