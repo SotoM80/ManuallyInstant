@@ -1,7 +1,7 @@
 # ADR 0003: Approximate CMYK, print PDF stays in RGB
 
 ## Status
-Accepted — 2026-10-11
+Superseded by ADR 0019 — 2026-10-28
 
 ## Context
 Brand manuals list each color as HEX, RGB and CMYK, and the print PDF should highlight CMYK. An accurate CMYK conversion depends on an ICC color profile for the specific printer and paper, and real CMYK PDFs need server-side or specialized tooling. Neither fits a frontend-only app (ADR 0002).

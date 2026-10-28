@@ -1,7 +1,7 @@
 # ADR 0018: An optional, stateless server, only for CMYK
 
 ## Status
-Proposed — 2026-10-28
+Accepted — 2026-10-28
 
 ## Context
 ADR 0002 keeps the app frontend only. ADR 0003 accepts approximate CMYK and an RGB print PDF because "real CMYK PDFs need server-side or specialized tooling". Agencies send the print PDF to print shops, so they need real CMYK pages and CMYK values that match what is printed (ADR 0019 decides how). That work needs a color-management library with an ICC profile, which the browser does not offer.

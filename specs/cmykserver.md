@@ -32,7 +32,7 @@ A small, optional server converts to **real CMYK** with an ICC profile (ADRs 001
 
 The profile file is downloaded from eci.org by the studio (or taken from Adobe's `CoatedFOGRA39.icc`) and is not kept in git (`server/profiles/README.md` says where to get it). At start, the server checks that the file is a CMYK output profile. If the file is missing, or is not a CMYK output profile, the server does not start and says why: a print PDF must never use a profile nobody chose.
 
-Every conversion goes from sRGB to the profile with the **Relative Colorimetric** intent and, unless it is turned off, black point compensation (ADR 0019).
+Every conversion goes from sRGB to the profile with the **Relative Colorimetric** intent and, unless it is turned off, black point compensation (ADR 0019). Colors are always read as **sRGB**, as a browser shows a HEX. An app that reads the same HEX in another RGB space gives other CMYK values: Illustrator with the *Europe Prepress 3* settings reads it as Adobe RGB (1998), so `#1E88E5` becomes `90, 37, 0, 0` there instead of `76, 42, 0, 0`.
 
 ### Common rules
 * Every route is under `/v1`. Every answer has `Cache-Control: no-store`.
@@ -151,6 +151,6 @@ Body (`image/png`): one page drawn by the app.
 * **Then**: Each value is within 1 of what macOS ColorSync gives for the same profile with the Relative Colorimetric intent. (This test only runs where the profile file is present.)
 
 ### Scenario 11: The Profile Matches Illustrator (checked by hand, once)
-* **Given**: Illustrator's Color Settings use Coated FOGRA39, Relative Colorimetric and black point compensation, and the server uses the same profile with its defaults.
-* **When**: The studio types `#1E88E5`, `#E53935` and `#00A86B` in Illustrator's color picker and reads their CMYK.
-* **Then**: Each value is within 2 of the server's.
+* **Given**: Illustrator's Color Settings start from *Europe Prepress 3* (Coated FOGRA39, Relative Colorimetric, black point compensation) with the RGB working space changed to **sRGB IEC61966-2.1**, and the server uses Coated FOGRA39 with its defaults.
+* **When**: The studio types `#1E88E5`, `#E53935` and `#00A86B` in the color picker of a new CMYK document and reads their CMYK.
+* **Then**: Each value is within 2 of the server's. (Checked on 2026-10-28: Illustrator gave `77, 42, 0, 0`, `1, 88, 78, 0` and `79, 0, 73, 0`; the server `76, 42, 0, 0`, `1, 89, 78, 0` and `78, 1, 73, 0`.)

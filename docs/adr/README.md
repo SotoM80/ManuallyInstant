@@ -13,8 +13,8 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | # | Decision | Status | Date |
 |---|----------|--------|------|
 | [0001](0001-record-architecture-decisions.md) | Record architecture decisions | Accepted | 2026-10-11 |
-| [0002](0002-frontend-only-no-persistence.md) | Frontend only, no persistence | Accepted | 2026-10-11 |
-| [0003](0003-approximate-cmyk-rgb-pdf.md) | Approximate CMYK, print PDF stays in RGB | Accepted | 2026-10-11 |
+| [0002](0002-frontend-only-no-persistence.md) | Frontend only, no persistence | Accepted (amended by 0018) | 2026-10-11 |
+| [0003](0003-approximate-cmyk-rgb-pdf.md) | Approximate CMYK, print PDF stays in RGB | Superseded by ADR 0019 | 2026-10-11 |
 | [0004](0004-templates-change-layout-not-content.md) | Templates change layout, not content | Accepted | 2026-10-11 |
 | [0005](0005-google-fonts-via-css-api.md) | Load Google Fonts through the CSS API | Accepted | 2026-10-11 |
 | [0006](0006-motion-with-css-and-view-transitions.md) | Motion with CSS and native browser APIs, no animation library | Accepted | 2026-10-11 |
@@ -27,5 +27,5 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0013](0013-mockups-as-svg-illustrations.md) | Mockups drawn as SVG illustrations from plain data | Proposed | 2026-10-16 |
 | [0014](0014-photo-mockups-composed-in-webgl.md) | Photo mockups composed in WebGL, shown as images | Proposed | 2026-10-16 |
 | [0015](0015-logo-layers-from-svg.md) | Logo layers read from SVG in the browser | Accepted | 2026-10-20 |
-| [0018](0018-optional-stateless-cmyk-server.md) | An optional, stateless server, only for CMYK | Proposed | 2026-10-28 |
-| [0019](0019-real-cmyk-with-icc-profile.md) | Real CMYK with an ICC profile, one page per request | Proposed | 2026-10-28 |
+| [0018](0018-optional-stateless-cmyk-server.md) | An optional, stateless server, only for CMYK | Accepted | 2026-10-28 |
+| [0019](0019-real-cmyk-with-icc-profile.md) | Real CMYK with an ICC profile, one page per request | Accepted | 2026-10-28 |

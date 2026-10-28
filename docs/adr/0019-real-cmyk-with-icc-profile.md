@@ -1,7 +1,7 @@
 # ADR 0019: Real CMYK with an ICC profile, one page per request
 
 ## Status
-Proposed — 2026-10-28
+Accepted — 2026-10-28
 
 ## Context
 With the server of ADR 0018, the print PDF can be in real CMYK and the Color palette page can show CMYK values that match it. Pages are already drawn as images (ADR 0012), so converting a page means converting the pixels of one image. The conversion depends on the printing conditions; the studio works with European print shops (offset on coated paper).
@@ -29,4 +29,5 @@ The browser sends **one page per request** (the PNG drawn as today), the server 
 * **−** Compressing the CMYK page takes longer than converting it (about 1.1 s of the 1.7 s a page takes).
 * **−** The print PDF weighs about as much as the RGB one, or up to twice as much.
 * **−** Without an output intent in the PDF, viewers show DeviceCMYK with their own default profile, so the on-screen look can be a little off; the separations are right.
-* Supersedes ADR 0003 once accepted. The naive formula stays as the fallback when there is no server.
+* Checked against Illustrator on 2026-10-28 (Coated FOGRA39, Relative Colorimetric, black point compensation, sRGB): every value within 1 point (`specs/cmykserver.md`, Scenario 11).
+* Supersedes ADR 0003. The naive formula stays as the fallback when there is no server.
