@@ -63,6 +63,7 @@ export type UsageExample = {
   id: number
   description: string
   image: UploadedImage | null
+  background: string | null // "#RRGGBB" behind the image, or none (specs/imagebackground.md)
 }
 
 // Each group is null until it is touched, so its page keeps its placeholder until then,
@@ -76,6 +77,7 @@ export type MarkPart = {
   name: string
   role: string
   image: UploadedImage | null
+  background: string | null // "#RRGGBB" behind the image, or none (specs/imagebackground.md)
 }
 
 // One kind of mark the brand uses, shown as a card on the Brand concept page.
@@ -86,6 +88,7 @@ export type MarkCard = {
   name: string
   role: string
   image: UploadedImage | null
+  background: string | null // "#RRGGBB" behind the image, or none (specs/imagebackground.md)
   parts: MarkPart[] // 0 to 4
 }
 
@@ -97,6 +100,7 @@ export type LogoVariant = {
   name: string
   usage: string
   image: UploadedImage | null // null → no image applied yet
+  background: string | null // "#RRGGBB" behind the image, or none (specs/imagebackground.md)
 }
 
 // Everything the Logo section shows in the preview. It fills three pages: Brand concept, Logo versions

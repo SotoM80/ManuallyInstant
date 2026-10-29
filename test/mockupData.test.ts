@@ -34,9 +34,9 @@ function logoWith(variants: LogoData['variants']): LogoData {
 }
 
 const VERSIONS = logoWith([
-  { id: 0, name: 'Horizontal', usage: '', image: image('horizontal.png') },
-  { id: 4, name: 'Negative', usage: '', image: image('negative.png') },
-  { id: 7, name: '', usage: '', image: null },
+  { id: 0, name: 'Horizontal', usage: '', image: image('horizontal.png'), background: null },
+  { id: 4, name: 'Negative', usage: '', image: image('negative.png'), background: null },
+  { id: 7, name: '', usage: '', image: null, background: null },
 ]);
 const COVER_LOGO = { url: 'blob:cover.png' };
 
@@ -111,7 +111,7 @@ describe('the logo of a mockup', () => {
   });
 
   it('uses the Cover logo when the Primary has no image, and nothing with no logo at all (scenario 11)', () => {
-    const noImages = logoWith([{ id: 0, name: '', usage: '', image: null }]);
+    const noImages = logoWith([{ id: 0, name: '', usage: '', image: null, background: null }]);
     expect(mockupLogo(noImages, COVER_LOGO, null)).toEqual(COVER_LOGO);
     expect(mockupLogo(null, COVER_LOGO, null)).toEqual(COVER_LOGO);
     expect(mockupLogo(null, null, null)).toBeNull();

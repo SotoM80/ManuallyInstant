@@ -13,14 +13,16 @@ type CardContentProps = {
   name: string
   role: string
   image: UploadedImage | null
+  background: string | null // behind the image, or none (specs/imagebackground.md)
 }
 
-// What a card shows: its image (or a faint striped box), its label, and its name and role
-// when they were typed.
-function CardContent({ label, name, role, image }: CardContentProps) {
+// What a card shows: its image (or a faint striped box) on its background, its label, and its
+// name and role when they were typed. backgroundColor, not background: an empty box keeps its
+// stripes on top.
+function CardContent({ label, name, role, image, background }: CardContentProps) {
   return (
     <>
-      <figure className="logo-figure" data-empty={!image}>
+      <figure className="logo-figure" data-empty={!image} style={{ backgroundColor: background ?? undefined }}>
         {image && <img src={image.url} alt={name || label} />}
       </figure>
       <p className="logo-card-type logo-cut" title={label}>
@@ -78,7 +80,7 @@ export function AnatomyPage({ logo, color }: AnatomyPageProps) {
                           </li>
                         )}
                         <li className="logo-card">
-                          <CardContent label={part.label} name={part.name} role={part.role} image={part.image} />
+                          <CardContent label={part.label} name={part.name} role={part.role} image={part.image} background={part.background} />
                         </li>
                       </Fragment>
                     ))}
@@ -94,6 +96,7 @@ export function AnatomyPage({ logo, color }: AnatomyPageProps) {
                   name={mark.name}
                   role={mark.role}
                   image={mark.image}
+                  background={mark.background}
                 />
               </div>
             </li>

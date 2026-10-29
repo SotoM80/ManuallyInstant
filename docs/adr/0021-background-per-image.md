@@ -1,7 +1,7 @@
 # ADR 0021: A background color for each logo image
 
 ## Status
-Proposed — 2026-10-29
+Accepted — 2026-10-29
 
 ## Context
 A brand manual often shows a version of the logo on its own color: a negative version on black, a symbol on the brand blue. Today every image box on the inner pages has no background of its own: it shows the page background, which belongs to the Skin (ADR 0011), the same for every page. A white logo is invisible on a white page, and there is no way to show a version on the color it is meant for.

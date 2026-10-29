@@ -1,17 +1,20 @@
 import { useMemo, useRef, useState } from 'react'
 import { ImageField } from './ImageField'
+import { MoreArea } from './MoreArea'
+import { SkinColorField } from './SkinColorField'
 import { MAX_EXAMPLES, START_EXAMPLES, USAGE_KINDS } from '../data/usageOptions'
 import { keepInPlace } from '../utils/scrollAnchor'
 import { validateImage } from '../utils/validation'
 import { NO_IMAGE, applyImage, chooseFile, isPending, shownFile, toImage, useLiveData } from '../utils/pendingImage'
 import type { PendingImage } from '../utils/pendingImage'
-import type { UsageData, UsageKind } from '../types'
+import type { PaletteColor, UsageData, UsageKind } from '../types'
 
 // Form of the Usage section (see specs/usage.md): a group of examples for each page, Correct use
 // and Incorrect use, that work like the versions of the Logo section. Text reaches the preview
 // at once; each new image waits for its own Apply (ADRs 0007 and 0020).
 type UsageFormProps = {
   onChange?: (usage: UsageData) => void
+  palette?: PaletteColor[] | null // for the Background chips that copy a palette color
 }
 
 // `key` stays the same when other examples are removed, so React keeps each example's state
@@ -20,6 +23,7 @@ type ExampleRow = {
   description: string
   image: PendingImage
   fileError: string
+  background: string | null // behind its image on the page, none by default (specs/imagebackground.md)
 }
 
 type GroupState = {
@@ -28,7 +32,7 @@ type GroupState = {
   touched: boolean // until then, the group sends null and its page shows its placeholder
 }
 
-export function UsageForm({ onChange }: UsageFormProps) {
+export function UsageForm({ onChange, palette = null }: UsageFormProps) {
   const nextKey = useRef(START_EXAMPLES * USAGE_KINDS.length)
   const [groups, setGroups] = useState<Record<UsageKind, GroupState>>(() => {
     // Keys 0–3 for the first group, 4–7 for the second: unique across the whole form
@@ -45,7 +49,7 @@ export function UsageForm({ onChange }: UsageFormProps) {
       group.touched
         ? group.rows.map((row) => {
             const file = shownFile(row.image)
-            return { id: row.key, description: row.description.trim(), image: file ? toImage(file) : null }
+            return { id: row.key, description: row.description.trim(), image: file ? toImage(file) : null, background: row.background }
           })
         : null
     return { correct: data(groups.correct), incorrect: data(groups.incorrect) }
@@ -153,6 +157,15 @@ export function UsageForm({ onChange }: UsageFormProps) {
                         pending={isPending(row.image, row.fileError)}
                         onApply={() => applyRowImage(kind, row)}
                       />
+                      <MoreArea label={`${label} image`}>
+                        <SkinColorField
+                          label={`${label} background`}
+                          value={row.background}
+                          onChange={(background) => updateRow(kind, row.key, { background })}
+                          palette={palette}
+                          allowNone
+                        />
+                      </MoreArea>
                       {group.rows.length > 1 && (
                         <button
                           type="button"
@@ -189,5 +202,5 @@ export function UsageForm({ onChange }: UsageFormProps) {
 }
 
 function newRow(key: number): ExampleRow {
-  return { key, description: '', image: NO_IMAGE, fileError: '' }
+  return { key, description: '', image: NO_IMAGE, fileError: '', background: null }
 }

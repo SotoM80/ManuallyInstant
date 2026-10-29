@@ -22,6 +22,8 @@ export function ClearSpacePage({ logo, coverLogo, color, guides, onGuidesChange 
   const primary = logo.variants[0]
   const primaryName = versionName(primary?.name ?? '', 0)
   const primaryImage = primary?.image ?? coverLogo
+  // Both blocks show the Primary logo, so both use Version 1's background (specs/imagebackground.md)
+  const background = primary?.background ?? null
   return (
     <div className="logo-page clearspace-layout" style={{ color }}>
       <header className="logo-page-header">
@@ -39,6 +41,7 @@ export function ClearSpacePage({ logo, coverLogo, color, guides, onGuidesChange 
             name={primaryName}
             modules={logo.gridModules}
             x={logo.gridX}
+            background={background}
           />
         </figure>
         <p className="logo-text logo-clamp">{clearSpaceText(logo)}</p>
@@ -47,7 +50,11 @@ export function ClearSpacePage({ logo, coverLogo, color, guides, onGuidesChange 
       <section className="logo-block clearspace-grid">
         <p className="logo-block-title">3.2 Construction grid</p>
         {/* An uploaded grid first; else one drawn by the app over the Primary logo */}
-        <figure className="logo-figure" data-empty={!logo.grid && !primaryImage}>
+        <figure
+          className="logo-figure"
+          data-empty={!logo.grid && !primaryImage}
+          style={{ backgroundColor: background ?? undefined }}
+        >
           {logo.grid ? (
             <img src={logo.grid.url} alt="Construction grid" />
           ) : primaryImage ? (

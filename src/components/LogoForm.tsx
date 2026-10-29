@@ -1,5 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { ImageField } from './ImageField'
+import { MoreArea } from './MoreArea'
+import { SkinColorField } from './SkinColorField'
 import {
   DEFAULT_CLEAR_SPACE_UNIT,
   DEFAULT_GRID_MODULES,
@@ -18,7 +20,7 @@ import { RULER_ERROR, parseRuler } from '../utils/rulers'
 import { logoLayers } from '../utils/logoLayers'
 import { NO_IMAGE, applyImage, chooseFile, isPending, shownFile, toImage, useLiveData } from '../utils/pendingImage'
 import type { PendingImage } from '../utils/pendingImage'
-import type { LogoData, MarkType } from '../types'
+import type { LogoData, MarkType, PaletteColor } from '../types'
 
 // What is typed in one part of a card (e.g. its Tagline). Everything is optional.
 type PartDraft = {
@@ -29,6 +31,7 @@ type PartDraft = {
   image: PendingImage
   fileError: string
   fromFile: File | null // the card's layered SVG it was made from: the card's Apply shows it too
+  background: string | null // behind its image on the page, none by default (specs/imagebackground.md)
 }
 
 // What is typed in the card of one mark type, with the parts it is built from.
@@ -38,11 +41,12 @@ type CardDraft = {
   role: string
   image: PendingImage
   fileError: string
+  background: string | null // behind its image on the page, none by default (specs/imagebackground.md)
   parts: PartDraft[]
   layersNote: string // what happened to the layers of the last SVG chosen, '' → nothing to say
 }
 
-const EMPTY_CARD: CardDraft = { name: '', role: '', image: NO_IMAGE, fileError: '', parts: [], layersNote: '' }
+const EMPTY_CARD: CardDraft = { name: '', role: '', image: NO_IMAGE, fileError: '', background: null, parts: [], layersNote: '' }
 
 const MAX_PARTS = 4
 
@@ -67,6 +71,7 @@ type VariantRow = {
   usage: string
   image: PendingImage
   fileError: string
+  background: string | null // behind its image on the page, none by default (specs/imagebackground.md)
 }
 
 // Form of the Logo section, in four groups that match its four pages:
@@ -78,12 +83,13 @@ type VariantRow = {
 type LogoFormProps = {
   onChange?: (logo: LogoData) => void
   parts?: LogoParts
+  palette?: PaletteColor[] | null // for the Background chips that copy a palette color
 }
 
 const MAX_VARIANTS = 4
 
 function newVariant(key: number): VariantRow {
-  return { key, name: '', usage: '', image: NO_IMAGE, fileError: '' }
+  return { key, name: '', usage: '', image: NO_IMAGE, fileError: '', background: null }
 }
 
 // The applied image of a field, ready for the preview (null → none yet).
@@ -93,7 +99,7 @@ function appliedImage(image: PendingImage) {
 }
 
 
-export function LogoForm({ onChange, parts = LOGO_PARTS }: LogoFormProps) {
+export function LogoForm({ onChange, parts = LOGO_PARTS, palette = null }: LogoFormProps) {
   const nextKey = useRef(1)
   // The last file chosen in each card: the layers of an older one, read late, are dropped
   const latestCardFile = useRef<Partial<Record<MarkType, File | null>>>({})
@@ -143,6 +149,7 @@ export function LogoForm({ onChange, parts = LOGO_PARTS }: LogoFormProps) {
           name: card.name.trim(),
           role: card.role.trim(),
           image: appliedImage(card.image),
+          background: card.background,
           parts: card.parts
             .filter((part) => !isEmptyPart(part))
             .map((part, index) => ({
@@ -150,6 +157,7 @@ export function LogoForm({ onChange, parts = LOGO_PARTS }: LogoFormProps) {
               name: part.name.trim(),
               role: part.role.trim(),
               image: appliedImage(part.image),
+              background: part.background,
             })),
         }
       }),
@@ -160,6 +168,7 @@ export function LogoForm({ onChange, parts = LOGO_PARTS }: LogoFormProps) {
             name: row.name.trim(),
             usage: row.usage.trim(),
             image: appliedImage(row.image),
+            background: row.background,
           }))
         : [],
       clearSpaceUnit: unit.trim(),
@@ -264,6 +273,7 @@ export function LogoForm({ onChange, parts = LOGO_PARTS }: LogoFormProps) {
           image: applied ? { file: part.file, shown: part.file } : chooseFile(NO_IMAGE, part.file),
           fileError: '',
           fromFile: file,
+          background: null,
         }),
       )
       return { ...prev, [type]: { ...card, parts, layersNote: result.total > MAX_PARTS ? LAYERS_CUT : '' } }
@@ -277,7 +287,7 @@ export function LogoForm({ onChange, parts = LOGO_PARTS }: LogoFormProps) {
   function addPart(type: MarkType) {
     const parts = cardParts(type)
     if (parts.length >= MAX_PARTS) return
-    const part: PartDraft = { key: takeKey(), label: '', name: '', role: '', image: NO_IMAGE, fileError: '', fromFile: null }
+    const part: PartDraft = { key: takeKey(), label: '', name: '', role: '', image: NO_IMAGE, fileError: '', fromFile: null, background: null }
     updateCard(type, { parts: [...parts, part] })
   }
 
@@ -451,6 +461,15 @@ export function LogoForm({ onChange, parts = LOGO_PARTS }: LogoFormProps) {
                 pending={isPending(card.image, card.fileError)}
                 onApply={() => applyCard(type)}
               />
+              <MoreArea label={`${type} image`}>
+                <SkinColorField
+                  label={`${type} background`}
+                  value={card.background}
+                  onChange={(background) => updateCard(type, { background })}
+                  palette={palette}
+                  allowNone
+                />
+              </MoreArea>
               {card.layersNote && (
                 <p className="logo-form-hint" role="status">
                   {card.layersNote}
@@ -497,6 +516,15 @@ export function LogoForm({ onChange, parts = LOGO_PARTS }: LogoFormProps) {
                       pending={isPending(part.image, part.fileError)}
                       onApply={() => applyPart(type, part)}
                     />
+                    <MoreArea label={`${partLabel} image`}>
+                      <SkinColorField
+                        label={`${partLabel} background`}
+                        value={part.background}
+                        onChange={(background) => updatePart(type, part.key, { background })}
+                        palette={palette}
+                        allowNone
+                      />
+                    </MoreArea>
                     <div className="logo-mark-card-fields">
                       <input
                         type="text"
@@ -601,6 +629,15 @@ export function LogoForm({ onChange, parts = LOGO_PARTS }: LogoFormProps) {
                         pending={isPending(row.image, row.fileError)}
                         onApply={() => applyVariant(row)}
                       />
+                      <MoreArea label={`${label} image`}>
+                        <SkinColorField
+                          label={`${label} background`}
+                          value={row.background}
+                          onChange={(background) => updateVariant(row.key, { background })}
+                          palette={palette}
+                          allowNone
+                        />
+                      </MoreArea>
                       {variants.length > 1 && (
                         <button
                           type="button"

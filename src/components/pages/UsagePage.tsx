@@ -34,7 +34,12 @@ export function UsagePage({ kind, examples, logo, cover, orientation, color }: U
       <ul className="usage-grid" data-count={examples.length} data-orientation={orientation} aria-label={label}>
         {examples.map((example, index) => (
           <li key={example.id} className="usage-example" data-kind={kind} aria-label={label}>
-            <figure className="logo-figure" data-empty={!example.image}>
+            {/* backgroundColor, not background: an empty box keeps its stripes on top */}
+            <figure
+              className="logo-figure"
+              data-empty={!example.image}
+              style={{ backgroundColor: example.background ?? undefined }}
+            >
               {example.image && <img src={example.image.url} alt={example.description || `Example ${index + 1}`} />}
               <span className="usage-mark" aria-hidden="true">
                 {mark}

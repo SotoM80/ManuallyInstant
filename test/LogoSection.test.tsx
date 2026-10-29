@@ -107,11 +107,11 @@ describe('Logo section – form', () => {
       brandName: 'VOLTA',
       concept: 'Energy that moves cities.',
       marks: [
-        { type: 'Imagotype', name: 'Lightning symbol', role: 'Conveys energy', image: null, parts: [] },
-        { type: 'Isologo', name: '', role: '', image: null, parts: [] },
+        { type: 'Imagotype', name: 'Lightning symbol', role: 'Conveys energy', image: null, background: null, parts: [] },
+        { type: 'Isologo', name: '', role: '', image: null, background: null, parts: [] },
       ],
       variants: [
-        { id: 0, name: 'Horizontal', usage: 'for web', image: { url: 'blob:volta-h.png', name: 'volta-h.png' } },
+        { id: 0, name: 'Horizontal', usage: 'for web', image: { url: 'blob:volta-h.png', name: 'volta-h.png' }, background: null },
       ],
       clearSpaceUnit: 'the height of the letter X',
       minDigitalPx: 32,
@@ -133,7 +133,7 @@ describe('Logo section – form', () => {
     expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({
         brandName: 'VOLTA',
-        variants: [{ id: 0, name: 'Horizontal', usage: 'for web', image: null }],
+        variants: [{ id: 0, name: 'Horizontal', usage: 'for web', image: null, background: null }],
       }),
     );
   });
@@ -336,8 +336,8 @@ describe('Logo section – mark cards', () => {
           expect.objectContaining({
             type: 'Imagotype',
             parts: [
-              { label: 'Isotype', name: '', role: '', image: { url: 'blob:symbol.png', name: 'symbol.png' } },
-              { label: 'Part 2', name: 'Energy for all', role: '', image: null },
+              { label: 'Isotype', name: '', role: '', image: { url: 'blob:symbol.png', name: 'symbol.png' }, background: null },
+              { label: 'Part 2', name: 'Energy for all', role: '', image: null, background: null },
             ],
           }),
         ],
@@ -506,10 +506,10 @@ describe('Logo section – Logo versions and Clear space pages', () => {
   const volta: LogoData = {
     brandName: 'VOLTA',
     concept: 'Energy that moves cities.',
-    marks: [{ type: 'Imagotype', name: 'Lightning symbol', role: 'Conveys energy', image: null, parts: [] }],
+    marks: [{ type: 'Imagotype', name: 'Lightning symbol', role: 'Conveys energy', image: null, background: null, parts: [] }],
     variants: [
-      { id: 0, name: 'Horizontal', usage: 'for web', image: image('volta-h.png') },
-      { id: 1, name: 'Symbol only', usage: 'for app icons', image: image('volta-s.png') },
+      { id: 0, name: 'Horizontal', usage: 'for web', image: image('volta-h.png'), background: null },
+      { id: 1, name: 'Symbol only', usage: 'for app icons', image: image('volta-s.png'), background: null },
     ],
     clearSpaceUnit: 'the height of the letter X',
     minDigitalPx: 32,
@@ -534,8 +534,8 @@ describe('Logo section – Logo versions and Clear space pages', () => {
       ...volta,
       brandName: '',
       variants: [
-        { id: 0, name: '', usage: '', image: null },
-        { id: 1, name: '', usage: 'for app icons', image: null },
+        { id: 0, name: '', usage: '', image: null, background: null },
+        { id: 1, name: '', usage: 'for app icons', image: null, background: null },
       ],
     };
     render(<LogoVersionsPage logo={empty} coverLogo={null} color="#000000" />);
@@ -546,7 +546,7 @@ describe('Logo section – Logo versions and Clear space pages', () => {
   });
 
   it('Logo versions shows a placeholder when no version says where it is used', () => {
-    const noUsage: LogoData = { ...volta, variants: [{ id: 0, name: 'Horizontal', usage: '', image: null }] };
+    const noUsage: LogoData = { ...volta, variants: [{ id: 0, name: 'Horizontal', usage: '', image: null, background: null }] };
     render(<LogoVersionsPage logo={noUsage} coverLogo={null} color="#000000" />);
 
     expect(screen.getByText('Where each version is used')).toBeInTheDocument();

@@ -14,10 +14,10 @@ const image = { url: 'blob:logo', name: 'logo.png' };
 const volta: LogoData = {
   brandName: 'VOLTA',
   concept: 'Energy that moves cities.',
-  marks: [{ type: 'Imagotype', name: 'Lightning symbol', role: 'Conveys energy', image: null, parts: [] }],
+  marks: [{ type: 'Imagotype', name: 'Lightning symbol', role: 'Conveys energy', image: null, background: null, parts: [] }],
   variants: [
-    { id: 0, name: 'Horizontal', usage: 'for web and long stationery.', image },
-    { id: 1, name: 'Vertical', usage: 'for packaging and social media', image },
+    { id: 0, name: 'Horizontal', usage: 'for web and long stationery.', image, background: null },
+    { id: 1, name: 'Vertical', usage: 'for packaging and social media', image, background: null },
   ],
   clearSpaceUnit: 'the height of the letter X',
   minDigitalPx: 32,
@@ -44,7 +44,7 @@ describe('logo copy', () => {
   });
 
   it('names every mark type when the brand uses several', () => {
-    const mark = (type: 'Logotype' | 'Imagotype' | 'Isotype') => ({ type, name: '', role: '', image: null, parts: [] });
+    const mark = (type: 'Logotype' | 'Imagotype' | 'Isotype') => ({ type, name: '', role: '', image: null, background: null, parts: [] });
 
     expect(anatomyText({ ...volta, marks: [mark('Logotype'), mark('Isotype')] })).toBe(
       'VOLTA works with a Logotype / Wordmark and an Isotype / Brandmark. Each one has its own role:',

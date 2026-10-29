@@ -28,7 +28,12 @@ export function LogoVersionsPage({ logo, coverLogo, color }: LogoVersionsPagePro
 
       <section className="logo-block versions-primary">
         <p className="logo-block-title">2.1 Primary version</p>
-        <figure className="logo-figure" data-empty={!primaryImage}>
+        {/* backgroundColor, not background: an empty box keeps its stripes on top */}
+        <figure
+          className="logo-figure"
+          data-empty={!primaryImage}
+          style={{ backgroundColor: primary.background ?? undefined }}
+        >
           {primaryImage && <img src={primaryImage.url} alt={`${primaryName} version`} />}
         </figure>
         <p className="logo-version-name logo-cut" title={primaryName}>
@@ -46,7 +51,11 @@ export function LogoVersionsPage({ logo, coverLogo, color }: LogoVersionsPagePro
               const name = versionName(variant.name, index + 1)
               return (
                 <li key={index} className="logo-version">
-                  <figure className="logo-figure" data-empty={!variant.image}>
+                  <figure
+                    className="logo-figure"
+                    data-empty={!variant.image}
+                    style={{ backgroundColor: variant.background ?? undefined }}
+                  >
                     {variant.image && <img src={variant.image.url} alt={`${name} version`} />}
                   </figure>
                   <p className="logo-version-name logo-cut" title={name}>

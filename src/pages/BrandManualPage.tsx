@@ -121,8 +121,8 @@ export function BrandManualPage({
   // to its field (see docs/adr/0007 and 0020).
   const sectionForms: Record<string, ReactNode> = {
     cover: <BrandForm onChange={onCoverChange} />,
-    logo: <LogoForm onChange={onLogoChange} />,
-    usage: <UsageForm onChange={onUsageChange} />,
+    logo: <LogoForm onChange={onLogoChange} palette={palette} />,
+    usage: <UsageForm onChange={onUsageChange} palette={palette} />,
     colors: <ColorsForm onChange={onPaletteChange} />,
     typography: <TypographyForm onChange={onTypographyChange} />,
     skin: (
