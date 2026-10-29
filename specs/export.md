@@ -1,7 +1,7 @@
 # Technical Specification: Export to PDF
 
 ## 1. What it does
-Two buttons next to **Apply** download the whole manual as a PDF: one **for print** and one **for the web**. Both have every page of the manual, in its natural order, with the chosen template, orientation, skin and colors, as the preview shows them. They differ in resolution, weight, color space and which color values the Color palette page highlights. When the app has a CMYK server (`cmykserver.md`), the print PDF is in **real CMYK**; without one, it is RGB, as the web PDF always is.
+Two buttons at the top of the sections column download the whole manual as a PDF: one **for print** and one **for the web**. Both have every page of the manual, in its natural order, with the chosen template, orientation, skin and colors, as the preview shows them. They differ in resolution, weight, color space and which color values the Color palette page highlights. When the app has a CMYK server (`cmykserver.md`), the print PDF is in **real CMYK**; without one, it is RGB, as the web PDF always is.
 
 ## Out of Scope
 * Vector PDFs (selectable text, embedded fonts): the pages are drawn as images (ADR 0012). Vector may come later.
@@ -13,7 +13,7 @@ Two buttons next to **Apply** download the whole manual as a PDF: one **for prin
 
 ## 2. Interface
 ### Buttons
-At the top of the sections column, on the right, in this order: **↓ Print PDF**, **↓ Web PDF**, **Apply**. Their accessible names are `Download print PDF` and `Download web PDF`.
+At the top of the sections column, on the right, in this order: **↓ Print PDF**, **↓ Web PDF**. (The Apply buttons sit next to each image field; see `brandmanual.md`.) Their accessible names are `Download print PDF` and `Download web PDF`.
 
 | | Print PDF | Web PDF |
 |---|---|---|
@@ -42,7 +42,7 @@ When `VITE_CMYK_SERVER_URL` is set, **↓ Print PDF** works like this (the web P
 
 If the server cannot be reached, or stops answering during the export, no PDF is made and a dialog shows under the buttons: `The CMYK server cannot be reached, so the print PDF cannot be made in CMYK. Download it in RGB instead?`, with **Download RGB PDF** and **Cancel**. Download RGB PDF makes the print PDF as without a server; Cancel closes the dialog. Any other failure shows `The PDF could not be created. Try again.`
 
-Apply has nothing to do with the export: the PDF shows what the preview shows, so an image still waiting for Apply is not in it.
+The Apply buttons have nothing to do with the export: the PDF shows what the preview shows, so an image still waiting for its Apply is not in it.
 
 ### What each page looks like
 * Every page is drawn as in the **Pages** view (titles at their real size), whatever view is chosen, at the size of an A4 page (`210 × 297 mm`, or `297 × 210 mm` in Landscape).
@@ -83,7 +83,7 @@ Apply has nothing to do with the export: the PDF shows what the preview shows, s
 ### Scenario 1: The Buttons
 * **Given**: The user opens the Brand Manual page.
 * **When**: The page loads.
-* **Then**: "Download print PDF", "Download web PDF" and "Apply" are shown in that order, and the two download buttons are enabled.
+* **Then**: "Download print PDF" and "Download web PDF" are shown in that order, first in the sections column, and both are enabled.
 
 ### Scenario 2: A Complete Manual
 * **Given**: Every section was touched; the title is "My Brand".

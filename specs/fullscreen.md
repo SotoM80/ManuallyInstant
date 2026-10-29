@@ -17,7 +17,7 @@ A presentation mode (one page at a time). A book view (two pages side by side). 
 
 ### The pages
 * Every page, in its **natural order** ("1. Cover" to "10. Mockups"), even when an open section moved its pages to the top of the preview.
-* With the chosen template, orientation and skin, and only the images already applied (ADR 0007): an image waiting for Apply is not shown.
+* With the chosen template, orientation and skin, and only the images already applied (ADRs 0007 and 0020): an image waiting for its Apply is not shown.
 * Drawn like the pages of the PDF (see `export.md` and ADR 0012): at A4 size, in the Pages view, with no motion, and with the guides of the Clear space page drawn but not clickable. The view reuses this way of drawing the pages, **not** the off-screen copy made for the PDF, which is hidden on purpose.
 * The pages have no view transition names (ADR 0006): the preview stays mounted below, with its own.
 * A photo mockup still being composed shows "Preparing…" on its page, as in the preview (ADR 0014); the view opens at once.
@@ -91,7 +91,7 @@ A presentation mode (one page at a time). A book view (two pages side by side). 
 * **Then**: The view fills the window with every page, then closes.
 
 ### Scenario 7: Only Applied Images
-* **Given**: A new Cover logo was chosen but Apply was not clicked.
+* **Given**: A new Cover logo was chosen but "Apply Logo" was not clicked.
 * **When**: The user opens the view.
 * **Then**: The Cover page shows the logo applied before (or its placeholder), as in the preview.
 

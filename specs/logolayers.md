@@ -40,14 +40,14 @@ The first 4 layers in reading order become parts, and the hint **"Only the first
 A card shows at most one of the hints above, for the last file chosen. Choosing another file (or none) clears it.
 
 ### Apply
-The whole logo and the images of the new parts wait for the **same Apply** (see `brandmanual.md` and ADR 0007), even when Apply is pressed while the file is still being read. The labels reach the form and the Anatomy page at once; the images only after Apply.
+The whole logo and the images of the new parts wait for the **card's Apply** (e.g. `Apply Imagotype image`; see `brandmanual.md` and ADR 0020), even when it is pressed while the file is still being read: then the parts arrive already applied. Each new part also has its own Apply, which shows only that part's image. The labels reach the form and the Anatomy page at once; the images only after an Apply.
 
 ### Other files
 A PNG, JPG, WebP or an SVG with fewer than 2 layers works exactly as before: it is the card's image and makes no parts.
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`), in the Logo section, group Anatomy, with at least one mark type ticked.
-* **Postconditions**: A card with no parts that gets a layered SVG has one part per layer (at most 4), in reading order, each with its label and its image. After Apply, the Anatomy page shows them.
+* **Postconditions**: A card with no parts that gets a layered SVG has one part per layer (at most 4), in reading order, each with its label and its image. After the card's Apply, the Anatomy page shows them.
 
 ## 4. Invariants
 * The user's SVG is only ever drawn **as an image** (never placed in the page as markup), so nothing in it can run.
@@ -56,7 +56,7 @@ A PNG, JPG, WebP or an SVG with fewer than 2 layers works exactly as before: it 
 * A card never has more than 4 parts.
 * The image of a part draws exactly what its layer draws in the file, with the file's own styles.
 * Hidden layers and layers that draw nothing are never turned into parts.
-* Text reaches the form and the page at once; images only after Apply, all in the same Apply.
+* Text reaches the form and the page at once; images only after an Apply. The card's Apply shows the card's image and the parts made from it, all at once.
 
 ## Failure Modes
 * **Wrong type or bigger than 5 MB**: the same errors as today (`"Use a PNG, JPG, SVG or WebP image"`, `"The image must be 5 MB or smaller"`); no parts are made.
@@ -98,8 +98,13 @@ A PNG, JPG, WebP or an SVG with fewer than 2 layers works exactly as before: it 
 
 ### Scenario 7: Parts Wait for Apply
 * **Given**: The user has chosen a layered SVG for the Imagotype card.
-* **When**: The user looks at the Anatomy page before and after clicking Apply.
-* **Then**: Before Apply the page shows the labels of the parts with empty boxes; after Apply it shows the whole logo and the image of each part.
+* **When**: The user looks at the Anatomy page before and after clicking "Apply Imagotype image".
+* **Then**: Before it the page shows the labels of the parts with empty boxes; after it the page shows the whole logo and the image of each part, and the parts' own Apply buttons are off.
+
+### Scenario 7b: Apply While the File Is Read
+* **Given**: The user has just chosen a layered SVG for the Imagotype card, and its layers are still being read.
+* **When**: The user clicks "Apply Imagotype image" before the parts appear.
+* **Then**: When the parts appear, the Anatomy page already shows their images, and their own Apply buttons are off.
 
 ### Scenario 8: Files Without Layers
 * **Given**: The Imagotype card has no parts.

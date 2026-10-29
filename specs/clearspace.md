@@ -11,12 +11,12 @@ Detecting the shapes of the logo (circles, angles) or measuring its proportions 
 * **Unit X**: free text, the end of "which equals …". Starts as `the height of the letter X`.
 * **Min digital size (px)**: a number greater than 0. Starts at `32`.
 * **Min print size (mm)**: a number greater than 0. Starts at `15`.
-* **Construction grid (optional)**: PNG, JPG, SVG or WebP, up to 5 MB. A new image waits for **Apply** (see `brandmanual.md` and ADR 0007).
+* **Construction grid (optional)**: PNG, JPG, SVG or WebP, up to 5 MB. A new image waits for its own **Apply**, next to the field (`Apply Construction grid`; see `brandmanual.md` and ADR 0020).
 * **Remove grid**: shown once a grid is chosen. It removes the uploaded grid at once (no Apply: it is not a new image), so 3.2 goes back to the grid drawn by the app.
 * **Grid modules**: **12**, **16** or **24**, with one always chosen (default **16**): how many squares fit across the logo in the grid the app draws when none is uploaded. It changes the grid at once (no Apply). It is turned off while an uploaded grid is shown, since it has nothing to change then.
 * **X (modules)**: **1**, **1.5**, **2** or **3**, with one always chosen (default **1**): how many modules X measures. It sets the free area of 3.1 and the margin of the grid in 3.2, so X is the same measure in both blocks. It changes them at once (no Apply).
 * **Top ruler** and **Side ruler**: optional sequences of steps in X, separated by spaces, e.g. `X 1.5X X 1.5X X` (a step is an optional number, with a point or a comma, followed by X). Empty → no ruler.
-* A short note under Grid modules says where 3.2 comes from: `Drawn from your logo (Cover or Version 1). No upload needed.`, `Click Apply to show this grid instead of the one drawn from your logo.` (a grid is chosen but not applied) or `Your uploaded grid is shown. Remove it to use the grid drawn from your logo.`
+* A short note under Grid modules says where 3.2 comes from: `Drawn from your logo (Cover or Version 1). No upload needed.`, `Click Apply to show this grid instead of the one drawn from your logo.` (the Apply next to the grid field) (a grid is chosen but not applied) or `Your uploaded grid is shown. Remove it to use the grid drawn from your logo.`
 
 ### Clear space page
 * Header: the brand name and the heading "Clear space".
@@ -43,7 +43,7 @@ The page never shows a sentence with a gap or a wrong number:
 
 ## 4. Invariants
 * The minimum sizes on the page are always numbers greater than 0.
-* Text reaches the page at once; a new grid image only after Apply.
+* Text reaches the page at once; a new grid image only after its Apply.
 * The diagram always keeps the logo inside its frame, with X on every side, in every template, orientation and view.
 
 ## Failure Modes
@@ -78,7 +78,7 @@ No field is required. A wrong value is flagged at once, with a red border, and t
 ### Scenario 5: Uploaded Construction Grid
 * **Given**: No grid is uploaded, so 3.2 shows a striped box.
 * **When**: The user chooses a grid image.
-* **Then**: 3.2 keeps the striped box until the user clicks Apply, and then shows the grid.
+* **Then**: 3.2 keeps the striped box until the user clicks "Apply Construction grid", and then shows the grid.
 
 ### Scenario 6: Grid Drawn by the App
 * **Given**: A Cover logo is applied and no grid is uploaded.
@@ -92,7 +92,7 @@ No field is required. A wrong value is flagged at once, with a red border, and t
 
 ### Scenario 8: The Uploaded Grid Wins
 * **Given**: 3.2 shows the grid drawn by the app.
-* **When**: The user uploads a grid image and clicks Apply.
+* **When**: The user uploads a grid image and clicks "Apply Construction grid".
 * **Then**: 3.2 shows the uploaded image instead.
 
 ### Scenario 9: Removing the Uploaded Grid

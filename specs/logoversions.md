@@ -11,7 +11,7 @@ Negative and monochrome versions, and colour rules per version. Editing or cropp
 Each version is a block of an accordion, like the colors of the Colors section (see `colorpalette.md`): only one is open; a folded one shows its name and its file name.
 * **Version N name**: free text, e.g. "Horizontal".
 * **Version N use for**: the end of the sentence "Use the … version …", e.g. "for web and long stationery".
-* **Version N image**: PNG, JPG, SVG or WebP, up to 5 MB. A new image waits for **Apply** (see `brandmanual.md` and ADR 0007).
+* **Version N image**: PNG, JPG, SVG or WebP, up to 5 MB. A new image waits for its own **Apply**, next to the field (`Apply Version N image`; see `brandmanual.md` and ADR 0020).
 * **Remove** (only when there is more than one version) and **Add version** (disabled at 4).
 * Version 1 is marked **· Primary**.
 
@@ -37,11 +37,11 @@ The page never shows a sentence with a gap:
 ## 4. Invariants
 * Every version has a stable id (kept while it exists, never reused), so what points at a version (a mockup, see `mockups.md`) keeps pointing at it when others are removed.
 * There are always between 1 and 4 versions; the first one is always the Primary.
-* Text reaches the page at once; a new image only after Apply.
+* Text reaches the page at once; a new image only after its Apply.
 * The page keeps the order of the form.
 
 ## Failure Modes
-No field is required. A wrong file is flagged as soon as it is chosen, with a red border; it never turns Apply on, and the page keeps the image it had:
+No field is required. A wrong file is flagged as soon as it is chosen, with a red border; it never turns its Apply on, and the page keeps the image it had:
 * **Not an image of an accepted type**: `"Use a PNG, JPG, SVG or WebP image"`.
 * **Bigger than 5 MB**: `"The logo must be 5 MB or smaller"`.
 
@@ -55,7 +55,7 @@ No field is required. A wrong file is flagged as soon as it is chosen, with a re
 ### Scenario 2: The Cover Logo as Primary
 * **Given**: A Cover logo is applied and Version 1 has no image.
 * **When**: The user looks at the Logo versions page.
-* **Then**: 2.1 shows the Cover logo. After the user chooses an image for Version 1 and clicks Apply, it shows that image instead.
+* **Then**: 2.1 shows the Cover logo. After the user chooses an image for Version 1 and clicks "Apply Version 1 image", it shows that image instead.
 
 ### Scenario 3: No Gaps While Typing
 * **Given**: The brand name and the version names are empty, and only Version 2 has a use for ("for app icons").

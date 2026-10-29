@@ -25,7 +25,7 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 |---|---|
 | Nav menu links | hover: lift 2px; press: shrink; the current page's link pops |
 | Home "Start" | hover: lift, shadow and grow a little; press: shrink |
-| Apply (above the Cover section) | hover: lift and shadow; press: shrink. **Disabled** → faded, no motion. **Applied** → accent ring pulses twice and a ✓ pops in next to "Apply" (decoration only: the accessible name stays "Apply") |
+| Apply (next to each image field) | hover: lift and shadow; press: shrink. **Disabled** → faded, no motion. **Applied** → accent ring pulses twice and a ✓ pops in next to "Apply" (decoration only: the accessible name, e.g. "Apply Logo", does not change) |
 | Logo "Choose file" | **no motion**: only the border color changes on hover |
 | Segmented controls (Orientation, Preview view, Template) | hover tints the options not chosen; press shrinks; the chosen one pops |
 | Autocomplete lists (Font family, Font style, Font size, Primary font, Secondary font) | **no bounce**: on open, the floating list fades in, rises 4px and grows from 96% out of the field (`--ease-smooth`, about 0.45 s); it closes at once. Hovering an option tints it |
@@ -53,17 +53,17 @@ Shared keyframes: `pop` (grows to 1.12 and back), `shake` (left-right, "no"), `p
 ## 5. Given-When-Then Test Criteria
 
 ### Scenario 1: Apply Disabled
-* **Given**: No new image is waiting.
-* **When**: The user looks at Apply.
+* **Given**: No new Cover logo is waiting.
+* **When**: The user looks at "Apply Logo".
 * **Then**: It is disabled and faded, and does not move on hover.
 
 ### Scenario 2: Apply
 * **Given**: The user chose a new Cover logo.
-* **When**: The user clicks Apply.
-* **Then**: Apply pulses with a ✓ (`data-feedback="saved"`), its accessible name is still "Apply", and the cover grows into the page with the new logo.
+* **When**: The user clicks "Apply Logo".
+* **Then**: It pulses with a ✓ (`data-feedback="saved"`), its accessible name is still "Apply Logo", and the cover grows into the page with the new logo.
 
 ### Scenario 3: Feedback Can Repeat
-* **Given**: Apply has just pulsed.
+* **Given**: "Apply Logo" has just pulsed.
 * **When**: Its animation ends.
 * **Then**: The button goes back to `data-feedback="idle"`, so the next Apply animates again.
 

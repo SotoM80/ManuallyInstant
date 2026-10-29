@@ -34,7 +34,7 @@ The content of the Logo section (it will have its own future spec). The content 
 
   Pages whose section is not built yet show "Coming soon".
   The preview stays visible while the user scrolls the sections (sticky).
-* **Right column — Manual Sections**: A region labeled "Manual sections". At the top, above the Cover section, the **Apply** button (see *Live Preview and Apply* below). Below it, the region lists every section needed to create the manual, one below the other, numbered, in this order:
+* **Right column — Manual Sections**: A region labeled "Manual sections". At the top, above the Cover section, the two PDF downloads (see `export.md`). Below them, the region lists every section needed to create the manual, one below the other, numbered, in this order:
   1. **Cover**: brand manual title, Designed by and logo (see `cover.md` and `titlefild.md`).
   2. **Logo**: "Coming soon".
   3. **Usage**: examples of the correct and incorrect use of the brand (see `usage.md`).
@@ -55,10 +55,12 @@ The sections work as an **accordion**, like the colors of the Colors section (se
 * **Motion** (no bounce, `--ease-smooth`): the work area unfolds from no height to its full height, settling slowly, while its content fades in and glides down a few pixels; folding is the same in reverse, a little faster. The arrow turns with it, and the open section gets an accent border and a soft shadow.
 
 ### Live Preview and Apply
-The sections have no Save buttons. Everything typed, picked or chosen in a section reaches the preview at once, except new images (see ADR 0007):
-* Choosing a new or replacing image (the Cover logo, or any image of the Logo section) turns **Apply** on. The preview keeps the image it had (or its placeholder) until the user clicks Apply.
-* Apply shows every image waiting in every section at once, then is disabled again. It is disabled from the start, and a wrong file never turns it on.
-* It is only as wide as its label and sits on the right. When clicked, an accent ring pulses twice and a ✓ pops in next to "Apply" (decoration only: the accessible name stays "Apply").
+The sections have no Save buttons. Everything typed, picked or chosen in a section reaches the preview at once, except new images (see ADRs 0007 and 0020):
+* Every image field that waits has its own **Apply** button, on the right of the field, after the file's name: the Cover logo; every card, part, version and the construction grid of Logo; every example of Usage. (The Mockups photo upload opens the template editor at once and has no Apply; see `mockups.md`.)
+* Choosing a new or replacing image turns **that field's** Apply on. The preview keeps the image it had (or its placeholder) until the user clicks it.
+* Each Apply shows **only its own image**, then is disabled again. Other fields keep waiting for their own Apply. It is disabled from the start, and a wrong file never turns it on. The one exception is a layered SVG (see `logolayers.md`): the Apply of its card also shows the parts made from it.
+* Its visible text is "Apply"; its accessible name is "Apply" and the field's label without "(optional)": `Apply Logo`, `Apply Isotype image`, `Apply Version 1 image`, `Apply Construction grid`, `Apply Correct use example 1 image`… Its tooltip says "Show this image in the manual", or "Choose a new image to apply it" while disabled.
+* It is only as wide as its label. When clicked, an accent ring pulses twice and a ✓ pops in next to "Apply" (decoration only: the accessible name does not change).
 
 ### The Open Section's Pages Come First
 So the page being edited is always in view without scrolling:
@@ -66,7 +68,7 @@ So the page being edited is always in view without scrolling:
 * Folding the section puts every page back in its natural order. Opening another section moves that section's pages to the top instead.
 * The pages glide softly to their new places, with no bounce: the same timing and easing as the accordion (about 0.5 s, `--ease-smooth`).
 * The pages of the open section get an accent outline, and each page keeps its natural number in its caption (e.g. "9. Typography" while it is first).
-* Apply has nothing to do with the order: it only shows waiting images.
+* An Apply has nothing to do with the order: it only shows its waiting image.
 * With Cover open (as on start) nothing moves, because Cover is already first.
 * **Logo areas**: the Logo section has four areas, each with its page: Concept → Brand concept, Anatomy → Anatomy, Versions → Logo versions, Clear space & size → Clear space. The area being worked in decides the **main page**: it comes first, with the accent outline, followed by the other Logo pages. An area becomes the one being worked in when the user clicks anywhere in it (a field, its title or an empty spot) or reaches it with the keyboard. Scrolling inside Logo does not change it, so the form and the preview never move at the same time. When Logo opens, Concept is the first one.
 * The open **section** moves too: it goes to the top of the right column (keeping its number, e.g. "5. Typography") and the column is pushed down so it starts at the same height as its page. The form and its page sit side by side. Folding it puts every section back in order. The sections glide like the pages. If the top of the column is above the screen when a section opens, the page scrolls smoothly up to it. On narrow screens (one column) the sections move but are not pushed down.
@@ -84,7 +86,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ## 4. Invariants
 * The preview always shows every page of the manual, in the same order, whether they have content or not.
 * The sections list always shows every section, in the same order, whether it is built or not.
-* Every page of the preview changes as soon as its section changes. Only new images wait, for Apply.
+* Every page of the preview changes as soon as its section changes. Only new images wait, each for its own Apply.
 * All the pages always share the same orientation.
 * The chosen orientation is kept when the user moves between pages. It is only reset (to Portrait) when the browser page is refreshed.
 * Every view always shows the same pages, in the same order, with the same orientation.
@@ -116,9 +118,14 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Then**: The Cover shows "My Brand" in blue at once, with no button.
 
 ### Scenario 5: Only New Images Wait for Apply
-* **Given**: The user is on the Brand Manual page; Apply, above the Cover section, is disabled.
+* **Given**: The user is on the Brand Manual page; "Apply Logo", next to the Cover's Logo field, is disabled, and there is no Apply above the Cover section.
 * **When**: The user chooses a logo in the Cover section.
-* **Then**: Apply turns on, and the Cover still shows "Your logo" until the user clicks it.
+* **Then**: "Apply Logo" turns on, and the Cover still shows "Your logo" until the user clicks it.
+
+### Scenario 5b: Each Apply Shows Only Its Image
+* **Given**: The user chose an image for Version 1 and another for Version 2, without applying them.
+* **When**: The user clicks "Apply Version 1 image".
+* **Then**: The Logo versions page shows the Version 1 image; Version 2 keeps its placeholder, and "Apply Version 2 image" is still on.
 
 ### Scenario 6: Changing the Page Orientation
 * **Given**: The user is on the Brand Manual page and Portrait is selected (default).
@@ -163,7 +170,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 ### Scenario 13: The Open Section's Page Comes First
 * **Given**: The user is on the Brand Manual page, with Cover open and the pages in their natural order.
 * **When**: The user opens Typography.
-* **Then**: The Typography page is first in the preview, with an accent outline and the caption "9. Typography". Apply stays off.
+* **Then**: The Typography page is first in the preview, with an accent outline and the caption "9. Typography". Every Apply stays off.
 
 ### Scenario 14: Folding Puts the Pages Back
 * **Given**: Colors is open and the Color palette page is first.

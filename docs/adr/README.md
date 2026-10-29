@@ -18,7 +18,7 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0004](0004-templates-change-layout-not-content.md) | Templates change layout, not content | Accepted | 2026-10-11 |
 | [0005](0005-google-fonts-via-css-api.md) | Load Google Fonts through the CSS API | Accepted | 2026-10-11 |
 | [0006](0006-motion-with-css-and-view-transitions.md) | Motion with CSS and native browser APIs, no animation library | Accepted | 2026-10-11 |
-| [0007](0007-live-preview-with-apply-for-images.md) | Live preview, with one Apply button for new images | Accepted | 2026-10-14 |
+| [0007](0007-live-preview-with-apply-for-images.md) | Live preview, with one Apply button for new images | Accepted (amended by 0020) | 2026-10-14 |
 | [0008](0008-construction-grid-from-visible-pixels.md) | Construction grid drawn from the logo's visible pixels | Accepted | 2026-10-15 |
 | [0009](0009-skins-drawn-in-svg.md) | Skins drawn in SVG, measured in mm | Accepted | 2026-10-16 |
 | [0010](0010-skins-as-a-stack-of-layers.md) | Skins as a stack of layers, reordered with buttons | Accepted | 2026-10-16 |
@@ -29,3 +29,4 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0015](0015-logo-layers-from-svg.md) | Logo layers read from SVG in the browser | Accepted | 2026-10-20 |
 | [0018](0018-optional-stateless-cmyk-server.md) | An optional, stateless server, only for CMYK | Accepted | 2026-10-28 |
 | [0019](0019-real-cmyk-with-icc-profile.md) | Real CMYK with an ICC profile, one page per request | Accepted | 2026-10-28 |
+| [0020](0020-one-apply-per-image.md) | One Apply button next to each image | Proposed | 2026-10-29 |

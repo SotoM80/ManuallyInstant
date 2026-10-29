@@ -1,7 +1,7 @@
 # ADR 0007: Live preview, with one Apply button for new images
 
 ## Status
-Accepted — 2026-10-14
+Accepted — 2026-10-14 (amended by ADR 0020: one Apply next to each image, not one at the top)
 
 ## Context
 Each section (Cover, Logo, Colors, Typography) had its own Save button. The preview only changed after Save, so trying out a font, a color or a title meant clicking Save and scrolling back to the preview every time. The forms are where the whole manual starts, and they have many options that the user wants to compare on the fly.

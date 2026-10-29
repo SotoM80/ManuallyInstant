@@ -36,7 +36,7 @@ A new section of the accordion, after Skin (it uses the logo versions of Logo an
 
 A product that is unticked keeps its color and logo version: ticking it again brings them back. They are only reset when the browser page is refreshed.
 
-Everything is live: there is no Apply (ADR 0007). A new logo image still waits for Apply in the Logo section, and the mockups show it once applied.
+Everything is live: there is no Apply (ADR 0007). A new logo image still waits for its Apply in the Logo section, and the mockups show it once applied.
 
 Opening the section features the **Mockups** page (`SECTION_PAGES.mockups = ['Mockups']`).
 
@@ -189,7 +189,7 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 ### Scenario 9: A Version with No Image Yet
 * **Given**: The Mug's Logo is Version 2, which has no image.
 * **When**: The user looks at the page and the Mug's block.
-* **Then**: The Mug shows the Primary image (or the Cover logo, when the Primary has none), and its select still says Version 2; once Version 2 gets an image and Apply is clicked, the Mug shows it.
+* **Then**: The Mug shows the Primary image (or the Cover logo, when the Primary has none), and its select still says Version 2; once Version 2 gets an image and "Apply Version 2 image" is clicked, the Mug shows it.
 
 ### Scenario 10: A Removed Version
 * **Given**: The T-shirt's Logo is Version 3, and the Mug's is Version 2.

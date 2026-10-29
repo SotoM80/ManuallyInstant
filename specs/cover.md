@@ -1,7 +1,7 @@
 # Technical Specification: Cover Section
 
 ## 1. What it does
-The first section of the Brand Manual page is **Cover** (portada). It collects everything shown on the cover page of the manual: the **brand manual title** (with its style), **Designed by** and the **logo**. The Cover page of the preview shows each of them as soon as it is typed or chosen; a new logo waits for the **Apply** button (see `brandmanual.md` and ADR 0007). Where each one sits on the page depends on the chosen template.
+The first section of the Brand Manual page is **Cover** (portada). It collects everything shown on the cover page of the manual: the **brand manual title** (with its style), **Designed by** and the **logo**. The Cover page of the preview shows each of them as soon as it is typed or chosen; a new logo waits for its **Apply** button, next to the Logo field ("Apply Logo"; see `brandmanual.md` and ADR 0020). Where each one sits on the page depends on the chosen template.
 
 ## Out of Scope
 Choosing a template and the layout of each template (see `templates.md`). The Logo page and section (they will reuse this same logo later). Cropping or editing the logo (the Logo size field only scales it). The font and size of "Designed by" (its color is the Text color). Saving anything between sessions.
@@ -48,7 +48,7 @@ The position of the title, logo and "Designed by" belongs to the template, not t
 * **Postconditions**: The Cover page shows what is typed in the title and Designed by, and the last applied logo, placed by the current template.
 
 ## 4. Invariants
-* Text, style, colors and Logo size reach the Cover at once. A new or replaced logo reaches it only after Apply; until then the Cover keeps the logo applied before (or its placeholder).
+* Text, style, colors and Logo size reach the Cover at once. A new or replaced logo reaches it only after "Apply Logo"; until then the Cover keeps the logo applied before (or its placeholder).
 * The Cover always shows the three slots (content or placeholder), in the positions of the current template.
 * The title, logo and "Designed by" always stay inside the page, with a margin around them and space between them, in both orientations and both preview views. Margins and spacing grow with the page (they are a percentage of its size). The logo is scaled to fit its space: bigger in Pages view, smaller in Grid view.
 * The Logo size only shrinks the logo inside its area, so the logo never leaves the page, at any size.
@@ -56,7 +56,7 @@ The position of the title, logo and "Designed by" belongs to the template, not t
 * Nothing is stored between sessions: refreshing the browser clears the Cover.
 
 ## Failure Modes
-No field is required: an empty field shows its placeholder on the Cover. A wrong file is flagged as soon as it is chosen, with a red border; it never turns Apply on, and the Cover keeps the logo it had:
+No field is required: an empty field shows its placeholder on the Cover. A wrong file is flagged as soon as it is chosen, with a red border; it never turns "Apply Logo" on, and the Cover keeps the logo it had:
 * **Logo is not an image of an accepted type**: `"Use a PNG, JPG, SVG or WebP image"`.
 * **Logo bigger than 5 MB**: `"The logo must be 5 MB or smaller"`.
 
@@ -75,24 +75,24 @@ The rules for an empty title and invalid style fields are in `titlefild.md`.
 * **Then**: The Cover shows "Your brand manual title" again, and no error is shown.
 
 ### Scenario 3: A New Logo Waits for Apply
-* **Given**: Apply is disabled.
+* **Given**: "Apply Logo", next to the Logo field, is disabled.
 * **When**: The user chooses a PNG logo.
-* **Then**: Apply turns on and the Cover still shows "Your logo". When the user clicks Apply, the logo appears in the middle of the Cover and Apply is disabled again.
+* **Then**: "Apply Logo" turns on and the Cover still shows "Your logo". When the user clicks it, the logo appears in the middle of the Cover and "Apply Logo" is disabled again.
 
 ### Scenario 4: Replacing the Logo
 * **Given**: The Cover shows an applied logo.
 * **When**: The user chooses another PNG.
-* **Then**: The Cover keeps the first logo until the user clicks Apply.
+* **Then**: The Cover keeps the first logo until the user clicks "Apply Logo".
 
 ### Scenario 5: Wrong File Type
 * **Given**: The user is on the Cover section.
 * **When**: The user chooses a PDF as the logo.
-* **Then**: Logo shows "Use a PNG, JPG, SVG or WebP image", Apply stays disabled and the Cover does not change.
+* **Then**: Logo shows "Use a PNG, JPG, SVG or WebP image", "Apply Logo" stays disabled and the Cover does not change.
 
 ### Scenario 6: File Too Big
 * **Given**: The user is on the Cover section.
 * **When**: The user chooses a PNG bigger than 5 MB.
-* **Then**: Logo shows "The logo must be 5 MB or smaller", and Apply stays disabled.
+* **Then**: Logo shows "The logo must be 5 MB or smaller", and "Apply Logo" stays disabled.
 
 ### Scenario 7: Logo Size
 * **Given**: The Cover shows an applied logo at Medium.
