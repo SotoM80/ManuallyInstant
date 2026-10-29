@@ -1,7 +1,7 @@
 # ADR 0022: Image boxes styled by the Skin, through CSS variables
 
 ## Status
-Proposed — 2026-10-29
+Accepted — 2026-10-29
 
 ## Context
 The boxes that hold the logo's images on the inner pages (Anatomy cards and parts, Logo versions, the construction grid of Clear space, Usage examples) all share one rule, `.logo-figure` in `src/templates/shared.css`: 4 px corners, the image 8 % in from each side, and a 1 px outline in the page text color at 15 %. No template changes it (ADR 0004 keeps templates to layout). A brand has its own look: square or round corners, more or less air around the logo, a frame or none. It should be set once and hold on every page, so the manual stays consistent.

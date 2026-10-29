@@ -392,20 +392,22 @@
 }
 
 /* An image area: the image fits inside it (contain), whatever its shape, without pushing
-   anything. The faint outline shows the area even with a transparent logo. */
+   anything. The faint outline shows the area even with a transparent logo. Its corners, the
+   room around the image and the outline come from the Skin's Image boxes (specs/imageboxes.md),
+   set on each inner page; the fallbacks are the defaults. */
 .logo-figure {
   position: relative;
   min-height: 24px;
   margin: 0;
-  border-radius: 4px;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 15%, transparent);
+  border-radius: var(--box-radius, 4px);
+  box-shadow: var(--box-outline, inset 0 0 0 1px color-mix(in srgb, currentColor 15%, transparent));
 }
 
 .logo-figure img {
   position: absolute;
-  inset: 8%;
-  width: 84%;
-  height: 84%;
+  inset: var(--box-margin, 8%);
+  width: calc(100% - 2 * var(--box-margin, 8%));
+  height: calc(100% - 2 * var(--box-margin, 8%));
   object-fit: contain;
 }
 
@@ -762,7 +764,15 @@
 /* Brand concept: the Cover's logo takes the room under the text */
 .concept-logo {
   min-height: 0;
+  border-radius: 4px;
   box-shadow: none; /* no frame: the logo stands on the page */
+}
+
+/* Not an image box: the Skin's Image boxes never move the Brand concept logo */
+.concept-logo img {
+  inset: 8%;
+  width: 84%;
+  height: 84%;
 }
 
 .concept-logo[data-empty='true'] {

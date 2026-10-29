@@ -46,6 +46,7 @@ While a HEX is half typed or not valid, the page keeps the last valid choice (a 
 * `src/types.ts`: `background: string | null` (`"#RRGGBB"` or none) on `MarkCard`, `MarkPart`, `LogoVariant` and `UsageExample`.
 * `src/components/SkinColorField.tsx`: a new `allowNone` prop; with it, `value` may be `null` and the No background chip is shown.
 * `LogoForm.tsx` and `UsageForm.tsx` keep the background of each card, part, version and example, and send it with the rest of the data.
+* `src/components/MoreArea.tsx`: the More area. Its content is only mounted while it is open: with one per image, keeping every color picker mounted made each change of the manual about 3 times slower. A HEX half typed in a folded area is dropped; the page keeps the last valid choice.
 * `AnatomyPage.tsx`, `LogoVersionsPage.tsx`, `UsagePage.tsx`, `ClearSpacePage.tsx` and `ClearSpaceDiagram.tsx` paint it.
 
 ## 3. Preconditions & Postconditions

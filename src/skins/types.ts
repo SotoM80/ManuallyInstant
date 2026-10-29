@@ -20,8 +20,17 @@ export type SkinLayer = {
 export type Skin = {
   pageBackground: string
   pageText: string
+  boxes: ImageBoxes
   layers: SkinLayer[]
   nextId: number
+}
+
+// The look of every image box of the inner pages, in px and % (specs/imageboxes.md, ADR 0022)
+export type ImageBoxes = {
+  radius: number // corner radius, 0–24 px
+  margin: number // room between the image and the edge, 0–20 % of the box
+  outline: boolean
+  outlineWidth: number // 1–4 px, kept while the outline is off
 }
 
 export type PageColorKey = 'pageBackground' | 'pageText'

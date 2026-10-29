@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import { SkinBackdrop } from './pages/SkinBackdrop'
 import { SkinColorField } from './SkinColorField'
 import { SKIN_PRESETS, SKIN_TYPES, controlMax, findPreset } from '../skins/presets'
 import { SKIN_DRAWINGS } from '../skins/draw'
 import { newLayerColors } from '../skins/colors'
+import { BOX_CONTROLS, setBoxes } from '../skins/boxes'
 import {
   MAX_LAYERS,
   addLayer,
@@ -173,6 +174,47 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
           palette={palette}
         />
       ))}
+
+      {/* The look of every image box of the inner pages (specs/imageboxes.md) */}
+      <fieldset className="logo-form-group skin-boxes">
+        <legend>Image boxes</legend>
+        {BOX_CONTROLS.map((control) => {
+          const id = `skin-boxes-${control.key}`
+          const value = skin.boxes[control.key]
+          return (
+            <Fragment key={control.key}>
+              {/* Outline on or off, right above its Thickness */}
+              {control.key === 'outlineWidth' && (
+                <label className="skin-check">
+                  <input
+                    type="checkbox"
+                    checked={skin.boxes.outline}
+                    onChange={(event) => onChange(setBoxes(skin, { outline: event.target.checked }))}
+                  />
+                  Outline
+                </label>
+              )}
+              <div className="skin-control">
+                <label htmlFor={id}>{control.label}</label>
+                <input
+                  id={id}
+                  type="range"
+                  min={control.min}
+                  max={control.max}
+                  step={control.step}
+                  value={value}
+                  disabled={control.key === 'outlineWidth' && !skin.boxes.outline}
+                  onChange={(event) => onChange(setBoxes(skin, { [control.key]: Number(event.target.value) }))}
+                />
+                <output htmlFor={id}>
+                  {value}
+                  {control.unit}
+                </output>
+              </div>
+            </Fragment>
+          )
+        })}
+      </fieldset>
 
       <button
         ref={addButton}
