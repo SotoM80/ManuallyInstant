@@ -4,7 +4,7 @@
 Part of the **Logo** section. The user lists the official versions of the logo (e.g. Horizontal, Vertical, Symbol only): from **1 to 4**, each with a **name**, what it is **used for** and an **image**. The first one is the **Primary** version. The **Logo versions** page of the preview shows them as chapter 2 of the Logo section, as soon as they are typed.
 
 ## Out of Scope
-Negative and monochrome versions, and colour rules per version. Editing or cropping the images. The Clear space page (see `clearspace.md`; its diagram uses the Primary version).
+Colour rules per version (a version can show its image on a background of its own, see `imagebackground.md`, but the app does not make a negative or monochrome version from another). Editing or cropping the images. The Clear space page (see `clearspace.md`; its diagram uses the Primary version).
 
 ## 2. Interface
 ### Form (group "Versions" of the Logo section)
@@ -12,6 +12,7 @@ Each version is a block of an accordion, like the colors of the Colors section (
 * **Version N name**: free text, e.g. "Horizontal".
 * **Version N use for**: the end of the sentence "Use the … version …", e.g. "for web and long stationery".
 * **Version N image**: PNG, JPG, SVG or WebP, up to 5 MB. A new image waits for its own **Apply**, next to the field (`Apply Version N image`; see `brandmanual.md` and ADR 0020).
+* **More** under the image: the version's **Background** color, none by default (see `imagebackground.md`).
 * **Remove** (only when there is more than one version) and **Add version** (disabled at 4).
 * Version 1 is marked **· Primary**.
 
