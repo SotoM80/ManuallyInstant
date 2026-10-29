@@ -20,9 +20,9 @@ Design agencies fill in seven sections, and the brand manual updates **live** ne
 7. **Mockups**: the logo on up to 4 products, illustrated by the app or from real photos.
 
 Key features:
-- **Two PDFs in one click**: **↓ Print PDF** (300 dpi, CMYK values highlighted) and **↓ Web PDF** (144 dpi, HEX and RGB highlighted, lightweight), next to Apply. Every page, in the chosen template, orientation and skin, looks as in the preview; empty sections are pointed out before downloading.
+- **Two PDFs in one click**: **↓ Print PDF** (300 dpi, CMYK values highlighted) and **↓ Web PDF** (144 dpi, HEX and RGB highlighted, lightweight), at the top of the sections. Every page, in the chosen template, orientation and skin, looks as in the preview; empty sections are pointed out before downloading.
 - **Real CMYK for print** *(optional)*: with the small CMYK server running, the print PDF comes out in real CMYK with an ICC profile (FOGRA39 for now), and the palette shows the same values as Illustrator (within a point). If the server cannot be reached, the app offers the RGB print PDF instead.
-- **Live preview**: text, colors and fonts show as you type. A new image waits for the **Apply** button, so it is never swapped in by accident.
+- **Live preview**: text, colors and fonts show as you type. A new image waits for the **Apply** button next to its field, so it is never swapped in by accident, and each Apply shows only its own image.
 - **Full screen**: the **⤢ Full screen** button in the preview shows the 10 pages one below the other, drawn as in the PDF and each one fitted whole to the viewer's screen. Esc or **Exit full screen** closes it.
 - **Work side by side**: when a section opens, it moves to the top of its column and its page moves to the top of the preview, at the same height. In the Logo and Usage sections, clicking in an area (Concept, Anatomy, Versions…, or Correct use and Incorrect use) makes its page the main one.
 - **Logo scrolls on its own**: the long Logo section scrolls inside, so the preview stays still; at its top or bottom, the page scrolls on.
@@ -52,7 +52,7 @@ Limits: nothing is saved between sessions (refreshing clears the manual). Withou
 
 ### How it was built
 - **Specs first**: each feature is described before it is coded, with Given-When-Then scenarios, in [`specs/`](specs/).
-- **Decisions on record**: every important choice, with the options weighed, is an Architecture Decision Record in [`docs/adr/`](docs/adr/README.md). For example: [live preview with Apply for images](docs/adr/0007-live-preview-with-apply-for-images.md).
+- **Decisions on record**: every important choice, with the options weighed, is an Architecture Decision Record in [`docs/adr/`](docs/adr/README.md). For example: [live preview with Apply for images](docs/adr/0007-live-preview-with-apply-for-images.md), later [one Apply next to each image](docs/adr/0020-one-apply-per-image.md).
 - **Tested**: around 460 tests with Jest and React Testing Library, written from the spec scenarios, and 23 for the CMYK server with Node's test runner.
 - **One feature at a time**: each change is tried on its own branch and only reaches `main` once it works.
 
@@ -135,9 +135,9 @@ Las agencias de diseño completan siete secciones, y el manual de marca se actua
 7. **Mockups**: el logo en hasta 4 productos, ilustrados por la app o a partir de fotos reales.
 
 Funciones clave:
-- **Dos PDF con un clic**: **↓ Print PDF** (300 dpi, valores CMYK destacados) y **↓ Web PDF** (144 dpi, HEX y RGB destacados, liviano), junto a Apply. Todas las hojas, con la plantilla, la orientación y la skin elegidas, se ven como en la vista previa; antes de descargar se avisa si hay secciones vacías.
+- **Dos PDF con un clic**: **↓ Print PDF** (300 dpi, valores CMYK destacados) y **↓ Web PDF** (144 dpi, HEX y RGB destacados, liviano), arriba de las secciones. Todas las hojas, con la plantilla, la orientación y la skin elegidas, se ven como en la vista previa; antes de descargar se avisa si hay secciones vacías.
 - **CMYK real para imprenta** *(opcional)*: con el pequeño servidor CMYK encendido, el PDF de imprenta sale en CMYK real con un perfil ICC (por ahora FOGRA39), y la paleta muestra los mismos valores que Illustrator (con un punto de diferencia como máximo). Si el servidor no responde, la app ofrece el PDF de imprenta en RGB.
-- **Vista previa en vivo**: el texto, los colores y las fuentes se ven mientras escribes. Una imagen nueva espera al botón **Apply**, así nunca se cambia por accidente.
+- **Vista previa en vivo**: el texto, los colores y las fuentes se ven mientras escribes. Una imagen nueva espera al botón **Apply** que tiene al lado, así nunca se cambia por accidente, y cada Apply muestra solo su propia imagen.
 - **Pantalla completa**: el botón **⤢ Full screen** del preview muestra las 10 hojas una debajo de otra, dibujadas como en el PDF y cada una ajustada entera a la pantalla de quien la mira. Esc o **Exit full screen** la cierran.
 - **Trabajo lado a lado**: al abrir una sección, sube al primer lugar de su columna y su hoja sube al primer lugar del preview, a la misma altura. En las secciones Logo y Usage, al hacer clic en un área (Concept, Anatomy, Versions…, o Correct use e Incorrect use) su hoja pasa a ser la principal.
 - **Logo con su propio scroll**: la sección Logo, que es larga, se desplaza por dentro y el preview no se mueve; al llegar arriba o abajo, sigue moviendo la página.
@@ -167,7 +167,7 @@ Límites: no se guarda nada entre sesiones (al recargar se borra el manual). Sin
 
 ### Cómo se construyó
 - **Primero la spec**: cada feature se describe antes de programarla, con escenarios Given-When-Then, en [`specs/`](specs/).
-- **Decisiones registradas**: cada decisión importante, con las opciones que se compararon, es un Architecture Decision Record en [`docs/adr/`](docs/adr/README.md). Por ejemplo: [vista previa en vivo con Apply para las imágenes](docs/adr/0007-live-preview-with-apply-for-images.md).
+- **Decisiones registradas**: cada decisión importante, con las opciones que se compararon, es un Architecture Decision Record en [`docs/adr/`](docs/adr/README.md). Por ejemplo: [vista previa en vivo con Apply para las imágenes](docs/adr/0007-live-preview-with-apply-for-images.md), y después [un Apply junto a cada imagen](docs/adr/0020-one-apply-per-image.md).
 - **Con tests**: unos 460 tests con Jest y React Testing Library, escritos a partir de los escenarios de las specs, y 23 del servidor CMYK con el test runner de Node.
 - **Una feature a la vez**: cada cambio se prueba en su propia rama y solo llega a `main` cuando funciona.
 
