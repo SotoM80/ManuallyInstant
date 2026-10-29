@@ -56,7 +56,7 @@ The sections work as an **accordion**, like the colors of the Colors section (se
 
 ### Live Preview and Apply
 The sections have no Save buttons. Everything typed, picked or chosen in a section reaches the preview at once, except new images (see ADRs 0007 and 0020):
-* Every image field that waits has its own **Apply** button, on the right of the field, after the file's name: the Cover logo; every card, part, version and the construction grid of Logo; every example of Usage. (The Mockups photo upload opens the template editor at once and has no Apply; see `mockups.md`.)
+* Every image field that waits has its own **Apply** button, on the right of the field, after the file's name: the Cover logo; every card, part, version and the construction grid of Logo; every example of Usage; the picture of each Image layer of the Skin (`skins.md`). (The Mockups photo upload opens the template editor at once and has no Apply; see `mockups.md`.)
 * Choosing a new or replacing image turns **that field's** Apply on. The preview keeps the image it had (or its placeholder) until the user clicks it.
 * Each Apply shows **only its own image**, then is disabled again. Other fields keep waiting for their own Apply. It is disabled from the start, and a wrong file never turns it on. The one exception is a layered SVG (see `logolayers.md`): the Apply of its card also shows the parts made from it.
 * Its visible text is "Apply"; its accessible name is "Apply" and the field's label without "(optional)": `Apply Logo`, `Apply Isotype image`, `Apply Version 1 image`, `Apply Construction grid`, `Apply Correct use example 1 image`… Its tooltip says "Show this image in the manual", or "Choose a new image to apply it" while disabled.

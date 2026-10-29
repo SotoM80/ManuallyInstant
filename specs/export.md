@@ -75,7 +75,7 @@ The Apply buttons have nothing to do with the export: the PDF shows what the pre
 
 ## Failure Modes
 * **Empty sections**: the warning above; the user may download anyway.
-* **The PDF cannot be made** (an image or a font fails to load): `The PDF could not be created. Try again.`, and the buttons are enabled again.
+* **The PDF cannot be made** (an image or a font fails to load, or a Skin picture cannot be read, see `skins.md`): `The PDF could not be created. Try again.`, and the buttons are enabled again.
 * **The CMYK server cannot be reached** (before or during the export): the dialog above, with **Download RGB PDF** and **Cancel**, and the buttons are enabled again.
 
 ## 5. Given-When-Then Test Criteria

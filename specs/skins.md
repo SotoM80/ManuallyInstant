@@ -1,7 +1,7 @@
 # Technical Specification: Skins
 
 ## 1. What it does
-A **skin** is how the **inner pages** of the manual look (every page but the Cover): their **Page background**, their **Page text** color and a stack of decorative **layers** drawn behind their content. Each layer is one preset (a gradient, a shape or a pattern) with its own values, its own two colors and its own Intensity. In the **Skin** section the user sets the two page colors, adds layers, turns each one on or off with a checkbox, moves them up or down to decide which one sits on top, and chooses for each layer whether it is **also drawn on the Cover**. Layers blend by transparency: a layer shows through the ones above it. With no layers, the inner pages show their plain Page background.
+A **skin** is how the **inner pages** of the manual look (every page but the Cover): their **Page background**, their **Page text** color and a stack of decorative **layers** drawn behind their content. Each layer is one preset (a gradient, a shape, a pattern or a texture) with its own values, its own two colors and its own Intensity, or an **Image** layer: a picture of the user's, with its Fit and Intensity (see *Image layers* below). In the **Skin** section the user sets the two page colors, adds layers, turns each one on or off with a checkbox, moves them up or down to decide which one sits on top, and chooses for each layer whether it is **also drawn on the Cover**. Layers blend by transparency: a layer shows through the ones above it. With no layers, the inner pages show their plain Page background.
 
 The Cover keeps its own colors (see `colorpicker.md`): its Background, Title and Text colors only paint the Cover. All colors of the Skin are its own: they can be picked freely or taken from the palette, and taking one from the palette copies its value (ADR 0011).
 
@@ -11,8 +11,8 @@ A skin does not depend on the template: it is the same stack under every layout,
 * More textures than Grain and Paper (linen, concrete, watercolor…). A random look on every page: the noise is the same on every page and every time (a fixed seed), so the PDF matches the preview.
 * Moving layers by drag and drop (buttons only, see ADR 0010). Blend modes (Multiply, Screen, Overlay…): layers blend by transparency only.
 * More than **4 layers**. More than two colors per layer. Colors that stay linked to the palette (a color taken from it is copied, see ADR 0011).
-* Uploading your own textures or images. A different skin on each page. Animated skins.
-* Real CMYK (the skin is RGB like the rest of the PDF, see ADR 0003).
+* Moving, zooming, cropping or tinting an Image layer's picture (only Cover or Contain). Uploading your own textures as a preset. A different skin on each page. Animated skins.
+* Converting the skin on its own: in the print PDF it is part of the page image, converted to CMYK with the rest when the app has a CMYK server (ADR 0019).
 * Creating, editing or saving presets. Copying a layer. Keeping a layer's values when its preset is changed (a layer's preset cannot be changed: remove it and add another).
 * Warnings about low contrast between the skin and the text (as in `colorpalette.md`).
 * The PDF export itself (Phase 4).
@@ -47,15 +47,28 @@ The section has, from top to bottom, the **page colors**, the **Add layer** butt
 * **✕ Remove**: removes the layer at once.
 * **▾**: opens the body: first the checkbox **Also on the Cover** (off by default: a layer is only drawn on the inner pages until it is ticked), then one slider per `control` of its preset (label, min, max, step and unit from `presets.ts`, with the value next to it; **Intensity**, 5–100 % step 5, default 30, is always last), then the layer's **Color A** and **Color B**. The bodies work as an **accordion**, like the colors of the Colors section: only one is open at a time, and a new layer opens and folds the open one.
 
-**Add layer** opens the **gallery** under the button: one card per preset with a drawing, grouped under the headings of `SKIN_TYPES` that have at least one: **Gradients** (Linear, Radial), **Shapes** (Circles, Diagonal block, Waves), **Patterns** (Dots, Stripes) and **Textures** (Grain, Paper). Each card is a small page with the preset drawn at full strength with the colors a new layer would get. Choosing a card adds a layer **at the top of the list**, with the preset's default values, on, not on the Cover, and open, and closes the gallery. The Add layer button stays still while the gallery folds and the new layer takes its place right under it, and the layer's title takes the focus; only the layer's title is brought into view, never the whole open layer, so a tall one (a Shape) does not pull the page down; the page only scrolls if the title is not in view (e.g. on a small screen). Opening or folding the gallery never moves Add layer either. Its **Color A** is palette color 1 and its **Color B** palette color 2; when one of them does not exist, the Page text color fills in for A and the Page background for B. These are copied values: changing the palette later never changes the layer. Escape or clicking Add layer again closes it with no change. With 4 layers, Add layer is disabled, with the note `Up to 4 layers.`
+**Add layer** opens the **gallery** under the button: one card per preset with a drawing, grouped under the headings of `SKIN_TYPES` that have at least one: **Gradients** (Linear, Radial), **Shapes** (Circles, Diagonal block, Waves), **Patterns** (Dots, Stripes), **Textures** (Grain, Paper) and **Images** (Image). Each card is a small page with the preset drawn at full strength with the colors a new layer would get. Choosing a card adds a layer **at the top of the list**, with the preset's default values, on, not on the Cover, and open, and closes the gallery. The Add layer button stays still while the gallery folds and the new layer takes its place right under it, and the layer's title takes the focus; only the layer's title is brought into view, never the whole open layer, so a tall one (a Shape) does not pull the page down; the page only scrolls if the title is not in view (e.g. on a small screen). Opening or folding the gallery never moves Add layer either. Its **Color A** is palette color 1 and its **Color B** palette color 2; when one of them does not exist, the Page text color fills in for A and the Page background for B. These are copied values: changing the palette later never changes the layer. Escape or clicking Add layer again closes it with no change. With 4 layers, Add layer is disabled, with the note `Up to 4 layers.`
 
 With no layers, the list shows `No layers yet. The inner pages show their plain Page background.`
 
 **Color fields** (Page background, Page text, and Color A / Color B of each layer) all work the same way: the **color picker** of the Cover (swatches, RGB sliders, custom picker and HEX field, see `colorpicker.md`), and under it a row of small chips, one per **palette color** (`Use Red`). Clicking a chip copies that color's HEX into the field. A HEX being typed is only used once it is valid; a wrong one is flagged on blur or Enter with `"Enter a valid HEX color, like #1E88E5"`, and the pages keep the last valid color. With an empty palette there are no chips.
 
-Everything is live: there is no Apply, because nothing here is an image (ADR 0007).
+Everything is live, with one exception: the picture of an Image layer waits for its own **Apply**, like every new image (ADRs 0007 and 0020).
 
 Opening the section features **Brand concept**, the first inner page (`SECTION_PAGES.skin = ['Brand concept']`), as any section does (see `brandmanual.md`).
+
+### Image layers
+An **Image** layer shows a picture of the user's behind the content (ADR 0023). It is a layer like the others: its checkbox, mini preview, name (`Image`, `Image 2`), ↑ ↓, ✕, Also on the Cover, Intensity, and it counts for the 4 layers. It differs in its body:
+* **Image**: an image field (PNG, JPG, SVG or WebP, up to 5 MB, as in `cover.md`), labelled `<name> image` (e.g. `Image image`, `Image 2 image`), with its own Apply next to it (`Apply Image image`). A new file waits for that Apply; a wrong file is flagged at once (`"Use a PNG, JPG, SVG or WebP image"`, `"The image must be 5 MB or smaller"`) and never turns Apply on.
+* **Fit**: a segmented control, **Cover** (default: the picture fills the page, cropped to it, centered) or **Contain** (the whole picture, centered; the page shows around it).
+* **Intensity**, 5–100 % step 5, default 30, as any layer.
+* No Color A or Color B.
+
+Its gallery card and its mini preview show an image icon on the Page background until a picture is applied; then the mini preview shows the picture.
+
+With no applied picture the layer draws nothing (its checkbox, place and Intensity still work). Hiding the layer keeps its picture, applied or waiting. Removing it drops both. A picture waiting for Apply is lost when the user leaves the Brand Manual page, as in every section; the applied one is kept with the skin.
+
+**In the PDF**: before drawing, the export waits for every Skin picture to load and checks that it can be read; if one cannot, no PDF is made and `The PDF could not be created. Try again.` is shown (`export.md`). A picture over the whole page makes the print PDF much heavier (each page is a 300 dpi PNG); with a CMYK server, a page over its limit (40 MB) is refused and the export shows that same message.
 
 ### On the pages
 * **Inner pages**: painted with the **Page background**, their text in the **Page text** color, and one SVG behind their content with one group per layer that is on.
@@ -69,6 +82,7 @@ Opening the section features **Brand concept**, the first inner page (`SECTION_P
 * The `viewBox` is the A4 page in **mm** for the current orientation: `0 0 210 297` (Portrait) or `0 0 297 210` (Landscape). It scales with the page in every view, Overview (`zoom: 0.5`) included.
 * Parameters in `mm` are real millimetres of the A4 page. Parameters in `%` are a share of the page: Center X/Y of its width/height, Radius of its diagonal, Size of its shorter side, Coverage of its area.
 * Angles follow CSS: `0°` points **up** and they turn **clockwise**, so a Linear layer at `135°` looks like `linear-gradient(135deg, A, B)`.
+* **Image layers** are drawn as an SVG `<image>` the size of the page in mm, `preserveAspectRatio="xMidYMid slice"` (Cover) or `"xMidYMid meet"` (Contain), in the layer's group with its opacity, like any layer.
 * **Unique ids**: gradients and patterns are referenced by id (`fill="url(#…)"`), and ids are shared by the whole document. Every SVG gets its own prefix (React `useId`) and every layer adds its own id to it, so no two layers, pages or previews share a definition.
 
 ### The presets
@@ -86,14 +100,14 @@ Opening the section features **Brand concept**, the first inner page (`SECTION_P
 Grain and Paper are drawn with an SVG noise filter (`feTurbulence`) in mm of the page, with a **fixed seed**: the noise is the same on every page, in the preview and in both PDFs (the PDF is drawn by the browser itself, ADR 0012). Its scale follows the page, so a speck is the same size in mm in every view. Browsers may draw the noise slightly differently.
 
 ### In the code
-* `src/skins/types.ts`: a `Skin` is `{ pageBackground, pageText, layers, nextId }`, with the layers in list order (the first is on top). A `SkinLayer` is `{ id, preset, params, colors, visible, onCover }`, where `colors` are two HEX values; `id` is stable and never reused (`nextId`). `NO_SKIN` has the default page colors and no layers.
+* `src/skins/types.ts`: a `Skin` is `{ pageBackground, pageText, layers, nextId }`, with the layers in list order (the first is on top). A `SkinLayer` is `{ id, preset, params, colors, visible, onCover }`, where `colors` are two HEX values; `id` is stable and never reused (`nextId`). An Image layer also has `image` (the applied picture, or null) and `fit` (`'cover' | 'contain'`), and ignores its `colors` (ADR 0023). `NO_SKIN` has the default page colors and no layers.
 * `src/skins/layers.ts`: pure functions for the skin: `setPageColor`, `addLayer` (with the colors of `newLayerColors`), `removeLayer`, `moveLayer(skin, id, -1 | 1)`, `setVisible`, `setOnCover`, `setLayerParam` (with `withParam`, so Thickness stays within Spacing), `setLayerColor`, and `layerNames` (`Dots`, `Dots 2`). They are unit tested.
 * `src/skins/presets.ts` lists the presets (ids, defaults, controls); the form is built from it.
 * `src/skins/colors.ts`: `newLayerColors(palette, skin)`, the copied colors of a new layer.
 * `SkinColorField`: the color picker of `colorpicker.md` (`ColorPicker`) with its own HEX being typed, plus the palette chips.
 * `src/skins/draw/<preset>.ts`: one **pure function** per preset, `(params, [a, b], page) → shape`. Textures return a `texture` shape: the noise (frequency in cycles per mm, octaves, seed), an optional base color, and one tint per color with the noise channel it reads and how much it is boosted; `SkinBackdrop` turns it into an SVG filter. `src/skins/draw/index.ts` maps preset ids to them; the gallery offers only presets listed there.
 * `SkinBackdrop` (the component that was `SkinLayer`): draws the visible layers of a skin in one SVG, bottom first. `ManualPreview` puts one in every page, before the content: all layers on the inner pages, only those Also on the Cover on the Cover. The mini previews and gallery cards use it with a one-layer skin.
-* `SkinForm`: the list, the accordion and the gallery.
+* `SkinForm`: the list, the accordion and the gallery. It keeps the picture of each Image layer that waits for Apply (with `chooseFile`, `applyImage` and `isPending` of `src/utils/pendingImage.ts`), by layer id.
 * The skin is kept in `App`, above the routes, like the template and the orientation, so it survives moving between pages.
 
 ## 3. Preconditions & Postconditions
@@ -107,6 +121,7 @@ Grain and Paper are drawn with an SVG noise filter (`feTurbulence`) in mm of the
 * The first layer of the list is always drawn on top, and the last one just over the Background.
 * A skin has 0 to 4 layers. A hidden layer keeps its values, colors and place.
 * Every color of the Skin is always a valid HEX.
+* An Image layer only ever draws a picture that was applied; a waiting or wrong file never reaches the pages.
 * Changing or removing a palette color never changes the Skin: colors taken from the palette are copies.
 * Every value stays between its control's min and max, and Thickness never passes Spacing.
 * No two SVG definitions on the page share an id.
@@ -118,6 +133,8 @@ Only a typed HEX can be wrong. Otherwise:
 * **A wrong HEX** in a color field is flagged with `"Enter a valid HEX color, like #1E88E5"`, and the pages keep the last valid color.
 * **An empty palette**: there are no chips, and a new layer takes the Page text and Page background colors.
 * **A layer whose preset has no drawing** (not expected in the UI) draws nothing.
+* **A wrong file for an Image layer**: flagged at once; its Apply stays off and the pages keep the picture they had.
+* **A Skin picture that cannot be read when the PDF is made**: no PDF, and `The PDF could not be created. Try again.`
 
 ## 5. Given-When-Then Test Criteria
 
@@ -265,3 +282,43 @@ Only a typed HEX can be wrong. Otherwise:
 6. ~~Page colors and Also on the Cover: the Cover's colors only paint the Cover (ADR 0011), Page background and Page text in the Skin, and the color fields with palette chips.~~
 7. ~~The skin in both PDFs (Phase 4).~~
 8. Textures: Grain and Paper, with their unit tests (the PDF is drawn by the browser, so `feTurbulence` works there too, ADR 0012).
+
+### Scenario 28: Adding an Image Layer
+* **Given**: The Skin has no layers.
+* **When**: The user clicks Add layer, then "Add Image" in the Images group.
+* **Then**: An open layer "Image" is on top of the list, with an empty "Image image" field, "Apply Image image" off, Fit on Cover, Intensity 30 % and no Color A or Color B; the pages do not change.
+
+### Scenario 29: The Picture Waits for Apply
+* **Given**: An Image layer with no picture.
+* **When**: The user chooses `paper.jpg`, then clicks "Apply Image image".
+* **Then**: The pages do not change until Apply; then every inner page draws `paper.jpg` behind its content, at 30 % opacity, and the Apply is off again.
+
+### Scenario 30: Fit
+* **Given**: An Image layer shows a picture.
+* **When**: The user switches Fit from Cover to Contain.
+* **Then**: The picture is drawn whole (`meet`) instead of filling the page (`slice`).
+
+### Scenario 31: A Wrong File
+* **Given**: An Image layer shows `paper.jpg`.
+* **When**: The user chooses a PDF file.
+* **Then**: The field shows "Use a PNG, JPG, SVG or WebP image", its Apply stays off, and the pages keep `paper.jpg`.
+
+### Scenario 32: On the Cover
+* **Given**: An Image layer shows a picture.
+* **When**: The user ticks Also on the Cover.
+* **Then**: The Cover draws the picture too, behind its content, over its own Background.
+
+### Scenario 33: Hiding and Removing
+* **Given**: An Image layer shows a picture and has another one waiting for Apply.
+* **When**: The user hides it, shows it again, then removes it.
+* **Then**: Hidden, it draws nothing; shown again, it draws the applied picture and its Apply is still on; removed, it is gone from the list and the pages.
+
+### Scenario 34: Four Layers
+* **Given**: The Skin has 3 layers.
+* **When**: The user adds an Image layer.
+* **Then**: The Skin has 4 layers and Add layer is disabled.
+
+### Scenario 35: A Picture That Cannot Be Read
+* **Given**: An Image layer shows a picture, and the picture cannot be read anymore.
+* **When**: The user clicks "Download web PDF".
+* **Then**: No PDF is made, and "The PDF could not be created. Try again." is shown.
