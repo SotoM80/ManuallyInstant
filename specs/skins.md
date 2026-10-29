@@ -23,10 +23,13 @@ The section has, from top to bottom, the **page colors**, the **Add layer** butt
 
 **Page colors**: two color fields, **Page background** (default White `#FFFFFF`) and **Page text** (default Black `#000000`). They paint the background and every text of the inner pages: Brand concept, Anatomy, Logo versions, Clear space (its lines and measures too), Color palette and Typography. They never change the Cover. The list reads like the layers panel of a design tool: **the first layer of the list is drawn on top**, the last one just over the page Background.
 
+**Image boxes**: after the page colors, a group that sets the corners, inner margin and outline of every image box of the inner pages (see `imageboxes.md` and ADR 0022).
+
 ```
 5. Skin
   Page background  [●] #FFFFFF
   Page text        [●] #000000
+  Image boxes      (Corner radius, Inner margin, Outline, Thickness)
                           [ + Add layer ]   → opens the gallery here; a new layer goes on top of the list
 ┌──────────────────────────────────────┐
 │ ☑ [▤] Stripes          ↑  ↓  ✕   ▾  │  ← on top

@@ -31,3 +31,4 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0019](0019-real-cmyk-with-icc-profile.md) | Real CMYK with an ICC profile, one page per request | Accepted | 2026-10-28 |
 | [0020](0020-one-apply-per-image.md) | One Apply button next to each image | Accepted | 2026-10-29 |
 | [0021](0021-background-per-image.md) | A background color for each logo image | Accepted | 2026-10-29 |
+| [0022](0022-image-boxes-styled-by-the-skin.md) | Image boxes styled by the Skin, through CSS variables | Proposed | 2026-10-29 |
