@@ -1,5 +1,7 @@
 import { findPreset, withParam } from './presets'
-import type { PageColorKey, Skin, SkinLayer } from './types'
+import { isImageLayer } from './draw/image'
+import type { ImageFit, PageColorKey, Skin, SkinLayer } from './types'
+import type { UploadedImage } from '../types'
 
 // The list of layers of a skin (see specs/skins.md). The first layer is drawn on top.
 // Every function returns a new skin, so the form only calls them and passes the result on.
@@ -25,6 +27,8 @@ export function addLayer(skin: Skin, presetId: string, colors: SkinLayer['colors
     colors,
     visible: true,
     onCover: false,
+    // An Image layer starts with no picture, filling the page once it has one
+    ...(isImageLayer({ preset: presetId }) ? { image: null, fit: 'cover' as const } : {}),
   }
   return { ...skin, layers: [layer, ...skin.layers], nextId: skin.nextId + 1 }
 }
@@ -76,4 +80,13 @@ export function layerNames(layers: SkinLayer[]) {
     names.set(layer.id, count === 1 ? name : `${name} ${count}`)
   }
   return names
+}
+
+// An Image layer's applied picture (only an applied one reaches the skin, ADR 0020)
+export function setLayerImage(skin: Skin, id: number, image: UploadedImage | null): Skin {
+  return update(skin, id, (layer) => ({ ...layer, image }))
+}
+
+export function setLayerFit(skin: Skin, id: number, fit: ImageFit): Skin {
+  return update(skin, id, (layer) => ({ ...layer, fit }))
 }

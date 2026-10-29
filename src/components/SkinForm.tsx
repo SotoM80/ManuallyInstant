@@ -2,8 +2,10 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import { SkinBackdrop } from './pages/SkinBackdrop'
 import { SkinColorField } from './SkinColorField'
+import { ImageField } from './ImageField'
 import { SKIN_PRESETS, SKIN_TYPES, controlMax, findPreset } from '../skins/presets'
 import { SKIN_DRAWINGS } from '../skins/draw'
+import { isImageLayer } from '../skins/draw/image'
 import { newLayerColors } from '../skins/colors'
 import { BOX_CONTROLS, setBoxes } from '../skins/boxes'
 import {
@@ -13,14 +15,19 @@ import {
   moveLayer,
   removeLayer,
   setLayerColor,
+  setLayerFit,
+  setLayerImage,
   setLayerParam,
   setOnCover,
   setPageColor,
   setVisible,
 } from '../skins/layers'
 import { keepInPlace } from '../utils/scrollAnchor'
+import { NO_IMAGE, applyImage, chooseFile, isPending, toImage } from '../utils/pendingImage'
+import type { PendingImage } from '../utils/pendingImage'
+import { validateImage } from '../utils/validation'
 import { useReorderGlide } from '../utils/useReorderGlide'
-import type { Skin, SkinLayer } from '../skins/types'
+import type { ImageFit, Skin, SkinLayer } from '../skins/types'
 import type { PaletteColor } from '../types'
 
 // Form of the Skin section: the colors of every page but the Cover, Add layer with its gallery,
@@ -33,8 +40,28 @@ type SkinFormProps = {
   palette: PaletteColor[] | null // offered as chips that copy a color
 }
 
-// Only presets with a drawing are offered, so one that is not built yet never appears
-const BUILT_PRESETS = SKIN_PRESETS.filter((preset) => preset.id in SKIN_DRAWINGS)
+// Only presets with a drawing are offered, so one that is not built yet never appears. The Image
+// layer has no drawing of its own: it shows the user's picture (ADR 0023)
+const BUILT_PRESETS = SKIN_PRESETS.filter((preset) => preset.id in SKIN_DRAWINGS || preset.type === 'image')
+
+const FITS: { fit: ImageFit; label: string }[] = [
+  { fit: 'cover', label: 'Cover' },
+  { fit: 'contain', label: 'Contain' },
+]
+
+// A picture waiting for its Apply, and its error, by layer id (only an applied one is in the skin)
+type Picture = { image: PendingImage; error: string }
+
+// What a preview of an Image layer with no picture shows: a small picture icon
+function ImageIcon() {
+  return (
+    <svg className="skin-image-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <circle cx="9" cy="10" r="1.6" />
+      <path d="M4 18l5-5 4 4 3-3 4 4" />
+    </svg>
+  )
+}
 const GALLERY = SKIN_TYPES.map((group) => ({
   ...group,
   presets: BUILT_PRESETS.filter((preset) => preset.type === group.type),
@@ -58,6 +85,7 @@ function previewLayer(layer: Pick<SkinLayer, 'preset' | 'params' | 'colors'>): S
 export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
   const [openId, setOpenId] = useState<number | null>(null) // null → every layer folded
   const [galleryOpen, setGalleryOpen] = useState(false)
+  const [pictures, setPictures] = useState<Record<number, Picture>>({})
   const list = useRef<HTMLOListElement>(null)
   const addButton = useRef<HTMLButtonElement>(null)
   useReorderGlide(list, skin.layers.map((layer) => layer.id).join('|'))
@@ -106,10 +134,66 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
     onChange(moveLayer(skin, id, step))
   }
 
+  // An Image layer's picture: a wrong file is flagged at once; a valid one waits for its Apply
+  function choosePicture(layer: SkinLayer, file: File | null) {
+    setPictures((prev) => ({
+      ...prev,
+      [layer.id]: { image: chooseFile(prev[layer.id]?.image ?? NO_IMAGE, file), error: file ? validateImage(file) : '' },
+    }))
+  }
+
+  function applyPicture(layer: SkinLayer) {
+    const picture = pictures[layer.id]
+    if (!picture) return
+    const image = applyImage(picture.image, picture.error)
+    setPictures((prev) => ({ ...prev, [layer.id]: { ...picture, image } }))
+    if (image.shown) onChange(setLayerImage(skin, layer.id, toImage(image.shown)))
+  }
+
+  // A removed layer drops its picture too, applied or waiting
+  function remove(layer: SkinLayer) {
+    setPictures((prev) => Object.fromEntries(Object.entries(prev).filter(([id]) => Number(id) !== layer.id)))
+    onChange(removeLayer(skin, layer.id))
+  }
+
   function closeGallery(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key !== 'Escape') return
     setGalleryOpen(false)
     addButton.current?.focus()
+  }
+
+  // The picture of an Image layer, with its own Apply, and how it fills the page (specs/skins.md)
+  function imageFields(layer: SkinLayer, name: string) {
+    const picture = pictures[layer.id]
+    const fit = layer.fit ?? 'cover'
+    return (
+      <>
+        <ImageField
+          id={`skin-${layer.id}-image`}
+          label={`${name} image`}
+          fileName={picture?.image.file?.name ?? layer.image?.name ?? null}
+          error={picture?.error ?? ''}
+          onChange={(file) => choosePicture(layer, file)}
+          pending={picture ? isPending(picture.image, picture.error) : false}
+          onApply={() => applyPicture(layer)}
+        />
+        <fieldset className="segmented-control">
+          <legend>Fit</legend>
+          {FITS.map((option) => (
+            <label key={option.fit}>
+              <input
+                type="radio"
+                name={`skin-${layer.id}-fit`}
+                value={option.fit}
+                checked={fit === option.fit}
+                onChange={() => onChange(setLayerFit(skin, layer.id, option.fit))}
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </fieldset>
+      </>
+    )
   }
 
   function layerBody(layer: SkinLayer, name: string) {
@@ -125,6 +209,8 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
           />
           <label htmlFor={coverId}>Also on the Cover</label>
         </div>
+
+        {isImageLayer(layer) && imageFields(layer, name)}
 
         {findPreset(layer.preset)?.controls.map((control) => {
           const id = `skin-${layer.id}-${control.key}`
@@ -149,7 +235,7 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
           )
         })}
 
-        {COLOR_FIELDS.map((field) => (
+        {!isImageLayer(layer) && COLOR_FIELDS.map((field) => (
           <SkinColorField
             key={field.index}
             label={`${name} ${field.label}`}
@@ -247,10 +333,14 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
                     onClick={() => add(preset.id)}
                   >
                     <span className="skin-card-preview" style={{ background: skin.pageBackground }}>
-                      <SkinBackdrop
-                        layers={[previewLayer({ preset: preset.id, params: preset.defaults, colors: startColors })]}
-                        orientation="portrait"
-                      />
+                      {preset.type === 'image' ? (
+                        <ImageIcon />
+                      ) : (
+                        <SkinBackdrop
+                          layers={[previewLayer({ preset: preset.id, params: preset.defaults, colors: startColors })]}
+                          orientation="portrait"
+                        />
+                      )}
                     </span>
                     <span className="skin-card-name">{preset.name}</span>
                   </button>
@@ -295,7 +385,11 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
                     }}
                   >
                     <span className="skin-card-preview" style={{ background: skin.pageBackground }}>
-                      <SkinBackdrop layers={[previewLayer(layer)]} orientation="portrait" />
+                      {isImageLayer(layer) && !layer.image ? (
+                        <ImageIcon />
+                      ) : (
+                        <SkinBackdrop layers={[previewLayer(layer)]} orientation="portrait" />
+                      )}
                     </span>
                     <span className="skin-row-name">{name}</span>
                     <span className="palette-block-chevron" aria-hidden="true" />
@@ -324,7 +418,7 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
                     type="button"
                     className="skin-row-button"
                     aria-label={`Remove ${name}`}
-                    onClick={() => onChange(removeLayer(skin, layer.id))}
+                    onClick={() => remove(layer)}
                   >
                     ✕
                   </button>

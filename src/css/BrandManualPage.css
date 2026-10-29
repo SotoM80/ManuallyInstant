@@ -804,6 +804,19 @@
   outline-offset: 2px;
 }
 
+/* An Image layer with no picture yet: a picture icon in the middle of its small page (ADR 0023) */
+.skin-image-icon {
+  position: absolute;
+  inset: 25% 15%;
+  width: 70%;
+  height: 50%;
+  fill: none;
+  stroke: #757575; /* the same on any Page background */
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .skin-card-preview {
   position: relative; /* the skin layer fills it */
   flex: none;

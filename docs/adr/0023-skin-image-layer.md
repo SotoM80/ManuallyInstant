@@ -1,7 +1,7 @@
 # ADR 0023: An Image layer in the Skin
 
 ## Status
-Proposed — 2026-10-29
+Accepted — 2026-10-29
 
 ## Context
 Brands often have a picture of their own for the background of a manual: a photo, a paper scan, a texture from the brand's world. The Skin only has drawn layers (gradients, shapes, patterns, textures), and `specs/skins.md` left "uploading your own images" out of scope.

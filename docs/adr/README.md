@@ -32,4 +32,4 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0020](0020-one-apply-per-image.md) | One Apply button next to each image | Accepted | 2026-10-29 |
 | [0021](0021-background-per-image.md) | A background color for each logo image | Accepted | 2026-10-29 |
 | [0022](0022-image-boxes-styled-by-the-skin.md) | Image boxes styled by the Skin, through CSS variables | Accepted | 2026-10-29 |
-| [0023](0023-skin-image-layer.md) | An Image layer in the Skin | Proposed | 2026-10-29 |
+| [0023](0023-skin-image-layer.md) | An Image layer in the Skin | Accepted | 2026-10-29 |

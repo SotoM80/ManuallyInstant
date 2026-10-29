@@ -8,6 +8,7 @@ import { drawDiagonal } from './diagonal'
 import { drawWaves } from './waves'
 import { drawGrain } from './grain'
 import { drawPaper } from './paper'
+import { drawImage, isImageLayer } from './image'
 import type { DrawSkin, Page } from './types'
 
 // The drawing of each preset. Only presets listed here are shown in the gallery,
@@ -24,8 +25,10 @@ export const SKIN_DRAWINGS: Record<string, DrawSkin> = {
   paper: drawPaper,
 }
 
-// What to draw for a layer, or null for a preset with no drawing
-export function drawLayer(layer: Pick<SkinLayer, 'preset' | 'params'>, colors: string[], page: Page) {
+// What to draw for a layer, or null for a preset with no drawing (or an Image layer with no
+// picture applied yet)
+export function drawLayer(layer: Pick<SkinLayer, 'preset' | 'params' | 'image' | 'fit'>, colors: string[], page: Page) {
+  if (isImageLayer(layer)) return drawImage(layer)
   const draw = SKIN_DRAWINGS[layer.preset]
   return draw ? draw(layer.params, colors, page) : null
 }

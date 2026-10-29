@@ -1,5 +1,5 @@
 import type { Orientation } from '../../types'
-import type { SkinParams } from '../types'
+import type { ImageFit, SkinParams } from '../types'
 
 // A page of the manual in mm: the viewBox of every skin (see specs/skins.md, Geometry)
 export type Page = { width: number; height: number }
@@ -31,6 +31,8 @@ export type SkinShape =
   // Noise (feTurbulence) in mm of the page: `frequency` in cycles per mm across and down, over an
   // optional base color. A fixed seed draws the same noise everywhere, the PDF included.
   | { kind: 'texture'; frequency: [number, number]; octaves: number; seed: number; base?: string; tints: Tint[] }
+  // A picture of the user's over the whole page (ADR 0023)
+  | { kind: 'image'; url: string; fit: ImageFit }
 
 // The direction of a CSS angle in SVG: 0° points up, turning clockwise (y grows downwards)
 export function direction(degrees: number) {

@@ -80,9 +80,19 @@ function texture(shape: Extract<SkinShape, { kind: 'texture' }>, id: string, pag
 }
 
 // How a shape is drawn on the page: shapes are their marks, turned around the page's center;
-// textures are a noise filter; the others are a paint (a gradient or a pattern tile) under `id`,
-// filling the whole page
+// textures are a noise filter; a picture fills the page (cropped for Cover, whole for Contain);
+// the others are a paint (a gradient or a pattern tile) under `id`, filling the whole page
 function draw(shape: SkinShape, id: string, page: { width: number; height: number }) {
+  if (shape.kind === 'image') {
+    return (
+      <image
+        href={shape.url}
+        width={page.width}
+        height={page.height}
+        preserveAspectRatio={shape.fit === 'contain' ? 'xMidYMid meet' : 'xMidYMid slice'}
+      />
+    )
+  }
   if (shape.kind === 'shapes') {
     return <g transform={`rotate(${shape.angle} ${page.width / 2} ${page.height / 2})`}>{marks(shape.marks)}</g>
   }
@@ -96,7 +106,7 @@ function draw(shape: SkinShape, id: string, page: { width: number; height: numbe
 }
 
 // The paint of a gradient or a pattern, under the given id
-function paint(shape: Exclude<SkinShape, { kind: 'shapes' | 'texture' }>, id: string) {
+function paint(shape: Exclude<SkinShape, { kind: 'shapes' | 'texture' | 'image' }>, id: string) {
   switch (shape.kind) {
     case 'linear':
       return (

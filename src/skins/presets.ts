@@ -95,6 +95,8 @@ const PRESETS: SkinPreset[] = [
     defaults: { size: 2 },
     controls: [{ key: 'size', label: 'Fiber size', min: 1, max: 6, step: 0.5, unit: '' }],
   },
+  // A picture of the user's (ADR 0023): no values of its own but Intensity, and no colors
+  { id: 'image', name: 'Image', type: 'image', defaults: {}, controls: [] },
 ]
 
 export const SKIN_PRESETS: SkinPreset[] = PRESETS.map((preset) => ({
@@ -108,6 +110,7 @@ export const SKIN_TYPES: { type: SkinType; label: string }[] = [
   { type: 'shapes', label: 'Shapes' },
   { type: 'pattern', label: 'Patterns' },
   { type: 'texture', label: 'Textures' },
+  { type: 'image', label: 'Images' },
 ]
 
 // White pages with black text and no layers

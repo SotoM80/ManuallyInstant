@@ -1,6 +1,11 @@
+import type { UploadedImage } from '../types'
+
 // A skin: a stack of decorative layers drawn behind every page of the manual
 // (see specs/skins.md and ADR 0010).
-export type SkinType = 'gradient' | 'shapes' | 'pattern' | 'texture'
+export type SkinType = 'gradient' | 'shapes' | 'pattern' | 'texture' | 'image'
+
+// How an Image layer's picture fills the page: cropped to fill it, or whole (ADR 0023)
+export type ImageFit = 'cover' | 'contain'
 
 export type SkinParams = Record<string, number>
 
@@ -12,6 +17,10 @@ export type SkinLayer = {
   colors: [string, string] // Color A and Color B, as "#RRGGBB" (a palette color is copied, ADR 0011)
   visible: boolean
   onCover: boolean // also drawn on the Cover (the inner pages always draw it)
+  // Only an Image layer (ADR 0023): its applied picture and how it fills the page. Its colors
+  // are kept like any layer's, and not used.
+  image?: UploadedImage | null
+  fit?: ImageFit
 }
 
 // How every page but the Cover looks: its background, its text and the layers in list order

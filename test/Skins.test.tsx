@@ -58,6 +58,7 @@ describe('Skin – layers', () => {
       'Add Stripes',
       'Add Grain',
       'Add Paper',
+      'Add Image',
     ]);
     expect(within(gallery).getByText('Shapes')).toBeInTheDocument();
     expect(within(gallery).getByText('Textures')).toBeInTheDocument();

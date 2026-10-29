@@ -7,6 +7,7 @@ import { cmykServerUrl } from '../export/cmykServerUrl'
 import { createCmykPdf, createPdf } from '../export/createPdf'
 import { emptySections, pdfFileName, progressLabel } from '../export/exportSettings'
 import { inlineSvgStyles } from '../export/inlineSvgStyles'
+import { skinPicturesReady } from '../export/skinPictures'
 import type { ExportKind, ExportStep } from '../export/exportSettings'
 import { useCmyk } from '../utils/cmykValues'
 import type { TemplateId } from '../templates'
@@ -73,10 +74,11 @@ function mockupsDrawn(root: HTMLElement) {
 }
 
 // Waits until the copied pages are ready to be drawn: fonts loaded, photo mockups composed,
-// images decoded, and every page done drawing itself
+// the Skin's pictures read (or the export stops), images decoded, and every page done drawing
 async function pagesReady(root: HTMLElement) {
   await document.fonts?.ready
   await mockupsDrawn(root)
+  await skinPicturesReady(root)
   const images = Array.from(root.querySelectorAll('img'))
   await Promise.all(images.map((image) => (typeof image.decode === 'function' ? image.decode().catch(() => {}) : null)))
   await settled(root)
