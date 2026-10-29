@@ -92,14 +92,15 @@ describe('Brand Manual – cover preview', () => {
     expect(getCover()).not.toHaveTextContent('Your brand manual title');
   });
 
-  // Spec: specs/brandmanual.md, Scenario 5 — Only new images wait for Apply
-  it('puts Apply above the Cover section, disabled until an image is chosen', () => {
+  // Spec: specs/brandmanual.md, Scenario 5 — Only new images wait for Apply (ADR 0020)
+  it('puts the logo\'s Apply next to its field, not above the Cover section, disabled until an image is chosen', () => {
     renderApp('/brand-manual');
 
-    const apply = within(getSections()).getByRole('button', { name: 'Apply' });
-    const cover = within(getSections()).getByRole('button', { name: '1. Cover' });
-    expect(apply.compareDocumentPosition(cover) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(within(getPreview()).queryByRole('button', { name: 'Apply' })).not.toBeInTheDocument();
+    const apply = within(getSections()).getByRole('button', { name: 'Apply Logo' });
+    const coverForm = screen.getByRole('form', { name: 'Cover' });
+    expect(coverForm).toContainElement(apply);
+    expect(within(getSections()).queryByRole('button', { name: 'Apply' })).not.toBeInTheDocument();
+    expect(within(getPreview()).queryByRole('button', { name: /^Apply/ })).not.toBeInTheDocument();
     expect(apply).toBeDisabled();
 
     fillRequiredCoverFields();

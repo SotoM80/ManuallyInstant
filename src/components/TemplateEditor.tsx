@@ -440,7 +440,7 @@ export function TemplateEditor({ template, logo, onSave, onClose }: TemplateEdit
               <button type="button" className="palette-secondary-button" onClick={downloadTemplate}>
                 Download template
               </button>
-              <button type="button" className="sections-apply" onClick={save}>
+              <button type="button" className="accent-button" onClick={save}>
                 Use now
               </button>
             </div>

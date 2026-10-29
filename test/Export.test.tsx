@@ -48,13 +48,13 @@ function touchEverySection() {
 }
 
 describe('Export – buttons', () => {
-  it('shows the two downloads before Apply (scenario 1)', () => {
+  it('shows the two downloads first in the sections column (scenario 1)', () => {
     renderApp();
     const names = within(sectionsColumn())
       .getAllByRole('button')
       .slice(0, 3)
       .map((button) => button.getAttribute('aria-label') ?? button.textContent);
-    expect(names).toEqual(['Download print PDF', 'Download web PDF', 'Apply']);
+    expect(names).toEqual(['Download print PDF', 'Download web PDF', '1. Cover']);
     expect(screen.getByRole('button', { name: 'Download print PDF' })).toBeEnabled();
   });
 

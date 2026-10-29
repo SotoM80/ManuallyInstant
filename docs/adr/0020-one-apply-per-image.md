@@ -1,7 +1,7 @@
 # ADR 0020: One Apply button next to each image
 
 ## Status
-Proposed — 2026-10-29
+Accepted — 2026-10-29
 
 ## Context
 ADR 0007 made the forms live and let new images wait for **one Apply button at the top of the sections column**, which shows every waiting image of every section at once. In use, that button is far from the field where the image was chosen (the Logo section alone has up to 4 cards, 4 parts per card, 4 versions and a grid), and pressing it can show images the user did not mean to show yet.

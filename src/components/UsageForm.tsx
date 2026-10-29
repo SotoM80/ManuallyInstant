@@ -3,17 +3,15 @@ import { ImageField } from './ImageField'
 import { MAX_EXAMPLES, START_EXAMPLES, USAGE_KINDS } from '../data/usageOptions'
 import { keepInPlace } from '../utils/scrollAnchor'
 import { validateImage } from '../utils/validation'
-import { NO_IMAGE, chooseFile, isPending, shownFile, toImage, useLiveData, usePendingReport } from '../utils/pendingImage'
+import { NO_IMAGE, applyImage, chooseFile, isPending, shownFile, toImage, useLiveData } from '../utils/pendingImage'
 import type { PendingImage } from '../utils/pendingImage'
 import type { UsageData, UsageKind } from '../types'
 
 // Form of the Usage section (see specs/usage.md): a group of examples for each page, Correct use
 // and Incorrect use, that work like the versions of the Logo section. Text reaches the preview
-// at once; new images wait for Apply (ADR 0007).
+// at once; each new image waits for its own Apply (ADRs 0007 and 0020).
 type UsageFormProps = {
   onChange?: (usage: UsageData) => void
-  applyCount?: number // how many times Apply was pressed
-  onPendingChange?: (pending: boolean) => void // a new image is waiting for Apply
 }
 
 // `key` stays the same when other examples are removed, so React keeps each example's state
@@ -30,7 +28,7 @@ type GroupState = {
   touched: boolean // until then, the group sends null and its page shows its placeholder
 }
 
-export function UsageForm({ onChange, applyCount = 0, onPendingChange }: UsageFormProps) {
+export function UsageForm({ onChange }: UsageFormProps) {
   const nextKey = useRef(START_EXAMPLES * USAGE_KINDS.length)
   const [groups, setGroups] = useState<Record<UsageKind, GroupState>>(() => {
     // Keys 0–3 for the first group, 4–7 for the second: unique across the whole form
@@ -46,18 +44,13 @@ export function UsageForm({ onChange, applyCount = 0, onPendingChange }: UsageFo
     const data = (group: GroupState) =>
       group.touched
         ? group.rows.map((row) => {
-            const file = shownFile(row.image, applyCount, row.fileError)
+            const file = shownFile(row.image)
             return { id: row.key, description: row.description.trim(), image: file ? toImage(file) : null }
           })
         : null
     return { correct: data(groups.correct), incorrect: data(groups.incorrect) }
-  }, [groups, applyCount])
+  }, [groups])
   useLiveData(usage, onChange)
-
-  const pending = Object.values(groups).some((group) =>
-    group.rows.some((row) => isPending(row.image, applyCount, row.fileError)),
-  )
-  usePendingReport(pending, onPendingChange)
 
   // Every change to a group touches it, so its page leaves its placeholder
   function change(kind: UsageKind, update: (group: GroupState) => Partial<GroupState>) {
@@ -90,12 +83,17 @@ export function UsageForm({ onChange, applyCount = 0, onPendingChange }: UsageFo
     }))
   }
 
-  // A wrong file is flagged as soon as it is chosen. A valid one waits for Apply.
+  // A wrong file is flagged as soon as it is chosen. A valid one waits for its Apply.
   function chooseRowFile(kind: UsageKind, row: ExampleRow, file: File | null) {
     updateRow(kind, row.key, {
-      image: chooseFile(row.image, file, applyCount, row.fileError),
+      image: chooseFile(row.image, file),
       fileError: file ? validateImage(file) : '',
     })
+  }
+
+  // The example's Apply: only its own image reaches the page
+  function applyRowImage(kind: UsageKind, row: ExampleRow) {
+    updateRow(kind, row.key, { image: applyImage(row.image, row.fileError) })
   }
 
   return (
@@ -152,6 +150,8 @@ export function UsageForm({ onChange, applyCount = 0, onPendingChange }: UsageFo
                         fileName={row.image.file?.name ?? null}
                         error={row.fileError}
                         onChange={(file) => chooseRowFile(kind, row, file)}
+                        pending={isPending(row.image, row.fileError)}
+                        onApply={() => applyRowImage(kind, row)}
                       />
                       {group.rows.length > 1 && (
                         <button

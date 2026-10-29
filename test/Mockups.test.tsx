@@ -51,7 +51,7 @@ describe('Mockups – the page', () => {
   it('shows the Cover logo once it is applied, as no version has an image (scenario 9)', () => {
     renderApp();
     uploadLogo();
-    fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Apply Logo' }));
     const images = [...page().querySelectorAll('image')].map((image) => image.getAttribute('href'));
     expect(images).toEqual(DEFAULT_NAMES.map(() => 'blob:logo.png'));
   });

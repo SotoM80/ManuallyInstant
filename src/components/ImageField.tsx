@@ -1,7 +1,9 @@
-import type { ChangeEvent } from 'react'
+import { useState } from 'react'
+import type { AnimationEvent, ChangeEvent } from 'react'
 import { IMAGE_TYPES } from '../utils/validation'
 
-// A file field for one image (Cover logo, Logo versions, construction grid).
+// A file field for one image (Cover logo, Logo versions, construction grid). With `onApply`, its
+// own Apply button sits after the file's name: it shows only this field's new image (ADR 0020).
 type ImageFieldProps = {
   id: string
   label: string
@@ -9,11 +11,30 @@ type ImageFieldProps = {
   fileName: string | null // null → "No file chosen"
   error: string
   onChange: (file: File | null) => void
+  pending?: boolean // a valid new image waits for this field's Apply
+  onApply?: () => void
 }
 
-export function ImageField({ id, label, hideLabel = false, fileName, error, onChange }: ImageFieldProps) {
+// "Isotype image (optional)" → "Apply Isotype image", so every Apply has a name of its own
+function applyName(label: string) {
+  return `Apply ${label.replace(/\s*\(optional\)$/, '')}`
+}
+
+export function ImageField({ id, label, hideLabel = false, fileName, error, onChange, pending = false, onApply }: ImageFieldProps) {
+  const [applied, setApplied] = useState(false)
+
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     onChange(event.target.files?.[0] ?? null)
+  }
+
+  function handleApply() {
+    onApply?.()
+    setApplied(true)
+  }
+
+  // Back to idle when the button's own animation ends; the check (::after) has its own.
+  function handleAppliedEnd(event: AnimationEvent<HTMLButtonElement>) {
+    if (!event.pseudoElement) setApplied(false)
   }
 
   return (
@@ -38,6 +59,20 @@ export function ImageField({ id, label, hideLabel = false, fileName, error, onCh
         <span className="file-field-name" title={fileName ?? undefined} aria-hidden="true">
           {fileName ?? 'No file chosen'}
         </span>
+        {onApply && (
+          <button
+            type="button"
+            className="accent-button image-apply"
+            aria-label={applyName(label)}
+            disabled={!pending}
+            onClick={handleApply}
+            data-feedback={applied ? 'saved' : 'idle'}
+            onAnimationEnd={handleAppliedEnd}
+            title={pending ? 'Show this image in the manual' : 'Choose a new image to apply it'}
+          >
+            Apply
+          </button>
+        )}
       </div>
       {error && (
         <p id={`${id}-error`} role="alert">

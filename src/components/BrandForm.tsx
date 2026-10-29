@@ -12,15 +12,7 @@ import {
 } from '../data/colorPalette'
 import { DEFAULT_LOGO_SIZE, LOGO_SIZES } from '../data/logoOptions'
 import { findOption, validateImage } from '../utils/validation'
-import {
-  NO_IMAGE,
-  chooseFile,
-  isPending,
-  shownFile,
-  toImage,
-  useLiveData,
-  usePendingReport,
-} from '../utils/pendingImage'
+import { NO_IMAGE, applyImage, chooseFile, isPending, shownFile, toImage, useLiveData } from '../utils/pendingImage'
 import type { CoverData, LogoSize, ManualColors, TitleStyle } from '../types'
 
 type StyleKey = keyof TitleStyle
@@ -28,11 +20,9 @@ type StyleValues = Record<StyleKey, string>
 type ColorKey = keyof ManualColors
 
 // Form of the Cover section: brand manual title (+ style), colors, Designed by and logo.
-// Every change reaches the preview at once; a new logo waits for Apply (see docs/adr/0007).
+// Every change reaches the preview at once; a new logo waits for its Apply (see docs/adr/0007, 0020).
 type BrandFormProps = {
   onChange?: (cover: CoverData) => void
-  applyCount?: number // how many times Apply was pressed
-  onPendingChange?: (pending: boolean) => void // a new logo is waiting for Apply
 }
 
 const NO_STYLE_ERRORS: StyleValues = { fontFamily: '', fontStyle: '', fontSize: '' }
@@ -54,7 +44,7 @@ function validateLogo(file: File | null) {
   return validateImage(file, 'logo')
 }
 
-export function BrandForm({ onChange, applyCount = 0, onPendingChange }: BrandFormProps) {
+export function BrandForm({ onChange }: BrandFormProps) {
   const [title, setTitle] = useState('')
   const [designedBy, setDesignedBy] = useState('')
   const [logo, setLogo] = useState(NO_IMAGE)
@@ -68,7 +58,7 @@ export function BrandForm({ onChange, applyCount = 0, onPendingChange }: BrandFo
   const [colorErrors, setColorErrors] = useState<ManualColors>(NO_COLOR_ERRORS)
   const [validColors, setValidColors] = useState<ManualColors>(DEFAULT_COLORS)
 
-  const shownLogo = shownFile(logo, applyCount, logoError)
+  const shownLogo = shownFile(logo)
   const cover = useMemo<CoverData>(
     () => ({
       title: title.trim(),
@@ -80,7 +70,6 @@ export function BrandForm({ onChange, applyCount = 0, onPendingChange }: BrandFo
     [title, validStyle, designedBy, shownLogo, logoSize, validColors],
   )
   useLiveData(cover, onChange)
-  usePendingReport(isPending(logo, applyCount, logoError), onPendingChange)
 
   function updateColor(key: ColorKey, value: string, fieldError = '') {
     setColors((prev) => ({ ...prev, [key]: value }))
@@ -115,9 +104,9 @@ export function BrandForm({ onChange, applyCount = 0, onPendingChange }: BrandFo
     updateStyle(key, match ?? value, match ? '' : 'Select a valid option')
   }
 
-  // A wrong file is flagged as soon as it is chosen. A valid one waits for Apply.
+  // A wrong file is flagged as soon as it is chosen. A valid one waits for its Apply.
   function handleLogoChange(file: File | null) {
-    setLogo((prev) => chooseFile(prev, file, applyCount, logoError))
+    setLogo((prev) => chooseFile(prev, file))
     setLogoError(file ? validateLogo(file) : '')
   }
 
@@ -169,6 +158,8 @@ export function BrandForm({ onChange, applyCount = 0, onPendingChange }: BrandFo
         fileName={logo.file?.name ?? null}
         error={logoError}
         onChange={handleLogoChange}
+        pending={isPending(logo, logoError)}
+        onApply={() => setLogo((prev) => applyImage(prev, logoError))}
       />
 
       {/* Always one option chosen, so it never shows an error */}

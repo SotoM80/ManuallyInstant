@@ -18,21 +18,23 @@ function uploadCoverLogo(name: string) {
 // Every part on, so the whole form can be tested (the app may still have some off).
 const ALL_PARTS = { versions: true, clearSpace: true };
 
-// Renders the form alone. `apply()` does what the Apply button of the preview does.
+// The Apply buttons of the form that are on: one per image field waiting (ADR 0020)
+function applyButtonsOn() {
+  return within(getForm())
+    .queryAllByRole('button', { name: /^Apply / })
+    .filter((button) => !(button as HTMLButtonElement).disabled);
+}
+
+// Renders the form alone. `apply()` clicks every Apply that is on, so each test can show all its
+// new images at once; `pending()` says whether any image still waits.
 function renderForm(parts: LogoParts = ALL_PARTS) {
   const onChange = jest.fn();
-  const onPendingChange = jest.fn();
-  let applyCount = 0;
-  const view = render(
-    <LogoForm onChange={onChange} applyCount={applyCount} onPendingChange={onPendingChange} parts={parts} />,
-  );
+  render(<LogoForm onChange={onChange} parts={parts} />);
   function apply() {
-    applyCount += 1;
-    view.rerender(
-      <LogoForm onChange={onChange} applyCount={applyCount} onPendingChange={onPendingChange} parts={parts} />,
-    );
+    applyButtonsOn().forEach((button) => fireEvent.click(button));
   }
-  return { onChange, onPendingChange, apply };
+  const pending = () => applyButtonsOn().length > 0;
+  return { onChange, pending, apply };
 }
 
 const NO_PARTS = { versions: false, clearSpace: false };
@@ -123,11 +125,11 @@ describe('Logo section – form', () => {
   });
 
   it('sends the text before Apply, with the new image still waiting', () => {
-    const { onChange, onPendingChange } = renderForm();
+    const { onChange, pending } = renderForm();
 
     fillValidForm();
 
-    expect(onPendingChange).toHaveBeenLastCalledWith(true);
+    expect(pending()).toBe(true);
     expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({
         brandName: 'VOLTA',
@@ -136,13 +138,13 @@ describe('Logo section – form', () => {
     );
   });
 
-  it('reports nothing pending once Apply is pressed', () => {
-    const { onPendingChange, apply } = renderForm();
+  it('has nothing pending once its Apply is pressed', () => {
+    const { pending } = renderForm();
     upload('Version 1 image', makeLogo('volta-h.png'));
 
-    apply();
+    fireEvent.click(within(getForm()).getByRole('button', { name: 'Apply Version 1 image' }));
 
-    expect(onPendingChange).toHaveBeenLastCalledWith(false);
+    expect(pending()).toBe(false);
   });
 
   it('shows no "Required field" errors for empty fields', () => {
@@ -162,12 +164,12 @@ describe('Logo section – form', () => {
   });
 
   it('flags a wrong image as soon as it is chosen, and does not wait for Apply', () => {
-    const { onPendingChange } = renderForm();
+    const { pending } = renderForm();
 
     upload('Version 1 image', makeLogo('volta.pdf', 'application/pdf'));
 
     expect(within(getForm()).getByText('Use a PNG, JPG, SVG or WebP image')).toBeInTheDocument();
-    expect(onPendingChange).toHaveBeenLastCalledWith(false);
+    expect(pending()).toBe(false);
   });
 
   it('sends the optional construction grid after Apply', () => {
@@ -292,7 +294,7 @@ describe('Logo section – mark cards', () => {
     upload('Isotype image (optional)', makeLogo('symbol.png'));
     type('Isotype name', 'Bolt');
 
-    clickApply();
+    clickApply('Apply Isotype image');
 
     const cards = within(getPage('Anatomy')).getByRole('list', { name: 'Marks of the brand' });
     const imagotype = within(cards).getByRole('listitem', { name: 'Imagotype' });
@@ -440,7 +442,7 @@ describe('Logo section – preview pages', () => {
     expect(within(versions).getByRole('img', { name: 'Horizontal version' })).toHaveAttribute('src', 'blob:cover.png');
 
     upload('Version 1 image', makeLogo('volta-h.png'));
-    clickApply();
+    clickApply('Apply Version 1 image');
 
     expect(within(versions).getByRole('img', { name: 'Horizontal version' })).toHaveAttribute('src', 'blob:volta-h.png');
   });
@@ -475,26 +477,26 @@ describe('Logo section – preview pages', () => {
   });
 });
 
-// Spec: docs/adr/0007 — one Apply button for every image
+// Spec: docs/adr/0020 — one Apply next to each image
 describe('Logo section – Apply button', () => {
-  it('turns Apply on when a card image is chosen, and shows it only after Apply', () => {
+  it('turns the card\'s Apply on when its image is chosen, and shows it only after it', () => {
     renderApp('/brand-manual');
     const sections = screen.getByRole('region', { name: 'Manual sections' });
     fireEvent.click(within(sections).getByRole('button', { name: '2. Logo' }));
     fillConcept();
-    expect(getApplyButton()).toBeDisabled();
+    expect(getApplyButton('Apply Imagotype image')).toBeDisabled();
 
     upload('Imagotype image (optional)', makeLogo('mark.png'));
 
     const preview = screen.getByRole('region', { name: 'Manual preview' });
     const anatomy = within(preview).getByRole('article', { name: 'Anatomy' });
-    expect(getApplyButton()).toBeEnabled();
+    expect(getApplyButton('Apply Imagotype image')).toBeEnabled();
     expect(within(anatomy).queryByRole('img')).not.toBeInTheDocument();
 
-    clickApply();
+    clickApply('Apply Imagotype image');
 
     expect(within(anatomy).getByRole('img', { name: 'Lightning symbol' })).toHaveAttribute('src', 'blob:mark.png');
-    expect(getApplyButton()).toBeDisabled();
+    expect(getApplyButton('Apply Imagotype image')).toBeDisabled();
   });
 });
 
@@ -626,7 +628,7 @@ describe('Logo section – Clear space page', () => {
     upload('Construction grid (optional)', makeLogo('grid.png'));
     expect(within(getPage()).queryByRole('img', { name: 'Construction grid' })).not.toBeInTheDocument();
 
-    clickApply();
+    clickApply('Apply Construction grid');
     expect(within(getPage()).getByRole('img', { name: 'Construction grid' })).toHaveAttribute('src', 'blob:grid.png');
   });
 });
@@ -703,7 +705,7 @@ describe('Logo section – construction grid', () => {
     openLogoSection();
 
     upload('Construction grid (optional)', makeLogo('grid.png'));
-    clickApply();
+    clickApply('Apply Construction grid');
 
     expect(within(getPage()).getByRole('img', { name: 'Construction grid' })).toBeInTheDocument();
     expect(within(getPage()).queryByRole('img', { name: 'Generated construction grid' })).not.toBeInTheDocument();
@@ -730,7 +732,7 @@ describe('Logo section – construction grid', () => {
     clickApply();
     openLogoSection();
     upload('Construction grid (optional)', makeLogo('grid.png'));
-    clickApply();
+    clickApply('Apply Construction grid');
 
     click('Remove grid');
 
@@ -748,7 +750,7 @@ describe('Logo section – construction grid', () => {
     upload('Construction grid (optional)', makeLogo('grid.png'));
     expect(within(getForm()).getByText('Click Apply to show this grid instead of the one drawn from your logo.')).toBeInTheDocument();
 
-    clickApply();
+    clickApply('Apply Construction grid');
     expect(modules).toBeDisabled();
     expect(within(getForm()).getByText(/Your uploaded grid is shown/)).toBeInTheDocument();
 
@@ -908,5 +910,48 @@ describe('Logo section – clicked guides', () => {
     fireEvent.click(getGrid().querySelector('[data-guide="vertical"]') as Element);
 
     expect(getGrid().querySelector('[data-ruler="top"]')).toBeNull();
+  });
+});
+
+// Spec: specs/brandmanual.md, Scenario 5b — each Apply shows only its image (ADR 0020)
+describe('Logo section – one Apply per image', () => {
+  it('shows only the image of the Apply clicked', () => {
+    const { onChange } = renderForm();
+    fireEvent.click(within(getForm()).getByRole('button', { name: 'Add version' }));
+    upload('Version 1 image', makeLogo('volta-h.png'));
+    upload('Version 2 image', makeLogo('volta-v.png'));
+    const versionImages = () => (onChange.mock.lastCall![0] as LogoData).variants.map((variant) => variant.image?.name ?? null);
+
+    fireEvent.click(within(getForm()).getByRole('button', { name: 'Apply Version 1 image' }));
+
+    expect(versionImages()).toEqual(['volta-h.png', null]);
+    expect(within(getForm()).getByRole('button', { name: 'Apply Version 1 image' })).toBeDisabled();
+    expect(within(getForm()).getByRole('button', { name: 'Apply Version 2 image' })).toBeEnabled();
+
+    fireEvent.click(within(getForm()).getByRole('button', { name: 'Apply Version 2 image' }));
+
+    expect(versionImages()).toEqual(['volta-h.png', 'volta-v.png']);
+  });
+
+  it('keeps every Apply off until its field has a new valid image', () => {
+    renderForm();
+
+    upload('Construction grid (optional)', makeLogo('grid.pdf', 'application/pdf'));
+
+    expect(within(getForm()).getByRole('button', { name: 'Apply Construction grid' })).toBeDisabled();
+    expect(within(getForm()).getByRole('button', { name: 'Apply Imagotype image' })).toBeDisabled();
+    expect(within(getForm()).getByRole('button', { name: 'Apply Version 1 image' })).toBeDisabled();
+  });
+
+  it('turns the Apply off again when the image shown is chosen once more', () => {
+    renderForm();
+    const grid = makeLogo('grid.png');
+    upload('Construction grid (optional)', grid);
+    fireEvent.click(within(getForm()).getByRole('button', { name: 'Apply Construction grid' }));
+
+    upload('Construction grid (optional)', makeLogo('other.png'));
+    upload('Construction grid (optional)', grid);
+
+    expect(within(getForm()).getByRole('button', { name: 'Apply Construction grid' })).toBeDisabled();
   });
 });

@@ -39,7 +39,7 @@ export function pickLogoSize(size: 'Small' | 'Medium' | 'Large') {
   fireEvent.click(getLogoSizeOption(size));
 }
 
-// Fills Designed by and chooses a logo (the logo still waits for Apply).
+// Fills Designed by and chooses a logo (the logo still waits for "Apply Logo").
 export function fillRequiredCoverFields() {
   typeDesignedBy('Studio X');
   uploadLogo();
@@ -64,11 +64,12 @@ export function typeHex(field: ColorField, value: string) {
   fireEvent.change(getHexInput(field), { target: { value } });
 }
 
-// The Apply button of the preview: it shows the images chosen since the last Apply.
-export function getApplyButton() {
-  return screen.getByRole('button', { name: 'Apply' });
+// The Apply next to an image field shows only that field's new image (ADR 0020). Its name is
+// "Apply" and the field's label: the Cover logo's by default, or e.g. "Apply Version 1 image".
+export function getApplyButton(name = 'Apply Logo') {
+  return screen.getByRole('button', { name });
 }
 
-export function clickApply() {
-  fireEvent.click(getApplyButton());
+export function clickApply(name = 'Apply Logo') {
+  fireEvent.click(getApplyButton(name));
 }

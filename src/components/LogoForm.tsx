@@ -16,15 +16,7 @@ import { keepInPlace } from '../utils/scrollAnchor'
 import { validateImage, validatePositiveNumber } from '../utils/validation'
 import { RULER_ERROR, parseRuler } from '../utils/rulers'
 import { logoLayers } from '../utils/logoLayers'
-import {
-  NO_IMAGE,
-  chooseFile,
-  isPending,
-  shownFile,
-  toImage,
-  useLiveData,
-  usePendingReport,
-} from '../utils/pendingImage'
+import { NO_IMAGE, applyImage, chooseFile, isPending, shownFile, toImage, useLiveData } from '../utils/pendingImage'
 import type { PendingImage } from '../utils/pendingImage'
 import type { LogoData, MarkType } from '../types'
 
@@ -36,6 +28,7 @@ type PartDraft = {
   role: string
   image: PendingImage
   fileError: string
+  fromFile: File | null // the card's layered SVG it was made from: the card's Apply shows it too
 }
 
 // What is typed in the card of one mark type, with the parts it is built from.
@@ -80,11 +73,10 @@ type VariantRow = {
 // Concept (Brand concept page), Anatomy (Anatomy page), Versions (Logo versions page) and
 // Clear space & size (Clear space page). The versions work like the colors of the Colors section: an accordion.
 // Groups whose part is off (see LOGO_PARTS) show "Coming soon" and send nothing.
-// Every change reaches the preview at once; new images wait for Apply (see docs/adr/0007).
+// Every change reaches the preview at once; each new image waits for its own Apply (see
+// docs/adr/0007 and 0020).
 type LogoFormProps = {
   onChange?: (logo: LogoData) => void
-  applyCount?: number // how many times Apply was pressed
-  onPendingChange?: (pending: boolean) => void // a new image is waiting for Apply
   parts?: LogoParts
 }
 
@@ -95,18 +87,13 @@ function newVariant(key: number): VariantRow {
 }
 
 // The applied image of a field, ready for the preview (null → none yet).
-function appliedImage(image: PendingImage, applyCount: number, error: string) {
-  const file = shownFile(image, applyCount, error)
+function appliedImage(image: PendingImage) {
+  const file = shownFile(image)
   return file ? toImage(file) : null
 }
 
 
-export function LogoForm({
-  onChange,
-  applyCount = 0,
-  onPendingChange,
-  parts = LOGO_PARTS,
-}: LogoFormProps) {
+export function LogoForm({ onChange, parts = LOGO_PARTS }: LogoFormProps) {
   const nextKey = useRef(1)
   // The last file chosen in each card: the layers of an older one, read late, are dropped
   const latestCardFile = useRef<Partial<Record<MarkType, File | null>>>({})
@@ -135,8 +122,8 @@ export function LogoForm({
   const [gridError, setGridError] = useState('')
 
   // The construction grid: an uploaded one (applied) replaces the one the app draws
-  const gridInUse = parts.clearSpace && shownFile(grid, applyCount, gridError) !== null
-  const gridWaiting = isPending(grid, applyCount, gridError)
+  const gridInUse = parts.clearSpace && shownFile(grid) !== null
+  const gridWaiting = isPending(grid, gridError)
 
   // Shown as soon as the value is wrong; a blank text field is not an error.
   const markTypesError = markTypes.length === 0 ? 'Choose at least one mark type' : ''
@@ -155,14 +142,14 @@ export function LogoForm({
           type,
           name: card.name.trim(),
           role: card.role.trim(),
-          image: appliedImage(card.image, applyCount, card.fileError),
+          image: appliedImage(card.image),
           parts: card.parts
             .filter((part) => !isEmptyPart(part))
             .map((part, index) => ({
               label: part.label.trim() || `Part ${index + 1}`,
               name: part.name.trim(),
               role: part.role.trim(),
-              image: appliedImage(part.image, applyCount, part.fileError),
+              image: appliedImage(part.image),
             })),
         }
       }),
@@ -172,34 +159,21 @@ export function LogoForm({
             id: row.key,
             name: row.name.trim(),
             usage: row.usage.trim(),
-            image: appliedImage(row.image, applyCount, row.fileError),
+            image: appliedImage(row.image),
           }))
         : [],
       clearSpaceUnit: unit.trim(),
       minDigitalPx: validMinDigital,
       minPrintMm: validMinPrint,
-      grid: parts.clearSpace ? appliedImage(grid, applyCount, gridError) : null,
+      grid: parts.clearSpace ? appliedImage(grid) : null,
       gridModules,
       gridX,
       rulerTop: validRulerTop,
       rulerSide: validRulerSide,
     }),
-    [brandName, concept, markTypes, cards, variants, unit, validMinDigital, validMinPrint, grid, gridError, gridModules, gridX, validRulerTop, validRulerSide, applyCount, parts],
+    [brandName, concept, markTypes, cards, variants, unit, validMinDigital, validMinPrint, grid, gridModules, gridX, validRulerTop, validRulerSide, parts],
   )
   useLiveData(logo, onChange)
-
-  // Only images of what is in use count: an unticked card or a part that is off waits silently.
-  const pending =
-    markTypes.some((type) => {
-      const card = cards[type] ?? EMPTY_CARD
-      return (
-        isPending(card.image, applyCount, card.fileError) ||
-        card.parts.some((part) => isPending(part.image, applyCount, part.fileError))
-      )
-    }) ||
-    (parts.versions && variants.some((row) => isPending(row.image, applyCount, row.fileError))) ||
-    (parts.clearSpace && isPending(grid, applyCount, gridError))
-  usePendingReport(pending, onPendingChange)
 
   // A size field: what is typed always shows; only a valid number reaches the page
   function sizeChange(setValue: (value: string) => void, setValid: (value: number) => void) {
@@ -257,12 +231,12 @@ export function LogoForm({
   }
 
   // Card images are optional: only a wrong file is an error, flagged as soon as it is chosen.
-  // A valid one waits for Apply.
+  // A valid one waits for the card's Apply.
   function chooseCardFile(type: MarkType, file: File | null) {
     const card = cards[type] ?? EMPTY_CARD
     const fileError = file ? validateImage(file) : ''
     updateCard(type, {
-      image: chooseFile(card.image, file, applyCount, card.fileError),
+      image: chooseFile(card.image, file),
       fileError,
       layersNote: '',
     })
@@ -271,24 +245,25 @@ export function LogoForm({
   }
 
   // A layered SVG gives a card with no parts one part per layer (see specs/logolayers.md).
-  // Its images count as chosen with the card's image, so the same Apply shows them all, even
-  // if Apply is pressed while the file is still being read.
+  // The parts remember the file they came from, so the card's Apply shows them too; if it was
+  // pressed while the file was still being read, they arrive already shown.
   async function fillPartsFromLayers(type: MarkType, file: File) {
-    const chosenAt = applyCount
     const result = await logoLayers(file, MAX_PARTS)
     if (result.kind === 'none' || latestCardFile.current[type] !== file) return
     setCards((prev) => {
       const card = { ...EMPTY_CARD, ...prev[type] }
       if (result.kind === 'unreadable') return { ...prev, [type]: { ...card, layersNote: LAYERS_UNREADABLE } }
       if (card.parts.length > 0) return { ...prev, [type]: { ...card, layersNote: LAYERS_KEPT } }
+      const applied = card.image.shown === file
       const parts = result.parts.map(
         (part): PartDraft => ({
           key: takeKey(),
           label: part.label,
           name: '',
           role: '',
-          image: chooseFile(NO_IMAGE, part.file, chosenAt, ''),
+          image: applied ? { file: part.file, shown: part.file } : chooseFile(NO_IMAGE, part.file),
           fileError: '',
+          fromFile: file,
         }),
       )
       return { ...prev, [type]: { ...card, parts, layersNote: result.total > MAX_PARTS ? LAYERS_CUT : '' } }
@@ -302,7 +277,7 @@ export function LogoForm({
   function addPart(type: MarkType) {
     const parts = cardParts(type)
     if (parts.length >= MAX_PARTS) return
-    const part: PartDraft = { key: takeKey(), label: '', name: '', role: '', image: NO_IMAGE, fileError: '' }
+    const part: PartDraft = { key: takeKey(), label: '', name: '', role: '', image: NO_IMAGE, fileError: '', fromFile: null }
     updateCard(type, { parts: [...parts, part] })
   }
 
@@ -316,25 +291,52 @@ export function LogoForm({
     })
   }
 
+  // A file chosen by hand is the part's own: the card's Apply no longer shows it
   function choosePartFile(type: MarkType, part: PartDraft, file: File | null) {
     updatePart(type, part.key, {
-      image: chooseFile(part.image, file, applyCount, part.fileError),
+      image: chooseFile(part.image, file),
       fileError: file ? validateImage(file) : '',
+      fromFile: null,
     })
   }
 
-  // A wrong file is flagged as soon as it is chosen. A valid one waits for Apply.
+  // A wrong file is flagged as soon as it is chosen. A valid one waits for its Apply.
   function chooseVariantFile(row: VariantRow, file: File | null) {
     updateVariant(row.key, {
-      image: chooseFile(row.image, file, applyCount, row.fileError),
+      image: chooseFile(row.image, file),
       fileError: file ? validateImage(file) : '',
     })
   }
 
   // The construction grid is optional: only a wrong file is an error.
   function chooseGridFile(file: File | null) {
-    setGrid((prev) => chooseFile(prev, file, applyCount, gridError))
+    setGrid((prev) => chooseFile(prev, file))
     setGridError(file ? validateImage(file) : '')
+  }
+
+  // Each Apply shows only its own image (ADR 0020). The card's also shows the parts made from
+  // its layered SVG (specs/logolayers.md).
+  function applyCard(type: MarkType) {
+    setCards((prev) => {
+      const card = { ...EMPTY_CARD, ...prev[type] }
+      const file = card.image.file
+      const parts = card.parts.map((part) =>
+        file && part.fromFile === file ? { ...part, image: applyImage(part.image, part.fileError) } : part,
+      )
+      return { ...prev, [type]: { ...card, image: applyImage(card.image, card.fileError), parts } }
+    })
+  }
+
+  function applyPart(type: MarkType, part: PartDraft) {
+    updatePart(type, part.key, { image: applyImage(part.image, part.fileError) })
+  }
+
+  function applyVariant(row: VariantRow) {
+    updateVariant(row.key, { image: applyImage(row.image, row.fileError) })
+  }
+
+  function applyGrid() {
+    setGrid((prev) => applyImage(prev, gridError))
   }
 
   // Back to the grid the app draws. Removing is not a new image, so it shows at once.
@@ -446,6 +448,8 @@ export function LogoForm({
                 fileName={card.image.file?.name ?? null}
                 error={card.fileError}
                 onChange={(file) => chooseCardFile(type, file)}
+                pending={isPending(card.image, card.fileError)}
+                onApply={() => applyCard(type)}
               />
               {card.layersNote && (
                 <p className="logo-form-hint" role="status">
@@ -490,6 +494,8 @@ export function LogoForm({
                       fileName={part.image.file?.name ?? null}
                       error={part.fileError}
                       onChange={(file) => choosePartFile(type, part, file)}
+                      pending={isPending(part.image, part.fileError)}
+                      onApply={() => applyPart(type, part)}
                     />
                     <div className="logo-mark-card-fields">
                       <input
@@ -592,6 +598,8 @@ export function LogoForm({
                         fileName={row.image.file?.name ?? null}
                         error={row.fileError}
                         onChange={(file) => chooseVariantFile(row, file)}
+                        pending={isPending(row.image, row.fileError)}
+                        onApply={() => applyVariant(row)}
                       />
                       {variants.length > 1 && (
                         <button
@@ -712,6 +720,8 @@ export function LogoForm({
               fileName={grid.file?.name ?? null}
               error={gridError}
               onChange={chooseGridFile}
+              pending={gridWaiting}
+              onApply={applyGrid}
             />
             {(grid.file || grid.shown) && (
               <button type="button" className="palette-secondary-button" onClick={removeGrid}>

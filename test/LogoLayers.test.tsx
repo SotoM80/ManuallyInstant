@@ -23,13 +23,12 @@ function svgFile(name: string, ...layers: string[]) {
   return new File([text], name, { type: 'image/svg+xml' });
 }
 
+// `apply()` clicks the card's Apply, which also shows the parts made from its layers
 function renderForm() {
   const onChange = jest.fn();
-  let applyCount = 0;
-  const view = render(<LogoForm onChange={onChange} applyCount={applyCount} />);
+  render(<LogoForm onChange={onChange} />);
   function apply() {
-    applyCount += 1;
-    view.rerender(<LogoForm onChange={onChange} applyCount={applyCount} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Apply Imagotype image' }));
   }
   return { apply, imagotype: () => (onChange.mock.lastCall![0] as LogoData).marks[0] };
 }
@@ -154,6 +153,34 @@ describe('Logo layers from SVG', () => {
 
     await waitForParts(2);
     expect(imagotype().parts.map((part) => part.image?.name)).toEqual(['volta-Logotipo.svg', 'volta-Tagline.svg']);
+    // Already shown, so the parts' own Apply buttons stay off (specs/logolayers.md, Scenario 7b)
+    expect(screen.getByRole('button', { name: 'Apply Imagotype part 1 image' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Apply Imagotype part 2 image' })).toBeDisabled();
+  });
+
+  it('leaves a part chosen by hand for its own Apply', async () => {
+    const { apply, imagotype } = renderForm();
+    chooseImagotype(svgFile('volta.svg', layer('Logotipo', 0), layer('Tagline', 60)));
+    await waitForParts(2);
+    apply();
+
+    fireEvent.change(within(getForm()).getByLabelText('Imagotype part 2 image (optional)', { selector: 'input' }), {
+      target: { files: [makeLogo('tagline-new.png')] },
+    });
+    fireEvent.change(within(getForm()).getByLabelText('Imagotype image (optional)', { selector: 'input' }), {
+      target: { files: [makeLogo('volta-new.png')] },
+    });
+    apply();
+
+    // The card shows its new file; the part chosen by hand still waits for its own Apply
+    expect(imagotype().image?.name).toBe('volta-new.png');
+    expect(imagotype().parts[1].image?.name).toBe('volta-Tagline.svg');
+    const partApply = screen.getByRole('button', { name: 'Apply Imagotype part 2 image' });
+    expect(partApply).toBeEnabled();
+
+    fireEvent.click(partApply);
+
+    expect(imagotype().parts[1].image?.name).toBe('tagline-new.png');
   });
 
   it('makes no parts from a PNG or an SVG with one layer', async () => {

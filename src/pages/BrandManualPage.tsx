@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
-import type { AnimationEvent, ReactNode, SyntheticEvent } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import type { ReactNode, SyntheticEvent } from 'react'
 import { BrandForm } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
@@ -113,38 +113,16 @@ export function BrandManualPage({
     if (opening && top < 0) window.scrollBy({ top: top - 16, behavior: 'smooth' })
   }
 
-  // The forms send every change to the preview at once, but a new image waits for the
-  // Apply button of the preview (see docs/adr/0007). Each Apply adds one to `applyCount`,
-  // and the forms show every image chosen before it.
-  const [applyCount, setApplyCount] = useState(0)
-  const [coverPending, setCoverPending] = useState(false)
-  const [logoPending, setLogoPending] = useState(false)
-  const [usagePending, setUsagePending] = useState(false)
-  const applyImages = useCallback(() => setApplyCount((count) => count + 1), [])
-  // A pulse with a check after Apply, like the Save buttons had (see specs/motion.md)
-  const [applied, setApplied] = useState(false)
-  const canApply = coverPending || logoPending || usagePending
-
-  function handleApply() {
-    applyImages()
-    setApplied(true)
-  }
-
-  // Back to idle when the button's own animation ends; the check (::after) has its own.
-  function handleAppliedEnd(event: AnimationEvent<HTMLButtonElement>) {
-    if (!event.pseudoElement) setApplied(false)
-  }
-
-  // Form of each built section. Sections not listed here show "Coming soon".
   // The palette's colors, for their CMYK values from the server (specs/colorpalette.md)
   const paletteHexes = useMemo(() => (palette ?? []).map((color) => color.hex), [palette])
 
+  // Form of each built section. Sections not listed here show "Coming soon".
+  // The forms send every change to the preview at once; a new image waits for the Apply next
+  // to its field (see docs/adr/0007 and 0020).
   const sectionForms: Record<string, ReactNode> = {
-    cover: (
-      <BrandForm onChange={onCoverChange} applyCount={applyCount} onPendingChange={setCoverPending} />
-    ),
-    logo: <LogoForm onChange={onLogoChange} applyCount={applyCount} onPendingChange={setLogoPending} />,
-    usage: <UsageForm onChange={onUsageChange} applyCount={applyCount} onPendingChange={setUsagePending} />,
+    cover: <BrandForm onChange={onCoverChange} />,
+    logo: <LogoForm onChange={onLogoChange} />,
+    usage: <UsageForm onChange={onUsageChange} />,
     colors: <ColorsForm onChange={onPaletteChange} />,
     typography: <TypographyForm onChange={onTypographyChange} />,
     skin: (
@@ -194,18 +172,6 @@ export function BrandManualPage({
               template={template}
               guides={guides}
             />
-            {/* Text and colors show at once; a new image waits here (see docs/adr/0007) */}
-            <button
-              type="button"
-              className="sections-apply"
-              disabled={!canApply}
-              onClick={handleApply}
-              data-feedback={applied ? 'saved' : 'idle'}
-              onAnimationEnd={handleAppliedEnd}
-              title={canApply ? 'Show the new image in the manual' : 'Choose a new image to apply it'}
-            >
-              Apply
-            </button>
           </div>
 
           <ol ref={sectionList}>

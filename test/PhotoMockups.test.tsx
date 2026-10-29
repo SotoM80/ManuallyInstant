@@ -66,7 +66,7 @@ describe('Photo mockups (phase 1)', () => {
   it('sends the size, rotation and blend, and Reset puts the logo back (scenarios 19 and 20)', async () => {
     renderApp();
     uploadLogo();
-    fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Apply Logo' }));
     const form = tickPhoto();
     fireEvent.change(within(form).getByRole('slider', { name: 'Size' }), { target: { value: '60' } });
     fireEvent.change(within(form).getByRole('slider', { name: 'Rotation' }), { target: { value: '10' } });
@@ -85,7 +85,7 @@ describe('Photo mockups (phase 1)', () => {
   it('moves the logo with the arrow keys, never out of its area', async () => {
     renderApp();
     uploadLogo();
-    fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Apply Logo' }));
     const form = tickPhoto();
     fireEvent.change(within(form).getByRole('slider', { name: 'Size' }), { target: { value: '40' } });
     const handle = within(form).getByRole('slider', { name: `Move the logo on the ${PHOTO}` });

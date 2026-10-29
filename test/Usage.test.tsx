@@ -72,22 +72,23 @@ describe('Usage – form and pages', () => {
     renderApp();
     openUsage();
     typeDescription('Incorrect use example 1', "Don't stretch the logo");
-    expect(getApplyButton()).toBeDisabled();
+    const apply = () => getApplyButton('Apply Incorrect use example 1 image');
+    expect(apply()).toBeDisabled();
 
     fireEvent.change(usageForm().getByLabelText('Incorrect use example 1 image', { selector: 'input' }), {
       target: { files: [makeLogo('stretched.png')] },
     });
 
-    expect(getApplyButton()).toBeEnabled();
+    expect(apply()).toBeEnabled();
     expect(within(page('Incorrect use')).queryByRole('img')).not.toBeInTheDocument();
 
-    fireEvent.click(getApplyButton());
+    fireEvent.click(apply());
 
     expect(within(page('Incorrect use')).getByRole('img', { name: "Don't stretch the logo" })).toHaveAttribute(
       'src',
       'blob:stretched.png',
     );
-    expect(getApplyButton()).toBeDisabled();
+    expect(apply()).toBeDisabled();
   });
 
   // Scenario 4
@@ -173,6 +174,29 @@ describe('Usage – form and pages', () => {
     });
 
     expect(usageForm().getByText('Use a PNG, JPG, SVG or WebP image')).toBeInTheDocument();
-    expect(getApplyButton()).toBeDisabled();
+    expect(getApplyButton('Apply Correct use example 2 image')).toBeDisabled();
+  });
+});
+
+// Spec: specs/usage.md, "Apply and the PDFs" — each example has its own Apply (ADR 0020)
+describe('Usage – one Apply per example', () => {
+  it('shows only the image of the example whose Apply is clicked', () => {
+    renderApp();
+    openUsage();
+    typeDescription('Incorrect use example 1', 'Stretched');
+    fireEvent.change(usageForm().getByLabelText('Incorrect use example 1 image', { selector: 'input' }), {
+      target: { files: [makeLogo('stretched.png')] },
+    });
+    fireEvent.click(group('Incorrect use').getByRole('button', { name: 'Incorrect use example 2' }));
+    typeDescription('Incorrect use example 2', 'Rotated');
+    fireEvent.change(usageForm().getByLabelText('Incorrect use example 2 image', { selector: 'input' }), {
+      target: { files: [makeLogo('rotated.png')] },
+    });
+
+    fireEvent.click(getApplyButton('Apply Incorrect use example 2 image'));
+
+    const images = within(page('Incorrect use')).getAllByRole('img');
+    expect(images.map((image) => image.getAttribute('src'))).toEqual(['blob:rotated.png']);
+    expect(getApplyButton('Apply Incorrect use example 1 image')).toBeEnabled();
   });
 });

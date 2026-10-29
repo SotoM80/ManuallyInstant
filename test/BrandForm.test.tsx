@@ -69,29 +69,28 @@ describe('BrandForm – live title', () => {
   });
 });
 
-// Spec: specs/cover.md — a new logo waits for Apply
+// Spec: specs/cover.md — a new logo waits for its Apply (ADR 0020)
 describe('BrandForm – logo waits for Apply', () => {
   function makeFile(name = 'logo.png', type = 'image/png') {
     return new File([new Uint8Array(1)], name, { type });
   }
 
-  it('reports a pending logo, and sends it only after Apply', () => {
+  it('turns its Apply on for a new logo, and sends the logo only after it', () => {
     const onChange = jest.fn();
-    const onPendingChange = jest.fn();
-    const { rerender } = render(
-      <BrandForm onChange={onChange} applyCount={0} onPendingChange={onPendingChange} />,
-    );
+    render(<BrandForm onChange={onChange} />);
+    const apply = screen.getByRole('button', { name: 'Apply Logo' });
+    expect(apply).toBeDisabled();
 
     fireEvent.change(screen.getByLabelText('Logo', { selector: 'input' }), {
       target: { files: [makeFile('brand.png')] },
     });
 
-    expect(onPendingChange).toHaveBeenLastCalledWith(true);
+    expect(apply).toBeEnabled();
     expect(onChange).not.toHaveBeenCalled(); // nothing the Cover shows has changed yet
 
-    rerender(<BrandForm onChange={onChange} applyCount={1} onPendingChange={onPendingChange} />);
+    fireEvent.click(apply);
 
-    expect(onPendingChange).toHaveBeenLastCalledWith(false);
+    expect(apply).toBeDisabled();
     expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({ logo: { url: 'blob:brand.png', name: 'brand.png', size: 'Medium' } }),
     );
