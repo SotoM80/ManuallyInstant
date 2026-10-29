@@ -28,9 +28,11 @@ Key features:
 - **Logo scrolls on its own**: the long Logo section scrolls inside, so the preview stays still; at its top or bottom, the page scrolls on.
 - **Construction grid drawn for you**: the app reads the logo's visible pixels and fits a grid of square modules to it (12, 16 or 24 across). X is a setting shared by the clear space and the grid; click the grid's rulers to place guides measured in X, and the logo's overall width and height are shown in X too. Uploading your own grid is still possible.
 - **Layered logos from Illustrator**: export the logo as SVG (Object IDs: Layer Names) and choose it in an Anatomy card. Each layer becomes a part of the mark (up to 4), in reading order, cropped to what it draws. Layers named Isotipo, Logotipo or Tagline get their label on their own.
+- **A background for each image**: under each Anatomy card and part, logo version and Usage example, **More** opens its own Background color (none by default), so a negative version can be shown on black. Clear space uses Version 1's.
 - **Colors calculated for you**: pick a color and get its HEX, RGB and CMYK values. `CMYK ≈` marks an approximate value; plain `CMYK` is the print profile's.
 - **Mockups** *(in progress)*: the logo on products (business card, t-shirt, mug), each with its color and logo version. Photo mockups tint a real product photo and blend the logo into it (printed or solid); drag it into place, or open the **template editor** to select the product with a magic wand and brush and mark the logo area with points, also at an angle or on a curve. You can upload your own photo too.
-- **Skins in layers**: stack gradients (Linear, Radial), shapes (Circles, Diagonal block, Waves), patterns (Dots, Stripes) and textures (Grain, Paper), each with its own sliders, colors and intensity. Tick a layer to show or hide it, move it up or down, and choose whether it is also drawn on the Cover. Any color can be picked, or copied from the palette.
+- **Skins in layers**: stack gradients (Linear, Radial), shapes (Circles, Diagonal block, Waves), patterns (Dots, Stripes), textures (Grain, Paper) and your own **Image** (a photo behind the pages, Cover or Contain, with its own Apply), each with its own sliders, colors and intensity. Tick a layer to show or hide it, move it up or down, and choose whether it is also drawn on the Cover. Any color can be picked, or copied from the palette.
+- **Image boxes**: the corner radius, inner margin and outline of every image box are set once in the Skin, the same on every page and template.
 - **Three templates**: centered (1), aligned left (2) or with a side column (3). They change where the content sits on each page, never the content itself.
 - **Portrait or landscape**, and three ways to view the manual: Grid, Overview and Pages.
 
@@ -42,7 +44,8 @@ Key features:
 - ✅ Usage pages: Correct use and Incorrect use, each with a grid of up to 6 examples (see the [spec](specs/usage.md)). The manual has 10 pages.
 - ✅ Anatomy parts filled from the layers of an SVG exported from Illustrator (see the [spec](specs/logolayers.md)).
 - ✅ A construction grid drawn by the app, fitted to the logo, with guides and measures in X.
-- ✅ Skins: page colors and up to 4 layers of gradients, shapes, patterns and textures (see the [spec](specs/skins.md)).
+- ✅ Skins: page colors and up to 4 layers of gradients, shapes, patterns, textures and images (see the [spec](specs/skins.md)), and the style of the image boxes (see the [spec](specs/imageboxes.md)).
+- ✅ A background color for each logo image (see the [spec](specs/imagebackground.md)).
 - ✅ Export to two PDFs: one for print (300 dpi, CMYK values highlighted) and one for the web (144 dpi, HEX/RGB, lightweight) (see the [spec](specs/export.md)).
 - ✅ An optional CMYK server: the print PDF in real CMYK and the palette's values from an ICC profile, checked against Illustrator (see the [spec](specs/cmykserver.md), ADRs [0018](docs/adr/0018-optional-stateless-cmyk-server.md) and [0019](docs/adr/0019-real-cmyk-with-icc-profile.md)).
 - 🔜 Mockups (see the [spec](specs/mockups.md)): 3 illustrated products and a photo business card work, with the template editor; more products and licensed photos to come.
@@ -53,7 +56,7 @@ Limits: nothing is saved between sessions (refreshing clears the manual). Withou
 ### How it was built
 - **Specs first**: each feature is described before it is coded, with Given-When-Then scenarios, in [`specs/`](specs/).
 - **Decisions on record**: every important choice, with the options weighed, is an Architecture Decision Record in [`docs/adr/`](docs/adr/README.md). For example: [live preview with Apply for images](docs/adr/0007-live-preview-with-apply-for-images.md), later [one Apply next to each image](docs/adr/0020-one-apply-per-image.md).
-- **Tested**: around 460 tests with Jest and React Testing Library, written from the spec scenarios, and 23 for the CMYK server with Node's test runner.
+- **Tested**: around 510 tests with Jest and React Testing Library, written from the spec scenarios, and 23 for the CMYK server with Node's test runner.
 - **One feature at a time**: each change is tried on its own branch and only reaches `main` once it works.
 
 **Tech stack:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint · pdf-lib. CMYK server *(optional)*: Node · Express · sharp · Little CMS (lcms-wasm)
@@ -143,9 +146,11 @@ Funciones clave:
 - **Logo con su propio scroll**: la sección Logo, que es larga, se desplaza por dentro y el preview no se mueve; al llegar arriba o abajo, sigue moviendo la página.
 - **Retícula de construcción automática**: la app lee los píxeles visibles del logo y le ajusta una retícula de módulos cuadrados (12, 16 o 24 de ancho). X es un ajuste común al área de respeto y a la retícula; con un clic en las reglas de la retícula se colocan guías medidas en X, y también se muestran el ancho y el alto totales del logo en X. Se puede seguir subiendo una retícula propia.
 - **Logos con capas desde Illustrator**: exporta el logo como SVG (Object IDs: Layer Names) y elígelo en una tarjeta de Anatomy. Cada capa pasa a ser una parte de la marca (hasta 4), en orden de lectura y recortada a lo que dibuja. Las capas llamadas Isotipo, Logotipo o Tagline reciben su etiqueta solas.
+- **Un fondo para cada imagen**: bajo cada tarjeta y parte de Anatomy, cada versión del logo y cada ejemplo de Usage, **More** abre su propio color de fondo (ninguno por defecto), así una versión en negativo se puede mostrar sobre negro. Clear space usa el de la Version 1.
 - **Colores calculados por ti**: eliges un color y obtienes sus valores HEX, RGB y CMYK. `CMYK ≈` marca un valor aproximado; `CMYK` a secas es el del perfil de imprenta.
 - **Mockups** *(en desarrollo)*: el logo en productos (tarjeta, polera, taza), cada uno con su color y su versión de logo. Los mockups con foto tiñen una foto real del producto y mezclan el logo con ella (impreso o sólido); se ubica arrastrándolo, o con el **editor de plantillas** se selecciona el producto con varita mágica y pincel y se marca el área del logo con puntos, también en ángulo o en curva. También se puede subir una foto propia.
-- **Skins en capas**: apila degradados (Linear, Radial), formas (Circles, Diagonal block, Waves), patrones (Dots, Stripes) y texturas (Grain, Paper), cada uno con sus sliders, colores e intensidad. Con un check se muestra u oculta cada capa, se mueve arriba o abajo, y se elige si también va en la portada. Se puede elegir cualquier color, o copiarlo de la paleta.
+- **Skins en capas**: apila degradados (Linear, Radial), formas (Circles, Diagonal block, Waves), patrones (Dots, Stripes), texturas (Grain, Paper) y tu propia **Image** (una foto detrás de las hojas, Cover o Contain, con su propio Apply), cada uno con sus sliders, colores e intensidad. Con un check se muestra u oculta cada capa, se mueve arriba o abajo, y se elige si también va en la portada. Se puede elegir cualquier color, o copiarlo de la paleta.
+- **Recuadros de imagen**: el radio de las esquinas, el margen interior y el contorno de todos los recuadros de imagen se definen una vez en la Skin, iguales en todas las hojas y plantillas.
 - **Tres plantillas**: centrada (1), alineada a la izquierda (2) o con columna lateral (3). Cambian dónde se ubica el contenido en cada hoja, nunca el contenido.
 - **Vertical o apaisado**, y tres formas de ver el manual: Grid, Overview y Pages.
 
@@ -157,7 +162,8 @@ Funciones clave:
 - ✅ Hojas de Usage: Correct use e Incorrect use, cada una con una grilla de hasta 6 ejemplos (ver el [spec](specs/usage.md)). El manual tiene 10 hojas.
 - ✅ Las partes de Anatomy se llenan con las capas de un SVG exportado desde Illustrator (ver el [spec](specs/logolayers.md)).
 - ✅ Una retícula de construcción dibujada por la app, ajustada al logo, con guías y medidas en X.
-- ✅ Skins: colores de página y hasta 4 capas de degradados, formas, patrones y texturas (ver el [spec](specs/skins.md)).
+- ✅ Skins: colores de página y hasta 4 capas de degradados, formas, patrones, texturas e imágenes (ver el [spec](specs/skins.md)), y el estilo de los recuadros de imagen (ver el [spec](specs/imageboxes.md)).
+- ✅ Un color de fondo para cada imagen del logo (ver el [spec](specs/imagebackground.md)).
 - ✅ La exportación a dos PDF: uno para imprenta (300 dpi, valores CMYK destacados) y otro para web (144 dpi, HEX/RGB, liviano) (ver el [spec](specs/export.md)).
 - ✅ Un servidor CMYK opcional: el PDF de imprenta en CMYK real y los valores de la paleta desde un perfil ICC, comprobados con Illustrator (ver el [spec](specs/cmykserver.md) y las ADR [0018](docs/adr/0018-optional-stateless-cmyk-server.md) y [0019](docs/adr/0019-real-cmyk-with-icc-profile.md)).
 - 🔜 Mockups (ver el [spec](specs/mockups.md)): funcionan 3 productos ilustrados y una tarjeta con foto, con el editor de plantillas; faltan más productos y fotos con licencia.
@@ -168,7 +174,7 @@ Límites: no se guarda nada entre sesiones (al recargar se borra el manual). Sin
 ### Cómo se construyó
 - **Primero la spec**: cada feature se describe antes de programarla, con escenarios Given-When-Then, en [`specs/`](specs/).
 - **Decisiones registradas**: cada decisión importante, con las opciones que se compararon, es un Architecture Decision Record en [`docs/adr/`](docs/adr/README.md). Por ejemplo: [vista previa en vivo con Apply para las imágenes](docs/adr/0007-live-preview-with-apply-for-images.md), y después [un Apply junto a cada imagen](docs/adr/0020-one-apply-per-image.md).
-- **Con tests**: unos 460 tests con Jest y React Testing Library, escritos a partir de los escenarios de las specs, y 23 del servidor CMYK con el test runner de Node.
+- **Con tests**: unos 510 tests con Jest y React Testing Library, escritos a partir de los escenarios de las specs, y 23 del servidor CMYK con el test runner de Node.
 - **Una feature a la vez**: cada cambio se prueba en su propia rama y solo llega a `main` cuando funciona.
 
 **Tecnologías:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint · pdf-lib. Servidor CMYK *(opcional)*: Node · Express · sharp · Little CMS (lcms-wasm)
