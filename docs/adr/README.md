@@ -23,7 +23,7 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0009](0009-skins-drawn-in-svg.md) | Skins drawn in SVG, measured in mm | Accepted | 2026-10-16 |
 | [0010](0010-skins-as-a-stack-of-layers.md) | Skins as a stack of layers, reordered with buttons | Accepted | 2026-10-16 |
 | [0011](0011-cover-colors-only-paint-the-cover.md) | The Cover's colors only paint the Cover; the Skin owns its colors | Accepted | 2026-10-16 |
-| [0012](0012-pdf-pages-drawn-as-images.md) | PDF pages drawn as images, with html-to-image and jsPDF | Accepted | 2026-10-16 |
+| [0012](0012-pdf-pages-drawn-as-images.md) | PDF pages drawn as images, with html-to-image and jsPDF | Accepted (amended by 0024) | 2026-10-16 |
 | [0013](0013-mockups-as-svg-illustrations.md) | Mockups drawn as SVG illustrations from plain data | Proposed | 2026-10-16 |
 | [0014](0014-photo-mockups-composed-in-webgl.md) | Photo mockups composed in WebGL, shown as images | Proposed | 2026-10-16 |
 | [0015](0015-logo-layers-from-svg.md) | Logo layers read from SVG in the browser | Accepted | 2026-10-20 |
@@ -33,3 +33,4 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0021](0021-background-per-image.md) | A background color for each logo image | Accepted | 2026-10-29 |
 | [0022](0022-image-boxes-styled-by-the-skin.md) | Image boxes styled by the Skin, through CSS variables | Accepted | 2026-10-29 |
 | [0023](0023-skin-image-layer.md) | An Image layer in the Skin | Accepted | 2026-10-29 |
+| [0024](0024-sharper-web-pdf.md) | A sharper web PDF, at 216 dpi and JPEG quality 0.9 | Accepted | 2026-10-30 |

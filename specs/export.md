@@ -17,8 +17,8 @@ At the top of the sections column, on the right, in this order: **↓ Print PDF*
 
 | | Print PDF | Web PDF |
 |---|---|---|
-| Resolution | 300 dpi | 144 dpi |
-| Image | PNG (no loss); with a CMYK server, CMYK pixels with no loss | JPEG (quality 0.82) |
+| Resolution | 300 dpi | 216 dpi (ADR 0024) |
+| Image | PNG (no loss); with a CMYK server, CMYK pixels with no loss | JPEG (quality 0.9) |
 | Color space | RGB; with a CMYK server, **CMYK** (the server's profile) | RGB |
 | Color palette page | **CMYK** first and in bold, then HEX and RGB | **HEX** and **RGB** in bold, **CMYK** last and softer |
 | File name | `<title>-print.pdf` | `<title>-web.pdf` |
@@ -93,7 +93,7 @@ The Apply buttons have nothing to do with the export: the PDF shows what the pre
 ### Scenario 3: The Web Version
 * **Given**: Every section was touched.
 * **When**: The user clicks "Download web PDF".
-* **Then**: A PDF named `my-brand-web.pdf` is made at 144 dpi in JPEG.
+* **Then**: A PDF named `my-brand-web.pdf` is made at 216 dpi in JPEG.
 
 ### Scenario 4: Empty Sections
 * **Given**: Only the Cover was touched.

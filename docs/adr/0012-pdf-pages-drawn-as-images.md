@@ -1,7 +1,7 @@
 # ADR 0012: PDF pages drawn as images, with html-to-image and jsPDF
 
 ## Status
-Accepted — 2026-10-16
+Accepted — 2026-10-16 (amended by ADR 0024: the web PDF at 216 dpi, JPEG quality 0.9)
 
 ## Context
 The manual must be downloaded as two PDFs: one for print (high resolution, CMYK values highlighted) and one for the web (RGB/HEX, lightweight). The app is frontend only (ADR 0002), so the PDF is made in the browser. The pages are HTML laid out by the template's CSS (ADR 0004), with Google Fonts (ADR 0005), the user's logo images and an SVG skin (ADRs 0009–0011).

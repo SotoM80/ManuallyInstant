@@ -22,9 +22,9 @@ describe('pdfFileName', () => {
 });
 
 describe('EXPORT_SETTINGS', () => {
-  it('draws print at 300 dpi in PNG and web at 144 dpi in JPEG (scenarios 2 and 3)', () => {
+  it('draws print at 300 dpi in PNG and web at 216 dpi in JPEG (scenarios 2 and 3, ADR 0024)', () => {
     expect(EXPORT_SETTINGS.print).toMatchObject({ dpi: 300, image: 'png' });
-    expect(EXPORT_SETTINGS.web).toMatchObject({ dpi: 144, image: 'jpeg', quality: 0.82 });
+    expect(EXPORT_SETTINGS.web).toMatchObject({ dpi: 216, image: 'jpeg', quality: 0.9 });
   });
 });
 

@@ -7,7 +7,7 @@ export const CSS_DPI = 96
 
 export const EXPORT_SETTINGS: Record<ExportKind, { dpi: number; image: 'png' | 'jpeg'; quality: number }> = {
   print: { dpi: 300, image: 'png', quality: 1 },
-  web: { dpi: 144, image: 'jpeg', quality: 0.82 },
+  web: { dpi: 216, image: 'jpeg', quality: 0.9 }, // sharp text, still light (ADR 0024)
 }
 
 // Where a PDF is: drawing its pages, or sending them to the CMYK server (specs/export.md)
