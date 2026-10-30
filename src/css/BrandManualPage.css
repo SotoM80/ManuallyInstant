@@ -73,7 +73,9 @@
   flex-basis: 100%;
 }
 
-.manual-sections ol {
+/* Only the list of sections: `>` keeps it off the lists inside, such as the Skin's layers and the
+   Anatomy cards of the PDF copy, which ExportButtons mounts in this column */
+.manual-sections > ol {
   list-style: none;
   margin: 0;
   padding: 0;
