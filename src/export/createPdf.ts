@@ -5,11 +5,14 @@ import type { CmykPage } from './cmykClient'
 import type { Orientation } from '../types'
 
 // What every page is drawn with: html-to-image, the kind's resolution and the fonts, fetched once
-// and embedded in every page (ADR 0012)
+// and embedded in every page (ADR 0012). html-to-image only embeds the fonts used inside the
+// element it is given, so it gets the list of every page, not the first one: the Cover alone
+// would leave out the fonts of the Typography page.
 async function pageDrawing(pages: HTMLElement[], kind: ExportKind) {
   const htmlToImage = await import('html-to-image')
   const settings = EXPORT_SETTINGS[kind]
-  const fontEmbedCSS = pages[0] ? await htmlToImage.getFontEmbedCSS(pages[0]) : undefined
+  const allPages = pages[0]?.closest<HTMLElement>('.manual-pages') ?? pages[0]
+  const fontEmbedCSS = allPages ? await htmlToImage.getFontEmbedCSS(allPages) : undefined
   const options = { pixelRatio: settings.dpi / CSS_DPI, quality: settings.quality, fontEmbedCSS, cacheBust: false }
   return { htmlToImage, settings, options }
 }

@@ -20,6 +20,9 @@ function addStylesheet(href: string) {
 
   const link = document.createElement('link')
   link.rel = 'stylesheet'
+  // Lets the PDF export read its rules to embed the fonts (Google allows it); without it the
+  // browser hides them, and html-to-image downloads the stylesheet again on every export
+  link.crossOrigin = 'anonymous'
   link.href = href
   document.head.appendChild(link)
 }

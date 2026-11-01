@@ -115,6 +115,15 @@ describe('Typography – live page', () => {
     expect(document.head.querySelector(`link[href="${googleFontHref('Lora', 'regular')}"]`)).not.toBeNull();
   });
 
+  it('asks for the fonts with CORS, so the PDF export can embed them', () => {
+    renderApp();
+
+    pickFonts('Bebas Neue', 'Lora');
+
+    const link = document.head.querySelector<HTMLLinkElement>(`link[href="${googleFontHref('Bebas Neue', 'regular')}"]`);
+    expect(link?.crossOrigin).toBe('anonymous');
+  });
+
   it('snaps a case-insensitive match to the option', () => {
     renderApp();
 
