@@ -20,7 +20,7 @@ Design agencies fill in seven sections, and the brand manual updates **live** ne
 7. **Mockups**: the logo on up to 4 products, illustrated by the app or from real photos.
 
 Key features:
-- **Two PDFs in one click**: **↓ Print PDF** (300 dpi, CMYK values highlighted) and **↓ Web PDF** (216 dpi, HEX and RGB highlighted, lightweight), at the top of the sections. Every page, in the chosen template, orientation and skin, looks as in the preview; empty sections are pointed out before downloading.
+- **Two PDFs in one click**: **↓ Print PDF** (300 dpi, CMYK values highlighted) and **↓ Web PDF** (216 dpi, HEX and RGB highlighted, lightweight), at the top of the sections. Every page, in the chosen template, orientation and skin, looks as in the preview, with the Google Fonts of every page embedded; empty sections are pointed out before downloading.
 - **Real CMYK for print** *(optional)*: with the small CMYK server running, the print PDF comes out in real CMYK with an ICC profile (FOGRA39 for now), and the palette shows the same values as Illustrator (within a point). If the server cannot be reached, the app offers the RGB print PDF instead.
 - **Live preview**: text, colors and fonts show as you type. A new image waits for the **Apply** button next to its field, so it is never swapped in by accident, and each Apply shows only its own image.
 - **Full screen**: the **⤢ Full screen** button in the preview shows the 10 pages one below the other, drawn as in the PDF and each one fitted whole to the viewer's screen. Esc or **Exit full screen** closes it.
@@ -138,7 +138,7 @@ Las agencias de diseño completan siete secciones, y el manual de marca se actua
 7. **Mockups**: el logo en hasta 4 productos, ilustrados por la app o a partir de fotos reales.
 
 Funciones clave:
-- **Dos PDF con un clic**: **↓ Print PDF** (300 dpi, valores CMYK destacados) y **↓ Web PDF** (216 dpi, HEX y RGB destacados, liviano), arriba de las secciones. Todas las hojas, con la plantilla, la orientación y la skin elegidas, se ven como en la vista previa; antes de descargar se avisa si hay secciones vacías.
+- **Dos PDF con un clic**: **↓ Print PDF** (300 dpi, valores CMYK destacados) y **↓ Web PDF** (216 dpi, HEX y RGB destacados, liviano), arriba de las secciones. Todas las hojas, con la plantilla, la orientación y la skin elegidas, se ven como en la vista previa, con las fuentes de Google de todas las hojas incrustadas; antes de descargar se avisa si hay secciones vacías.
 - **CMYK real para imprenta** *(opcional)*: con el pequeño servidor CMYK encendido, el PDF de imprenta sale en CMYK real con un perfil ICC (por ahora FOGRA39), y la paleta muestra los mismos valores que Illustrator (con un punto de diferencia como máximo). Si el servidor no responde, la app ofrece el PDF de imprenta en RGB.
 - **Vista previa en vivo**: el texto, los colores y las fuentes se ven mientras escribes. Una imagen nueva espera al botón **Apply** que tiene al lado, así nunca se cambia por accidente, y cada Apply muestra solo su propia imagen.
 - **Pantalla completa**: el botón **⤢ Full screen** del preview muestra las 10 hojas una debajo de otra, dibujadas como en el PDF y cada una ajustada entera a la pantalla de quien la mira. Esc o **Exit full screen** la cierran.
