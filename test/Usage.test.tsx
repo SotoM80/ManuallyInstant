@@ -200,3 +200,30 @@ describe('Usage – one Apply per example', () => {
     expect(getApplyButton('Apply Incorrect use example 1 image')).toBeEnabled();
   });
 });
+
+// Scenario 11
+describe('Usage – kept between pages', () => {
+  it('keeps the form fields, so editing one example keeps the others', () => {
+    renderApp();
+    openUsage();
+    typeDescription('Correct use example 1', 'On white');
+    typeDescription('Incorrect use example 1', "Don't stretch the logo");
+    fireEvent.change(usageForm().getByLabelText('Incorrect use example 1 image', { selector: 'input' }), {
+      target: { files: [makeLogo('stretched.png')] },
+    });
+    fireEvent.click(getApplyButton('Apply Incorrect use example 1 image'));
+
+    fireEvent.click(screen.getByRole('link', { name: 'Home' }));
+    fireEvent.click(screen.getByRole('link', { name: 'Brand Manual' }));
+    openUsage();
+
+    expect(usageForm().getByLabelText('Correct use example 1 description')).toHaveValue('On white');
+    expect(usageForm().getByLabelText('Incorrect use example 1 description')).toHaveValue("Don't stretch the logo");
+    expect(group('Incorrect use').getAllByText('stretched.png').length).toBeGreaterThan(0);
+
+    typeDescription('Correct use example 2', 'On black');
+    expect(page('Correct use')).toHaveTextContent('On white');
+    expect(page('Correct use')).toHaveTextContent('On black');
+    expect(within(page('Incorrect use')).getByRole('img', { name: "Don't stretch the logo" })).toBeInTheDocument();
+  });
+});

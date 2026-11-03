@@ -127,3 +127,8 @@ No field is required. A wrong file is flagged as soon as it is chosen, with a re
 * **Given**: The Usage section is open.
 * **When**: The user chooses `rules.pdf` for Correct use, Example 2.
 * **Then**: The field shows "Use a PNG, JPG, SVG or WebP image" with a red border, and its Apply stays off.
+
+### Scenario 11: Kept Between Pages
+* **Given**: Correct use example 1 reads "On white", and Incorrect use example 1 reads "Don't stretch the logo" with an applied image.
+* **When**: The user goes to Home and then back to Brand Manual.
+* **Then**: The Usage form still shows both descriptions and the image's file name; editing one example keeps the others on their pages, image included.

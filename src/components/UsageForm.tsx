@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo } from 'react'
 import { ImageField } from './ImageField'
 import { MoreArea } from './MoreArea'
 import { SkinColorField } from './SkinColorField'
@@ -7,6 +7,7 @@ import { keepInPlace } from '../utils/scrollAnchor'
 import { validateImage } from '../utils/validation'
 import { NO_IMAGE, applyImage, chooseFile, isPending, shownFile, toImage, useLiveData } from '../utils/pendingImage'
 import type { PendingImage } from '../utils/pendingImage'
+import { useDraft } from '../utils/useDraft'
 import type { PaletteColor, UsageData, UsageKind } from '../types'
 
 // Form of the Usage section (see specs/usage.md): a group of examples for each page, Correct use
@@ -15,6 +16,9 @@ import type { PaletteColor, UsageData, UsageKind } from '../types'
 type UsageFormProps = {
   onChange?: (usage: UsageData) => void
   palette?: PaletteColor[] | null // for the Background chips that copy a palette color
+  // Optional owner of the form's fields (see useDraft)
+  draft?: UsageDraft
+  onDraftChange?: (draft: UsageDraft) => void
 }
 
 // `key` stays the same when other examples are removed, so React keeps each example's state
@@ -32,17 +36,29 @@ type GroupState = {
   touched: boolean // until then, the group sends null and its page shows its placeholder
 }
 
-export function UsageForm({ onChange, palette = null }: UsageFormProps) {
-  const nextKey = useRef(START_EXAMPLES * USAGE_KINDS.length)
-  const [groups, setGroups] = useState<Record<UsageKind, GroupState>>(() => {
-    // Keys 0–3 for the first group, 4–7 for the second: unique across the whole form
-    const start = (offset: number): GroupState => ({
-      rows: Array.from({ length: START_EXAMPLES }, (_, i) => newRow(offset + i)),
-      openKey: offset,
-      touched: false,
-    })
-    return { correct: start(0), incorrect: start(START_EXAMPLES) }
-  })
+// Everything the form shows. `nextKey` is kept too, so an example added later never reuses a key.
+export type UsageDraft = {
+  groups: Record<UsageKind, GroupState>
+  nextKey: number
+}
+
+// Keys 0–3 for the first group, 4–7 for the second: unique across the whole form
+function startGroup(offset: number): GroupState {
+  return {
+    rows: Array.from({ length: START_EXAMPLES }, (_, i) => newRow(offset + i)),
+    openKey: offset,
+    touched: false,
+  }
+}
+
+const NO_USAGE_DRAFT: UsageDraft = {
+  groups: { correct: startGroup(0), incorrect: startGroup(START_EXAMPLES) },
+  nextKey: START_EXAMPLES * USAGE_KINDS.length,
+}
+
+export function UsageForm({ onChange, palette = null, draft: ownerDraft, onDraftChange }: UsageFormProps) {
+  const [draft, update] = useDraft(NO_USAGE_DRAFT, ownerDraft, onDraftChange)
+  const { groups } = draft
 
   const usage = useMemo<UsageData>(() => {
     const data = (group: GroupState) =>
@@ -57,19 +73,30 @@ export function UsageForm({ onChange, palette = null }: UsageFormProps) {
   useLiveData(usage, onChange)
 
   // Every change to a group touches it, so its page leaves its placeholder
-  function change(kind: UsageKind, update: (group: GroupState) => Partial<GroupState>) {
-    setGroups((prev) => ({ ...prev, [kind]: { ...prev[kind], ...update(prev[kind]), touched: true } }))
+  function change(kind: UsageKind, edit: (group: GroupState) => Partial<GroupState>) {
+    update((prev) => ({
+      groups: { ...prev.groups, [kind]: { ...prev.groups[kind], ...edit(prev.groups[kind]), touched: true } },
+    }))
   }
 
-  function updateRow(kind: UsageKind, key: number, changes: Partial<ExampleRow>) {
-    change(kind, (group) => ({ rows: group.rows.map((row) => (row.key === key ? { ...row, ...changes } : row)) }))
+  // `changes` may be built from the newest row, so two changes in one event build on each other
+  function updateRow(kind: UsageKind, key: number, changes: (row: ExampleRow) => Partial<ExampleRow>) {
+    change(kind, (group) => ({
+      rows: group.rows.map((row) => (row.key === key ? { ...row, ...changes(row) } : row)),
+    }))
   }
 
   // A new example opens, and the one that was open folds (like Add version)
   function addRow(kind: UsageKind) {
     if (groups[kind].rows.length >= MAX_EXAMPLES) return
-    const key = nextKey.current++
-    change(kind, (group) => ({ rows: [...group.rows, newRow(key)], openKey: key }))
+    update((prev) => {
+      const key = prev.nextKey
+      const group = prev.groups[kind]
+      return {
+        groups: { ...prev.groups, [kind]: { ...group, rows: [...group.rows, newRow(key)], openKey: key, touched: true } },
+        nextKey: key + 1,
+      }
+    })
   }
 
   function removeRow(kind: UsageKind, key: number) {
@@ -81,23 +108,22 @@ export function UsageForm({ onChange, palette = null }: UsageFormProps) {
 
   // Folding or unfolding is not a change of the manual: it does not touch the group
   function toggleRow(kind: UsageKind, key: number) {
-    setGroups((prev) => ({
-      ...prev,
-      [kind]: { ...prev[kind], openKey: prev[kind].openKey === key ? null : key },
+    update((prev) => ({
+      groups: { ...prev.groups, [kind]: { ...prev.groups[kind], openKey: prev.groups[kind].openKey === key ? null : key } },
     }))
   }
 
   // A wrong file is flagged as soon as it is chosen. A valid one waits for its Apply.
   function chooseRowFile(kind: UsageKind, row: ExampleRow, file: File | null) {
-    updateRow(kind, row.key, {
-      image: chooseFile(row.image, file),
+    updateRow(kind, row.key, (now) => ({
+      image: chooseFile(now.image, file),
       fileError: file ? validateImage(file) : '',
-    })
+    }))
   }
 
   // The example's Apply: only its own image reaches the page
   function applyRowImage(kind: UsageKind, row: ExampleRow) {
-    updateRow(kind, row.key, { image: applyImage(row.image, row.fileError) })
+    updateRow(kind, row.key, (now) => ({ image: applyImage(now.image, now.fileError) }))
   }
 
   return (
@@ -146,7 +172,10 @@ export function UsageForm({ onChange, palette = null }: UsageFormProps) {
                         type="text"
                         value={row.description}
                         placeholder={suggestions[index] ?? ''}
-                        onChange={(event) => updateRow(kind, row.key, { description: event.target.value })}
+                        onChange={(event) => {
+                          const description = event.target.value
+                          updateRow(kind, row.key, () => ({ description }))
+                        }}
                       />
                       <ImageField
                         id={`${id}-image`}
@@ -161,7 +190,7 @@ export function UsageForm({ onChange, palette = null }: UsageFormProps) {
                         <SkinColorField
                           label={`${label} background`}
                           value={row.background}
-                          onChange={(background) => updateRow(kind, row.key, { background })}
+                          onChange={(background) => updateRow(kind, row.key, () => ({ background }))}
                           palette={palette}
                           allowNone
                         />
