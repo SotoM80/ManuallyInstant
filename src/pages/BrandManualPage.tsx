@@ -3,6 +3,7 @@ import type { ReactNode, SyntheticEvent } from 'react'
 import { BrandForm } from '../components/BrandForm'
 import type { CoverDraft } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
+import type { LogoDraft } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
 import type { ColorsDraft } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
@@ -44,6 +45,8 @@ type BrandManualPageProps = {
   onGuidesChange: (guides: Guides) => void
   logo: LogoData | null
   onLogoChange: (logo: LogoData) => void
+  logoDraft?: LogoDraft
+  onLogoDraftChange?: (draft: LogoDraft) => void
   usage?: UsageData
   onUsageChange?: (usage: UsageData) => void
   usageDraft?: UsageDraft
@@ -77,6 +80,8 @@ export function BrandManualPage({
   onGuidesChange,
   logo,
   onLogoChange,
+  logoDraft,
+  onLogoDraftChange,
   usage = NO_USAGE,
   onUsageChange = () => {},
   usageDraft,
@@ -145,7 +150,9 @@ export function BrandManualPage({
     cover: (
       <BrandForm onChange={onCoverChange} draft={coverDraft} onDraftChange={onCoverDraftChange} />
     ),
-    logo: <LogoForm onChange={onLogoChange} palette={palette} />,
+    logo: (
+      <LogoForm onChange={onLogoChange} palette={palette} draft={logoDraft} onDraftChange={onLogoDraftChange} />
+    ),
     usage: (
       <UsageForm
         onChange={onUsageChange}

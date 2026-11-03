@@ -8,6 +8,7 @@ import type { CoverDraft } from './components/BrandForm'
 import type { TypographyDraft } from './components/TypographyForm'
 import type { ColorsDraft } from './components/ColorsForm'
 import type { UsageDraft } from './components/UsageForm'
+import type { LogoDraft } from './components/LogoForm'
 import { NO_GUIDES } from './utils/guides'
 import type { Guides } from './utils/guides'
 import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
@@ -31,6 +32,7 @@ function App() {
   // Each …Draft is what a form shows (half-typed values too), so it is filled again on the way back.
   const [coverDraft, setCoverDraft] = useState<CoverDraft>()
   const [logo, setLogo] = useState<LogoData | null>(null)
+  const [logoDraft, setLogoDraft] = useState<LogoDraft>()
   const [usage, setUsage] = useState<UsageData>(NO_USAGE) // each group null until touched
   const [usageDraft, setUsageDraft] = useState<UsageDraft>()
   const [palette, setPalette] = useState<PaletteColor[] | null>(null)
@@ -89,6 +91,8 @@ function App() {
                 onGuidesChange={setGuides}
                 logo={logo}
                 onLogoChange={setLogo}
+                logoDraft={logoDraft}
+                onLogoDraftChange={setLogoDraft}
                 usage={usage}
                 onUsageChange={setUsage}
                 usageDraft={usageDraft}

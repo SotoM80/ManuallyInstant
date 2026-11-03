@@ -835,6 +835,41 @@ describe('Logo section – grid rulers', () => {
   });
 });
 
+// Spec: specs/brandmanual.md, Scenario 18 — The Logo Form Is Kept Between Pages
+describe('Logo section – kept between pages', () => {
+  it('keeps the form fields, so editing one keeps the others', () => {
+    renderApp('/brand-manual');
+    const openLogo = () =>
+      fireEvent.click(
+        within(screen.getByRole('region', { name: 'Manual sections' })).getByRole('button', { name: '2. Logo' }),
+      );
+    openLogo();
+    fillConcept();
+    type('Version 1 name', 'Horizontal');
+    click('Add version');
+    type('Version 2 name', 'Stacked');
+    fireEvent.click(within(within(getForm()).getByRole('group', { name: 'X (modules)' })).getByRole('radio', { name: '2' }));
+
+    const menu = screen.getByRole('navigation', { name: 'Main' });
+    fireEvent.click(within(menu).getByRole('link', { name: 'Home' }));
+    fireEvent.click(within(menu).getByRole('link', { name: 'Brand Manual' }));
+    openLogo();
+
+    const form = within(getForm());
+    expect(form.getByLabelText('Brand name')).toHaveValue('VOLTA');
+    expect(form.getByLabelText('Concept')).toHaveValue('Energy that moves cities.');
+    expect(form.getByLabelText('Imagotype name')).toHaveValue('Lightning symbol');
+    expect(form.getByLabelText('Version 1 name')).toHaveValue('Horizontal');
+    expect(form.getByLabelText('Version 2 name')).toHaveValue('Stacked');
+    expect(within(form.getByRole('group', { name: 'X (modules)' })).getByRole('radio', { name: '2' })).toBeChecked();
+
+    type('Concept', 'Energy for every city.');
+    const preview = within(screen.getByRole('region', { name: 'Manual preview' }));
+    expect(preview.getByRole('article', { name: 'Brand concept' })).toHaveTextContent('Energy for every city.');
+    expect(preview.getByRole('article', { name: 'Logo versions' })).toHaveTextContent('Stacked');
+  });
+});
+
 // Experiment (option 3): guides clicked on the construction grid
 describe('Logo section – clicked guides', () => {
   function getGrid() {

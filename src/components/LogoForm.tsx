@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef } from 'react'
 import { ImageField } from './ImageField'
 import { MoreArea } from './MoreArea'
 import { SkinColorField } from './SkinColorField'
@@ -20,6 +20,7 @@ import { RULER_ERROR, parseRuler } from '../utils/rulers'
 import { logoLayers } from '../utils/logoLayers'
 import { NO_IMAGE, applyImage, chooseFile, isPending, shownFile, toImage, useLiveData } from '../utils/pendingImage'
 import type { PendingImage } from '../utils/pendingImage'
+import { useDraft } from '../utils/useDraft'
 import type { LogoData, MarkType, PaletteColor } from '../types'
 
 // What is typed in one part of a card (e.g. its Tagline). Everything is optional.
@@ -84,12 +85,67 @@ type LogoFormProps = {
   onChange?: (logo: LogoData) => void
   parts?: LogoParts
   palette?: PaletteColor[] | null // for the Background chips that copy a palette color
+  // Optional owner of the form's fields (see useDraft)
+  draft?: LogoDraft
+  onDraftChange?: (draft: LogoDraft) => void
 }
 
 const MAX_VARIANTS = 4
 
 function newVariant(key: number): VariantRow {
   return { key, name: '', usage: '', image: NO_IMAGE, fileError: '', background: null }
+}
+
+// Everything the form shows, half-typed values and errors included. `nextKey` is kept too:
+// a version's key is its id (the mockups pick a version by id), so a new one never reuses one.
+export type LogoDraft = {
+  nextKey: number
+  brandName: string
+  // The brand may use several kinds of mark (at least one); each chosen one gets a card.
+  markTypes: MarkType[]
+  // A card per mark type, kept while it is unticked so nothing typed is lost.
+  cards: Partial<Record<MarkType, CardDraft>>
+  concept: string
+  variants: VariantRow[]
+  openKey: number | null // null → every version folded
+  unit: string
+  minDigital: string
+  minPrint: string
+  // The last valid sizes: while a number is half typed or wrong, the page keeps these
+  validMinDigital: number
+  validMinPrint: number
+  grid: PendingImage
+  gridModules: number
+  gridX: number
+  // The rulers as typed, and the last valid steps the page draws (see utils/rulers.ts)
+  rulerTop: string
+  rulerSide: string
+  validRulerTop: number[]
+  validRulerSide: number[]
+  gridError: string
+}
+
+const NO_LOGO_DRAFT: LogoDraft = {
+  nextKey: 1,
+  brandName: '',
+  markTypes: DEFAULT_MARK_TYPES,
+  cards: {},
+  concept: '',
+  variants: [newVariant(0)],
+  openKey: 0,
+  unit: DEFAULT_CLEAR_SPACE_UNIT,
+  minDigital: '32',
+  minPrint: '15',
+  validMinDigital: 32,
+  validMinPrint: 15,
+  grid: NO_IMAGE,
+  gridModules: DEFAULT_GRID_MODULES,
+  gridX: DEFAULT_GRID_X,
+  rulerTop: '',
+  rulerSide: '',
+  validRulerTop: [],
+  validRulerSide: [],
+  gridError: '',
 }
 
 // The applied image of a field, ready for the preview (null → none yet).
@@ -99,33 +155,41 @@ function appliedImage(image: PendingImage) {
 }
 
 
-export function LogoForm({ onChange, parts = LOGO_PARTS, palette = null }: LogoFormProps) {
-  const nextKey = useRef(1)
+export function LogoForm({ onChange, parts = LOGO_PARTS, palette = null, draft: ownerDraft, onDraftChange }: LogoFormProps) {
   // The last file chosen in each card: the layers of an older one, read late, are dropped
   const latestCardFile = useRef<Partial<Record<MarkType, File | null>>>({})
-  const [brandName, setBrandName] = useState('')
-  // The brand may use several kinds of mark (at least one); each chosen one gets a card.
-  const [markTypes, setMarkTypes] = useState<MarkType[]>(DEFAULT_MARK_TYPES)
-  // A card per mark type, kept while it is unticked so nothing typed is lost.
-  const [cards, setCards] = useState<Partial<Record<MarkType, CardDraft>>>({})
-  const [concept, setConcept] = useState('')
-  const [variants, setVariants] = useState<VariantRow[]>(() => [newVariant(0)])
-  const [openKey, setOpenKey] = useState<number | null>(0) // null → every version folded
-  const [unit, setUnit] = useState(DEFAULT_CLEAR_SPACE_UNIT)
-  const [minDigital, setMinDigital] = useState('32')
-  const [minPrint, setMinPrint] = useState('15')
-  // The last valid sizes: while a number is half typed or wrong, the page keeps these
-  const [validMinDigital, setValidMinDigital] = useState(32)
-  const [validMinPrint, setValidMinPrint] = useState(15)
-  const [grid, setGrid] = useState(NO_IMAGE)
-  const [gridModules, setGridModules] = useState<number>(DEFAULT_GRID_MODULES)
-  const [gridX, setGridX] = useState<number>(DEFAULT_GRID_X)
-  // The rulers as typed, and the last valid steps the page draws (see utils/rulers.ts)
-  const [rulerTop, setRulerTop] = useState('')
-  const [rulerSide, setRulerSide] = useState('')
-  const [validRulerTop, setValidRulerTop] = useState<number[]>([])
-  const [validRulerSide, setValidRulerSide] = useState<number[]>([])
-  const [gridError, setGridError] = useState('')
+  const [draft, update, current] = useDraft(NO_LOGO_DRAFT, ownerDraft, onDraftChange)
+  const { brandName, markTypes, cards, concept, variants, openKey, unit, minDigital, minPrint } = draft
+  const { validMinDigital, validMinPrint, grid, gridModules, gridX, gridError } = draft
+  const { rulerTop, rulerSide, validRulerTop, validRulerSide } = draft
+
+  // Works like a useState setter (a value, or a function of the newest one) for one field
+  function setter<K extends keyof LogoDraft>(key: K) {
+    return (value: LogoDraft[K] | ((prev: LogoDraft[K]) => LogoDraft[K])) =>
+      update((prev) => {
+        const next = typeof value === 'function' ? (value as (prev: LogoDraft[K]) => LogoDraft[K])(prev[key]) : value
+        return { [key]: next } as Partial<LogoDraft>
+      })
+  }
+  const setBrandName = setter('brandName')
+  const setMarkTypes = setter('markTypes')
+  const setCards = setter('cards')
+  const setConcept = setter('concept')
+  const setVariants = setter('variants')
+  const setOpenKey = setter('openKey')
+  const setUnit = setter('unit')
+  const setMinDigital = setter('minDigital')
+  const setMinPrint = setter('minPrint')
+  const setValidMinDigital = setter('validMinDigital')
+  const setValidMinPrint = setter('validMinPrint')
+  const setGrid = setter('grid')
+  const setGridModules = setter('gridModules')
+  const setGridX = setter('gridX')
+  const setRulerTop = setter('rulerTop')
+  const setRulerSide = setter('rulerSide')
+  const setValidRulerTop = setter('validRulerTop')
+  const setValidRulerSide = setter('validRulerSide')
+  const setGridError = setter('gridError')
 
   // The construction grid: an uploaded one (applied) replaces the one the app draws
   const gridInUse = parts.clearSpace && shownFile(grid) !== null
@@ -201,8 +265,11 @@ export function LogoForm({ onChange, parts = LOGO_PARTS, palette = null }: LogoF
     }
   }
 
+  // Never inside another change: it is a change of its own
   function takeKey() {
-    return nextKey.current++
+    const key = current().nextKey
+    update(() => ({ nextKey: key + 1 }))
+    return key
   }
 
   function updateCard(type: MarkType, changes: Partial<CardDraft>) {
@@ -259,14 +326,15 @@ export function LogoForm({ onChange, parts = LOGO_PARTS, palette = null }: LogoF
   async function fillPartsFromLayers(type: MarkType, file: File) {
     const result = await logoLayers(file, MAX_PARTS)
     if (result.kind === 'none' || latestCardFile.current[type] !== file) return
-    setCards((prev) => {
+    update(({ cards: prev, nextKey }) => {
       const card = { ...EMPTY_CARD, ...prev[type] }
-      if (result.kind === 'unreadable') return { ...prev, [type]: { ...card, layersNote: LAYERS_UNREADABLE } }
-      if (card.parts.length > 0) return { ...prev, [type]: { ...card, layersNote: LAYERS_KEPT } }
+      const note = (layersNote: string) => ({ cards: { ...prev, [type]: { ...card, layersNote } } })
+      if (result.kind === 'unreadable') return note(LAYERS_UNREADABLE)
+      if (card.parts.length > 0) return note(LAYERS_KEPT)
       const applied = card.image.shown === file
       const parts = result.parts.map(
-        (part): PartDraft => ({
-          key: takeKey(),
+        (part, index): PartDraft => ({
+          key: nextKey + index,
           label: part.label,
           name: '',
           role: '',
@@ -276,7 +344,10 @@ export function LogoForm({ onChange, parts = LOGO_PARTS, palette = null }: LogoF
           background: null,
         }),
       )
-      return { ...prev, [type]: { ...card, parts, layersNote: result.total > MAX_PARTS ? LAYERS_CUT : '' } }
+      return {
+        cards: { ...prev, [type]: { ...card, parts, layersNote: result.total > MAX_PARTS ? LAYERS_CUT : '' } },
+        nextKey: nextKey + parts.length,
+      }
     })
   }
 

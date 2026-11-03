@@ -191,3 +191,8 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Given**: Logo is open, and Brand concept is the main page.
 * **When**: The user clicks in "Version 1 name" (scrolling to Versions alone changes nothing).
 * **Then**: Logo versions glides to the first place of the preview, with the accent outline, followed by Brand concept, Anatomy and Clear space.
+
+### Scenario 18: The Logo Form Is Kept Between Pages
+* **Given**: In the Logo section the user typed "VOLTA" as Brand name, a Concept, an Imagotype name, a second version, and chose 2 in X (modules).
+* **When**: The user goes to Home and then back to Brand Manual, and opens Logo.
+* **Then**: Every field still holds what was entered, and editing one of them keeps the others in the preview.
