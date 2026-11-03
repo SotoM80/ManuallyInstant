@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { AutocompleteField } from './AutocompleteField'
 import { BRAND_FONT_FAMILIES, DEFAULT_BRAND_FONTS, toFontFamilyCss } from '../data/fontOptions'
 import { loadFontPreviews } from '../utils/googleFonts'
 import { findOption } from '../utils/validation'
 import { useLiveData } from '../utils/pendingImage'
+import { useDraft } from '../utils/useDraft'
 import type { BrandFonts } from '../types'
 
 type FontKey = keyof BrandFonts
@@ -12,6 +13,17 @@ type FontKey = keyof BrandFonts
 // A valid font reaches the preview at once.
 type TypographyFormProps = {
   onChange?: (fonts: BrandFonts) => void
+  // Optional owner of the form's fields (see useDraft)
+  draft?: TypographyDraft
+  onDraftChange?: (draft: TypographyDraft) => void
+}
+
+// Everything the form shows, half-typed names and errors included.
+export type TypographyDraft = {
+  fonts: BrandFonts
+  errors: BrandFonts
+  // The last valid fonts: while a name is half typed, the preview keeps these.
+  validFonts: BrandFonts
 }
 
 const FONT_FIELDS: { key: FontKey; label: string }[] = [
@@ -21,16 +33,20 @@ const FONT_FIELDS: { key: FontKey; label: string }[] = [
 
 const NO_ERRORS: BrandFonts = { primary: '', secondary: '' }
 
+const NO_TYPOGRAPHY_DRAFT: TypographyDraft = {
+  fonts: DEFAULT_BRAND_FONTS,
+  errors: NO_ERRORS,
+  validFonts: DEFAULT_BRAND_FONTS,
+}
+
 // Each option of the list is drawn in its own font
 function fontOptionStyle(family: string) {
   return { fontFamily: toFontFamilyCss(family) }
 }
 
-export function TypographyForm({ onChange }: TypographyFormProps) {
-  const [fonts, setFonts] = useState<BrandFonts>(DEFAULT_BRAND_FONTS)
-  const [errors, setErrors] = useState<BrandFonts>(NO_ERRORS)
-  // The last valid fonts: while a name is half typed, the preview keeps these.
-  const [validFonts, setValidFonts] = useState<BrandFonts>(DEFAULT_BRAND_FONTS)
+export function TypographyForm({ onChange, draft: ownerDraft, onDraftChange }: TypographyFormProps) {
+  const [draft, update, current] = useDraft(NO_TYPOGRAPHY_DRAFT, ownerDraft, onDraftChange)
+  const { fonts, errors, validFonts } = draft
   useLiveData(validFonts, onChange)
 
   // Only the letters of the names, so the list can show every font without downloading them all
@@ -39,16 +55,20 @@ export function TypographyForm({ onChange }: TypographyFormProps) {
   }, [])
 
   function updateFont(key: FontKey, value: string, fieldError = '') {
-    setFonts((prev) => ({ ...prev, [key]: value }))
-    setErrors((prev) => ({ ...prev, [key]: fieldError }))
     const match = findOption(BRAND_FONT_FAMILIES, value)
-    if (match) setValidFonts((prev) => (prev[key] === match ? prev : { ...prev, [key]: match }))
+    update((prev) => ({
+      fonts: { ...prev.fonts, [key]: value },
+      errors: { ...prev.errors, [key]: fieldError },
+      // Same object while the font stays the same, so the preview is not sent it again
+      validFonts:
+        match && prev.validFonts[key] !== match ? { ...prev.validFonts, [key]: match } : prev.validFonts,
+    }))
   }
 
   // On blur or Enter: snap a case-insensitive match to the option, flag anything else.
   // A blank field is not an error: the preview keeps the last valid font.
   function commitFont(key: FontKey) {
-    const value = fonts[key]
+    const value = current().fonts[key]
     if (value.trim() === '') return
     const match = findOption(BRAND_FONT_FAMILIES, value)
     updateFont(key, match ?? value, match ? '' : 'Select a valid option')

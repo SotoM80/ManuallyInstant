@@ -190,4 +190,19 @@ describe('Typography – navigation', () => {
 
     expect(within(getTypographyPage()).getByText('Playfair Display')).toBeInTheDocument();
   });
+
+  it('keeps the form fields, so changing one font keeps the other', () => {
+    renderApp();
+    pickFonts('Playfair Display', 'Inter');
+
+    fireEvent.click(screen.getByRole('link', { name: 'Home' }));
+    fireEvent.click(screen.getByRole('link', { name: 'Brand Manual' }));
+
+    expect(getField('Primary font')).toHaveValue('Playfair Display');
+    expect(getField('Secondary font')).toHaveValue('Inter');
+
+    pickFont('Secondary font', 'Lora');
+    expect(within(getTypographyPage()).getByText('Playfair Display')).toBeInTheDocument();
+    expect(within(getTypographyPage()).getByText('Lora')).toBeInTheDocument();
+  });
 });

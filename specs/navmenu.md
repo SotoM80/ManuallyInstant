@@ -44,7 +44,7 @@ The page will be responsive: it will adapt to mobile, tablet and desktop screens
 ## 4. Invariants
 * The header (logo + menu) is visible on every page.
 * The menu shows exactly the sections in the list, in the same order.
-* The brand title shown on the Cover and its style are kept when the user moves between pages. They are only reset when the browser page is refreshed (see `titlefild.md`, Out of Scope).
+* The manual is kept when the user moves between pages: the preview, and what the user entered in the forms of the sections (Cover, Typography), half-typed values included. It is only reset when the browser page is refreshed (see `titlefild.md`, Out of Scope, and ADR 0002).
 
 ## Failure Modes
 * **Unknown URL**: If the user opens a URL that does not exist (e.g. `/does-not-exist`), the app redirects to Home.

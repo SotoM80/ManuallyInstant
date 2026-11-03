@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo } from 'react'
 import { AutocompleteField } from './AutocompleteField'
 import { ColorPicker } from './ColorPicker'
 import { ImageField } from './ImageField'
@@ -14,6 +14,7 @@ import { DEFAULT_LOGO_SIZE, LOGO_SIZES } from '../data/logoOptions'
 import { findOption, validateImage } from '../utils/validation'
 import { NO_IMAGE, applyImage, chooseFile, isPending, shownFile, toImage, useLiveData } from '../utils/pendingImage'
 import type { PendingImage } from '../utils/pendingImage'
+import { useDraft } from '../utils/useDraft'
 import type { CoverData, LogoSize, ManualColors, TitleStyle } from '../types'
 
 type StyleKey = keyof TitleStyle
@@ -80,20 +81,9 @@ function validateLogo(file: File | null) {
 }
 
 export function BrandForm({ onChange, draft: ownerDraft, onDraftChange }: BrandFormProps) {
-  const [ownDraft, setOwnDraft] = useState(ownerDraft ?? NO_COVER_DRAFT)
-  const draft = ownerDraft ?? ownDraft
+  const [draft, update, current] = useDraft(NO_COVER_DRAFT, ownerDraft, onDraftChange)
   const { title, designedBy, logo, logoError, logoSize } = draft
   const { style, styleErrors, validStyle, colors, colorErrors, validColors } = draft
-  // The newest fields, so two changes in one event (select, then commit) build on each other.
-  const latest = useRef(draft)
-
-  function update(change: (prev: CoverDraft) => Partial<CoverDraft>) {
-    const next = { ...latest.current, ...change(latest.current) }
-    latest.current = next
-    setOwnDraft(next)
-    onDraftChange?.(next)
-  }
-
   const shownLogo = shownFile(logo)
   const cover = useMemo<CoverData>(
     () => ({
@@ -119,7 +109,7 @@ export function BrandForm({ onChange, draft: ownerDraft, onDraftChange }: BrandF
   // On blur or Enter in the HEX field: tidy a valid value ("1e88e5" → "#1E88E5"), flag the rest.
   // A blank field is not an error: the preview keeps the last valid color.
   function commitColor(key: ColorKey) {
-    const value = latest.current.colors[key]
+    const value = current().colors[key]
     if (value.trim() === '') return
     const hex = normalizeHex(value)
     updateColor(key, hex ?? value, hex ? '' : INVALID_HEX_MESSAGE)
@@ -138,7 +128,7 @@ export function BrandForm({ onChange, draft: ownerDraft, onDraftChange }: BrandF
   // On blur or Enter: snap a case-insensitive match to the option, flag anything else.
   // A blank field is not an error: the preview keeps the last valid option.
   function commitStyle(key: StyleKey, options: readonly string[]) {
-    const value = latest.current.style[key]
+    const value = current().style[key]
     if (value.trim() === '') return
     const match = findOption(options, value)
     updateStyle(key, match ?? value, match ? '' : 'Select a valid option')

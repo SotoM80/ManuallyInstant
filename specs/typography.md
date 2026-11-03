@@ -106,3 +106,4 @@ No field is required: an empty field is not an error, and the page keeps the las
 * **Given**: The page shows "Playfair Display" as Primary font.
 * **When**: The user goes to Home and then back to Brand Manual.
 * **Then**: The Typography page still shows "Playfair Display".
+* **And**: The Typography form still shows both fonts, and changing the Secondary font keeps "Playfair Display" on the page.
