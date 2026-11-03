@@ -234,4 +234,28 @@ describe('Color palette – navigation', () => {
 
     expect(within(getPalettePage()).getByText('Primary blue')).toBeInTheDocument();
   });
+
+  it('keeps the form fields, so editing one color keeps the others', () => {
+    renderApp();
+    typeName(1, 'Primary blue');
+    clickAddColor();
+    typeName(2, 'Accent');
+
+    fireEvent.click(screen.getByRole('link', { name: 'Home' }));
+    fireEvent.click(screen.getByRole('link', { name: 'Brand Manual' }));
+
+    expect(getColorGroups()).toHaveLength(2);
+    expect(within(getColorsForm()).getByLabelText('Color 1 name')).toHaveValue('Primary blue');
+    expect(within(getColorsForm()).getByLabelText('Color 2 name')).toHaveValue('Accent');
+
+    typeName(2, 'Accent red');
+    clickAddColor();
+    typeName(3, 'Night');
+
+    expect(getColorGroups()).toHaveLength(3);
+    const page = within(getPalettePage());
+    expect(page.getByText('Primary blue')).toBeInTheDocument();
+    expect(page.getByText('Accent red')).toBeInTheDocument();
+    expect(page.getByText('Night')).toBeInTheDocument();
+  });
 });

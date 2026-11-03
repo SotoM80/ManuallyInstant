@@ -4,6 +4,7 @@ import { BrandForm } from '../components/BrandForm'
 import type { CoverDraft } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
+import type { ColorsDraft } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
 import type { TypographyDraft } from '../components/TypographyForm'
 import { SkinForm } from '../components/SkinForm'
@@ -46,6 +47,8 @@ type BrandManualPageProps = {
   onUsageChange?: (usage: UsageData) => void
   palette: PaletteColor[] | null
   onPaletteChange: (palette: PaletteColor[]) => void
+  colorsDraft?: ColorsDraft
+  onColorsDraftChange?: (draft: ColorsDraft) => void
   typography: BrandFonts | null
   onTypographyChange: (fonts: BrandFonts) => void
   typographyDraft?: TypographyDraft
@@ -75,6 +78,8 @@ export function BrandManualPage({
   onUsageChange = () => {},
   palette,
   onPaletteChange,
+  colorsDraft,
+  onColorsDraftChange,
   typography,
   onTypographyChange,
   typographyDraft,
@@ -137,7 +142,9 @@ export function BrandManualPage({
     ),
     logo: <LogoForm onChange={onLogoChange} palette={palette} />,
     usage: <UsageForm onChange={onUsageChange} palette={palette} />,
-    colors: <ColorsForm onChange={onPaletteChange} />,
+    colors: (
+      <ColorsForm onChange={onPaletteChange} draft={colorsDraft} onDraftChange={onColorsDraftChange} />
+    ),
     typography: (
       <TypographyForm
         onChange={onTypographyChange}

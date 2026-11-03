@@ -1,9 +1,10 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo } from 'react'
 import { ColorPicker } from './ColorPicker'
 import { useCmyk } from '../utils/cmykValues'
 import { INVALID_HEX_MESSAGE, PALETTE, colorValues, normalizeHex } from '../data/colorPalette'
 import { keepInPlace } from '../utils/scrollAnchor'
 import { useLiveData } from '../utils/pendingImage'
+import { useDraft } from '../utils/useDraft'
 import type { PaletteColor } from '../types'
 
 // One block of the form: what is typed (valid or not) and its errors.
@@ -21,6 +22,17 @@ type ColorRow = {
 // short row (chip, name and HEX) that opens it with a click. Every change reaches the preview at once.
 type ColorsFormProps = {
   onChange?: (palette: PaletteColor[]) => void
+  // Optional owner of the form's fields (see useDraft)
+  draft?: ColorsDraft
+  onDraftChange?: (draft: ColorsDraft) => void
+}
+
+// Everything the form shows. `nextKey` is kept too: a row's key is its color's id in the
+// palette (the skin copies colors by id), so a color added later must never reuse one.
+export type ColorsDraft = {
+  rows: ColorRow[]
+  openKey: number | null // null → every color folded
+  nextKey: number
 }
 
 const MAX_COLORS = 6
@@ -36,10 +48,11 @@ function newRow(key: number, rows: ColorRow[]): ColorRow {
   return { key, name: '', hex, validHex: hex, hexError: '' }
 }
 
-export function ColorsForm({ onChange }: ColorsFormProps) {
-  const nextKey = useRef(1)
-  const [rows, setRows] = useState<ColorRow[]>(() => [newRow(0, [])])
-  const [openKey, setOpenKey] = useState<number | null>(0) // null → every color folded
+const NO_COLORS_DRAFT: ColorsDraft = { rows: [newRow(0, [])], openKey: 0, nextKey: 1 }
+
+export function ColorsForm({ onChange, draft: ownerDraft, onDraftChange }: ColorsFormProps) {
+  const [draft, update, current] = useDraft(NO_COLORS_DRAFT, ownerDraft, onDraftChange)
+  const { rows, openKey } = draft
   const { valuesOf } = useCmyk()
 
   const palette = useMemo(
@@ -49,25 +62,28 @@ export function ColorsForm({ onChange }: ColorsFormProps) {
   useLiveData(palette, onChange)
 
   function updateRow(key: number, changes: Partial<ColorRow>) {
-    setRows((prev) => prev.map((row) => (row.key === key ? { ...row, ...changes } : row)))
+    update((prev) => ({ rows: prev.rows.map((row) => (row.key === key ? { ...row, ...changes } : row)) }))
   }
 
   // A new color opens, and the one that was open folds.
   function addColor() {
-    if (rows.length >= MAX_COLORS) return
-    const key = nextKey.current++
-    setRows((prev) => [...prev, newRow(key, prev)])
-    setOpenKey(key)
+    update((prev) =>
+      prev.rows.length >= MAX_COLORS
+        ? {}
+        : { rows: [...prev.rows, newRow(prev.nextKey, prev.rows)], openKey: prev.nextKey, nextKey: prev.nextKey + 1 },
+    )
   }
 
   function removeColor(key: number) {
-    setRows((prev) => (prev.length > 1 ? prev.filter((row) => row.key !== key) : prev))
-    setOpenKey(null)
+    update((prev) => ({
+      rows: prev.rows.length > 1 ? prev.rows.filter((row) => row.key !== key) : prev.rows,
+      openKey: null,
+    }))
   }
 
   // Opening a color folds the open one; clicking the open one folds it.
   function toggleColor(key: number) {
-    setOpenKey((prev) => (prev === key ? null : key))
+    update((prev) => ({ openKey: prev.openKey === key ? null : key }))
   }
 
   // Typing or picking a color: a valid HEX also becomes the one the preview shows.
@@ -77,7 +93,8 @@ export function ColorsForm({ onChange }: ColorsFormProps) {
   }
 
   // On blur or Enter in the HEX field: tidy a valid value, flag the rest (same rule as the Cover).
-  function commitHex(row: ColorRow) {
+  function commitHex(shown: ColorRow) {
+    const row = current().rows.find((item) => item.key === shown.key) ?? shown
     if (row.hex.trim() === '') return
     const hex = normalizeHex(row.hex)
     updateRow(row.key, { hex: hex ?? row.hex, hexError: hex ? '' : INVALID_HEX_MESSAGE })

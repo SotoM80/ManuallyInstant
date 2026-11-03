@@ -137,6 +137,7 @@ No field is required. A wrong value is flagged on blur or Enter, with a red bord
 * **Given**: The page shows a color named "Primary blue".
 * **When**: The user goes to Home and then back to Brand Manual.
 * **Then**: The Color palette page still shows "Primary blue".
+* **And**: The Colors form still shows every color with its name and HEX; editing one keeps the others, and a color added afterwards is a new one.
 
 ### Scenario 9: Adding Opens the New Color
 * **Given**: The palette has one color, open.

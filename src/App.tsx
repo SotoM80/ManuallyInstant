@@ -6,6 +6,7 @@ import { HomePage } from './pages/HomePage'
 import { BrandManualPage } from './pages/BrandManualPage'
 import type { CoverDraft } from './components/BrandForm'
 import type { TypographyDraft } from './components/TypographyForm'
+import type { ColorsDraft } from './components/ColorsForm'
 import { NO_GUIDES } from './utils/guides'
 import type { Guides } from './utils/guides'
 import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
@@ -31,6 +32,7 @@ function App() {
   const [logo, setLogo] = useState<LogoData | null>(null)
   const [usage, setUsage] = useState<UsageData>(NO_USAGE) // each group null until touched
   const [palette, setPalette] = useState<PaletteColor[] | null>(null)
+  const [colorsDraft, setColorsDraft] = useState<ColorsDraft>()
   const [typography, setTypography] = useState<BrandFonts | null>(null)
   const [typographyDraft, setTypographyDraft] = useState<TypographyDraft>()
   const [orientation, setOrientation] = useState<Orientation>('portrait')
@@ -89,6 +91,8 @@ function App() {
                 onUsageChange={setUsage}
                 palette={palette}
                 onPaletteChange={setPalette}
+                colorsDraft={colorsDraft}
+                onColorsDraftChange={setColorsDraft}
                 typography={typography}
                 onTypographyChange={setTypography}
                 typographyDraft={typographyDraft}
