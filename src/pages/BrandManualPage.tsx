@@ -14,7 +14,6 @@ import { ManualPreview } from '../components/ManualPreview'
 import { MANUAL_SECTIONS, SECTION_AREAS, SECTION_PAGES, orderPages } from '../data/manualSections'
 import { NO_USAGE } from '../data/usageOptions'
 import { useAlignOpenSection } from '../utils/useAlignOpenSection'
-import { NO_GUIDES } from '../utils/guides'
 import type { Guides } from '../utils/guides'
 import { useReorderGlide } from '../utils/useReorderGlide'
 import type { TemplateId } from '../templates'
@@ -36,6 +35,10 @@ type BrandManualPageProps = {
   onCoverChange: (cover: CoverData) => void
   coverDraft?: CoverDraft
   onCoverDraftChange?: (draft: CoverDraft) => void
+  // Guides clicked on the construction grid (Clear space page). They are drawn in the preview,
+  // so they are not part of the Logo form
+  guides: Guides
+  onGuidesChange: (guides: Guides) => void
   logo: LogoData | null
   onLogoChange: (logo: LogoData) => void
   usage?: UsageData
@@ -61,6 +64,8 @@ export function BrandManualPage({
   onCoverChange,
   coverDraft,
   onCoverDraftChange,
+  guides,
+  onGuidesChange,
   logo,
   onLogoChange,
   usage = NO_USAGE,
@@ -77,9 +82,6 @@ export function BrandManualPage({
   // The sections work like an accordion: only one is open, the others fold into their header.
   // Folded forms stay in the page (inert), so nothing typed in them is lost.
   const [openSection, setOpenSection] = useState<string | null>('cover')
-  // Guides clicked on the construction grid (Clear space page). They are drawn in the preview,
-  // so they live here rather than in the Logo form.
-  const [guides, setGuides] = useState<Guides>(NO_GUIDES)
   // The open section's pages come first in the preview, so the page being edited is always
   // in view; folding the section puts every page back in its natural order.
   // In a section with areas (Logo, Usage), the area being worked in decides which of its pages is
@@ -159,7 +161,7 @@ export function BrandManualPage({
           pages={orderPages(featured)}
           featured={mainPage ? [mainPage] : []}
           guides={guides}
-          onGuidesChange={setGuides}
+          onGuidesChange={onGuidesChange}
           skin={skin}
           mockups={mockups}
         />

@@ -903,6 +903,18 @@ describe('Logo section – clicked guides', () => {
     expect(labels('width')).toEqual(['8X']);
   });
 
+  // Spec: specs/clearspace.md, Scenario 17 — Guides Are Kept Between Pages
+  it('keeps the guides when going to Home and back', () => {
+    setup();
+    clickBand('top', 40);
+
+    const menu = screen.getByRole('navigation', { name: 'Main' });
+    fireEvent.click(within(menu).getByRole('link', { name: 'Home' }));
+    fireEvent.click(within(menu).getByRole('link', { name: 'Brand Manual' }));
+
+    expect(labels('top')).toEqual(['4X', '12X']);
+  });
+
   it('removes a guide when it is clicked', () => {
     setup();
     clickBand('top', 40);

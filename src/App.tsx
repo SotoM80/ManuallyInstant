@@ -5,6 +5,8 @@ import { NavMenu } from './components/NavMenu'
 import { HomePage } from './pages/HomePage'
 import { BrandManualPage } from './pages/BrandManualPage'
 import type { CoverDraft } from './components/BrandForm'
+import { NO_GUIDES } from './utils/guides'
+import type { Guides } from './utils/guides'
 import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
 import { loadGoogleFont } from './utils/googleFonts'
 import { DEFAULT_TEMPLATE } from './templates'
@@ -34,6 +36,7 @@ function App() {
   const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
   const [skin, setSkin] = useState<Skin>(NO_SKIN)
   const [mockups, setMockups] = useState<Mockups>(DEFAULT_MOCKUPS)
+  const [guides, setGuides] = useState<Guides>(NO_GUIDES) // clicked on the construction grid
 
   // Photo templates for local tests only, if the file is there (see public/mockups/LICENSES.md)
   useEffect(() => {
@@ -76,6 +79,8 @@ function App() {
                 onCoverChange={setCover}
                 coverDraft={coverDraft}
                 onCoverDraftChange={setCoverDraft}
+                guides={guides}
+                onGuidesChange={setGuides}
                 logo={logo}
                 onLogoChange={setLogo}
                 usage={usage}
