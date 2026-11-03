@@ -51,7 +51,7 @@ Key features:
 - 🔜 Mockups (see the [spec](specs/mockups.md)): 3 illustrated products and a photo business card work, with the template editor; more products and licensed photos to come.
 - 🔜 A last review of the layout of every page (Phase 3), and a vector print PDF with selectable text.
 
-Limits: nothing is saved between sessions (refreshing clears the manual). Without the CMYK server, CMYK values are an approximation and the print PDF stays in RGB; with it, pages are images, so black text prints with the four inks. The server has no login yet. See [PLAN.md](PLAN.md) for the full list.
+Limits: nothing is saved between sessions (refreshing clears the manual). Within a session, everything typed in the forms is kept while moving between pages. Without the CMYK server, CMYK values are an approximation and the print PDF stays in RGB; with it, pages are images, so black text prints with the four inks. The server has no login yet. See [PLAN.md](PLAN.md) for the full list.
 
 ### How it was built
 - **Specs first**: each feature is described before it is coded, with Given-When-Then scenarios, in [`specs/`](specs/).
@@ -169,7 +169,7 @@ Funciones clave:
 - 🔜 Mockups (ver el [spec](specs/mockups.md)): funcionan 3 productos ilustrados y una tarjeta con foto, con el editor de plantillas; faltan más productos y fotos con licencia.
 - 🔜 Una última revisión del maquetado de cada hoja (Fase 3), y un PDF de imprenta vectorial con texto seleccionable.
 
-Límites: no se guarda nada entre sesiones (al recargar se borra el manual). Sin el servidor CMYK, los valores CMYK son una aproximación y el PDF de imprenta sigue en RGB; con él, las hojas son imágenes, así que el texto negro se imprime con las cuatro tintas. El servidor todavía no tiene login. La lista completa está en [PLAN.md](PLAN.md).
+Límites: no se guarda nada entre sesiones (al recargar se borra el manual). Dentro de una sesión, todo lo escrito en los formularios se mantiene al moverse entre páginas. Sin el servidor CMYK, los valores CMYK son una aproximación y el PDF de imprenta sigue en RGB; con él, las hojas son imágenes, así que el texto negro se imprime con las cuatro tintas. El servidor todavía no tiene login. La lista completa está en [PLAN.md](PLAN.md).
 
 ### Cómo se construyó
 - **Primero la spec**: cada feature se describe antes de programarla, con escenarios Given-When-Then, en [`specs/`](specs/).
