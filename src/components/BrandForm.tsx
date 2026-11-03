@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { AutocompleteField } from './AutocompleteField'
 import { ColorPicker } from './ColorPicker'
 import { ImageField } from './ImageField'
@@ -13,6 +13,7 @@ import {
 import { DEFAULT_LOGO_SIZE, LOGO_SIZES } from '../data/logoOptions'
 import { findOption, validateImage } from '../utils/validation'
 import { NO_IMAGE, applyImage, chooseFile, isPending, shownFile, toImage, useLiveData } from '../utils/pendingImage'
+import type { PendingImage } from '../utils/pendingImage'
 import type { CoverData, LogoSize, ManualColors, TitleStyle } from '../types'
 
 type StyleKey = keyof TitleStyle
@@ -23,6 +24,26 @@ type ColorKey = keyof ManualColors
 // Every change reaches the preview at once; a new logo waits for its Apply (see docs/adr/0007, 0020).
 type BrandFormProps = {
   onChange?: (cover: CoverData) => void
+  // Optional owner of the form's fields (App keeps them so they survive moving between pages,
+  // specs/navmenu.md Scenario 4). Without it, the form keeps its own fields.
+  draft?: CoverDraft
+  onDraftChange?: (draft: CoverDraft) => void
+}
+
+// Everything the form shows, half-typed values and errors included.
+export type CoverDraft = {
+  title: string
+  designedBy: string
+  logo: PendingImage
+  logoError: string
+  logoSize: LogoSize
+  style: StyleValues
+  styleErrors: StyleValues
+  // The last valid style and colors: while a field is half typed, the preview keeps these.
+  validStyle: TitleStyle
+  colors: ManualColors
+  colorErrors: ManualColors
+  validColors: ManualColors
 }
 
 const NO_STYLE_ERRORS: StyleValues = { fontFamily: '', fontStyle: '', fontSize: '' }
@@ -40,23 +61,38 @@ const COLOR_FIELDS: { key: ColorKey; label: string }[] = [
   { key: 'background', label: 'Background color' },
 ]
 
+const NO_COVER_DRAFT: CoverDraft = {
+  title: '',
+  designedBy: '',
+  logo: NO_IMAGE,
+  logoError: '',
+  logoSize: DEFAULT_LOGO_SIZE,
+  style: DEFAULT_TITLE_STYLE,
+  styleErrors: NO_STYLE_ERRORS,
+  validStyle: DEFAULT_TITLE_STYLE,
+  colors: DEFAULT_COLORS,
+  colorErrors: NO_COLOR_ERRORS,
+  validColors: DEFAULT_COLORS,
+}
+
 function validateLogo(file: File | null) {
   return validateImage(file, 'logo')
 }
 
-export function BrandForm({ onChange }: BrandFormProps) {
-  const [title, setTitle] = useState('')
-  const [designedBy, setDesignedBy] = useState('')
-  const [logo, setLogo] = useState(NO_IMAGE)
-  const [logoError, setLogoError] = useState('')
-  const [logoSize, setLogoSize] = useState<LogoSize>(DEFAULT_LOGO_SIZE)
-  const [style, setStyle] = useState<StyleValues>(DEFAULT_TITLE_STYLE)
-  const [styleErrors, setStyleErrors] = useState<StyleValues>(NO_STYLE_ERRORS)
-  // The last valid style and colors: while a field is half typed, the preview keeps these.
-  const [validStyle, setValidStyle] = useState<TitleStyle>(DEFAULT_TITLE_STYLE)
-  const [colors, setColors] = useState<ManualColors>(DEFAULT_COLORS)
-  const [colorErrors, setColorErrors] = useState<ManualColors>(NO_COLOR_ERRORS)
-  const [validColors, setValidColors] = useState<ManualColors>(DEFAULT_COLORS)
+export function BrandForm({ onChange, draft: ownerDraft, onDraftChange }: BrandFormProps) {
+  const [ownDraft, setOwnDraft] = useState(ownerDraft ?? NO_COVER_DRAFT)
+  const draft = ownerDraft ?? ownDraft
+  const { title, designedBy, logo, logoError, logoSize } = draft
+  const { style, styleErrors, validStyle, colors, colorErrors, validColors } = draft
+  // The newest fields, so two changes in one event (select, then commit) build on each other.
+  const latest = useRef(draft)
+
+  function update(change: (prev: CoverDraft) => Partial<CoverDraft>) {
+    const next = { ...latest.current, ...change(latest.current) }
+    latest.current = next
+    setOwnDraft(next)
+    onDraftChange?.(next)
+  }
 
   const shownLogo = shownFile(logo)
   const cover = useMemo<CoverData>(
@@ -72,33 +108,37 @@ export function BrandForm({ onChange }: BrandFormProps) {
   useLiveData(cover, onChange)
 
   function updateColor(key: ColorKey, value: string, fieldError = '') {
-    setColors((prev) => ({ ...prev, [key]: value }))
-    setColorErrors((prev) => ({ ...prev, [key]: fieldError }))
     const hex = normalizeHex(value)
-    if (hex) setValidColors((prev) => ({ ...prev, [key]: hex }))
+    update((prev) => ({
+      colors: { ...prev.colors, [key]: value },
+      colorErrors: { ...prev.colorErrors, [key]: fieldError },
+      validColors: hex ? { ...prev.validColors, [key]: hex } : prev.validColors,
+    }))
   }
 
   // On blur or Enter in the HEX field: tidy a valid value ("1e88e5" → "#1E88E5"), flag the rest.
   // A blank field is not an error: the preview keeps the last valid color.
   function commitColor(key: ColorKey) {
-    const value = colors[key]
+    const value = latest.current.colors[key]
     if (value.trim() === '') return
     const hex = normalizeHex(value)
     updateColor(key, hex ?? value, hex ? '' : INVALID_HEX_MESSAGE)
   }
 
   function updateStyle(key: StyleKey, value: string, fieldError = '') {
-    setStyle((prev) => ({ ...prev, [key]: value }))
-    setStyleErrors((prev) => ({ ...prev, [key]: fieldError }))
     const field = STYLE_FIELDS.find((item) => item.key === key)
     const match = field && findOption(field.options, value)
-    if (match) setValidStyle((prev) => ({ ...prev, [key]: match }))
+    update((prev) => ({
+      style: { ...prev.style, [key]: value },
+      styleErrors: { ...prev.styleErrors, [key]: fieldError },
+      validStyle: match ? { ...prev.validStyle, [key]: match } : prev.validStyle,
+    }))
   }
 
   // On blur or Enter: snap a case-insensitive match to the option, flag anything else.
   // A blank field is not an error: the preview keeps the last valid option.
   function commitStyle(key: StyleKey, options: readonly string[]) {
-    const value = style[key]
+    const value = latest.current.style[key]
     if (value.trim() === '') return
     const match = findOption(options, value)
     updateStyle(key, match ?? value, match ? '' : 'Select a valid option')
@@ -106,8 +146,7 @@ export function BrandForm({ onChange }: BrandFormProps) {
 
   // A wrong file is flagged as soon as it is chosen. A valid one waits for its Apply.
   function handleLogoChange(file: File | null) {
-    setLogo((prev) => chooseFile(prev, file))
-    setLogoError(file ? validateLogo(file) : '')
+    update((prev) => ({ logo: chooseFile(prev.logo, file), logoError: file ? validateLogo(file) : '' }))
   }
 
   return (
@@ -117,7 +156,7 @@ export function BrandForm({ onChange }: BrandFormProps) {
         id="brand-title"
         type="text"
         value={title}
-        onChange={(event) => setTitle(event.target.value)}
+        onChange={(event) => update(() => ({ title: event.target.value }))}
       />
       {STYLE_FIELDS.map((field) => (
         <AutocompleteField
@@ -149,7 +188,7 @@ export function BrandForm({ onChange }: BrandFormProps) {
         id="designed-by"
         type="text"
         value={designedBy}
-        onChange={(event) => setDesignedBy(event.target.value)}
+        onChange={(event) => update(() => ({ designedBy: event.target.value }))}
       />
 
       <ImageField
@@ -159,7 +198,7 @@ export function BrandForm({ onChange }: BrandFormProps) {
         error={logoError}
         onChange={handleLogoChange}
         pending={isPending(logo, logoError)}
-        onApply={() => setLogo((prev) => applyImage(prev, logoError))}
+        onApply={() => update((prev) => ({ logo: applyImage(prev.logo, prev.logoError) }))}
       />
 
       {/* Always one option chosen, so it never shows an error */}
@@ -172,7 +211,7 @@ export function BrandForm({ onChange }: BrandFormProps) {
               name="logo-size"
               value={size}
               checked={logoSize === size}
-              onChange={() => setLogoSize(size)}
+              onChange={() => update(() => ({ logoSize: size }))}
             />
             <span>{size}</span>
           </label>

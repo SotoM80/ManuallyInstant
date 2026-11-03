@@ -70,6 +70,7 @@ The page will be responsive: it will adapt to mobile, tablet and desktop screens
 * **Given**: The user typed the title "My Brand" on the Brand Manual page.
 * **When**: The user goes to Home and then back to Brand Manual.
 * **Then**: Back on Brand Manual, the Cover of the manual preview still shows "My Brand".
+* **And**: The Cover form's fields still hold what the user entered (title, title style, colors, Designed by, the applied logo and its size), and editing any of them keeps the rest.
 
 ### Scenario 5: Unknown URL
 * **Given**: The user opens `/does-not-exist`.

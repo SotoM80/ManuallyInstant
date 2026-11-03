@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import type { ReactNode, SyntheticEvent } from 'react'
 import { BrandForm } from '../components/BrandForm'
+import type { CoverDraft } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
@@ -33,6 +34,8 @@ type BrandManualPageProps = {
   template: TemplateId
   onTemplateChange: (template: TemplateId) => void
   onCoverChange: (cover: CoverData) => void
+  coverDraft?: CoverDraft
+  onCoverDraftChange?: (draft: CoverDraft) => void
   logo: LogoData | null
   onLogoChange: (logo: LogoData) => void
   usage?: UsageData
@@ -56,6 +59,8 @@ export function BrandManualPage({
   template,
   onTemplateChange,
   onCoverChange,
+  coverDraft,
+  onCoverDraftChange,
   logo,
   onLogoChange,
   usage = NO_USAGE,
@@ -120,7 +125,9 @@ export function BrandManualPage({
   // The forms send every change to the preview at once; a new image waits for the Apply next
   // to its field (see docs/adr/0007 and 0020).
   const sectionForms: Record<string, ReactNode> = {
-    cover: <BrandForm onChange={onCoverChange} />,
+    cover: (
+      <BrandForm onChange={onCoverChange} draft={coverDraft} onDraftChange={onCoverDraftChange} />
+    ),
     logo: <LogoForm onChange={onLogoChange} palette={palette} />,
     usage: <UsageForm onChange={onUsageChange} palette={palette} />,
     colors: <ColorsForm onChange={onPaletteChange} />,

@@ -4,6 +4,7 @@ import { Logo } from './components/Logo'
 import { NavMenu } from './components/NavMenu'
 import { HomePage } from './pages/HomePage'
 import { BrandManualPage } from './pages/BrandManualPage'
+import type { CoverDraft } from './components/BrandForm'
 import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
 import { loadGoogleFont } from './utils/googleFonts'
 import { DEFAULT_TEMPLATE } from './templates'
@@ -22,6 +23,8 @@ function App() {
   // Each one is null until its section is touched for the first time; from then on the
   // forms send every change here, so the preview follows them live.
   const [cover, setCover] = useState<CoverData | null>(null)
+  // What the Cover form shows (half-typed values too), so it is filled again on the way back.
+  const [coverDraft, setCoverDraft] = useState<CoverDraft>()
   const [logo, setLogo] = useState<LogoData | null>(null)
   const [usage, setUsage] = useState<UsageData>(NO_USAGE) // each group null until touched
   const [palette, setPalette] = useState<PaletteColor[] | null>(null)
@@ -71,6 +74,8 @@ function App() {
                 template={template}
                 onTemplateChange={setTemplate}
                 onCoverChange={setCover}
+                coverDraft={coverDraft}
+                onCoverDraftChange={setCoverDraft}
                 logo={logo}
                 onLogoChange={setLogo}
                 usage={usage}

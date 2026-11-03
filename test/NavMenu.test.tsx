@@ -1,7 +1,16 @@
 import { screen, fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import { NAV_ITEMS } from '../src/data/navItems';
-import { clickApply, fillRequiredCoverFields, typeTitle } from './coverForm';
+import {
+  clickApply,
+  coverForm,
+  fillRequiredCoverFields,
+  getHexInput,
+  getLogoSizeOption,
+  pickLogoSize,
+  typeDesignedBy,
+  typeTitle,
+} from './coverForm';
 
 function getMenu() {
   return within(screen.getByRole('banner')).getByRole('navigation', { name: 'Main' });
@@ -98,6 +107,32 @@ describe('NavMenu – title is kept between pages', () => {
     // ...Then: back on Brand Manual, the Cover still shows the title
     fireEvent.click(getMenuLink('Brand Manual'));
     expect(getCover()).toHaveTextContent('My Brand');
+  });
+
+  it('keeps the Cover form fields, so editing one keeps the rest', () => {
+    // Given: a filled Cover form
+    renderApp('/brand-manual');
+    typeTitle('My Brand');
+    fillRequiredCoverFields();
+    clickApply();
+    pickLogoSize('Large');
+    fireEvent.change(getHexInput('Title color'), { target: { value: '#112233' } });
+
+    // When: going to Home and back
+    fireEvent.click(getMenuLink('Home'));
+    fireEvent.click(getMenuLink('Brand Manual'));
+
+    // Then: the fields still hold what was entered
+    expect(coverForm().getByLabelText('Brand manual title')).toHaveValue('My Brand');
+    expect(coverForm().getByLabelText('Designed by')).toHaveValue('Studio X');
+    expect(getHexInput('Title color')).toHaveValue('#112233');
+    expect(getLogoSizeOption('Large')).toBeChecked();
+
+    // And: editing one field does not reset the others in the preview
+    typeDesignedBy('Studio Y');
+    expect(getCover()).toHaveTextContent('My Brand');
+    expect(getCover()).toHaveTextContent('Studio Y');
+    expect(within(getCover()).getByRole('img')).toBeInTheDocument();
   });
 });
 
