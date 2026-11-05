@@ -333,4 +333,4 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
    1. ✅ Spike (2026-10-23): Gemini answers the browser (CORS); the free tier makes no images. Recorded in ADR 0016.
    2. `src/mockups/generate/` (the `PhotoGenerator` interface, the chosen adapter, `buildPrompt`) with unit tests on a fake `fetch`.
    3. The panel in the Mockups section, sharing one `openPhoto` path with Upload your own photo; scenarios 27–32.
-   4. README.
+   4. ✅ README.
