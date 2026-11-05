@@ -1071,6 +1071,28 @@
   justify-content: flex-start;
 }
 
+/* Generate a photo: the button, then its panel, folded until it is opened */
+.mockup-generate,
+.mockup-generate-panel {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
+.mockup-generate-panel input {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.mockup-generate-panel[hidden] {
+  display: none;
+}
+
+.mockup-generate-actions {
+  display: flex;
+  gap: 8px;
+}
+
 /* The template editor (specs/mockups.md): a large window over the page, the photo on the left
    and the tools on the right (stacked on narrow screens) */
 .template-editor-backdrop {

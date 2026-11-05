@@ -129,7 +129,7 @@ A window over the page, opened with **Edit template** in a photo mockup's block,
 
 #### Generated photos (ADR 0016)
 Next to **Upload your own photo**, a **Generate a photo** button opens a small panel:
-* **API key**: a password field. The key lives only in memory: it is never stored, logged, exported or sent anywhere but the provider, and it is gone when the page is refreshed. A line says who the provider is and that the agency pays for its images.
+* **API key**: a password field. The key lives only in memory: it is never stored, logged, exported or sent anywhere but the provider (in the `x-goog-api-key` header, never in the URL), and it is gone when the page is refreshed. Spaces around it are trimmed. A line says the photos are made by **Google Gemini** with the user's own key, that Google bills them (a key with billing on: the free tier makes no images), and links to where a key is made (Google AI Studio).
 * **Product**: free text, up to 100 characters (`ceramic mug`, `tote bag hanging on a hook`).
 * **Generate**: disabled until both fields have text. The app sends the product followed by a fixed suffix: `, blank, unbranded, plain white product, no logo, no text, front view, studio lighting, plain light background`. The suffix keeps the photo light and empty, so the tint works and no fake logo appears.
 * While it works, the button reads `Generating…` and a **Cancel** button stops the request.
@@ -153,7 +153,7 @@ Next to **Upload your own photo**, a **Generate a photo** button opens a small p
 * The choice is kept when the user moves between pages; it is only reset (to the four defaults, with default colors and the Primary) when the browser page is refreshed.
 
 ## Failure Modes
-For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn` when it fails (no WebGL, a photo that does not load), and in the editor a photo that is not an image or is over 10 MB is refused with `Use a JPG or PNG photo, up to 10 MB`. For generated photos, the panel shows one line and keeps its fields: `The API key was not accepted` (401/403), `Too many requests or no credit left with the provider` (429), `The provider refused this description; try other words` (content refused), `Could not reach the provider; check the connection` (network or CORS error), or `The photo could not be generated` (anything else). Otherwise, only a typed HEX can be wrong: it is flagged with `"Enter a valid HEX color, like #1E88E5"`, and the page keeps the last valid color. Everything else falls back: a missing logo to the next one in the chain, a removed version to the Primary, a 5th product to a disabled checkbox, a missing brand name to the Cover title or to no brand line.
+For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn` when it fails (no WebGL, a photo that does not load), and in the editor a photo that is not an image or is over 10 MB is refused with `Use a JPG or PNG photo, up to 10 MB`. For generated photos, the panel shows one line and keeps its fields: `The API key was not accepted` (401/403, or Gemini's 400 about the API key), `Your Gemini plan does not include images; turn on billing in Google AI Studio` (429 with a quota limit of 0, the free tier), `Too many requests or no credit left with the provider` (any other 429), `The provider refused this description; try other words` (content refused), `Could not reach the provider; check the connection` (network or CORS error), or `The photo could not be generated` (anything else). Otherwise, only a typed HEX can be wrong: it is flagged with `"Enter a valid HEX color, like #1E88E5"`, and the page keeps the last valid color. Everything else falls back: a missing logo to the next one in the chain, a removed version to the Primary, a 5th product to a disabled checkbox, a missing brand name to the Cover title or to no brand line.
 
 ## 5. Given-When-Then Test Criteria
 
@@ -307,7 +307,12 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **When**: The user clicks Generate.
 * **Then**: The panel shows "The API key was not accepted", keeps both fields, and no editor opens.
 
-### Scenario 31: Cancel
+### Scenario 31: A Key without Billing
+* **Given**: The provider answers 429 with a quota limit of 0.
+* **When**: The user clicks Generate.
+* **Then**: The panel shows "Your Gemini plan does not include images; turn on billing in Google AI Studio", and keeps both fields.
+
+### Scenario 32: Cancel
 * **Given**: A photo is being generated.
 * **When**: The user clicks Cancel.
 * **Then**: The request is stopped, no error is shown, and Generate can be clicked again.
@@ -325,7 +330,7 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
    3. The template editor (magic wand, brush, area points with angles and curves) and uploads, brought forward after trying phase 1.
    4. Later: the folds (displacement).
 8. **Generated photos** (ADR 0016):
-   1. Spike: a `fetch` from `localhost` to each candidate provider with a real key; keep the first that answers without a CORS error, and record it in ADR 0016 (or rewrite the ADR for a proxy).
+   1. ✅ Spike (2026-10-23): Gemini answers the browser (CORS); the free tier makes no images. Recorded in ADR 0016.
    2. `src/mockups/generate/` (the `PhotoGenerator` interface, the chosen adapter, `buildPrompt`) with unit tests on a fake `fetch`.
-   3. The panel in the Mockups section, sharing one `openPhoto` path with Upload your own photo; scenarios 27–31.
+   3. The panel in the Mockups section, sharing one `openPhoto` path with Upload your own photo; scenarios 27–32.
    4. README.

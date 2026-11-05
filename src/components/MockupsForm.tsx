@@ -4,6 +4,7 @@ import { MockupArt } from './pages/MockupArt'
 import { PhotoMockup } from './pages/PhotoMockup'
 import { SkinColorField } from './SkinColorField'
 import { TemplateEditor } from './TemplateEditor'
+import { GeneratePhotoPanel } from './GeneratePhotoPanel'
 import { MOCKUP_GROUPS } from '../mockups/products'
 import { savePhotoTemplate, useMockupCatalog } from '../mockups/catalog'
 import { ROTATION_LIMIT, SIZE_LIMITS, dragPlacement } from '../mockups/geometry'
@@ -168,13 +169,18 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
       return
     }
     setUploadError('')
+    openPhoto(URL.createObjectURL(file), file.name.replace(/\.[^.]+$/, ''))
+  }
+
+  // An uploaded or a generated photo: the same new template of this session, in the editor
+  function openPhoto(image: string, name: string) {
     uploads.current += 1
     setEditing({
       kind: 'photo',
       id: `upload-${uploads.current}`,
-      name: file.name.replace(/\.[^.]+$/, '') || 'My photo',
+      name: name || 'My photo',
       group: 'apparel',
-      image: URL.createObjectURL(file),
+      image,
       size: [0, 0], // read by the editor
       mask: [],
       area: { x: 0, y: 0, width: 0, height: 0 }, // placed by the editor
@@ -320,6 +326,7 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
           {uploadError}
         </p>
       )}
+      <GeneratePhotoPanel onPhoto={openPhoto} />
 
       {mockups.chosen.map((id) => {
         const item = catalog.find((other) => other.id === id)
