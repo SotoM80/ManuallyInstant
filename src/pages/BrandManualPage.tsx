@@ -3,7 +3,6 @@ import type { ReactNode, SyntheticEvent } from 'react'
 import { BrandForm } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
-import type { ColorsDraft } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
 import type { TypographyDraft } from '../components/TypographyForm'
 import { SkinForm } from '../components/SkinForm'
@@ -48,8 +47,6 @@ type BrandManualPageProps = {
   onUsageChange?: (usage: UsageData) => void
   palette: PaletteColor[] | null
   onPaletteChange: (palette: PaletteColor[]) => void
-  colorsDraft?: ColorsDraft
-  onColorsDraftChange?: (draft: ColorsDraft) => void
   typography: BrandFonts | null
   onTypographyChange: (fonts: BrandFonts) => void
   typographyDraft?: TypographyDraft
@@ -79,8 +76,6 @@ export function BrandManualPage({
   onUsageChange = () => {},
   palette,
   onPaletteChange,
-  colorsDraft,
-  onColorsDraftChange,
   typography,
   onTypographyChange,
   typographyDraft,
@@ -162,7 +157,11 @@ export function BrandManualPage({
       />
     ),
     colors: (
-      <ColorsForm onChange={onPaletteChange} draft={colorsDraft} onDraftChange={onColorsDraftChange} />
+      <ColorsForm
+        onChange={onPaletteChange}
+        draft={drafts.colors}
+        onDraftChange={onDraftChange && ((draft) => onDraftChange('colors', draft))}
+      />
     ),
     typography: (
       <TypographyForm
