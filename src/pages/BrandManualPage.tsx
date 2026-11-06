@@ -8,7 +8,6 @@ import { TypographyForm } from '../components/TypographyForm'
 import type { TypographyDraft } from '../components/TypographyForm'
 import { SkinForm } from '../components/SkinForm'
 import { UsageForm } from '../components/UsageForm'
-import type { UsageDraft } from '../components/UsageForm'
 import { ExportButtons } from '../components/ExportButtons'
 import { CmykProvider } from '../components/CmykProvider'
 import { NO_SKIN } from '../skins/presets'
@@ -47,8 +46,6 @@ type BrandManualPageProps = {
   onLogoChange: (logo: LogoData) => void
   usage?: UsageData
   onUsageChange?: (usage: UsageData) => void
-  usageDraft?: UsageDraft
-  onUsageDraftChange?: (draft: UsageDraft) => void
   palette: PaletteColor[] | null
   onPaletteChange: (palette: PaletteColor[]) => void
   colorsDraft?: ColorsDraft
@@ -80,8 +77,6 @@ export function BrandManualPage({
   onLogoChange,
   usage = NO_USAGE,
   onUsageChange = () => {},
-  usageDraft,
-  onUsageDraftChange,
   palette,
   onPaletteChange,
   colorsDraft,
@@ -162,8 +157,8 @@ export function BrandManualPage({
       <UsageForm
         onChange={onUsageChange}
         palette={palette}
-        draft={usageDraft}
-        onDraftChange={onUsageDraftChange}
+        draft={drafts.usage}
+        onDraftChange={onDraftChange && ((draft) => onDraftChange('usage', draft))}
       />
     ),
     colors: (
