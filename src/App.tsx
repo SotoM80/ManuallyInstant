@@ -5,7 +5,6 @@ import { NavMenu } from './components/NavMenu'
 import { HomePage } from './pages/HomePage'
 import { BrandManualPage } from './pages/BrandManualPage'
 import type { DraftKey, Drafts } from './utils/drafts'
-import type { TypographyDraft } from './components/TypographyForm'
 import { NO_GUIDES } from './utils/guides'
 import type { Guides } from './utils/guides'
 import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
@@ -36,7 +35,6 @@ function App() {
   const [usage, setUsage] = useState<UsageData>(NO_USAGE) // each group null until touched
   const [palette, setPalette] = useState<PaletteColor[] | null>(null)
   const [typography, setTypography] = useState<BrandFonts | null>(null)
-  const [typographyDraft, setTypographyDraft] = useState<TypographyDraft>()
   const [orientation, setOrientation] = useState<Orientation>('portrait')
   const [previewView, setPreviewView] = useState<PreviewView>('grid')
   const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
@@ -95,8 +93,6 @@ function App() {
                 onPaletteChange={setPalette}
                 typography={typography}
                 onTypographyChange={setTypography}
-                typographyDraft={typographyDraft}
-                onTypographyDraftChange={setTypographyDraft}
                 skin={skin}
                 mockups={mockups}
                 onMockupsChange={setMockups}
