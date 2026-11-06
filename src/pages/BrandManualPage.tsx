@@ -1,10 +1,12 @@
 import { useMemo, useRef, useState } from 'react'
-import type { ReactNode, SyntheticEvent } from 'react'
+import type { Dispatch, ReactNode, SetStateAction, SyntheticEvent } from 'react'
 import { BrandForm } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
 import { SkinForm } from '../components/SkinForm'
+import { SectionBackgroundField } from '../components/SectionBackgroundField'
+import { isSectionId, sectionBackground, setSectionBackground } from '../skins/sections'
 import { UsageForm } from '../components/UsageForm'
 import { ExportButtons } from '../components/ExportButtons'
 import { CmykProvider } from '../components/CmykProvider'
@@ -49,7 +51,8 @@ type BrandManualPageProps = {
   typography: BrandFonts | null
   onTypographyChange: (fonts: BrandFonts) => void
   skin?: Skin
-  onSkinChange?: (skin: Skin) => void
+  // A new skin, or a change made from the newest one (the section backgrounds, ADR 0025)
+  onSkinChange?: Dispatch<SetStateAction<Skin>>
   mockups?: Mockups
   onMockupsChange?: (mockups: Mockups) => void
 }
@@ -258,6 +261,20 @@ export function BrandManualPage({
                         onFocus={SECTION_AREAS[section.id] ? handleArea : undefined}
                       >
                         {sectionForms[section.id]}
+                        {/* Its pages' own background, kept in the Skin (specs/sectionbackgrounds.md) */}
+                        {isSectionId(section.id) && (
+                          <SectionBackgroundField
+                            section={section.id}
+                            label={section.label}
+                            value={sectionBackground(skin, section.id)}
+                            onChange={(change) => {
+                              const id = section.id
+                              if (isSectionId(id)) onSkinChange((prev) => setSectionBackground(prev, id, change))
+                            }}
+                            palette={palette}
+                            sectionOpen={isOpen}
+                          />
+                        )}
                       </div>
                     </div>
                   )}

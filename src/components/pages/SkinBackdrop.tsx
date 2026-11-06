@@ -2,12 +2,14 @@ import { Fragment, useId } from 'react'
 import { drawLayer } from '../../skins/draw'
 import { pageSize } from '../../skins/draw/types'
 import type { GradientStop, Mark, SkinShape, Tint } from '../../skins/draw/types'
-import type { SkinLayer } from '../../skins/types'
-import type { Orientation } from '../../types'
+import type { ImageFit, SkinLayer } from '../../skins/types'
+import type { Orientation, UploadedImage } from '../../types'
 
 type SkinBackdropProps = {
   layers: SkinLayer[] // in list order: the first one is on top (hidden ones are skipped)
   orientation: Orientation
+  // The page's section picture, under every layer (specs/sectionbackgrounds.md, ADR 0025)
+  picture?: { image: UploadedImage; fit: ImageFit; opacity: number } | null
 }
 
 function stops(list: GradientStop[]) {
@@ -138,7 +140,7 @@ function paint(shape: Exclude<SkinShape, { kind: 'shapes' | 'texture' | 'image' 
 // The layers of a skin behind the content of a page, in one SVG measured in mm of the A4 page,
 // so it looks the same in every view (see specs/skins.md, ADR 0009 and ADR 0010). The first
 // layer of the list is on top, so they are drawn from the last one to the first. Decoration only.
-export function SkinBackdrop({ layers, orientation }: SkinBackdropProps) {
+export function SkinBackdrop({ layers, orientation, picture = null }: SkinBackdropProps) {
   // Ids are shared by the whole document, so every SVG has its own prefix and every layer its own id
   const prefix = useId()
   const page = pageSize(orientation)
@@ -147,7 +149,7 @@ export function SkinBackdrop({ layers, orientation }: SkinBackdropProps) {
     .map((layer) => ({ layer, shape: drawLayer(layer, layer.colors, page) }))
     .filter((entry): entry is { layer: SkinLayer; shape: SkinShape } => entry.shape !== null)
     .reverse()
-  if (drawn.length === 0) return null
+  if (drawn.length === 0 && !picture) return null
 
   return (
     <svg
@@ -156,6 +158,12 @@ export function SkinBackdrop({ layers, orientation }: SkinBackdropProps) {
       preserveAspectRatio="none"
       aria-hidden="true"
     >
+      {/* In the same SVG as the layers, so the PDF's picture check covers it (ADR 0023) */}
+      {picture && (
+        <g opacity={picture.opacity / 100} data-skin="section">
+          {draw({ kind: 'image', url: picture.image.url, fit: picture.fit }, `${prefix}-section`, page)}
+        </g>
+      )}
       {drawn.map(({ layer, shape }) => {
         const id = `${prefix}-layer-${layer.id}`
         return (

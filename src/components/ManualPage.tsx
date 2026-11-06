@@ -1,5 +1,6 @@
 import { LOGO_PARTS } from '../data/manualSections'
 import { boxVariables } from '../skins/boxes'
+import { pageColor, pagePicture } from '../skins/sections'
 import { CoverPage } from './pages/CoverPage'
 import { BrandConceptPage } from './pages/BrandConceptPage'
 import { AnatomyPage } from './pages/AnatomyPage'
@@ -97,12 +98,13 @@ export function ManualPage({
       style={{
         // Named after the page, not its place, so each page keeps its own name when the order changes
         viewTransitionName: transitionName ? `manual-page-${page.toLowerCase().replace(/ /g, '-')}` : undefined,
-        background: isCover ? cover?.colors.background : skin.pageBackground,
+        // Its section's color when it has one (specs/sectionbackgrounds.md)
+        background: pageColor(skin, page, cover?.colors.background),
         // The image boxes of the inner pages (specs/imageboxes.md); the Cover has none
         ...(isCover ? {} : boxVariables(skin.boxes)),
       }}
     >
-      <SkinBackdrop layers={layers} orientation={orientation} />
+      <SkinBackdrop layers={layers} orientation={orientation} picture={pagePicture(skin, page)} />
       <div className="manual-page-content">{content()}</div>
     </article>
   )

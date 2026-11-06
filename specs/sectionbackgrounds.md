@@ -37,7 +37,7 @@ At the end of the Cover, Logo, Usage, Colors, Typography and Mockups forms there
 
 **Image** (`<Section> background image`): an image field (PNG, JPG, SVG or WebP, up to 5 MB, as in `cover.md`) with its own **Apply** next to it (`Apply <Section> background image`, ADR 0020) and a **Remove** button (`Remove <Section> background image`) once a picture is applied. A new file waits for Apply; a wrong file is flagged at once (`"Use a PNG, JPG, SVG or WebP image"`, `"The image must be 5 MB or smaller"`) and never turns Apply on. Remove takes the applied picture off the pages at once.
 
-**Fit** (`<Section> background fit`): a segmented control, **Cover** (default: the picture fills the page, cropped to it, centered) or **Contain** (the whole picture, centered; the color shows around it), as the Skin's Image layer.
+**Fit**: a segmented control (`<Section> background fit: Cover`, `<Section> background fit: Contain`), **Cover** (default: the picture fills the page, cropped to it, centered) or **Contain** (the whole picture, centered; the color shows around it), as the Skin's Image layer.
 
 **Opacity** (`<Section> background opacity`): a slider 5–100 %, step 5, default **100 %**, with its value next to it. At 100 % the picture hides the color; lower, the color shows through it. It keeps its value with no picture.
 

@@ -32,7 +32,24 @@ export type Skin = {
   boxes: ImageBoxes
   layers: SkinLayer[]
   nextId: number
+  // The background of each section that has one of its own (specs/sectionbackgrounds.md,
+  // ADR 0025). Missing → no section has one.
+  sections?: SectionBackgrounds
 }
+
+// The sections whose pages can have a background of their own (the Skin section has no page)
+export type SectionId = 'cover' | 'logo' | 'usage' | 'colors' | 'typography' | 'mockups'
+
+// A section's background: its color (null → the Skin's Page background; never used on the
+// Cover, which keeps its own), and an applied picture over it with its Fit and opacity (5–100 %)
+export type SectionBackground = {
+  color: string | null
+  image: UploadedImage | null
+  fit: ImageFit
+  opacity: number
+}
+
+export type SectionBackgrounds = Partial<Record<SectionId, SectionBackground>>
 
 // The look of every image box of the inner pages, in px and % (specs/imageboxes.md, ADR 0022)
 export type ImageBoxes = {

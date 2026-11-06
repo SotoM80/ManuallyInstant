@@ -14,6 +14,8 @@ type SkinColorFieldProps<Value extends string | null> = {
   onChange: (hex: Value) => void
   palette: PaletteColor[] | null
   allowNone?: boolean
+  noneName?: string // the none chip's name, after the label: "none" by default ("Skin's" for a section)
+  noneTitle?: string
 }
 
 export function SkinColorField<Value extends string | null = string>({
@@ -22,6 +24,8 @@ export function SkinColorField<Value extends string | null = string>({
   onChange,
   palette,
   allowNone,
+  noneName = 'none',
+  noneTitle = 'No background',
 }: SkinColorFieldProps<Value>) {
   const [typed, setTyped] = useState<string | null>(null) // null → the field shows `value`
   const [error, setError] = useState('')
@@ -63,9 +67,9 @@ export function SkinColorField<Value extends string | null = string>({
             <button
               type="button"
               className="palette-block-chip skin-color-chip skin-color-none"
-              aria-label={`${label}: none`}
+              aria-label={`${label}: ${noneName}`}
               aria-pressed={value === null}
-              title="No background"
+              title={noneTitle}
               onClick={() => use(null as Value)}
             />
           )}

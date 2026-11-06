@@ -11,7 +11,7 @@ A skin does not depend on the template: it is the same stack under every layout,
 * More textures than Grain and Paper (linen, concrete, watercolor…). A random look on every page: the noise is the same on every page and every time (a fixed seed), so the PDF matches the preview.
 * Moving layers by drag and drop (buttons only, see ADR 0010). Blend modes (Multiply, Screen, Overlay…): layers blend by transparency only.
 * More than **4 layers**. More than two colors per layer. Colors that stay linked to the palette (a color taken from it is copied, see ADR 0011).
-* Moving, zooming, cropping or tinting an Image layer's picture (only Cover or Contain). Uploading your own textures as a preset. A different skin on each page. Animated skins.
+* Moving, zooming, cropping or tinting an Image layer's picture (only Cover or Contain). Uploading your own textures as a preset. A different skin on each page (a section can only change its background, see `sectionbackgrounds.md` and ADR 0025). Animated skins.
 * Converting the skin on its own: in the print PDF it is part of the page image, converted to CMYK with the rest when the app has a CMYK server (ADR 0019).
 * Creating, editing or saving presets. Copying a layer. Keeping a layer's values when its preset is changed (a layer's preset cannot be changed: remove it and add another).
 * Warnings about low contrast between the skin and the text (as in `colorpalette.md`).
@@ -71,7 +71,7 @@ With no applied picture the layer draws nothing (its checkbox, place and Intensi
 **In the PDF**: before drawing, the export waits for every Skin picture to load and checks that it can be read; if one cannot, no PDF is made and `The PDF could not be created. Try again.` is shown (`export.md`). A picture over the whole page makes the print PDF much heavier (each page is a 300 dpi PNG); with a CMYK server, a page over its limit (40 MB) is refused and the export shows that same message.
 
 ### On the pages
-* **Inner pages**: painted with the **Page background**, their text in the **Page text** color, and one SVG behind their content with one group per layer that is on.
+* **Inner pages**: painted with the **Page background** (or their section's own color, `sectionbackgrounds.md`), their text in the **Page text** color, and one SVG behind their content with one group per layer that is on.
 * **Cover**: painted with the Cover's own Background color, its title in the Cover's Title color and "Designed by" in its Text color, and one SVG with only the layers that are on **and** marked **Also on the Cover**.
 * The groups are drawn from the **last** layer of the list to the **first**, so the first one is on top. A page with no layer to draw has no SVG.
 * Each group's opacity is its layer's **Intensity**. The layers blend by transparency only; the content of the page is never faded.
