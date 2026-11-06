@@ -8,7 +8,6 @@ import type { DraftKey, Drafts } from './utils/drafts'
 import type { TypographyDraft } from './components/TypographyForm'
 import type { ColorsDraft } from './components/ColorsForm'
 import type { UsageDraft } from './components/UsageForm'
-import type { LogoDraft } from './components/LogoForm'
 import { NO_GUIDES } from './utils/guides'
 import type { Guides } from './utils/guides'
 import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
@@ -36,7 +35,6 @@ function App() {
     setDrafts((prev) => ({ ...prev, [key]: draft }))
   }, [])
   const [logo, setLogo] = useState<LogoData | null>(null)
-  const [logoDraft, setLogoDraft] = useState<LogoDraft>()
   const [usage, setUsage] = useState<UsageData>(NO_USAGE) // each group null until touched
   const [usageDraft, setUsageDraft] = useState<UsageDraft>()
   const [palette, setPalette] = useState<PaletteColor[] | null>(null)
@@ -95,8 +93,6 @@ function App() {
                 onGuidesChange={setGuides}
                 logo={logo}
                 onLogoChange={setLogo}
-                logoDraft={logoDraft}
-                onLogoDraftChange={setLogoDraft}
                 usage={usage}
                 onUsageChange={setUsage}
                 usageDraft={usageDraft}
