@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import type { ReactNode, SyntheticEvent } from 'react'
 import { BrandForm } from '../components/BrandForm'
-import type { CoverDraft } from '../components/BrandForm'
 import { LogoForm } from '../components/LogoForm'
 import type { LogoDraft } from '../components/LogoForm'
 import { ColorsForm } from '../components/ColorsForm'
@@ -19,6 +18,7 @@ import { MANUAL_SECTIONS, SECTION_AREAS, SECTION_PAGES, orderPages } from '../da
 import { NO_USAGE } from '../data/usageOptions'
 import { useAlignOpenSection } from '../utils/useAlignOpenSection'
 import type { Guides } from '../utils/guides'
+import type { DraftKey, Drafts } from '../utils/drafts'
 import { useReorderGlide } from '../utils/useReorderGlide'
 import type { TemplateId } from '../templates'
 import type { Skin } from '../skins/types'
@@ -37,8 +37,9 @@ type BrandManualPageProps = {
   template: TemplateId
   onTemplateChange: (template: TemplateId) => void
   onCoverChange: (cover: CoverData) => void
-  coverDraft?: CoverDraft
-  onCoverDraftChange?: (draft: CoverDraft) => void
+  // What each form shows, kept by App so the forms are filled again on the way back (see useDraft)
+  drafts?: Drafts
+  onDraftChange?: <K extends DraftKey>(key: K, draft: Drafts[K]) => void
   // Guides clicked on the construction grid (Clear space page). They are drawn in the preview,
   // so they are not part of the Logo form
   guides: Guides
@@ -74,8 +75,8 @@ export function BrandManualPage({
   template,
   onTemplateChange,
   onCoverChange,
-  coverDraft,
-  onCoverDraftChange,
+  drafts = {},
+  onDraftChange,
   guides,
   onGuidesChange,
   logo,
@@ -148,7 +149,11 @@ export function BrandManualPage({
   // to its field (see docs/adr/0007 and 0020).
   const sectionForms: Record<string, ReactNode> = {
     cover: (
-      <BrandForm onChange={onCoverChange} draft={coverDraft} onDraftChange={onCoverDraftChange} />
+      <BrandForm
+        onChange={onCoverChange}
+        draft={drafts.cover}
+        onDraftChange={onDraftChange && ((draft) => onDraftChange('cover', draft))}
+      />
     ),
     logo: (
       <LogoForm onChange={onLogoChange} palette={palette} draft={logoDraft} onDraftChange={onLogoDraftChange} />

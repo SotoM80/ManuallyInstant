@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router'
 import { Logo } from './components/Logo'
 import { NavMenu } from './components/NavMenu'
 import { HomePage } from './pages/HomePage'
 import { BrandManualPage } from './pages/BrandManualPage'
-import type { CoverDraft } from './components/BrandForm'
+import type { DraftKey, Drafts } from './utils/drafts'
 import type { TypographyDraft } from './components/TypographyForm'
 import type { ColorsDraft } from './components/ColorsForm'
 import type { UsageDraft } from './components/UsageForm'
@@ -29,8 +29,12 @@ function App() {
   // Each one is null until its section is touched for the first time; from then on the
   // forms send every change here, so the preview follows them live.
   const [cover, setCover] = useState<CoverData | null>(null)
-  // Each …Draft is what a form shows (half-typed values too), so it is filled again on the way back.
-  const [coverDraft, setCoverDraft] = useState<CoverDraft>()
+  // What each form shows (half-typed values too), so it is filled again on the way back.
+  const [drafts, setDrafts] = useState<Drafts>({})
+  // Always from the newest drafts, so two forms changing close together never undo each other.
+  const onDraftChange = useCallback(<K extends DraftKey>(key: K, draft: Drafts[K]) => {
+    setDrafts((prev) => ({ ...prev, [key]: draft }))
+  }, [])
   const [logo, setLogo] = useState<LogoData | null>(null)
   const [logoDraft, setLogoDraft] = useState<LogoDraft>()
   const [usage, setUsage] = useState<UsageData>(NO_USAGE) // each group null until touched
@@ -85,8 +89,8 @@ function App() {
                 template={template}
                 onTemplateChange={setTemplate}
                 onCoverChange={setCover}
-                coverDraft={coverDraft}
-                onCoverDraftChange={setCoverDraft}
+                drafts={drafts}
+                onDraftChange={onDraftChange}
                 guides={guides}
                 onGuidesChange={setGuides}
                 logo={logo}
