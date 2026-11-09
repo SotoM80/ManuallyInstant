@@ -34,8 +34,10 @@ Key features:
 - **Skins in layers**: stack gradients (Linear, Radial), shapes (Circles, Diagonal block, Waves), patterns (Dots, Stripes), textures (Grain, Paper) and your own **Image** (a photo behind the pages, Cover or Contain, with its own Apply), each with its own sliders, colors and intensity. Tick a layer to show or hide it, move it up or down, and choose whether it is also drawn on the Cover. Any color can be picked, or copied from the palette.
 - **A background for each section**: at the end of the Cover, Logo, Usage, Colors, Typography and Mockups forms, a folded **Section background** group gives every page of that section its own color (or the Skin's), and a picture of yours with its own Apply, Cover or Contain, and an opacity that lets the color show through. The Skin's layers are still drawn over it, and the Cover keeps its own Background color.
 - **Image boxes**: the corner radius, inner margin and outline of every image box are set once in the Skin, the same on every page and template.
+- **Line spacing for each section**: next to Section background, a folded **Line spacing** group opens or tightens the titles and the text of that section's pages, from 50 to 200 % of their usual spacing (the Cover too).
+- **Line weight**: in the Skin, **Decorative lines** (the dividers of Template 3 and the outline of the color chips, in px) and **Technical lines** (the clear space and construction grid, in %, keeping their differences) thicken or thin the lines of the whole manual.
 - **Three templates**: centered (1), aligned left (2) or with a side column (3). They change where the content sits on each page, never the content itself.
-- **Portrait or landscape**, and three ways to view the manual: Grid, Overview and Pages.
+- **Landscape (the default) or portrait**, and three ways to view the manual: Grid, Overview and Pages.
 
 <!-- A screenshot of the Brand Manual page can go here. -->
 
@@ -47,6 +49,7 @@ Key features:
 - ✅ A construction grid drawn by the app, fitted to the logo, with guides and measures in X.
 - ✅ Skins: page colors and up to 4 layers of gradients, shapes, patterns, textures and images (see the [spec](specs/skins.md)), and the style of the image boxes (see the [spec](specs/imageboxes.md)).
 - ✅ Section backgrounds: a color and a picture with its opacity for each section (see the [spec](specs/sectionbackgrounds.md)).
+- ✅ Line spacing for each section and line weight for the whole manual (see the specs for [line spacing](specs/linespacing.md) and [lines](specs/lines.md)).
 - ✅ A background color for each logo image (see the [spec](specs/imagebackground.md)).
 - ✅ Export to two PDFs: one for print (300 dpi, CMYK values highlighted) and one for the web (216 dpi, HEX/RGB, lightweight) (see the [spec](specs/export.md)).
 - ✅ An optional CMYK server: the print PDF in real CMYK and the palette's values from an ICC profile, checked against Illustrator (see the [spec](specs/cmykserver.md), ADRs [0018](docs/adr/0018-optional-stateless-cmyk-server.md) and [0019](docs/adr/0019-real-cmyk-with-icc-profile.md)).
@@ -154,8 +157,10 @@ Funciones clave:
 - **Skins en capas**: apila degradados (Linear, Radial), formas (Circles, Diagonal block, Waves), patrones (Dots, Stripes), texturas (Grain, Paper) y tu propia **Image** (una foto detrás de las hojas, Cover o Contain, con su propio Apply), cada uno con sus sliders, colores e intensidad. Con un check se muestra u oculta cada capa, se mueve arriba o abajo, y se elige si también va en la portada. Se puede elegir cualquier color, o copiarlo de la paleta.
 - **Un fondo para cada sección**: al final de los formularios de Cover, Logo, Usage, Colors, Typography y Mockups, un grupo plegado **Section background** le da a todas las hojas de esa sección su propio color (o el de la Skin) y una imagen tuya con su propio Apply, Cover o Contain, y una opacidad que deja ver el color a través. Las capas de la Skin se siguen dibujando encima, y la portada mantiene su propio Background color.
 - **Recuadros de imagen**: el radio de las esquinas, el margen interior y el contorno de todos los recuadros de imagen se definen una vez en la Skin, iguales en todas las hojas y plantillas.
+- **Interlineado para cada sección**: junto a Section background, un grupo plegado **Line spacing** abre o cierra el interlineado de los títulos y del texto de las hojas de esa sección, del 50 al 200 % del habitual (también en la portada).
+- **Grosor de líneas**: en la Skin, **Decorative lines** (los divisores de la plantilla 3 y el contorno de los chips de color, en px) y **Technical lines** (el área de respeto y la retícula de construcción, en %, manteniendo sus diferencias) engrosan o afinan las líneas de todo el manual.
 - **Tres plantillas**: centrada (1), alineada a la izquierda (2) o con columna lateral (3). Cambian dónde se ubica el contenido en cada hoja, nunca el contenido.
-- **Vertical o apaisado**, y tres formas de ver el manual: Grid, Overview y Pages.
+- **Apaisado (por defecto) o vertical**, y tres formas de ver el manual: Grid, Overview y Pages.
 
 <!-- Aquí puede ir una captura de la página Brand Manual. -->
 
@@ -167,6 +172,7 @@ Funciones clave:
 - ✅ Una retícula de construcción dibujada por la app, ajustada al logo, con guías y medidas en X.
 - ✅ Skins: colores de página y hasta 4 capas de degradados, formas, patrones, texturas e imágenes (ver el [spec](specs/skins.md)), y el estilo de los recuadros de imagen (ver el [spec](specs/imageboxes.md)).
 - ✅ Fondos por sección: un color y una imagen con su opacidad para cada sección (ver el [spec](specs/sectionbackgrounds.md)).
+- ✅ Interlineado para cada sección y grosor de líneas para todo el manual (ver los specs de [interlineado](specs/linespacing.md) y [líneas](specs/lines.md)).
 - ✅ Un color de fondo para cada imagen del logo (ver el [spec](specs/imagebackground.md)).
 - ✅ La exportación a dos PDF: uno para imprenta (300 dpi, valores CMYK destacados) y otro para web (216 dpi, HEX/RGB, liviano) (ver el [spec](specs/export.md)).
 - ✅ Un servidor CMYK opcional: el PDF de imprenta en CMYK real y los valores de la paleta desde un perfil ICC, comprobados con Illustrator (ver el [spec](specs/cmykserver.md) y las ADR [0018](docs/adr/0018-optional-stateless-cmyk-server.md) y [0019](docs/adr/0019-real-cmyk-with-icc-profile.md)).
