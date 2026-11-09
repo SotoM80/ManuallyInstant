@@ -183,11 +183,13 @@ describe('Title style – cover preview', () => {
     renderApp();
     typeTitle('My Brand');
 
-    // Unitless, so it is 1.15 times this title's own size, not a length inherited from the page
-    expect(getCoverTitle().style.lineHeight).toBe('1.15'); // Medium, the default
+    // Unitless, so it is 1.15 times this title's own size, not a length inherited from the page;
+    // times the Cover's Titles line spacing (specs/linespacing.md), 1 by default
+    const proportional = 'calc(1.15 * var(--title-leading, 1))';
+    expect(getCoverTitle().style.lineHeight).toBe(proportional); // Medium, the default
     for (const size of ['Large', 'Small']) {
       pickOption('Font size', size);
-      expect(getCoverTitle().style.lineHeight).toBe('1.15');
+      expect(getCoverTitle().style.lineHeight).toBe(proportional);
     }
   });
 

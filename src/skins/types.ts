@@ -35,6 +35,11 @@ export type Skin = {
   // The background of each section that has one of its own (specs/sectionbackgrounds.md,
   // ADR 0025). Missing → no section has one.
   sections?: SectionBackgrounds
+  // The line spacing of each section that changed it (specs/linespacing.md, ADR 0026).
+  // Missing → every section at 100 %.
+  spacing?: SectionSpacings
+  // The weight of the manual's lines (specs/lines.md, ADR 0026). Missing → today's lines.
+  lines?: SkinLines
 }
 
 // The sections whose pages can have a background of their own (the Skin section has no page)
@@ -50,6 +55,21 @@ export type SectionBackground = {
 }
 
 export type SectionBackgrounds = Partial<Record<SectionId, SectionBackground>>
+
+// A section's line spacing, as a share of today's line heights: 50–200 %, 100 → as before
+export type SectionSpacing = {
+  title: number // its titles
+  text: number // the rest of its text
+}
+
+export type SectionSpacings = Partial<Record<SectionId, SectionSpacing>>
+
+// The weight of the manual's lines: the decorative ones in px (all 1 px before), the technical
+// ones of the Clear space page as a share of their own widths (50–300 %), so they keep their differences
+export type SkinLines = {
+  decorative: number
+  technical: number
+}
 
 // The look of every image box of the inner pages, in px and % (specs/imageboxes.md, ADR 0022)
 export type ImageBoxes = {

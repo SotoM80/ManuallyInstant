@@ -37,7 +37,8 @@ export function toTitleCss(style: TitleStyle): CSSProperties {
     fontSize: FONT_SIZES[style.fontSize],
     // A proportion, never a length: the page inherits the site's 145% as a fixed 26px, which
     // made the lines of a Large title overlap (specs/titlefild.md, Scenario 6)
-    lineHeight: TITLE_LINE_HEIGHT,
+    // Times the Cover's Titles line spacing (specs/linespacing.md): calc() of two numbers is still a number
+    lineHeight: `calc(${TITLE_LINE_HEIGHT} * var(--title-leading, 1))`,
     ...FONT_STYLES[style.fontStyle],
   }
 }

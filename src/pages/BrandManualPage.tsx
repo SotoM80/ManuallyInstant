@@ -6,7 +6,9 @@ import { ColorsForm } from '../components/ColorsForm'
 import { TypographyForm } from '../components/TypographyForm'
 import { SkinForm } from '../components/SkinForm'
 import { SectionBackgroundField } from '../components/SectionBackgroundField'
+import { LineSpacingField } from '../components/LineSpacingField'
 import { isSectionId, sectionBackground, setSectionBackground } from '../skins/sections'
+import { sectionSpacing, setSectionSpacing } from '../skins/spacing'
 import { UsageForm } from '../components/UsageForm'
 import { ExportButtons } from '../components/ExportButtons'
 import { CmykProvider } from '../components/CmykProvider'
@@ -261,6 +263,19 @@ export function BrandManualPage({
                         onFocus={SECTION_AREAS[section.id] ? handleArea : undefined}
                       >
                         {sectionForms[section.id]}
+                        {/* Its pages' line spacing, kept in the Skin (specs/linespacing.md) */}
+                        {isSectionId(section.id) && (
+                          <LineSpacingField
+                            section={section.id}
+                            label={section.label}
+                            value={sectionSpacing(skin, section.id)}
+                            onChange={(change) => {
+                              const id = section.id
+                              if (isSectionId(id)) onSkinChange((prev) => setSectionSpacing(prev, id, change))
+                            }}
+                            sectionOpen={isOpen}
+                          />
+                        )}
                         {/* Its pages' own background, kept in the Skin (specs/sectionbackgrounds.md) */}
                         {isSectionId(section.id) && (
                           <SectionBackgroundField

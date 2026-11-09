@@ -38,10 +38,12 @@
   transform-origin: center;
 }
 
-/* Same ink as the title (the Typography color), a bit softer */
+/* Same ink as the title (the Typography color), a bit softer. Its line height is the site's
+   (145 % of the root size, inherited as a length), times the Cover's Text line spacing. */
 .cover-designed-by {
   grid-area: designed;
   font-size: 11px;
+  line-height: calc(1.45rem * var(--text-leading, 1));
   opacity: 0.75;
 }
 
@@ -88,7 +90,7 @@
   height: 100%;
   min-height: 0;
   display: grid;
-  line-height: 1.25; /* the site's roomy line height would push the colors off small pages */
+  line-height: calc(1.25 * var(--text-leading, 1)); /* the site's roomy one would push the colors off small pages */
   grid-template-rows: auto minmax(0, 1fr) auto;
   row-gap: 6%;
   animation: cover-enter var(--dur-slow) var(--ease-bounce);
@@ -97,6 +99,7 @@
 .palette-heading {
   font-size: 12px;
   font-weight: 600;
+  line-height: calc(1.25 * var(--title-leading, 1));
 }
 
 .palette-colors {
@@ -123,7 +126,7 @@
   display: block;
   min-height: 0;
   border-radius: 4px;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 20%, transparent);
+  box-shadow: inset 0 0 0 var(--line-decorative, 1px) color-mix(in srgb, currentColor 20%, transparent); /* Decorative lines (specs/lines.md) */
 }
 
 .palette-name {
@@ -180,13 +183,14 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   row-gap: 6%;
-  line-height: 1.2; /* the site's roomy line height would push the fonts off small pages */
+  line-height: calc(1.2 * var(--text-leading, 1)); /* the site's roomy one would push the fonts off small pages */
   animation: cover-enter var(--dur-slow) var(--ease-bounce);
 }
 
 .type-heading {
   font-size: 12px;
   font-weight: 600;
+  line-height: calc(1.2 * var(--title-leading, 1));
 }
 
 .type-fonts {
@@ -270,7 +274,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   row-gap: 5%;
-  line-height: 1.3; /* the site's roomy line height would push the blocks off small pages */
+  line-height: calc(1.3 * var(--text-leading, 1)); /* the site's roomy one would push the blocks off small pages */
   text-align: left;
   animation: cover-enter var(--dur-slow) var(--ease-bounce);
 }
@@ -344,6 +348,13 @@
 .logo-page-heading {
   font-size: 12px;
   font-weight: 600;
+}
+
+/* The titles of the Logo, Usage and Mockups pages: today's 1.3, times their section's Titles */
+.logo-page-brand,
+.logo-page-heading,
+.logo-block-title {
+  line-height: calc(1.3 * var(--title-leading, 1));
 }
 
 /* A block: small numbered title, then its content. Its rows never grow past the page. */
@@ -465,12 +476,12 @@
 }
 
 .clearspace-area-edge {
-  stroke-width: 1px;
+  stroke-width: calc(1px * var(--line-technical, 1));
   stroke-dasharray: 4 3;
 }
 
 .clearspace-logo-box {
-  stroke-width: 0.75px;
+  stroke-width: calc(0.75px * var(--line-technical, 1));
   opacity: 0.35;
 }
 
@@ -517,23 +528,23 @@
 }
 
 .construction-grid-lines {
-  stroke-width: 0.6px;
+  stroke-width: calc(0.6px * var(--line-technical, 1));
   opacity: 0.45;
 }
 
 .construction-grid-logo {
-  stroke-width: 1.2px;
+  stroke-width: calc(1.2px * var(--line-technical, 1));
   stroke-dasharray: 3 2;
   opacity: 0.9;
 }
 
 .construction-grid-x path {
-  stroke-width: 0.75px;
+  stroke-width: calc(0.75px * var(--line-technical, 1));
 }
 
 /* Rulers: dimension lines in X outside the grid, and faint dashed guides across it */
 .construction-grid-ruler path {
-  stroke-width: 0.75px;
+  stroke-width: calc(0.75px * var(--line-technical, 1));
 }
 
 /* Text in the SVG is measured in modules: the page's letter spacing (in px) would spread it */
@@ -576,7 +587,7 @@
 }
 
 .construction-grid-guides {
-  stroke-width: 0.75px;
+  stroke-width: calc(0.75px * var(--line-technical, 1));
   stroke-dasharray: 2 2;
   opacity: 0.6;
 }
@@ -932,7 +943,7 @@
 
 .usage-description {
   font-size: 6px;
-  line-height: 1.3;
+  line-height: calc(1.3 * var(--text-leading, 1));
 }
 
 .manual-preview[data-view='pages'] .usage-mark {

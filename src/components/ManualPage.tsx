@@ -1,6 +1,8 @@
 import { LOGO_PARTS } from '../data/manualSections'
 import { boxVariables } from '../skins/boxes'
 import { pageColor, pagePicture } from '../skins/sections'
+import { spacingVariables } from '../skins/spacing'
+import { lineVariables } from '../skins/lines'
 import { CoverPage } from './pages/CoverPage'
 import { BrandConceptPage } from './pages/BrandConceptPage'
 import { AnatomyPage } from './pages/AnatomyPage'
@@ -102,6 +104,9 @@ export function ManualPage({
         background: pageColor(skin, page, cover?.colors.background),
         // The image boxes of the inner pages (specs/imageboxes.md); the Cover has none
         ...(isCover ? {} : boxVariables(skin.boxes)),
+        // Its section's line spacing and the manual's line weight, the Cover included (ADR 0026)
+        ...spacingVariables(skin, page),
+        ...lineVariables(skin),
       }}
     >
       <SkinBackdrop layers={layers} orientation={orientation} picture={pagePicture(skin, page)} />

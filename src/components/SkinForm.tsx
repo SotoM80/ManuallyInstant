@@ -8,6 +8,7 @@ import { SKIN_DRAWINGS } from '../skins/draw'
 import { isImageLayer } from '../skins/draw/image'
 import { newLayerColors } from '../skins/colors'
 import { BOX_CONTROLS, setBoxes } from '../skins/boxes'
+import { LINE_CONTROLS, setLines, skinLines } from '../skins/lines'
 import {
   MAX_LAYERS,
   addLayer,
@@ -298,6 +299,33 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
                 </output>
               </div>
             </Fragment>
+          )
+        })}
+      </fieldset>
+
+      {/* The weight of the manual's lines, the Cover included (specs/lines.md) */}
+      <fieldset className="logo-form-group skin-boxes">
+        <legend>Lines</legend>
+        {LINE_CONTROLS.map((control) => {
+          const id = `skin-lines-${control.key}`
+          const value = skinLines(skin)[control.key]
+          return (
+            <div key={control.key} className="skin-control">
+              <label htmlFor={id}>{control.label}</label>
+              <input
+                id={id}
+                type="range"
+                min={control.min}
+                max={control.max}
+                step={control.step}
+                value={value}
+                onChange={(event) => onChange(setLines(skin, { [control.key]: Number(event.target.value) }))}
+              />
+              <output htmlFor={id}>
+                {value}
+                {control.unit}
+              </output>
+            </div>
           )
         })}
       </fieldset>

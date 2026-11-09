@@ -18,7 +18,7 @@
       color-mix(in srgb, currentColor 25%, transparent),
       color-mix(in srgb, currentColor 25%, transparent)
     )
-    no-repeat 34% 0 / 1px 100%; /* 30% column + half of the 8% gap */
+    no-repeat 34% 0 / var(--line-decorative, 1px) 100%; /* 30% column + half of the 8% gap; Decorative lines */
 }
 
 /* Cover
@@ -125,7 +125,7 @@
 }
 
 .manual-preview[data-template='template3'] .type-font + .type-font {
-  border-top: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-top: var(--line-decorative, 1px) solid color-mix(in srgb, currentColor 25%, transparent); /* Decorative lines */
 }
 
 /* Logo pages (Brand concept, Anatomy, Logo versions, Clear space)
