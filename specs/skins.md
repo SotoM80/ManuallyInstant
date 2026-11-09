@@ -25,11 +25,14 @@ The section has, from top to bottom, the **page colors**, the **Add layer** butt
 
 **Image boxes**: after the page colors, a group that sets the corners, inner margin and outline of every image box of the inner pages (see `imageboxes.md` and ADR 0022).
 
+**Lines**: after Image boxes, a group with two sliders, **Decorative lines** and **Technical lines**, that set the weight of the lines of every page, the Cover included (see `lines.md` and ADR 0026). The line spacing is set per section, in each section's own form (`linespacing.md`).
+
 ```
 5. Skin
   Page background  [●] #FFFFFF
   Page text        [●] #000000
   Image boxes      (Corner radius, Inner margin, Outline, Thickness)
+  Lines            (Decorative lines, Technical lines)
                           [ + Add layer ]   → opens the gallery here; a new layer goes on top of the list
 ┌──────────────────────────────────────┐
 │ ☑ [▤] Stripes          ↑  ↓  ✕   ▾  │  ← on top
@@ -100,7 +103,7 @@ With no applied picture the layer draws nothing (its checkbox, place and Intensi
 Grain and Paper are drawn with an SVG noise filter (`feTurbulence`) in mm of the page, with a **fixed seed**: the noise is the same on every page, in the preview and in both PDFs (the PDF is drawn by the browser itself, ADR 0012). Its scale follows the page, so a speck is the same size in mm in every view. Browsers may draw the noise slightly differently.
 
 ### In the code
-* `src/skins/types.ts`: a `Skin` is `{ pageBackground, pageText, layers, nextId }`, with the layers in list order (the first is on top). A `SkinLayer` is `{ id, preset, params, colors, visible, onCover }`, where `colors` are two HEX values; `id` is stable and never reused (`nextId`). An Image layer also has `image` (the applied picture, or null) and `fit` (`'cover' | 'contain'`), and ignores its `colors` (ADR 0023). `NO_SKIN` has the default page colors and no layers.
+* `src/skins/types.ts`: a `Skin` is `{ pageBackground, pageText, layers, nextId }`, with the layers in list order (the first is on top). A `SkinLayer` is `{ id, preset, params, colors, visible, onCover }`, where `colors` are two HEX values; `id` is stable and never reused (`nextId`). An Image layer also has `image` (the applied picture, or null) and `fit` (`'cover' | 'contain'`), and ignores its `colors` (ADR 0023). `NO_SKIN` has the default page colors and no layers. The Skin also keeps the image boxes (`imageboxes.md`), and three optional parts: the section backgrounds (`sections`, `sectionbackgrounds.md`), the line spacing of each section (`spacing`, `linespacing.md`) and the line weight (`lines`, `lines.md`).
 * `src/skins/layers.ts`: pure functions for the skin: `setPageColor`, `addLayer` (with the colors of `newLayerColors`), `removeLayer`, `moveLayer(skin, id, -1 | 1)`, `setVisible`, `setOnCover`, `setLayerParam` (with `withParam`, so Thickness stays within Spacing), `setLayerColor`, and `layerNames` (`Dots`, `Dots 2`). They are unit tested.
 * `src/skins/presets.ts` lists the presets (ids, defaults, controls); the form is built from it.
 * `src/skins/colors.ts`: `newLayerColors(palette, skin)`, the copied colors of a new layer.
