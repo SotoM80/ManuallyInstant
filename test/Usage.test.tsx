@@ -103,7 +103,7 @@ describe('Usage – form and pages', () => {
     expect(grid('Incorrect use')).toHaveAttribute('data-count', '6');
 
     expect(add).toBeDisabled();
-    expect(grid('Incorrect use')).toHaveAttribute('data-orientation', 'portrait');
+    expect(grid('Incorrect use')).toHaveAttribute('data-orientation', 'landscape');
   });
 
   // Scenario 5

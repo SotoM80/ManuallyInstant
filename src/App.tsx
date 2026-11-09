@@ -35,7 +35,7 @@ function App() {
   const [usage, setUsage] = useState<UsageData>(NO_USAGE) // each group null until touched
   const [palette, setPalette] = useState<PaletteColor[] | null>(null)
   const [typography, setTypography] = useState<BrandFonts | null>(null)
-  const [orientation, setOrientation] = useState<Orientation>('portrait')
+  const [orientation, setOrientation] = useState<Orientation>('landscape')
   const [previewView, setPreviewView] = useState<PreviewView>('grid')
   const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
   const [skin, setSkin] = useState<Skin>(NO_SKIN)

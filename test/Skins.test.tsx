@@ -147,7 +147,7 @@ describe('Skin – layers', () => {
     add(form, 'Diagonal block');
     expect(drawnKinds()).toEqual(['shapes', 'shapes', 'shapes']);
     const [waves] = backdrop()!.querySelectorAll(':scope > g');
-    expect(waves.querySelector('g')).toHaveAttribute('transform', 'rotate(0 105 148.5)');
+    expect(waves.querySelector('g')).toHaveAttribute('transform', 'rotate(0 148.5 105)');
     expect(waves.querySelectorAll('path').length).toBeGreaterThan(3);
   });
 

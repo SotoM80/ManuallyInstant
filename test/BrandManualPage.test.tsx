@@ -120,32 +120,33 @@ describe('Brand Manual – page orientation', () => {
       .map((page) => page.getAttribute('data-orientation'));
   }
 
-  it('starts in Portrait', () => {
+  it('starts in Landscape', () => {
     renderApp('/brand-manual');
 
-    expect(within(getOrientationGroup()).getByRole('radio', { name: 'Portrait' })).toBeChecked();
-    expect(getPageOrientations()).toEqual(Array(ALL_PAGES.length).fill('portrait'));
+    expect(within(getOrientationGroup()).getByRole('radio', { name: 'Landscape' })).toBeChecked();
+    expect(getPageOrientations()).toEqual(Array(ALL_PAGES.length).fill('landscape'));
+    expect(within(getOrientationGroup()).getAllByRole('radio').map((radio) => radio.getAttribute('value'))).toEqual(['landscape', 'portrait']);
   });
 
   // Spec: specs/brandmanual.md, Scenario 6 — Changing the Page Orientation
-  it('turns every page landscape when Landscape is selected, without Save', () => {
+  it('turns every page portrait when Portrait is selected, without Save', () => {
     // Given
     renderApp('/brand-manual');
 
     // When
-    fireEvent.click(within(getOrientationGroup()).getByRole('radio', { name: 'Landscape' }));
+    fireEvent.click(within(getOrientationGroup()).getByRole('radio', { name: 'Portrait' }));
 
     // Then
-    expect(within(getOrientationGroup()).getByRole('radio', { name: 'Landscape' })).toBeChecked();
-    expect(within(getOrientationGroup()).getByRole('radio', { name: 'Portrait' })).not.toBeChecked();
-    expect(getPageOrientations()).toEqual(Array(ALL_PAGES.length).fill('landscape'));
+    expect(within(getOrientationGroup()).getByRole('radio', { name: 'Portrait' })).toBeChecked();
+    expect(within(getOrientationGroup()).getByRole('radio', { name: 'Landscape' })).not.toBeChecked();
+    expect(getPageOrientations()).toEqual(Array(ALL_PAGES.length).fill('portrait'));
   });
 
   // Spec: specs/brandmanual.md, Scenario 7 — Orientation Is Kept Between Pages
-  it('keeps Landscape after going to Home and back', () => {
+  it('keeps Portrait after going to Home and back', () => {
     // Given
     renderApp('/brand-manual');
-    fireEvent.click(within(getOrientationGroup()).getByRole('radio', { name: 'Landscape' }));
+    fireEvent.click(within(getOrientationGroup()).getByRole('radio', { name: 'Portrait' }));
     const menu = within(screen.getByRole('banner')).getByRole('navigation', { name: 'Main' });
 
     // When
@@ -153,8 +154,8 @@ describe('Brand Manual – page orientation', () => {
     fireEvent.click(within(menu).getByRole('link', { name: 'Brand Manual' }));
 
     // Then
-    expect(within(getOrientationGroup()).getByRole('radio', { name: 'Landscape' })).toBeChecked();
-    expect(getPageOrientations()).toEqual(Array(ALL_PAGES.length).fill('landscape'));
+    expect(within(getOrientationGroup()).getByRole('radio', { name: 'Portrait' })).toBeChecked();
+    expect(getPageOrientations()).toEqual(Array(ALL_PAGES.length).fill('portrait'));
   });
 });
 

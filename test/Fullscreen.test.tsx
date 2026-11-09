@@ -157,7 +157,7 @@ describe('Full screen view', () => {
 
   // Scenario 8
   it('fits each page and its caption whole to any window, and fits again when it changes', () => {
-    const page = a4('portrait').px;
+    const page = a4('landscape').px;
     renderApp();
     resize(1440, 900);
     const view = open();

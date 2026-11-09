@@ -10,8 +10,8 @@ The content of the Logo section (it will have its own future spec). The content 
 ### Layout
 * **Column widths**: The page uses almost the whole window (96%). The sections (right) are a narrow column of 320–380px, and the preview (left) takes the rest of the width (`minmax(0, 1fr)` / `minmax(320px, 380px)`).
 * **Page Orientation** (top of the left column, above the thumbnails): A group labeled "Page orientation" with two options:
-  * **Portrait** (vertical): A4 standing, `210 × 297`. Selected by default.
-  * **Landscape** (apaisado): A4 lying down, `297 × 210`.
+  * **Landscape** (apaisado): A4 lying down, `297 × 210`. Selected by default.
+  * **Portrait** (vertical): A4 standing, `210 × 297`.
 
   Choosing an option changes the shape of all four page thumbnails immediately. The chosen orientation is also the one the PDF export will use (Phase 4).
 * **Preview View** (next to Page orientation): A group labeled "Preview view" with three options:
@@ -128,14 +128,14 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Then**: The Logo versions page shows the Version 1 image; Version 2 keeps its placeholder, and "Apply Version 2 image" is still on.
 
 ### Scenario 6: Changing the Page Orientation
-* **Given**: The user is on the Brand Manual page and Portrait is selected (default).
-* **When**: The user selects Landscape.
-* **Then**: Landscape is selected and all four page thumbnails become landscape
+* **Given**: The user is on the Brand Manual page and Landscape is selected (default).
+* **When**: The user selects Portrait.
+* **Then**: Portrait is selected and all four page thumbnails become portrait
 
 ### Scenario 7: Orientation Is Kept Between Pages
-* **Given**: The user selected Landscape.
+* **Given**: The user selected Portrait.
 * **When**: The user goes to Home and then back to Brand Manual.
-* **Then**: Landscape is still selected and the pages are still landscape.
+* **Then**: Portrait is still selected and the pages are still portrait.
 
 ### Scenario 8: Changing the Preview View
 * **Given**: The user is on the Brand Manual page and Grid is selected (default).

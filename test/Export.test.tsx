@@ -67,7 +67,7 @@ describe('Export – buttons', () => {
     await waitFor(() => expect(mockCreatePdf).toHaveBeenCalledTimes(1), { timeout: 5000 });
     const [pages, kind, orientation, name] = mockCreatePdf.mock.calls[0];
     expect(pages.map((page) => page.getAttribute('aria-label'))).toEqual(MANUAL_PAGES);
-    expect([kind, orientation, name]).toEqual(['print', 'portrait', 'my-brand-print.pdf']);
+    expect([kind, orientation, name]).toEqual(['print', 'landscape', 'my-brand-print.pdf']);
   });
 
   it('makes the web PDF in Landscape (scenarios 3 and 7)', async () => {
@@ -215,7 +215,7 @@ describe('Export – the print PDF with a CMYK server', () => {
     expect(screen.getByRole('button', { name: 'Download web PDF' })).toBeDisabled();
     const [pages, orientation, name, server] = mockCreateCmykPdf.mock.calls[0];
     expect(pages.map((page) => page.getAttribute('aria-label'))).toEqual(MANUAL_PAGES);
-    expect([orientation, name, server]).toEqual(['portrait', 'my-brand-print.pdf', 'http://cmyk.test']);
+    expect([orientation, name, server]).toEqual(['landscape', 'my-brand-print.pdf', 'http://cmyk.test']);
     expect(mockCreatePdf).not.toHaveBeenCalled();
     finish();
     await waitFor(() => expect(screen.getByRole('button', { name: 'Download print PDF' })).toHaveTextContent('↓ Print PDF'));
@@ -239,7 +239,7 @@ describe('Export – the print PDF with a CMYK server', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Download print PDF' }));
     fireEvent.click(within(await screen.findByRole('alertdialog', {}, { timeout: 5000 })).getByRole('button', { name: 'Download RGB PDF' }));
     await waitFor(() => expect(mockCreatePdf).toHaveBeenCalledTimes(1), { timeout: 5000 });
-    expect(mockCreatePdf.mock.calls[0].slice(1, 4)).toEqual(['print', 'portrait', 'my-brand-print.pdf']);
+    expect(mockCreatePdf.mock.calls[0].slice(1, 4)).toEqual(['print', 'landscape', 'my-brand-print.pdf']);
     expect(dialog()).not.toBeInTheDocument();
   });
 

@@ -37,8 +37,8 @@ type ManualPreviewProps = {
 }
 
 const ORIENTATIONS: { value: Orientation; label: string }[] = [
-  { value: 'portrait', label: 'Portrait' },
   { value: 'landscape', label: 'Landscape' },
+  { value: 'portrait', label: 'Portrait' },
 ]
 
 const VIEWS: { value: PreviewView; label: string }[] = [
