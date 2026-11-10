@@ -1,17 +1,30 @@
 /* Rules shared by every template. Each template only decides where the slots go
    (see templateN/templateN.css), never what is inside them. */
 
-/* Cover: three slots (title, logo, designed by) on a grid that fills the page */
+/* Cover: three slots (title, logo, designed by) on a grid that fills the page.
+   The site's letter spacing (0.18 px) is measured on the page too, as on a Grid page 460 px
+   wide: a fixed one takes twice the share of a small page, and breaks a title differently
+   in each view (ADR 0027). */
 .cover-layout {
   width: 100%;
   height: 100%;
   min-height: 0;
   display: grid;
+  letter-spacing: 0.04cqw;
+}
+
+/* The grey placeholders, measured on the page too: today's 13 px with the site's line height
+   (26.1 px) on a Grid page 460 px wide (ADR 0027) */
+.cover-layout .manual-page-empty {
+  font-size: 2.8cqw;
+  line-height: 5.7cqw;
 }
 
 .cover-title {
   grid-area: title;
   overflow-wrap: anywhere;
+  /* Its Font size, measured on the page (cqw), set inline by toTitleCss (ADR 0027) */
+  font-size: var(--cover-title-size, 3.5cqw);
 }
 
 .cover-logo {
@@ -38,17 +51,14 @@
   transform-origin: center;
 }
 
-/* Same ink as the title (the Typography color), a bit softer. Its line height is the site's
-   (145 % of the root size, inherited as a length), times the Cover's Text line spacing. */
+/* Same ink as the title (the Typography color), a bit softer. Measured on the page (cqw), so it
+   is the same in every view and in the PDF (ADR 0027): today's Grid look, 11 px with a line
+   height of 26.1 px on a Grid page 460 px wide, times the Cover's Text line spacing. */
 .cover-designed-by {
   grid-area: designed;
-  font-size: 11px;
-  line-height: calc(1.45rem * var(--text-leading, 1));
+  font-size: 2.4cqw;
+  line-height: calc(5.7cqw * var(--text-leading, 1));
   opacity: 0.75;
-}
-
-.manual-preview[data-view='pages'] .cover-designed-by {
-  font-size: 13px;
 }
 
 /* Motion (see src/utils/viewTransition.ts): when the template, orientation or view

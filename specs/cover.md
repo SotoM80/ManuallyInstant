@@ -4,7 +4,7 @@
 The first section of the Brand Manual page is **Cover** (portada). It collects everything shown on the cover page of the manual: the **brand manual title** (with its style), **Designed by** and the **logo**. The Cover page of the preview shows each of them as soon as it is typed or chosen; a new logo waits for its **Apply** button, next to the Logo field ("Apply Logo"; see `brandmanual.md` and ADR 0020). Where each one sits on the page depends on the chosen template.
 
 ## Out of Scope
-Choosing a template and the layout of each template (see `templates.md`). The Logo page and section (they will reuse this same logo later). Cropping or editing the logo (the Logo size field only scales it). The font and size of "Designed by" (its color is the Text color). Saving anything between sessions.
+Choosing a template and the layout of each template (see `templates.md`). The Logo page and section (they will reuse this same logo later). Cropping or editing the logo (the Logo size field only scales it). Choosing the font and size of "Designed by" on its own (it uses the title's Font family in Regular; its color is the Text color). Saving anything between sessions.
 
 ## 2. Interface
 ### Fields (in this order, all inside the "1. Cover" section)
@@ -48,7 +48,11 @@ The Cover looks the same in **Grid, Overview, Pages, the full screen view and bo
 | Title | Small 2.6, Medium 3.5, Large 5.2 `cqw` | 1.15 × its size, × the Cover's Titles line spacing |
 | "Designed by" | 2.4 `cqw` | 5.7 `cqw` × the Cover's Text line spacing |
 
-The grey placeholders (`Your brand manual title`, `Your logo`, `Designed by …`) keep their size in px.
+The letter spacing of both is measured on the page too: 0.04 `cqw` (the site's 0.18 px on that Grid page). A fixed spacing in px takes twice the share of a page half as wide, which is enough to break a title differently in each view.
+
+The grey placeholders (`Your brand manual title`, `Your logo`, `Designed by …`) are measured on the page too: 2.8 `cqw`, with a line height of 5.7 `cqw` (today's 13 px and 26.1 px on that Grid page). The line spacing sliders do not change them (`linespacing.md`).
+
+The whole Cover is drawn in the title's **Font family**: the title with its Font style, "Designed by" and the placeholders in Regular. A Google Font keeps the same shapes at every size; the system font the Cover used before changes its shapes and letter spacing with the size (and is another font on another computer), so the same text took a different share of the page in each view.
 
 ### Templates
 The position of the title, logo and "Designed by" belongs to the template, not to the section. Each template only changes where these three elements sit on the page; the content is the same. See `templates.md`.

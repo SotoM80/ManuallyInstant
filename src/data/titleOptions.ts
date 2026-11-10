@@ -10,10 +10,13 @@ export const FONT_STYLES: Record<FontStyleName, CSSProperties> = {
   'Bold Italic': { fontWeight: 'bold', fontStyle: 'italic' },
 }
 
+// Measured on the page (cqw: a hundredth of its width), so the Cover looks the same in every view
+// and in the PDF, and a title breaks into the same lines everywhere (specs/cover.md, ADR 0027).
+// Today's Grid look: 12, 16 and 24 px on a Grid page 460 px wide.
 export const FONT_SIZES: Record<FontSize, string> = {
-  Small: '24px',
-  Medium: '32px',
-  Large: '48px',
+  Small: '2.6cqw',
+  Medium: '3.5cqw',
+  Large: '5.2cqw',
 }
 
 export const DEFAULT_TITLE_STYLE: TitleStyle = {
@@ -34,11 +37,13 @@ export const TITLE_LINE_HEIGHT = 1.15
 export function toTitleCss(style: TitleStyle): CSSProperties {
   return {
     fontFamily: `'${style.fontFamily}', sans-serif`,
-    fontSize: FONT_SIZES[style.fontSize],
+    // Read by .cover-title (shared.css) as its font-size: passed as a variable because a cqw size
+    // set inline is dropped by the test DOM (jsdom); the browser draws the same either way
+    '--cover-title-size': FONT_SIZES[style.fontSize],
     // A proportion, never a length: the page inherits the site's 145% as a fixed 26px, which
     // made the lines of a Large title overlap (specs/titlefild.md, Scenario 6)
     // Times the Cover's Titles line spacing (specs/linespacing.md): calc() of two numbers is still a number
     lineHeight: `calc(${TITLE_LINE_HEIGHT} * var(--title-leading, 1))`,
     ...FONT_STYLES[style.fontStyle],
-  }
+  } as CSSProperties
 }

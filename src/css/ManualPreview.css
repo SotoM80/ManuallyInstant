@@ -121,6 +121,8 @@
   box-shadow: var(--shadow);
   overflow: hidden;
   position: relative; /* the skin layer fills it */
+  /* Its text can be measured on it (cqw), the same in every view (ADR 0027) */
+  container-type: inline-size;
 }
 
 .manual-page[data-orientation='landscape'] {

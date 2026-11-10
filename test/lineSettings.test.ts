@@ -69,7 +69,7 @@ describe('Line spacing and lines – the templates\' CSS', () => {
   }
 
   it("multiplies today's line heights by the section's factors", () => {
-    expect(rule(shared, '.cover-designed-by')).toContain('line-height: calc(1.45rem * var(--text-leading, 1))');
+    expect(rule(shared, '.cover-designed-by')).toContain('line-height: calc(5.7cqw * var(--text-leading, 1))');
     expect(rule(shared, '.palette-layout')).toContain('line-height: calc(1.25 * var(--text-leading, 1))');
     expect(rule(shared, '.palette-heading')).toContain('line-height: calc(1.25 * var(--title-leading, 1))');
     expect(rule(shared, '.type-layout')).toContain('line-height: calc(1.2 * var(--text-leading, 1))');

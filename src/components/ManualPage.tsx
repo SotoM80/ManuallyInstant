@@ -33,7 +33,6 @@ export type ManualData = {
 type ManualPageProps = ManualData & {
   page: string
   orientation: Orientation
-  titleScale: number // the Cover title's size, as a share of its real size
   guides?: Guides
   onGuidesChange?: (guides: Guides) => void // given → the guide bands of 3.2 can be clicked
   emphasis?: ExportKind // the values the Color palette page highlights in a PDF
@@ -45,7 +44,6 @@ type ManualPageProps = ManualData & {
 export function ManualPage({
   page,
   orientation,
-  titleScale,
   cover,
   logo,
   usage,
@@ -89,7 +87,7 @@ export function ManualPage({
     if (page === 'Mockups') return <MockupsPage mockups={mockups} logo={logo} cover={cover} color={textColor} />
     if (!isCover) return <p className="manual-page-empty">Coming soon</p>
     // A new key on every applied logo (each one has its own URL) redraws the cover, so it grows in again
-    return <CoverPage key={cover?.logo?.url ?? 'empty'} cover={cover} titleScale={titleScale} />
+    return <CoverPage key={cover?.logo?.url ?? 'empty'} cover={cover} />
   }
 
   return (

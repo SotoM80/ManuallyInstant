@@ -143,7 +143,7 @@ function getCoverTitle() {
 }
 
 // Spec: specs/titlefild.md, Scenario 1 — the Cover shows the style as it changes
-// The Cover is a thumbnail, so the title is drawn at half its real size (Large 48px → 24px).
+// The title is measured on the page (cqw), the same in every view (specs/cover.md, ADR 0027).
 describe('Title style – cover preview', () => {
   afterEach(() => {
     document.head.querySelectorAll('link[href*="fonts.googleapis.com"]').forEach((l) => l.remove());
@@ -162,8 +162,8 @@ describe('Title style – cover preview', () => {
       color: '#1E88E5',
       fontWeight: 'bold',
       fontStyle: 'italic',
-      fontSize: '24px',
     });
+    expect(title.style.getPropertyValue('--cover-title-size')).toBe('5.2cqw');
     expect(title.style.fontFamily).toContain('Open Sans');
   });
 
@@ -174,8 +174,8 @@ describe('Title style – cover preview', () => {
 
     typeInto('Font size', 'Sma');
 
-    // Still Large (48px → 24px on the thumbnail)
-    expect(getCoverTitle()).toHaveStyle({ fontSize: '24px' });
+    // Still Large
+    expect(getCoverTitle().style.getPropertyValue('--cover-title-size')).toBe('5.2cqw');
   });
 
   // Spec: specs/titlefild.md, Scenario 6 — Large Titles Keep Their Lines Apart

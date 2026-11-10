@@ -55,5 +55,5 @@ type PrintedPageProps = ManualData & {
 // title at its real size, and the guides drawn but not clickable (no onGuidesChange). Shared by
 // the PDF copy and the full screen view (specs/fullscreen.md), so both show the same page.
 export function PrintedPage({ page, orientation, guides, emphasis, ...data }: PrintedPageProps) {
-  return <ManualPage page={page} orientation={orientation} titleScale={1} guides={guides} emphasis={emphasis} {...data} />
+  return <ManualPage page={page} orientation={orientation} guides={guides} emphasis={emphasis} {...data} />
 }
