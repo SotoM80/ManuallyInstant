@@ -31,7 +31,7 @@ import { useReorderGlide } from '../utils/useReorderGlide'
 import type { ImageFit, Skin, SkinLayer } from '../skins/types'
 import type { PaletteColor } from '../types'
 
-// Form of the Skin section: the colors of every page but the Cover, Add layer with its gallery,
+// Form of the Skin section: the colors of every page but the Cover, Layer gallery button,
 // then the list of layers (the first one is drawn on top), each one shown or hidden with a
 // checkbox, moved with ↑ ↓ and opened like the colors of the Colors section. A new layer appears
 // right under the gallery that was clicked. Everything reaches the preview at once (specs/skins.md).
@@ -342,7 +342,7 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
           setGalleryOpen((open) => !open)
         }}
       >
-        Add layer
+        Layer gallery
         <span className="palette-block-chevron" aria-hidden="true" />
       </button>
       {full && <p className="logo-form-hint">Up to {MAX_LAYERS} layers.</p>}

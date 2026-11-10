@@ -685,7 +685,7 @@
   color: var(--text);
 }
 
-/* Skin section (specs/skins.md): a list of layers like the colors of Colors, then Add layer
+/* Skin section (specs/skins.md): a list of layers like the colors of Colors, then Layer gallery
    and the gallery. Each layer reuses the palette-block accordion. */
 .skin-layers {
   display: grid;
@@ -767,7 +767,7 @@
   text-align: left;
 }
 
-/* Add layer: the same arrow as every folding block, pointing up while the gallery is open */
+/* Layer gallery: the same arrow as every folding block, pointing up while the gallery is open */
 .skin-add-button {
   display: inline-flex;
   align-items: center;

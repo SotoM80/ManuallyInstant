@@ -10,7 +10,7 @@ function openSkin() {
 }
 
 function add(form: HTMLElement, preset: string) {
-  fireEvent.click(within(form).getByRole('button', { name: 'Add layer' }));
+  fireEvent.click(within(form).getByRole('button', { name: 'Layer gallery' }));
   fireEvent.click(within(form).getByRole('button', { name: `Add ${preset}` }));
 }
 
@@ -38,15 +38,15 @@ describe('Skin – layers', () => {
     expect(within(form).getByRole('textbox', { name: 'Page background HEX' })).toHaveValue('#FFFFFF');
     expect(within(form).getByRole('textbox', { name: 'Page text HEX' })).toHaveValue('#000000');
     expect(within(form).getByText(/No layers yet/)).toBeInTheDocument();
-    expect(within(form).getByRole('button', { name: 'Add layer' })).toBeEnabled();
+    expect(within(form).getByRole('button', { name: 'Layer gallery' })).toBeEnabled();
     expect(MANUAL_PAGES.every((page) => backdrop(page) === undefined)).toBe(true);
     expect(screen.getAllByRole('article')[0]).toHaveAccessibleName('Brand concept');
   });
 
-  it('ends Add layer in the folding arrow, pointing up while the gallery is open', () => {
+  it('ends Layer gallery in the folding arrow, pointing up while the gallery is open', () => {
     renderApp();
     const form = openSkin();
-    const add = within(form).getByRole('button', { name: 'Add layer' });
+    const add = within(form).getByRole('button', { name: 'Layer gallery' });
     expect(add.querySelector('.palette-block-chevron')).toHaveAttribute('aria-hidden', 'true');
     expect(add).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(add);
@@ -59,7 +59,7 @@ describe('Skin – layers', () => {
   it('offers only the presets that can be drawn (scenario 2)', () => {
     renderApp();
     const form = openSkin();
-    fireEvent.click(within(form).getByRole('button', { name: 'Add layer' }));
+    fireEvent.click(within(form).getByRole('button', { name: 'Layer gallery' }));
     const gallery = within(form).getByRole('group', { name: 'Add a layer' });
     expect(within(gallery).getAllByRole('button').map((card) => card.getAttribute('aria-label'))).toEqual([
       'Add Linear',
@@ -199,10 +199,10 @@ describe('Skin – layers', () => {
     const form = openSkin();
     for (const preset of ['Dots', 'Linear', 'Dots', 'Stripes']) add(form, preset);
     expect(layerNames(form)).toEqual(['Stripes', 'Dots 2', 'Linear', 'Dots']);
-    expect(within(form).getByRole('button', { name: 'Add layer' })).toBeDisabled();
+    expect(within(form).getByRole('button', { name: 'Layer gallery' })).toBeDisabled();
     expect(within(form).getByText('Up to 4 layers.')).toBeInTheDocument();
     fireEvent.click(within(form).getByRole('button', { name: 'Remove Linear' }));
-    expect(within(form).getByRole('button', { name: 'Add layer' })).toBeEnabled();
+    expect(within(form).getByRole('button', { name: 'Layer gallery' })).toBeEnabled();
   });
 
   it('gives each layer its own values (scenario 11)', () => {
@@ -243,7 +243,7 @@ describe('Skin – layers', () => {
     add(form, 'Linear');
     add(form, 'Dots');
     add(form, 'Dots');
-    fireEvent.click(within(form).getByRole('button', { name: 'Add layer' }));
+    fireEvent.click(within(form).getByRole('button', { name: 'Layer gallery' }));
     const ids = [...container.querySelectorAll('linearGradient, radialGradient, pattern')].map((paint) => paint.id);
     expect(ids.length).toBeGreaterThan(MANUAL_PAGES.length * 3);
     expect(new Set(ids).size).toBe(ids.length);
@@ -265,10 +265,10 @@ describe('Skin – layers', () => {
   it('closes the gallery with Escape', () => {
     renderApp();
     const form = openSkin();
-    fireEvent.click(within(form).getByRole('button', { name: 'Add layer' }));
+    fireEvent.click(within(form).getByRole('button', { name: 'Layer gallery' }));
     fireEvent.keyDown(within(form).getByRole('button', { name: 'Add Dots' }), { key: 'Escape' });
     expect(within(form).queryByRole('group', { name: 'Add a layer' })).not.toBeInTheDocument();
-    expect(within(form).getByRole('button', { name: 'Add layer' })).toHaveFocus();
+    expect(within(form).getByRole('button', { name: 'Layer gallery' })).toHaveFocus();
   });
 });
 

@@ -19,7 +19,7 @@ A skin does not depend on the template: it is the same stack under every layout,
 
 ## 2. Interface
 ### Section "6. Skin"
-The section has, from top to bottom, the **page colors**, the **Add layer** button with its gallery, then the **list of layers**. Add layer sits above the list so that a new layer, which goes on top of the list, appears right where the user chose it.
+The section has, from top to bottom, the **page colors**, the **Layer gallery** button with the gallery it opens, then the **list of layers**. Layer gallery sits above the list so that a new layer, which goes on top of the list, appears right where the user chose it.
 
 **Page colors**: two color fields, **Page background** (default White `#FFFFFF`) and **Page text** (default Black `#000000`). They paint the background and every text of the inner pages: Brand concept, Anatomy, Logo versions, Clear space (its lines and measures too), Color palette and Typography. They never change the Cover. The list reads like the layers panel of a design tool: **the first layer of the list is drawn on top**, the last one just over the page Background.
 
@@ -33,7 +33,7 @@ The section has, from top to bottom, the **page colors**, the **Add layer** butt
   Page text        [●] #000000
   Image boxes      (Corner radius, Inner margin, Outline, Thickness)
   Lines            (Decorative lines, Technical lines)
-                          [ Add layer ⌄ ]   → opens the gallery here; a new layer goes on top of the list
+                          [ Layer gallery ⌄ ]   → opens the gallery here; a new layer goes on top of the list
 ┌──────────────────────────────────────┐
 │ ☑ [▤] Stripes          ↑  ↓  ✕   ▾  │  ← on top
 │ ☑ [◉] Radial           ↑  ↓  ✕   ▾  │
@@ -50,7 +50,7 @@ The section has, from top to bottom, the **page colors**, the **Add layer** butt
 * **✕ Remove**: removes the layer at once.
 * **▾**: opens the body: first the checkbox **Also on the Cover** (off by default: a layer is only drawn on the inner pages until it is ticked), then one slider per `control` of its preset (label, min, max, step and unit from `presets.ts`, with the value next to it; **Intensity**, 5–100 % step 5, default 30, is always last), then the layer's **Color A** and **Color B**. The bodies work as an **accordion**, like the colors of the Colors section: only one is open at a time, and a new layer opens and folds the open one.
 
-**Add layer** opens the **gallery** under the button: one card per preset with a drawing, grouped under the headings of `SKIN_TYPES` that have at least one: **Gradients** (Linear, Radial), **Shapes** (Circles, Diagonal block, Waves), **Patterns** (Dots, Stripes), **Textures** (Grain, Paper) and **Images** (Image). Each card is a small page with the preset drawn at full strength with the colors a new layer would get. Choosing a card adds a layer **at the top of the list**, with the preset's default values, on, not on the Cover, and open, and closes the gallery. The Add layer button stays still while the gallery folds and the new layer takes its place right under it, and the layer's title takes the focus; only the layer's title is brought into view, never the whole open layer, so a tall one (a Shape) does not pull the page down; the page only scrolls if the title is not in view (e.g. on a small screen). Opening or folding the gallery never moves Add layer either. Its **Color A** is palette color 1 and its **Color B** palette color 2; when one of them does not exist, the Page text color fills in for A and the Page background for B. These are copied values: changing the palette later never changes the layer. Escape or clicking Add layer again closes it with no change. Add layer ends in the same arrow as every folding block: it points down while the gallery is closed and up while it is open, so the user sees the button also folds it. With 4 layers, Add layer is disabled, with the note `Up to 4 layers.`
+**Layer gallery** opens the **gallery** under the button: one card per preset with a drawing, grouped under the headings of `SKIN_TYPES` that have at least one: **Gradients** (Linear, Radial), **Shapes** (Circles, Diagonal block, Waves), **Patterns** (Dots, Stripes), **Textures** (Grain, Paper) and **Images** (Image). Each card is a small page with the preset drawn at full strength with the colors a new layer would get. Choosing a card adds a layer **at the top of the list**, with the preset's default values, on, not on the Cover, and open, and closes the gallery. The Layer gallery button stays still while the gallery folds and the new layer takes its place right under it, and the layer's title takes the focus; only the layer's title is brought into view, never the whole open layer, so a tall one (a Shape) does not pull the page down; the page only scrolls if the title is not in view (e.g. on a small screen). Opening or folding the gallery never moves Layer gallery either. Its **Color A** is palette color 1 and its **Color B** palette color 2; when one of them does not exist, the Page text color fills in for A and the Page background for B. These are copied values: changing the palette later never changes the layer. Escape or clicking Layer gallery again closes it with no change. The button is named **Layer gallery** (it was "+ Add layer"), and it ends in the same arrow as every folding block: it points down while the gallery is closed and up while it is open, so the user sees the button also folds it. With 4 layers, Layer gallery is disabled, with the note `Up to 4 layers.`
 
 With no layers, the list shows `No layers yet. The inner pages show their plain Page background.`
 
@@ -132,7 +132,7 @@ Grain and Paper are drawn with an SVG noise filter (`feTurbulence`) in mm of the
 
 ## Failure Modes
 Only a typed HEX can be wrong. Otherwise:
-* **Sliders** cannot go past their limits; **↑ / ↓** are disabled at the ends of the list; **Add layer** is disabled at 4 layers.
+* **Sliders** cannot go past their limits; **↑ / ↓** are disabled at the ends of the list; **Layer gallery** is disabled at 4 layers.
 * **A wrong HEX** in a color field is flagged with `"Enter a valid HEX color, like #1E88E5"`, and the pages keep the last valid color.
 * **An empty palette**: there are no chips, and a new layer takes the Page text and Page background colors.
 * **A layer whose preset has no drawing** (not expected in the UI) draws nothing.
@@ -144,11 +144,11 @@ Only a typed HEX can be wrong. Otherwise:
 ### Scenario 1: No Layers by Default
 * **Given**: The user opens the Brand Manual page.
 * **When**: The user opens "6. Skin".
-* **Then**: Page background is White and Page text is Black, the list says "No layers yet…", Add layer is on, the pages show their plain backgrounds, and Brand concept comes first in the preview.
+* **Then**: Page background is White and Page text is Black, the list says "No layers yet…", Layer gallery is on, the pages show their plain backgrounds, and Brand concept comes first in the preview.
 
 ### Scenario 2: The Gallery
 * **Given**: The Skin section is open.
-* **When**: The user clicks Add layer.
+* **When**: The user clicks Layer gallery.
 * **Then**: The gallery shows Gradients (Linear, Radial), Shapes (Circles, Diagonal block, Waves), Patterns (Dots, Stripes) and Textures (Grain, Paper).
 
 ### Scenario 3: Adding a Layer
@@ -183,7 +183,7 @@ Only a typed HEX can be wrong. Otherwise:
 
 ### Scenario 9: Up to Four Layers
 * **Given**: The list has 4 layers.
-* **When**: The user looks at Add layer.
+* **When**: The user looks at Layer gallery.
 * **Then**: It is disabled, with the note "Up to 4 layers." Removing a layer turns it on again.
 
 ### Scenario 10: Two Layers with the Same Preset
@@ -280,7 +280,7 @@ Only a typed HEX can be wrong. Otherwise:
 1. ~~Linear, `SkinLayer`, the section with one preset, Radial, Dots and Stripes~~ (done, one preset at a time).
 2. ~~The layer model: `Skin = { layers }`, `src/skins/layers.ts` and its unit tests.~~
 3. ~~`SkinBackdrop`: one SVG with a group per visible layer, bottom first, with ids per layer. Checked with `npm run dev` using two layers turned on by hand.~~
-4. ~~The Skin section as a list: checkbox, mini preview, ↑ ↓ ✕, accordion, Add layer with the gallery, the 4-layer limit.~~
+4. ~~The Skin section as a list: checkbox, mini preview, ↑ ↓ ✕, accordion, Add layer with the gallery (now Layer gallery), the 4-layer limit.~~
 5. ~~Shapes: Circles, Diagonal block and Waves, one at a time, each with its unit test (after step 6).~~
 6. ~~Page colors and Also on the Cover: the Cover's colors only paint the Cover (ADR 0011), Page background and Page text in the Skin, and the color fields with palette chips.~~
 7. ~~The skin in both PDFs (Phase 4).~~
@@ -288,7 +288,7 @@ Only a typed HEX can be wrong. Otherwise:
 
 ### Scenario 28: Adding an Image Layer
 * **Given**: The Skin has no layers.
-* **When**: The user clicks Add layer, then "Add Image" in the Images group.
+* **When**: The user clicks Layer gallery, then "Add Image" in the Images group.
 * **Then**: An open layer "Image" is on top of the list, with an empty "Image image" field, "Apply Image image" off, Fit on Cover, Intensity 30 % and no Color A or Color B; the pages do not change.
 
 ### Scenario 29: The Picture Waits for Apply
@@ -319,7 +319,7 @@ Only a typed HEX can be wrong. Otherwise:
 ### Scenario 34: Four Layers
 * **Given**: The Skin has 3 layers.
 * **When**: The user adds an Image layer.
-* **Then**: The Skin has 4 layers and Add layer is disabled.
+* **Then**: The Skin has 4 layers and Layer gallery is disabled.
 
 ### Scenario 35: A Picture That Cannot Be Read
 * **Given**: An Image layer shows a picture, and the picture cannot be read anymore.
