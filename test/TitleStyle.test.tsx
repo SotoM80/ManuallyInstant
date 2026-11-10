@@ -206,8 +206,9 @@ describe('Title style – cover preview', () => {
     // Then: the Cover title is bold italic...
     expect(getCoverTitle()).toHaveStyle({ fontWeight: 'bold', fontStyle: 'italic' });
 
-    // ...and Google Fonts is asked for the bold and italic variants
-    const link = document.head.querySelector('link[href*="family=Open+Sans"]:not([href*="text="])');
+    // ...and Google Fonts is asked for the bold and italic variants (Open Sans is also the default
+    // Secondary brand font, loaded in Regular only: specs/everyview.md)
+    const link = document.head.querySelector('link[href*="family=Open+Sans:"]:not([href*="text="])');
     expect(link).toHaveAttribute(
       'href',
       expect.stringContaining('family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700'),
@@ -221,7 +222,8 @@ describe('Title style – cover preview', () => {
     typeTitle('My Brand 2');
     typeTitle('My Brand');
 
-    const links = document.head.querySelectorAll('link[href*="family=Open+Sans"]:not([href*="text="])');
+    // The title's request (all four variants); the brand fonts' Regular one is another file
+    const links = document.head.querySelectorAll('link[href*="family=Open+Sans:"]:not([href*="text="])');
     expect(links).toHaveLength(1);
   });
 });

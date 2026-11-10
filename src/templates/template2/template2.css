@@ -85,5 +85,5 @@
 
 .manual-preview[data-template='template2'] .type-info {
   display: grid;
-  gap: 3px;
+  gap: 0.65cqw;
 }

@@ -85,7 +85,8 @@ async function measure(page: Page, scope: string): Promise<Pages> {
     const result: Record<string, { text: string; share: number; lines: number }[]> = {}
     for (const article of document.querySelectorAll<HTMLElement>(`${scope} article.manual-page`)) {
       const width = article.clientWidth
-      const zoom = parseFloat(getComputedStyle(article).zoom) || 1
+      // Drawn size ÷ laid-out size: Overview's zoom (0.5) and the full screen view's scale both count
+      const scale = article.getBoundingClientRect().width / article.offsetWidth
       const texts = [...article.querySelectorAll<HTMLElement>('*')].filter(
         (element) => !element.closest('svg') && [...element.childNodes].some((node) => node.nodeType === 3 && node.textContent?.trim()),
       )
@@ -96,7 +97,7 @@ async function measure(page: Page, scope: string): Promise<Pages> {
         return {
           text: (element.textContent ?? '').trim().slice(0, 40),
           share: fontSize / width,
-          lines: Math.max(1, Math.round(element.getBoundingClientRect().height / (lineHeight * zoom))),
+          lines: Math.max(1, Math.round(element.getBoundingClientRect().height / (lineHeight * scale))),
         }
       })
     }

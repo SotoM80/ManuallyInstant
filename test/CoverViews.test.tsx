@@ -60,9 +60,10 @@ describe('Cover – the same in every view', () => {
     const page = preview.slice(preview.indexOf('\n.manual-page {'), preview.indexOf('}', preview.indexOf('\n.manual-page {')));
     expect(page).toContain('container-type: inline-size');
     expect(shared).toContain('font-size: var(--cover-title-size, 3.5cqw)');
-    const layout = shared.slice(shared.indexOf('\n.cover-layout {'), shared.indexOf('}', shared.indexOf('\n.cover-layout {')));
-    expect(layout).toContain('letter-spacing: 0.04cqw');
-    const empty = shared.slice(shared.indexOf('\n.cover-layout .manual-page-empty {'), shared.indexOf('}', shared.indexOf('\n.cover-layout .manual-page-empty {')));
+    // The letter spacing is measured on every page (ADR 0028), the Cover included
+    const content = preview.slice(preview.indexOf('\n.manual-page-content {'), preview.indexOf('}', preview.indexOf('\n.manual-page-content {')));
+    expect(content).toContain('letter-spacing: 0.04cqw');
+    const empty = shared.slice(shared.indexOf('\n.manual-page-content .manual-page-empty {'), shared.indexOf('}', shared.indexOf('\n.manual-page-content .manual-page-empty {')));
     expect(empty).toContain('font-size: 2.8cqw');
     expect(empty).toContain('line-height: 5.7cqw');
 

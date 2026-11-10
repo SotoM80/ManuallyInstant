@@ -154,6 +154,12 @@
 
 .manual-page-content {
   position: relative; /* over the skin layer */
+  /* The brand's Secondary font (ADR 0029); titles take the Primary one (shared.css) */
+  font-family: var(--font-text, sans-serif);
+  /* The site's letter spacing (0.18 px) measured on the page, as on a Grid page 460 px wide: a
+     fixed one takes twice the share of a page half as wide, and breaks a text differently in
+     each view (ADRs 0027 and 0028) */
+  letter-spacing: 0.04cqw;
   box-sizing: border-box; /* padding inside the 100% height, so nothing falls off the page */
   height: 100%;
   display: grid;

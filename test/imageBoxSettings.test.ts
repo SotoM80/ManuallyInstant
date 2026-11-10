@@ -58,7 +58,7 @@ describe('Image boxes – shared.css', () => {
 
   // Scenario 7
   it('keeps the Brand concept logo out of them', () => {
-    expect(rule('.concept-logo')).toContain('border-radius: 4px');
+    expect(rule('.concept-logo')).toContain('border-radius: 0.87cqw'); // measured on the page (ADR 0028)
     expect(rule('.concept-logo')).toContain('box-shadow: none');
     expect(rule('.concept-logo img')).toContain('inset: 8%');
     expect(css.indexOf('\n.concept-logo img {')).toBeGreaterThan(css.indexOf('\n.logo-figure img {'));

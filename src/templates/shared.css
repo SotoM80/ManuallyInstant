@@ -1,21 +1,17 @@
 /* Rules shared by every template. Each template only decides where the slots go
    (see templateN/templateN.css), never what is inside them. */
 
-/* Cover: three slots (title, logo, designed by) on a grid that fills the page.
-   The site's letter spacing (0.18 px) is measured on the page too, as on a Grid page 460 px
-   wide: a fixed one takes twice the share of a small page, and breaks a title differently
-   in each view (ADR 0027). */
+/* Cover: three slots (title, logo, designed by) on a grid that fills the page */
 .cover-layout {
   width: 100%;
   height: 100%;
   min-height: 0;
   display: grid;
-  letter-spacing: 0.04cqw;
 }
 
-/* The grey placeholders, measured on the page too: today's 13 px with the site's line height
-   (26.1 px) on a Grid page 460 px wide (ADR 0027) */
-.cover-layout .manual-page-empty {
+/* The grey placeholders of every page, measured on the page too: today's 13 px with the site's
+   line height (26.1 px) on a Grid page 460 px wide (ADRs 0027 and 0028) */
+.manual-page-content .manual-page-empty {
   font-size: 2.8cqw;
   line-height: 5.7cqw;
 }
@@ -107,7 +103,7 @@
 }
 
 .palette-heading {
-  font-size: 12px;
+  font-size: 2.6cqw;
   font-weight: 600;
   line-height: calc(1.25 * var(--title-leading, 1));
 }
@@ -127,7 +123,7 @@
   min-height: 0;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
-  gap: 4px;
+  gap: 0.87cqw;
   overflow: hidden;
 }
 
@@ -135,19 +131,19 @@
 .palette-chip {
   display: block;
   min-height: 0;
-  border-radius: 4px;
+  border-radius: 0.87cqw;
   box-shadow: inset 0 0 0 var(--line-decorative, 1px) color-mix(in srgb, currentColor 20%, transparent); /* Decorative lines (specs/lines.md) */
 }
 
 .palette-name {
-  font-size: 8px;
+  font-size: 1.75cqw;
   font-weight: 600;
   overflow-wrap: anywhere;
 }
 
 .palette-values {
   display: grid;
-  font-size: 6px;
+  font-size: 1.3cqw;
   opacity: 0.75;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
@@ -167,21 +163,8 @@
 }
 
 .palette-note {
-  font-size: 6px;
+  font-size: 1.3cqw;
   opacity: 0.6;
-}
-
-.manual-preview[data-view='pages'] .palette-heading {
-  font-size: 20px;
-}
-
-.manual-preview[data-view='pages'] .palette-name {
-  font-size: 13px;
-}
-
-.manual-preview[data-view='pages'] .palette-values,
-.manual-preview[data-view='pages'] .palette-note {
-  font-size: 10px;
 }
 
 /* Typography: heading and the two brand fonts, on a grid that fills the page.
@@ -198,7 +181,7 @@
 }
 
 .type-heading {
-  font-size: 12px;
+  font-size: 2.6cqw;
   font-weight: 600;
   line-height: calc(1.2 * var(--title-leading, 1));
 }
@@ -218,18 +201,18 @@
   min-height: 0;
   display: grid;
   align-content: center;
-  gap: 3px;
+  gap: 0.65cqw;
   overflow: hidden;
 }
 
 /* line-height 1 keeps the big "Aa" from taking more room than its letters */
 .type-sample {
-  font-size: 30px;
+  font-size: 6.5cqw;
   line-height: 1;
 }
 
 .type-usage {
-  font-size: 6px;
+  font-size: 1.3cqw;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -237,41 +220,20 @@
 }
 
 .type-name {
-  font-size: 10px;
+  font-size: 2.2cqw;
   overflow-wrap: anywhere;
 }
 
 .type-alphabet {
   display: grid;
-  font-size: 6px;
+  font-size: 1.3cqw;
   opacity: 0.8;
   overflow-wrap: anywhere;
 }
 
-/* Small landscape thumbnails are short: a smaller "Aa" leaves room for both fonts */
-.manual-preview[data-view='grid'] .manual-page[data-orientation='landscape'] .type-sample,
-.manual-preview[data-view='overview'] .manual-page[data-orientation='landscape'] .type-sample {
-  font-size: 22px;
-}
-
-.manual-preview[data-view='pages'] .type-heading {
-  font-size: 20px;
-}
-
-.manual-preview[data-view='pages'] .type-sample {
-  font-size: 60px;
-}
-
-.manual-preview[data-view='pages'] .type-usage {
-  font-size: 10px;
-}
-
-.manual-preview[data-view='pages'] .type-name {
-  font-size: 18px;
-}
-
-.manual-preview[data-view='pages'] .type-alphabet {
-  font-size: 11px;
+/* A landscape page is short: a smaller "Aa" leaves room for both fonts, in every view */
+.manual-page[data-orientation='landscape'] .type-sample {
+  font-size: 4.8cqw;
 }
 
 /* Logo pages (Brand concept, Logo versions, Clear space): a header (brand name + heading)
@@ -344,11 +306,11 @@
 .logo-page-header {
   min-width: 0;
   display: grid;
-  gap: 2px;
+  gap: 0.43cqw;
 }
 
 .logo-page-brand {
-  font-size: 7px;
+  font-size: 1.5cqw;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -356,7 +318,7 @@
 }
 
 .logo-page-heading {
-  font-size: 12px;
+  font-size: 2.6cqw;
   font-weight: 600;
 }
 
@@ -367,6 +329,16 @@
   line-height: calc(1.3 * var(--title-leading, 1));
 }
 
+/* Every title of the inner pages is set in the brand's Primary font (ADR 0029): the same
+   titles as the Titles line spacing (specs/linespacing.md) */
+.logo-page-brand,
+.logo-page-heading,
+.logo-block-title,
+.palette-heading,
+.type-heading {
+  font-family: var(--font-titles, sans-serif);
+}
+
 /* A block: small numbered title, then its content. Its rows never grow past the page. */
 .logo-block {
   min-width: 0;
@@ -374,7 +346,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-content: start;
-  gap: 4px;
+  gap: 0.87cqw;
   overflow: hidden;
 }
 
@@ -388,7 +360,7 @@
 }
 
 .logo-block-title {
-  font-size: 6px;
+  font-size: 1.3cqw;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -396,7 +368,7 @@
 }
 
 .logo-text {
-  font-size: 6px;
+  font-size: 1.3cqw;
 }
 
 .logo-quote {
@@ -409,7 +381,7 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 2px;
+  gap: 0.43cqw;
 }
 
 /* An image area: the image fits inside it (contain), whatever its shape, without pushing
@@ -418,7 +390,7 @@
    set on each inner page; the fallbacks are the defaults. */
 .logo-figure {
   position: relative;
-  min-height: 24px;
+  min-height: 5.2cqw;
   margin: 0;
   border-radius: var(--box-radius, 4px);
   box-shadow: var(--box-outline, inset 0 0 0 1px color-mix(in srgb, currentColor 15%, transparent));
@@ -433,7 +405,7 @@
 }
 
 .logo-version-name {
-  font-size: 7px;
+  font-size: 1.5cqw;
   font-weight: 600;
 }
 
@@ -458,7 +430,7 @@
   min-height: 0;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
-  gap: 3px;
+  gap: 0.65cqw;
 }
 
 /* 3.1 Clear space: the logo inside a dashed frame; the gap between them is X */
@@ -511,8 +483,8 @@
   place-items: center;
   background: repeating-linear-gradient(
     45deg,
-    color-mix(in srgb, currentColor 6%, transparent) 0 4px,
-    transparent 4px 8px
+    color-mix(in srgb, currentColor 6%, transparent) 0 0.87cqw,
+    transparent 0.87cqw 1.75cqw
   );
 }
 
@@ -609,7 +581,7 @@
 }
 
 .clearspace-grid-empty {
-  font-size: 6px;
+  font-size: 1.3cqw;
   opacity: 0.6;
 }
 
@@ -660,7 +632,7 @@
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto auto auto;
   align-content: start;
-  gap: 2px;
+  gap: 0.43cqw;
 }
 
 /* A mark without parts stays at a reasonable width instead of filling the row */
@@ -672,14 +644,14 @@
 .logo-card .logo-figure[data-empty='true'] {
   background: repeating-linear-gradient(
     45deg,
-    color-mix(in srgb, currentColor 5%, transparent) 0 4px,
-    transparent 4px 8px
+    color-mix(in srgb, currentColor 5%, transparent) 0 0.87cqw,
+    transparent 0.87cqw 1.75cqw
   );
 }
 
 .logo-card-type {
-  margin-top: 2px;
-  font-size: 6px;
+  margin-top: 0.43cqw;
+  font-size: 1.3cqw;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -687,12 +659,12 @@
 }
 
 .logo-card-name {
-  font-size: 8px;
+  font-size: 1.75cqw;
   font-weight: 600;
 }
 
 .logo-card-role {
-  font-size: 7px;
+  font-size: 1.5cqw;
   opacity: 0.8;
 }
 
@@ -700,92 +672,33 @@
 .logo-card-sign {
   flex: none;
   align-self: center;
-  margin-bottom: 18px;
-  font-size: 14px;
+  margin-bottom: 3.9cqw;
+  font-size: 3.05cqw;
   font-weight: 300;
   opacity: 0.6;
 }
 
-.manual-preview[data-view='pages'] .logo-card-type {
-  font-size: 10px;
-}
-
-.manual-preview[data-view='pages'] .logo-card-name {
-  font-size: 14px;
-}
-
-.manual-preview[data-view='pages'] .logo-card-role {
-  font-size: 12px;
-}
-
-.manual-preview[data-view='pages'] .logo-card-sign {
-  margin-bottom: 36px;
-  font-size: 28px;
-}
-
 /* Brand concept and Anatomy have room to spare, so their text is a bit bigger */
 :is(.concept-layout, .anatomy-layout) .logo-page-brand {
-  font-size: 8px;
+  font-size: 1.75cqw;
 }
 
 :is(.concept-layout, .anatomy-layout) .logo-page-heading {
-  font-size: 14px;
+  font-size: 3.05cqw;
 }
 
 :is(.concept-layout, .anatomy-layout) .logo-block-title {
-  font-size: 7px;
+  font-size: 1.5cqw;
 }
 
 :is(.concept-layout, .anatomy-layout) .logo-text {
-  font-size: 8px;
-}
-
-.manual-preview[data-view='pages'] :is(.concept-layout, .anatomy-layout) .logo-page-brand {
-  font-size: 12px;
-}
-
-.manual-preview[data-view='pages'] :is(.concept-layout, .anatomy-layout) .logo-page-heading {
-  font-size: 24px;
-}
-
-.manual-preview[data-view='pages'] :is(.concept-layout, .anatomy-layout) .logo-block-title {
-  font-size: 11px;
-}
-
-.manual-preview[data-view='pages'] :is(.concept-layout, .anatomy-layout) .logo-text {
-  font-size: 14px;
-}
-
-/* Pages view: each page is about twice as wide, so the text is bigger */
-.manual-preview[data-view='pages'] .logo-page-brand {
-  font-size: 11px;
-}
-
-.manual-preview[data-view='pages'] .logo-page-heading {
-  font-size: 20px;
-}
-
-.manual-preview[data-view='pages'] .logo-block {
-  gap: 8px;
-}
-
-.manual-preview[data-view='pages'] .logo-block-title,
-.manual-preview[data-view='pages'] .clearspace-grid-empty {
-  font-size: 10px;
-}
-
-.manual-preview[data-view='pages'] .logo-text {
-  font-size: 11px;
-}
-
-.manual-preview[data-view='pages'] .logo-version-name {
-  font-size: 12px;
+  font-size: 1.75cqw;
 }
 
 /* Brand concept: the Cover's logo takes the room under the text */
 .concept-logo {
   min-height: 0;
-  border-radius: 4px;
+  border-radius: 0.87cqw;
   box-shadow: none; /* no frame: the logo stands on the page */
 }
 
@@ -799,17 +712,13 @@
 .concept-logo[data-empty='true'] {
   display: grid;
   place-items: center;
-  border-radius: 4px;
+  border-radius: 0.87cqw;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 15%, transparent);
 }
 
 .concept-logo-empty {
-  font-size: 7px;
+  font-size: 1.5cqw;
   opacity: 0.5;
-}
-
-.manual-preview[data-view='pages'] .concept-logo-empty {
-  font-size: 11px;
 }
 
 /* Mockups (specs/mockups.md): the header, then the ticked products in two columns. One takes the
@@ -856,13 +765,9 @@
 }
 
 .mockup-name {
-  font-size: 6px;
+  font-size: 1.3cqw;
   font-weight: 600;
   opacity: 0.7;
-}
-
-.manual-preview[data-view='pages'] .mockup-name {
-  font-size: 11px;
 }
 
 /* Usage (specs/usage.md): the header, then the examples of Correct use or Incorrect use.
@@ -933,12 +838,12 @@
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 12px;
-  height: 12px;
+  width: 2.6cqw;
+  height: 2.6cqw;
   border-radius: 50%;
   background: #ffffff;
   box-shadow: 0 0 0 1px rgb(0 0 0 / 12%);
-  font-size: 8px;
+  font-size: 1.75cqw;
   font-weight: 700;
   line-height: 1;
 }
@@ -952,18 +857,8 @@
 }
 
 .usage-description {
-  font-size: 6px;
+  font-size: 1.3cqw;
   line-height: calc(1.3 * var(--text-leading, 1));
-}
-
-.manual-preview[data-view='pages'] .usage-mark {
-  width: 22px;
-  height: 22px;
-  font-size: 14px;
-}
-
-.manual-preview[data-view='pages'] .usage-description {
-  font-size: 11px;
 }
 
 /* A photo mockup (specs/mockups.md, Photo mockups): the composed image, kept in the photo's
@@ -992,8 +887,8 @@
 
 .photo-mockup-note {
   margin: 0;
-  padding: 4px;
-  font-size: 6px;
+  padding: 0.87cqw;
+  font-size: 1.3cqw;
   opacity: 0.6;
   text-align: center;
 }

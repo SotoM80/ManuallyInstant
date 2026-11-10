@@ -1,8 +1,10 @@
+import type { CSSProperties } from 'react'
 import { LOGO_PARTS } from '../data/manualSections'
 import { boxVariables } from '../skins/boxes'
 import { pageColor, pagePicture } from '../skins/sections'
 import { spacingVariables } from '../skins/spacing'
 import { lineVariables } from '../skins/lines'
+import { DEFAULT_BRAND_FONTS, toFontFamilyCss } from '../data/fontOptions'
 import { CoverPage } from './pages/CoverPage'
 import { BrandConceptPage } from './pages/BrandConceptPage'
 import { AnatomyPage } from './pages/AnatomyPage'
@@ -37,6 +39,13 @@ type ManualPageProps = ManualData & {
   onGuidesChange?: (guides: Guides) => void // given → the guide bands of 3.2 can be clicked
   emphasis?: ExportKind // the values the Color palette page highlights in a PDF
   transitionName?: boolean // the preview's pages glide between layouts (ADR 0006); a copy must not
+}
+
+// The brand's two fonts, as CSS variables the templates read: titles in the Primary font, the
+// rest in the Secondary one; their defaults while the Typography section is untouched
+function fontVariables(typography: BrandFonts | null): CSSProperties {
+  const { primary, secondary } = typography ?? DEFAULT_BRAND_FONTS
+  return { '--font-titles': toFontFamilyCss(primary), '--font-text': toFontFamilyCss(secondary) } as CSSProperties
 }
 
 // One page of the manual: its background, its skin and its content. The preview and the
@@ -105,6 +114,8 @@ export function ManualPage({
         // Its section's line spacing and the manual's line weight, the Cover included (ADR 0026)
         ...spacingVariables(skin, page),
         ...lineVariables(skin),
+        // The brand fonts the inner pages are set in (ADR 0029); the Cover keeps the title's
+        ...fontVariables(typography),
       }}
     >
       <SkinBackdrop layers={layers} orientation={orientation} picture={pagePicture(skin, page)} />

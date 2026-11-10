@@ -8,6 +8,7 @@ import type { DraftKey, Drafts } from './utils/drafts'
 import { NO_GUIDES } from './utils/guides'
 import type { Guides } from './utils/guides'
 import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
+import { DEFAULT_BRAND_FONTS } from './data/fontOptions'
 import { loadGoogleFont } from './utils/googleFonts'
 import { DEFAULT_TEMPLATE } from './templates'
 import type { TemplateId } from './templates'
@@ -52,12 +53,13 @@ function App() {
     loadGoogleFont(fontFamily)
   }, [fontFamily])
 
-  // The brand fonts are only drawn in regular (see specs/typography.md)
+  // The brand fonts are only drawn in regular (see specs/typography.md). Every inner page is set
+  // in them, so the defaults load from the start, before the section is touched (ADR 0029)
+  const { primary, secondary } = typography ?? DEFAULT_BRAND_FONTS
   useEffect(() => {
-    if (!typography) return
-    loadGoogleFont(typography.primary, 'regular')
-    loadGoogleFont(typography.secondary, 'regular')
-  }, [typography])
+    loadGoogleFont(primary, 'regular')
+    loadGoogleFont(secondary, 'regular')
+  }, [primary, secondary])
 
   return (
     <>
