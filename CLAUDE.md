@@ -9,7 +9,7 @@ Nothing is saved between sessions. An optional, stateless CMYK server in `server
 - **Language:** TypeScript
 - **Frontend Framework:** React
 - **Build Tool / Bundler:** Vite
-- **Test Runner:** Jest + React Testing Library + jest-environment-jsdom (app); Node's test runner, `node --test` (server)
+- **Test Runner:** Jest + React Testing Library + jest-environment-jsdom (app); Playwright (`@playwright/test`, layout tests in a real Chromium browser, `e2e/`, ADR 0030); Node's test runner, `node --test` (server)
 - **Linter:** ESLint
 - **Backend:** optional CMYK server: Node (runs `.ts` directly) + Express 5, sharp (decodes pages), lcms-wasm (Little CMS, converts); its own package in `server/`
 
@@ -18,6 +18,7 @@ Nothing is saved between sessions. An optional, stateless CMYK server in `server
 ManuallyInstant
     ├── docs
     │   └── adr
+    ├── e2e
     ├── node_modules
     ├── public
     ├── server
@@ -35,9 +36,11 @@ ManuallyInstant
     ├── jest.config.js
     ├── package-lock.json
     ├── package.json
+    ├── playwright.config.ts
     ├── PLAN.md
     ├── README.md
     ├── tsconfig.app.json
+    ├── tsconfig.e2e.json
     ├── tsconfig.json
     ├── tsconfig.node.json
     ├── tsconfig.test.json
@@ -57,7 +60,7 @@ No se guarda nada entre sesiones. Un servidor CMYK opcional y sin estado en `ser
 - **Lenguaje:** TypeScript
 - **Framework de frontend:** React
 - **Build / Bundler:** Vite
-- **Tests:** Jest + React Testing Library + jest-environment-jsdom (app); el test runner de Node, `node --test` (servidor)
+- **Tests:** Jest + React Testing Library + jest-environment-jsdom (app); Playwright (`@playwright/test`, tests de diseño en un navegador Chromium real, `e2e/`, ADR 0030); el test runner de Node, `node --test` (servidor)
 - **Linter:** ESLint
 - **Backend:** servidor CMYK opcional: Node (ejecuta `.ts` directamente) + Express 5, sharp (decodifica las hojas), lcms-wasm (Little CMS, convierte); un paquete aparte en `server/`
 
@@ -66,6 +69,7 @@ No se guarda nada entre sesiones. Un servidor CMYK opcional y sin estado en `ser
 ManuallyInstant
     ├── docs
     │   └── adr
+    ├── e2e
     ├── node_modules
     ├── public
     ├── server
@@ -83,9 +87,11 @@ ManuallyInstant
     ├── jest.config.js
     ├── package-lock.json
     ├── package.json
+    ├── playwright.config.ts
     ├── PLAN.md
     ├── README.md
     ├── tsconfig.app.json
+    ├── tsconfig.e2e.json
     ├── tsconfig.json
     ├── tsconfig.node.json
     ├── tsconfig.test.json
