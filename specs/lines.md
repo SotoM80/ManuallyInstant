@@ -35,7 +35,7 @@ After the **Image boxes** group and before **Add layer**, a group with the legen
   Lines
     Decorative lines  ──●─────── 1 px
     Technical lines   ──●─────── 100 %
-  + Add layer
+  Add layer ⌄
 ```
 
 **Why two units:** the decorative lines are all 1 px today, so their slider is their real width. The technical lines have several weights on purpose (the grid at 0.6 px is finer than the logo's outline at 1.2 px), so their slider multiplies each one and keeps those differences.

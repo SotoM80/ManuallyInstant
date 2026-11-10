@@ -34,7 +34,7 @@ After the two page colors and before the layers, a group with the legend **Image
     Inner margin   ───●────── 8 %
     ☑ Outline
     Thickness      ●──────── 1 px
-  + Add layer
+  Add layer ⌄
 ```
 
 ### Which boxes

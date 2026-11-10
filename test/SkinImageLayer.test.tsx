@@ -16,7 +16,7 @@ function openSkin() {
 }
 
 function add(form: ReturnType<typeof openSkin>, preset: string) {
-  fireEvent.click(form.getByRole('button', { name: '+ Add layer' }));
+  fireEvent.click(form.getByRole('button', { name: 'Add layer' }));
   fireEvent.click(form.getByRole('button', { name: `Add ${preset}` }));
 }
 
@@ -131,7 +131,7 @@ describe('Skin – Image layers', () => {
     add(form, 'Image');
 
     expect(form.getAllByRole('listitem')).toHaveLength(4);
-    expect(form.getByRole('button', { name: '+ Add layer' })).toBeDisabled();
+    expect(form.getByRole('button', { name: 'Add layer' })).toBeDisabled();
   });
 
   // Scenario 35

@@ -333,7 +333,7 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
       <button
         ref={addButton}
         type="button"
-        className="palette-secondary-button"
+        className="palette-secondary-button skin-add-button"
         aria-expanded={galleryOpen}
         aria-controls="skin-gallery"
         disabled={full}
@@ -342,7 +342,8 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
           setGalleryOpen((open) => !open)
         }}
       >
-        + Add layer
+        Add layer
+        <span className="palette-block-chevron" aria-hidden="true" />
       </button>
       {full && <p className="logo-form-hint">Up to {MAX_LAYERS} layers.</p>}
 

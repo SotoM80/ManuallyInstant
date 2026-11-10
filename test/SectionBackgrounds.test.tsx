@@ -89,7 +89,7 @@ describe('Section backgrounds', () => {
   it('draws the picture only after its Apply, under the Skin layers (scenarios 5 and 9)', () => {
     renderApp();
     const skin = openSection('Skin');
-    fireEvent.click(skin.getByRole('button', { name: '+ Add layer' }));
+    fireEvent.click(skin.getByRole('button', { name: 'Add layer' }));
     fireEvent.click(skin.getByRole('button', { name: 'Add Dots' }));
 
     const form = unfold('Mockups');

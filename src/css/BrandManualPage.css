@@ -767,6 +767,17 @@
   text-align: left;
 }
 
+/* Add layer: the same arrow as every folding block, pointing up while the gallery is open */
+.skin-add-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.skin-add-button[aria-expanded='true'] .palette-block-chevron {
+  transform: translateY(3px) rotate(-135deg);
+}
+
 .skin-gallery {
   display: grid;
   gap: 10px;
