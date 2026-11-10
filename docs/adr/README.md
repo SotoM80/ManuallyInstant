@@ -38,3 +38,6 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0025](0025-background-per-section.md) | A background for each section | Accepted | 2026-11-06 |
 | [0026](0026-line-spacing-and-line-weight-as-css-variables.md) | Line spacing and line weight as CSS variables kept in the Skin | Accepted | 2026-11-09 |
 | [0027](0027-cover-text-measured-on-the-page.md) | The Cover's text is measured on the page (cqw) | Accepted | 2026-11-10 |
+| [0028](0028-every-page-measured-on-the-page.md) | Every page measured on the page (cqw) | Accepted | 2026-11-10 |
+| [0029](0029-inner-pages-in-the-brand-fonts.md) | The inner pages in the brand fonts | Accepted | 2026-11-10 |
+| [0030](0030-browser-tests-with-playwright.md) | Layout tests in a real browser, with Playwright | Accepted | 2026-11-10 |

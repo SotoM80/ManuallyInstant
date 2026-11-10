@@ -35,6 +35,9 @@ The form follows the visual rules of the Cover form (text aligned right).
 * Once picked, each font is downloaded in its **regular** style only (all the Typography page needs). Some fonts have no bold or italic, and asking Google for a style a font does not have would fail.
 * Until a font arrives, the browser draws the text with a fallback of the same kind (`sans-serif`, `serif` or `monospace`; Display fonts fall back to `sans-serif`).
 
+### The brand fonts on every inner page
+The two fonts are not only shown on the Typography page: every inner page is drawn in them, its titles in the Primary font and the rest of its text in the Secondary font, in Regular (`everyview.md`, ADR 0029). While the section is untouched, the defaults (Montserrat and Open Sans) are used, and both are loaded as soon as the Brand Manual opens.
+
 ### Typography page in the preview
 The page shows the heading **"Typography"** and, for each font (Primary first):
 * its **usage**: `Primary · Headings` or `Secondary · Body text`;
