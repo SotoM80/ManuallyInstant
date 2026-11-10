@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "jest",
     "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
     "dev:server": "npm --prefix server run dev",
     "test:server": "npm --prefix server test"
   },
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/jest": "^30.0.0",

@@ -31,6 +31,10 @@ public/mockups/pexels-tarjeta.jpg
 # Playwright MCP screenshots and snapshots
 .playwright-mcp/
 
+# Playwright test runs (ADR 0030)
+test-results/
+playwright-report/
+
 # ICC profiles may not be shared freely, and server settings (see server/profiles/README.md)
 server/profiles/*.icc
 server/profiles/*.icm
