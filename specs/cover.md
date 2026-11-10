@@ -40,6 +40,16 @@ The layouts of Template 2 and Template 3 are in `templates.md`.
 
 Each slot shows its placeholder while it is empty, in the same place: `Your brand manual title`, `Your logo` and `Designed by …`. The slots fill in one by one as the user types.
 
+### The same Cover in every view
+The Cover looks the same in **Grid, Overview, Pages, the full screen view and both PDFs**, at any window size: its title breaks into the same lines and every slot sits in the same place, relative to the page (ADR 0027). Its text is measured on the page, in `cqw` (a hundredth of the page's width), with today's look of the Grid view (a Grid page 460 px wide):
+
+| Text | Size | Line height |
+|---|---|---|
+| Title | Small 2.6, Medium 3.5, Large 5.2 `cqw` | 1.15 × its size, × the Cover's Titles line spacing |
+| "Designed by" | 2.4 `cqw` | 5.7 `cqw` × the Cover's Text line spacing |
+
+The grey placeholders (`Your brand manual title`, `Your logo`, `Designed by …`) keep their size in px.
+
 ### Templates
 The position of the title, logo and "Designed by" belongs to the template, not to the section. Each template only changes where these three elements sit on the page; the content is the same. See `templates.md`.
 
@@ -51,6 +61,7 @@ The position of the title, logo and "Designed by" belongs to the template, not t
 * Text, style, colors and Logo size reach the Cover at once. A new or replaced logo reaches it only after "Apply Logo"; until then the Cover keeps the logo applied before (or its placeholder).
 * The Cover always shows the three slots (content or placeholder), in the positions of the current template.
 * The title, logo and "Designed by" always stay inside the page, with a margin around them and space between them, in both orientations and both preview views. Margins and spacing grow with the page (they are a percentage of its size). The logo is scaled to fit its space: bigger in Pages view, smaller in Grid view.
+* The title and "Designed by" keep the same share of the page's width in every view and at any window size, so a title breaks into the same lines everywhere, the PDF included.
 * The Logo size only shrinks the logo inside its area, so the logo never leaves the page, at any size.
 * The logo applied here is the brand's only logo; the Logo page will use this same file.
 * Nothing is stored between sessions: refreshing the browser clears the Cover.
@@ -98,3 +109,18 @@ The rules for an empty title and invalid style fields are in `titlefild.md`.
 * **Given**: The Cover shows an applied logo at Medium.
 * **When**: The user chooses **Small** in Logo size.
 * **Then**: The Cover draws the logo at 50% of its area at once, without Apply.
+
+### Scenario 8: The Same Lines in Every View
+* **Given**: The title `Northwind Coffee Roasters Visual Identity Guidelines` at Medium, and "Designed by Studio X".
+* **When**: The user switches between Grid, Overview and Pages, and opens the full screen view.
+* **Then**: The title breaks into the same lines in all of them, and the title and "Designed by" are the same share of the page's width (3.5 % and 2.4 %).
+
+### Scenario 9: Any Window Size
+* **Given**: The same Cover, in Grid.
+* **When**: The user makes the browser window narrower or wider.
+* **Then**: The page grows or shrinks, and its title keeps the same lines.
+
+### Scenario 10: The PDF Looks Like the Preview
+* **Given**: The same Cover.
+* **When**: The user makes the web PDF.
+* **Then**: The Cover of the PDF breaks the title into the same lines as the preview, with the title and "Designed by" at the same share of the page's width.

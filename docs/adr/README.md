@@ -35,3 +35,6 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0022](0022-image-boxes-styled-by-the-skin.md) | Image boxes styled by the Skin, through CSS variables | Accepted | 2026-10-29 |
 | [0023](0023-skin-image-layer.md) | An Image layer in the Skin | Accepted | 2026-10-29 |
 | [0024](0024-sharper-web-pdf.md) | A sharper web PDF, at 216 dpi and JPEG quality 0.9 | Accepted | 2026-10-30 |
+| [0025](0025-background-per-section.md) | A background for each section | Accepted | 2026-11-06 |
+| [0026](0026-line-spacing-and-line-weight-as-css-variables.md) | Line spacing and line weight as CSS variables kept in the Skin | Accepted | 2026-11-09 |
+| [0027](0027-cover-text-measured-on-the-page.md) | The Cover's text is measured on the page (cqw) | Accepted | 2026-11-10 |

@@ -45,7 +45,7 @@ If the server cannot be reached, or stops answering during the export, no PDF is
 The Apply buttons have nothing to do with the export: the PDF shows what the preview shows, so an image still waiting for its Apply is not in it.
 
 ### What each page looks like
-* Every page is drawn as in the **Pages** view (titles at their real size), whatever view is chosen, at the size of an A4 page (`210 × 297 mm`, or `297 × 210 mm` in Landscape).
+* Every page is drawn as in the **Pages** view, whatever view is chosen (the Cover looks the same in every view, `cover.md`), at the size of an A4 page (`210 × 297 mm`, or `297 × 210 mm` in Landscape).
 * No motion: pages are drawn at rest.
 * The **guide bands** of the construction grid (3.2) are not drawn; the guides themselves are.
 * The page outline and shadow of the preview, and the accent outline of the open section, are not drawn.

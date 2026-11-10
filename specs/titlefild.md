@@ -24,7 +24,7 @@ Each style field is an autocomplete input that starts with its default value alr
 |---|---|---|
 | Font Family | Roboto, Open Sans, Lato, Montserrat, Playfair Display (loaded from Google Fonts) | Roboto |
 | Font Style | Regular, Bold, Italic, Bold Italic | Regular |
-| Font Size | Small `24px`, Medium `32px`, Large `48px` | Medium |
+| Font Size | Small, Medium, Large: 2.6, 3.5 and 5.2 % of the page's width (`cqw`, see `cover.md` and ADR 0027) | Medium |
 
 * **Font Size** follows the same rules as Font Family and Font Style (Failure Modes, Scenarios 3 and 4).
 * The old "Font color" field was replaced by the **Title color** picker ("Designed by" has its own **Text color**) (see `colorpicker.md`).

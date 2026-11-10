@@ -44,7 +44,7 @@ The spacing of each element is **its line height today × the slider**. "Today" 
 
 | Section | Pages | Titles | Text | Today |
 |---|---|---|---|---|
-| **Cover** | Cover | the brand manual title | "Designed by" | title 1.15, text 1.45 × the site's font size (`1.45rem`, the line height it inherits) |
+| **Cover** | Cover | the brand manual title | "Designed by" | title 1.15, text 5.7 % of the page's width (`cqw`, `cover.md`) |
 | **Logo** | Brand concept, Anatomy, Logo versions, Clear space | the brand name above the heading, the page heading, the numbered block titles (`1.1 Philosophy`, `3.2 Construction grid`…) | every other text: the concept, the cards' names and roles, the versions' names and uses, the clear space and minimum size notes | 1.3 |
 | **Usage** | Correct use, Incorrect use | the brand name and the page heading | the examples' descriptions | 1.3 |
 | **Colors** | Color palette | the heading `Color palette` | the colors' names and values, the CMYK note | 1.25 |

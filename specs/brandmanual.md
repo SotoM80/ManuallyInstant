@@ -17,7 +17,7 @@ The content of the Logo section (it will have its own future spec). The content 
 * **Preview View** (next to Page orientation): A group labeled "Preview view" with three options:
   * **Grid**: the four pages as small thumbnails in a 2 × 2 grid. Selected by default.
   * **Overview**: four pages per row, so many pages can be seen at once; when the manual has more pages they continue on the next rows. Each page looks like a Grid thumbnail drawn at half size. The preview stays sticky.
-  * **Pages**: a closer look. Each page takes the full width of the left column, one below the other, and the user scrolls down to see them. The cover title is drawn at its real size (in Grid it is drawn at half size). In this view the preview is not sticky, so every page can be reached by scrolling.
+  * **Pages**: a closer look. Each page takes the full width of the left column, one below the other, and the user scrolls down to see them. The Cover looks the same as in Grid, only bigger: its text is measured on the page (`cover.md`, ADR 0027). In this view the preview is not sticky, so every page can be reached by scrolling.
 
   Choosing an option changes the view immediately. It only changes how the preview looks, not the manual or the PDF.
 * **Template** (next to Preview view): A group labeled "Template" with three options: **Template 1** (default), **Template 2** and **Template 3**. It changes where the content sits on every page, immediately. See `templates.md`.
