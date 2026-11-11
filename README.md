@@ -36,6 +36,7 @@ Key features:
 - **Image boxes**: the corner radius, inner margin and outline of every image box are set once in the Skin, the same on every page and template.
 - **Line spacing for each section**: next to Section background, a folded **Line spacing** group opens or tightens the titles and the text of that section's pages, from 50 to 200 % of their usual spacing (the Cover too).
 - **Line weight**: in the Skin, **Decorative lines** (the dividers of Template 3 and the outline of the color chips, in px) and **Technical lines** (the clear space and construction grid, in %, keeping their differences) thicken or thin the lines of the whole manual.
+- **Page numbers and footer**: in the Skin, **Show footer** adds a footer to every page but the Cover, with its **Page numbers** (the Cover counts as 1, so Brand concept is 2) and a **Footer text** of your own. Each template places it in the bottom margin; turning it off keeps what you typed.
 - **Three templates**: centered (1), aligned left (2) or with a side column (3). They change where the content sits on each page, never the content itself.
 - **Landscape (the default) or portrait**, and three ways to view the manual: Grid, Overview and Pages.
 - **Every page the same in every view**: the text is measured on the page, so every page looks the same, and breaks its text into the same lines, in Grid, Overview, Pages, the full screen view and the PDF, in both orientations and at any window size. The Cover uses the title's font ("Designed by" in Regular); the other pages are set in the brand fonts of Typography (Primary for titles, Secondary for the rest).
@@ -51,6 +52,7 @@ Key features:
 - ✅ Skins: page colors and up to 4 layers of gradients, shapes, patterns, textures and images (see the [spec](specs/skins.md)), and the style of the image boxes (see the [spec](specs/imageboxes.md)).
 - ✅ Section backgrounds: a color and a picture with its opacity for each section (see the [spec](specs/sectionbackgrounds.md)).
 - ✅ Line spacing for each section and line weight for the whole manual (see the specs for [line spacing](specs/linespacing.md) and [lines](specs/lines.md)).
+- ✅ Page numbers and footer on the inner pages (see the [spec](specs/footer.md)).
 - ✅ Every page looks the same in every view and in the PDF, in the brand fonts, checked by a test in a real browser (see the specs for [the Cover](specs/cover.md) and [every page](specs/everyview.md), and ADRs 0027–0030).
 - ✅ A background color for each logo image (see the [spec](specs/imagebackground.md)).
 - ✅ Export to two PDFs: one for print (300 dpi, CMYK values highlighted) and one for the web (216 dpi, HEX/RGB, lightweight) (see the [spec](specs/export.md)).
@@ -162,6 +164,7 @@ Funciones clave:
 - **Recuadros de imagen**: el radio de las esquinas, el margen interior y el contorno de todos los recuadros de imagen se definen una vez en la Skin, iguales en todas las hojas y plantillas.
 - **Interlineado para cada sección**: junto a Section background, un grupo plegado **Line spacing** abre o cierra el interlineado de los títulos y del texto de las hojas de esa sección, del 50 al 200 % del habitual (también en la portada).
 - **Grosor de líneas**: en la Skin, **Decorative lines** (los divisores de la plantilla 3 y el contorno de los chips de color, en px) y **Technical lines** (el área de respeto y la retícula de construcción, en %, manteniendo sus diferencias) engrosan o afinan las líneas de todo el manual.
+- **Números de página y pie de página**: en la Skin, **Show footer** agrega un pie a todas las hojas salvo la portada, con sus **Page numbers** (la portada cuenta como 1, así que Brand concept es la 2) y un **Footer text** propio. Cada plantilla lo ubica en el margen inferior; al apagarlo se guarda lo que escribiste.
 - **Tres plantillas**: centrada (1), alineada a la izquierda (2) o con columna lateral (3). Cambian dónde se ubica el contenido en cada hoja, nunca el contenido.
 - **Apaisado (por defecto) o vertical**, y tres formas de ver el manual: Grid, Overview y Pages.
 - **Todas las hojas iguales en todas las vistas**: el texto se mide sobre la hoja, así que cada hoja se ve igual, y corta su texto en las mismas líneas, en Grid, Overview, Pages, la pantalla completa y el PDF, en ambas orientaciones y con cualquier tamaño de ventana. La portada usa la fuente del título ("Designed by" en Regular); las demás hojas usan las fuentes de la marca de Typography (Primary para los títulos, Secondary para el resto).
@@ -177,6 +180,7 @@ Funciones clave:
 - ✅ Skins: colores de página y hasta 4 capas de degradados, formas, patrones, texturas e imágenes (ver el [spec](specs/skins.md)), y el estilo de los recuadros de imagen (ver el [spec](specs/imageboxes.md)).
 - ✅ Fondos por sección: un color y una imagen con su opacidad para cada sección (ver el [spec](specs/sectionbackgrounds.md)).
 - ✅ Interlineado para cada sección y grosor de líneas para todo el manual (ver los specs de [interlineado](specs/linespacing.md) y [líneas](specs/lines.md)).
+- ✅ Números de página y pie de página en las hojas interiores (ver el [spec](specs/footer.md)).
 - ✅ Todas las hojas se ven igual en todas las vistas y en el PDF, con las fuentes de la marca, comprobado por un test en un navegador real (ver los specs de [la portada](specs/cover.md) y [todas las hojas](specs/everyview.md), y los ADR 0027–0030).
 - ✅ Un color de fondo para cada imagen del logo (ver el [spec](specs/imagebackground.md)).
 - ✅ La exportación a dos PDF: uno para imprenta (300 dpi, valores CMYK destacados) y otro para web (216 dpi, HEX/RGB, liviano) (ver el [spec](specs/export.md)).
