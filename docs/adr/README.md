@@ -41,3 +41,4 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0028](0028-every-page-measured-on-the-page.md) | Every page measured on the page (cqw) | Accepted | 2026-11-10 |
 | [0029](0029-inner-pages-in-the-brand-fonts.md) | The inner pages in the brand fonts | Accepted | 2026-11-10 |
 | [0030](0030-browser-tests-with-playwright.md) | Layout tests in a real browser, with Playwright | Accepted | 2026-11-10 |
+| [0031](0031-page-numbers-and-footer-in-the-skin.md) | Page numbers and footer in the Skin, placed by the template | Accepted | 2026-11-11 |
