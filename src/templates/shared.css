@@ -898,3 +898,40 @@
   position: absolute;
   border: 1px dashed rgb(0 0 0 / 45%);
 }
+
+/* Page numbers and footer (specs/footer.md, ADR 0031): in the page's bottom margin, under the
+   content, so it never covers or moves it. Template 1 (and any template that says nothing):
+   centered, the number above the text.
+   ┌──────────────┐
+   │   content    │
+   │      2       │
+   │ Northwind …  │
+   └──────────────┘ */
+.page-footer {
+  position: absolute;
+  left: 8cqw; /* the content's side margins (8 % of the page) */
+  right: 8cqw;
+  bottom: 3.5cqw;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  /* Outside .manual-page-content, so it sets its own font and letter spacing (ADRs 0028, 0029) */
+  font-family: var(--font-text, sans-serif);
+  font-size: 1.3cqw;
+  /* Fixed, not the section's line spacing: two lines must always fit the bottom margin, under
+     pages whose content reaches it (Mockups) */
+  line-height: 1.4;
+  letter-spacing: 0.04cqw;
+  pointer-events: none;
+}
+
+.page-footer-text {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap; /* one line: a text too long for its room is cut with … */
+  text-overflow: ellipsis;
+}
+
+.page-footer-number {
+  font-variant-numeric: tabular-nums;
+}

@@ -35,6 +35,9 @@ See `colorpalette.md` and `typography.md` for their diagrams.
 
 While a slot is empty, its placeholder ("Your brand manual title", "Your logo", "Designed by …") sits in the same place.
 
+### Page numbers and footer
+When the Skin shows a footer, each template places it in the bottom margin of the inner pages: centered (Template 1), text left and number right (Template 2), or in the side column (Template 3). See `footer.md` and ADR 0031.
+
 ### Structure in the code
 Each template has its own folder in `src/templates/` (`template1/`, `template2/`, `template3/`) with the CSS that places the content. Every template uses the same page markup; `src/templates/index.ts` lists the templates in the order of the selector.
 

@@ -87,3 +87,22 @@
   display: grid;
   gap: 0.65cqw;
 }
+
+/* Page numbers and footer (specs/footer.md): one line, the text on the left, the number on the right
+   │Northwind…   2│ */
+.manual-preview[data-template='template2'] .page-footer {
+  display: flex;
+  align-items: baseline;
+  gap: 2cqw;
+  text-align: left;
+}
+
+.manual-preview[data-template='template2'] .page-footer-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.manual-preview[data-template='template2'] .page-footer-number {
+  order: 1; /* after the text */
+  margin-left: auto; /* on the right, even with no text */
+}

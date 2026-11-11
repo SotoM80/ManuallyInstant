@@ -35,6 +35,7 @@ After the **Image boxes** group and before **Layer gallery**, a group with the l
   Lines
     Decorative lines  ──●─────── 1 px
     Technical lines   ──●─────── 100 %
+  Footer           (Show footer; Page numbers, Footer text)
   Layer gallery ⌄
 ```
 

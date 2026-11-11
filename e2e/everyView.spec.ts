@@ -74,6 +74,11 @@ async function fillManual(page: Page) {
     await input.fill(font)
     await input.press('Enter')
   }
+
+  // The footer (specs/footer.md): the page number and a text, so both are measured too
+  await open(/^6\. Skin/)
+  await page.getByRole('checkbox', { name: 'Show footer', exact: true }).check()
+  await page.getByLabel('Footer text', { exact: true }).fill('Northwind Coffee Roasters · Brand Guidelines 2026')
   await page.evaluate(() => document.fonts.ready)
 }
 

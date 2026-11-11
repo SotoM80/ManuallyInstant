@@ -9,6 +9,7 @@ import { isImageLayer } from '../skins/draw/image'
 import { newLayerColors } from '../skins/colors'
 import { BOX_CONTROLS, setBoxes } from '../skins/boxes'
 import { LINE_CONTROLS, setLines, skinLines } from '../skins/lines'
+import { FOOTER_TEXT_MAX, setFooter, skinFooter } from '../skins/footer'
 import {
   MAX_LAYERS,
   addLayer,
@@ -91,6 +92,7 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
   const addButton = useRef<HTMLButtonElement>(null)
   useReorderGlide(list, skin.layers.map((layer) => layer.id).join('|'))
   const names = layerNames(skin.layers)
+  const footer = skinFooter(skin)
   const full = skin.layers.length >= MAX_LAYERS
   const startColors = newLayerColors(palette, skin) // the colors a new layer gets
 
@@ -328,6 +330,42 @@ export function SkinForm({ skin, onChange, palette }: SkinFormProps) {
             </div>
           )
         })}
+      </fieldset>
+
+      {/* The footer of the inner pages, used only when wanted (specs/footer.md) */}
+      <fieldset className="logo-form-group skin-boxes">
+        <legend>Footer</legend>
+        <label className="skin-check">
+          <input
+            type="checkbox"
+            checked={footer.shown}
+            onChange={(event) => onChange(setFooter(skin, { shown: event.target.checked }))}
+          />
+          Show footer
+        </label>
+        {/* Hidden while the footer is off; their values are kept */}
+        {footer.shown && (
+          <>
+            <label className="skin-check">
+              <input
+                type="checkbox"
+                checked={footer.numbers}
+                onChange={(event) => onChange(setFooter(skin, { numbers: event.target.checked }))}
+              />
+              Page numbers
+            </label>
+            <div className="skin-control skin-footer-text">
+              <label htmlFor="skin-footer-text">Footer text</label>
+              <input
+                id="skin-footer-text"
+                type="text"
+                maxLength={FOOTER_TEXT_MAX}
+                value={footer.text}
+                onChange={(event) => onChange(setFooter(skin, { text: event.target.value }))}
+              />
+            </div>
+          </>
+        )}
       </fieldset>
 
       <button

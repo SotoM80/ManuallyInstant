@@ -15,6 +15,7 @@ import { TypographyPage } from './pages/TypographyPage'
 import { MockupsPage } from './pages/MockupsPage'
 import { UsagePage } from './pages/UsagePage'
 import { SkinBackdrop } from './pages/SkinBackdrop'
+import { PageFooter } from './PageFooter'
 import type { ExportKind } from '../export/exportSettings'
 import type { Skin } from '../skins/types'
 import type { Mockups } from '../mockups/types'
@@ -120,6 +121,8 @@ export function ManualPage({
     >
       <SkinBackdrop layers={layers} orientation={orientation} picture={pagePicture(skin, page)} />
       <div className="manual-page-content">{content()}</div>
+      {/* Its number and the footer text, when the Skin shows them (specs/footer.md) */}
+      <PageFooter skin={skin} page={page} />
     </article>
   )
 }

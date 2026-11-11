@@ -179,3 +179,14 @@
 .manual-preview[data-template='template3'] .usage-layout {
   grid-template-rows: minmax(0, 1fr);
 }
+
+/* Page numbers and footer (specs/footer.md): in the side column, aligned left, the number above
+   the text, cut to the column's width (30 % of the content, which is 84 % of the page)
+   │2     │       │
+   │North…│       │ */
+.manual-preview[data-template='template3'] .page-footer {
+  right: auto;
+  width: 25.2cqw;
+  justify-items: start;
+  text-align: left;
+}

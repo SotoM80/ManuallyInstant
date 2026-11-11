@@ -47,6 +47,7 @@ The Apply buttons have nothing to do with the export: the PDF shows what the pre
 ### What each page looks like
 * Every page is drawn as in the **Pages** view, whatever view is chosen (every page looks the same in every view, `cover.md` and `everyview.md`), at the size of an A4 page (`210 × 297 mm`, or `297 × 210 mm` in Landscape).
 * No motion: pages are drawn at rest.
+* The page numbers and footer, when the Skin shows them, are drawn on the inner pages as in the preview (`footer.md`).
 * The **guide bands** of the construction grid (3.2) are not drawn; the guides themselves are.
 * The page outline and shadow of the preview, and the accent outline of the open section, are not drawn.
 

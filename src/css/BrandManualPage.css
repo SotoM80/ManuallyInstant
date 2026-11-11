@@ -1018,6 +1018,13 @@
   color: var(--accent);
 }
 
+/* The footer text: a text field as wide as the sliders' row (specs/footer.md) */
+.skin-footer-text input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  max-width: 220px;
+}
+
 .skin-check {
   display: flex;
   align-items: center;

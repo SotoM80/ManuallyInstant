@@ -40,6 +40,8 @@ export type Skin = {
   spacing?: SectionSpacings
   // The weight of the manual's lines (specs/lines.md, ADR 0026). Missing → today's lines.
   lines?: SkinLines
+  // The footer of the inner pages (specs/footer.md, ADR 0031). Missing → not shown.
+  footer?: SkinFooter
 }
 
 // The sections whose pages can have a background of their own (the Skin section has no page)
@@ -97,4 +99,12 @@ export type SkinPreset = {
   type: SkinType
   defaults: SkinParams
   controls: SkinControl[]
+}
+
+// The footer of every inner page: shown or not, and while shown, its page number and its text.
+// Hiding it keeps the other two, so showing it again brings the same footer back.
+export type SkinFooter = {
+  shown: boolean
+  numbers: boolean
+  text: string
 }

@@ -54,7 +54,7 @@ After the **Lines** group and before **Layer gallery**, a group with the legend 
 * Show footer off → no footer at all, whatever Page numbers and Footer text say.
 * With Show footer on: numbers on and a text → both; numbers on and no text → the number only; numbers off and a text → the text only; neither → no footer at all (nothing is added to the page).
 * The footer sits in the page's **bottom margin**, under the content, so it never covers or moves it. Its base is **3.5 `cqw`** above the page's bottom edge, and it keeps the page's side margins (8 % of the width, as the content).
-* In the brand's **Secondary** font (ADR 0029), **1.3 `cqw`** (the size of the pages' smallest texts, ADR 0028), in the Skin's **Page text** color, at the line spacing of the page's section (`--text-leading`, `linespacing.md`).
+* In the brand's **Secondary** font (ADR 0029), **1.3 `cqw`** (the size of the pages' smallest texts, ADR 0028), in the Skin's **Page text** color, with a fixed line height (1.4). It does not follow the sections' line spacing (`linespacing.md`): its two lines must always fit the bottom margin, and some pages (Mockups) fill their content down to that margin.
 * On **one line**: a text too long for its room is cut with `…`.
 * It is drawn over the Skin's layers and the section's background, like the rest of the content.
 
