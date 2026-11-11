@@ -36,6 +36,9 @@ type BrandManualPageProps = {
   onPreviewViewChange: (view: PreviewView) => void
   template: TemplateId
   onTemplateChange: (template: TemplateId) => void
+  // Off → the pages and sections keep their natural order (specs/brandmanual.md, ADR 0032)
+  followSection?: boolean
+  onFollowSectionChange?: (follow: boolean) => void
   onCoverChange: (cover: CoverData) => void
   // What each form shows, kept by App so the forms are filled again on the way back (see useDraft)
   drafts?: Drafts
@@ -67,6 +70,8 @@ export function BrandManualPage({
   onPreviewViewChange,
   template,
   onTemplateChange,
+  followSection = true,
+  onFollowSectionChange = () => {},
   onCoverChange,
   drafts = {},
   onDraftChange,
@@ -99,7 +104,7 @@ export function BrandManualPage({
   const featured = mainPage ? [mainPage, ...sectionPages.filter((page) => page !== mainPage)] : []
   // The open section also moves to the top of its column, at the height of its page, so
   // the form and its page sit side by side. Folding it puts every section back in order.
-  const sections = openSection
+  const sections = openSection && followSection
     ? [
         ...MANUAL_SECTIONS.filter((section) => section.id === openSection),
         ...MANUAL_SECTIONS.filter((section) => section.id !== openSection),
@@ -107,7 +112,7 @@ export function BrandManualPage({
     : MANUAL_SECTIONS
   const pageRoot = useRef<HTMLDivElement>(null)
   const sectionList = useRef<HTMLOListElement>(null)
-  useAlignOpenSection(pageRoot, openSection !== null)
+  useAlignOpenSection(pageRoot, followSection && openSection !== null)
   useReorderGlide(sectionList, sections.map((section) => section.id).join('|'))
 
   // Clicking in an area of the Logo or Usage form (or reaching it with Tab) makes its page the
@@ -123,7 +128,7 @@ export function BrandManualPage({
     setArea('')
     // The section and its page are now at the top: bring the top into view if it is above it
     const top = sectionList.current?.getBoundingClientRect().top ?? 0
-    if (opening && top < 0) window.scrollBy({ top: top - 16, behavior: 'smooth' })
+    if (opening && followSection && top < 0) window.scrollBy({ top: top - 16, behavior: 'smooth' })
   }
 
   // The palette's colors, for their CMYK values from the server (specs/colorpalette.md)
@@ -194,7 +199,9 @@ export function BrandManualPage({
           onPreviewViewChange={onPreviewViewChange}
           template={template}
           onTemplateChange={onTemplateChange}
-          pages={orderPages(featured)}
+          pages={followSection ? orderPages(featured) : orderPages([])}
+          followSection={followSection}
+          onFollowSectionChange={onFollowSectionChange}
           featured={mainPage ? [mainPage] : []}
           guides={guides}
           onGuidesChange={onGuidesChange}

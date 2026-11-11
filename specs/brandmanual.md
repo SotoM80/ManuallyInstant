@@ -21,7 +21,8 @@ The content of the Logo section (it will have its own future spec). The content 
 
   Choosing an option changes the view immediately. It only changes how the preview looks, not the manual or the PDF.
 * **Template** (next to Preview view): A group labeled "Template" with three options: **Template 1** (default), **Template 2** and **Template 3**. It changes where the content sits on every page, immediately. See `templates.md`.
-* **Full screen** (after Template): a button that shows every page at the size of the screen, without the form. See `fullscreen.md`.
+* **Follow section** (after Template): a group labeled "Follow section" with two options, **On** (default) and **Off**. On: the open section's pages come first in the preview and the section moves beside them (see *The Open Section's Pages Come First*). Off: the pages and the sections always stay in their natural order. It only changes the order of the preview and of the sections column, never the manual, the Full screen view or the PDF. See ADR 0032.
+* **Full screen** (after Follow section): a button that shows every page at the size of the screen, without the form. See `fullscreen.md`.
 * **Left column — Manual Preview**: A region labeled "Manual preview". It shows the manual's pages as small page thumbnails, in this order:
   1. **Cover**: shows the brand manual title with its style, the applied logo and "Designed by <name>", placed by the template (see `cover.md`). Each empty slot shows its placeholder: "Your brand manual title", "Your logo" and "Designed by …".
   2. **Logo**
@@ -63,13 +64,14 @@ The sections have no Save buttons. Everything typed, picked or chosen in a secti
 * It is only as wide as its label. When clicked, an accent ring pulses twice and a ✓ pops in next to "Apply" (decoration only: the accessible name does not change).
 
 ### The Open Section's Pages Come First
-So the page being edited is always in view without scrolling:
+So the page being edited is always in view without scrolling. Everything below happens only while **Follow section** is **On** (the default):
 * Opening a section moves its pages to the **top** of the preview, at the same size as the others, and the rest follow in their natural order. Cover → Cover; Logo → Brand concept, Anatomy, Logo versions, Clear space; Usage → Correct use, Incorrect use (the group being worked in decides which one comes first, like the Logo areas; see `usage.md`); Colors → Color palette; Typography → Typography; Skin → Brand concept (the first page it paints; the Cover only gets the layers marked Also on the Cover); Mockups → Mockups.
 * Folding the section puts every page back in its natural order. Opening another section moves that section's pages to the top instead.
 * The pages glide softly to their new places, with no bounce: the same timing and easing as the accordion (about 0.5 s, `--ease-smooth`).
 * The pages of the open section get an accent outline, and each page keeps its natural number in its caption (e.g. "9. Typography" while it is first).
 * An Apply has nothing to do with the order: it only shows its waiting image.
 * With Cover open (as on start) nothing moves, because Cover is already first.
+* **Follow section Off**: no page and no section moves. The pages stay in their natural order (Cover first), the sections column keeps its order and is not pushed down, and the page is not scrolled. The open section's pages (in Logo and Usage, the main page of the area being worked in) still get the accent outline, so the user still sees which pages are being edited. Switching to Off while a section is open puts the pages and sections back in their natural order at once (they glide, as when folding); switching to On moves them as opening the section would.
 * **Logo areas**: the Logo section has four areas, each with its page: Concept → Brand concept, Anatomy → Anatomy, Versions → Logo versions, Clear space & size → Clear space. The area being worked in decides the **main page**: it comes first, with the accent outline, followed by the other Logo pages. An area becomes the one being worked in when the user clicks anywhere in it (a field, its title or an empty spot) or reaches it with the keyboard. Scrolling inside Logo does not change it, so the form and the preview never move at the same time. When Logo opens, Concept is the first one.
 * The open **section** moves too: it goes to the top of the right column (keeping its number, e.g. "5. Typography") and the column is pushed down so it starts at the same height as its page. The form and its page sit side by side. Folding it puts every section back in order. The sections glide like the pages. If the top of the column is above the screen when a section opens, the page scrolls smoothly up to it. On narrow screens (one column) the sections move but are not pushed down.
 
@@ -88,9 +90,10 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * The sections list always shows every section, in the same order, whether it is built or not.
 * Every page of the preview changes as soon as its section changes. Only new images wait, each for its own Apply.
 * All the pages always share the same orientation.
-* The chosen orientation is kept when the user moves between pages. It is only reset (to Portrait) when the browser page is refreshed.
+* The chosen orientation is kept when the user moves between pages. It is only reset (to Landscape) when the browser page is refreshed.
 * Every view always shows the same pages, in the same order, with the same orientation.
 * The chosen preview view is kept when the user moves between pages. It is only reset (to Grid) when the browser page is refreshed.
+* With Follow section Off, the preview and the sections column always keep their natural order, whatever section is open. The choice is kept when the user moves between pages, and reset (to On) when the browser page is refreshed.
 
 ## Failure Modes
 * **Nothing typed yet**: The Cover shows the placeholders "Your brand manual title", "Your logo" and "Designed by …" instead of an empty page.
@@ -196,3 +199,23 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Given**: In the Logo section the user typed "VOLTA" as Brand name, a Concept, an Imagotype name, a second version, and chose 2 in X (modules).
 * **When**: The user goes to Home and then back to Brand Manual, and opens Logo.
 * **Then**: Every field still holds what was entered, and editing one of them keeps the others in the preview.
+
+### Scenario 19: Follow Section On by Default
+* **Given**: The user opens the Brand Manual page.
+* **When**: The user looks at the toolbar and opens Typography.
+* **Then**: Follow section offers On and Off, On is selected, and the Typography page comes first in the preview, as in Scenario 13.
+
+### Scenario 20: Follow Section Off
+* **Given**: Follow section is Off.
+* **When**: The user opens Typography.
+* **Then**: The preview still starts with the Cover and keeps its natural order; the Typography page has the accent outline; "5. Typography" stays fifth in the sections column.
+
+### Scenario 21: Switching Off While a Section Is Open
+* **Given**: Typography is open and its page is first in the preview.
+* **When**: The user chooses Off.
+* **Then**: Every page glides back to its natural order and every section to its place; Typography stays open. Choosing On again brings the Typography page and section back to the top.
+
+### Scenario 22: Follow Section Is Kept Between Pages
+* **Given**: Follow section is Off.
+* **When**: The user goes to Home and then back to Brand Manual.
+* **Then**: Follow section is still Off.

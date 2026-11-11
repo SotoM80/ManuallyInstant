@@ -536,3 +536,79 @@ describe('Brand Manual – Logo areas', () => {
     expect(featuredPages()).toEqual(['Brand concept']);
   });
 });
+
+// Spec: specs/brandmanual.md, Scenarios 19–22 — Follow Section (ADR 0032)
+describe('Brand Manual – follow section', () => {
+  const SECTIONS = ['1. Cover', '2. Logo', '3. Usage', '4. Colors', '5. Typography', '6. Skin', '7. Mockups'];
+
+  function openSection(name: string) {
+    fireEvent.click(within(getSections()).getByRole('button', { name }));
+  }
+
+  function follow(option: 'On' | 'Off') {
+    return within(screen.getByRole('group', { name: 'Follow section' })).getByRole('radio', { name: option });
+  }
+
+  function pageOrder() {
+    return within(getPreview())
+      .getAllByRole('article')
+      .map((page) => page.getAttribute('aria-label'));
+  }
+
+  function sectionOrder() {
+    return within(getSections())
+      .getAllByRole('heading', { level: 2 })
+      .map((heading) => heading.textContent);
+  }
+
+  function isMarked(page: string) {
+    return within(getPreview()).getByRole('article', { name: page }).closest('li')!.getAttribute('data-featured') === 'true';
+  }
+
+  it('is On by default, and the open section\'s page comes first (scenario 19)', () => {
+    renderApp('/brand-manual');
+    expect(within(screen.getByRole('group', { name: 'Follow section' })).getAllByRole('radio').map((radio) => radio.getAttribute('value'))).toEqual(['on', 'off']);
+    expect(follow('On')).toBeChecked();
+
+    openSection('5. Typography');
+
+    expect(pageOrder()[0]).toBe('Typography');
+  });
+
+  it('keeps the pages and sections in their natural order when Off, still marking the page (scenario 20)', () => {
+    renderApp('/brand-manual');
+    fireEvent.click(follow('Off'));
+
+    openSection('5. Typography');
+
+    expect(pageOrder()).toEqual(ALL_PAGES);
+    expect(sectionOrder()).toEqual(SECTIONS);
+    expect(isMarked('Typography')).toBe(true);
+    expect((document.querySelector('.brand-manual-page') as HTMLElement).style.getPropertyValue('--sections-offset')).toBe('');
+  });
+
+  it('puts everything back when switched Off with a section open, and moves it again when On (scenario 21)', () => {
+    renderApp('/brand-manual');
+    openSection('5. Typography');
+
+    fireEvent.click(follow('Off'));
+    expect(pageOrder()).toEqual(ALL_PAGES);
+    expect(sectionOrder()).toEqual(SECTIONS);
+    expect(within(getSections()).getByRole('button', { name: '5. Typography' })).toHaveAttribute('aria-expanded', 'true');
+
+    fireEvent.click(follow('On'));
+    expect(pageOrder()[0]).toBe('Typography');
+    expect(sectionOrder()[0]).toBe('5. Typography');
+  });
+
+  it('is kept when going Home and back (scenario 22)', () => {
+    renderApp('/brand-manual');
+    fireEvent.click(follow('Off'));
+
+    const menu = screen.getByRole('navigation');
+    fireEvent.click(within(menu).getByRole('link', { name: 'Home' }));
+    fireEvent.click(within(menu).getByRole('link', { name: 'Brand Manual' }));
+
+    expect(follow('Off')).toBeChecked();
+  });
+});

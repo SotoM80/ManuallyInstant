@@ -38,6 +38,8 @@ function App() {
   const [typography, setTypography] = useState<BrandFonts | null>(null)
   const [orientation, setOrientation] = useState<Orientation>('landscape')
   const [previewView, setPreviewView] = useState<PreviewView>('grid')
+  // The open section's pages come first, and the section beside them (ADR 0032)
+  const [followSection, setFollowSection] = useState(true)
   const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
   const [skin, setSkin] = useState<Skin>(NO_SKIN)
   const [mockups, setMockups] = useState<Mockups>(DEFAULT_MOCKUPS)
@@ -78,6 +80,8 @@ function App() {
                 cover={cover}
                 orientation={orientation}
                 onOrientationChange={setOrientation}
+                followSection={followSection}
+                onFollowSectionChange={setFollowSection}
                 previewView={previewView}
                 onPreviewViewChange={setPreviewView}
                 template={template}
