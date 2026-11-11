@@ -28,6 +28,8 @@ type ManualPreviewProps = {
   onPreviewViewChange: (view: PreviewView) => void
   template: TemplateId
   onTemplateChange: (template: TemplateId) => void
+  followSection?: boolean // On: the open section's pages come first (ADR 0032)
+  onFollowSectionChange?: (follow: boolean) => void
   pages?: string[] // the order to draw the pages in (the open section's pages may come first)
   featured?: string[] // pages moved to the top, marked so the user sees what they are editing
   guides?: Guides // guides clicked on the construction grid of the Clear space page
@@ -39,6 +41,12 @@ type ManualPreviewProps = {
 const ORIENTATIONS: { value: Orientation; label: string }[] = [
   { value: 'landscape', label: 'Landscape' },
   { value: 'portrait', label: 'Portrait' },
+]
+
+// Whether the open section's pages come first in the preview (specs/brandmanual.md, ADR 0032)
+const FOLLOW_OPTIONS: { value: boolean; label: string }[] = [
+  { value: true, label: 'On' },
+  { value: false, label: 'Off' },
 ]
 
 const VIEWS: { value: PreviewView; label: string }[] = [
@@ -63,6 +71,8 @@ export function ManualPreview({
   onPreviewViewChange,
   template,
   onTemplateChange,
+  followSection = true,
+  onFollowSectionChange = () => {},
   pages = MANUAL_PAGES,
   featured = [],
   guides,
@@ -133,6 +143,22 @@ export function ManualPreview({
                 onChange={() => withViewTransition(() => onTemplateChange(option.id))}
               />
               <span>{option.name}</span>
+            </label>
+          ))}
+        </fieldset>
+
+        <fieldset className="segmented-control">
+          <legend>Follow section</legend>
+          {FOLLOW_OPTIONS.map((option) => (
+            <label key={option.label}>
+              <input
+                type="radio"
+                name="follow-section"
+                value={option.label.toLowerCase()}
+                checked={followSection === option.value}
+                onChange={() => withViewTransition(() => onFollowSectionChange(option.value))}
+              />
+              <span>{option.label}</span>
             </label>
           ))}
         </fieldset>
