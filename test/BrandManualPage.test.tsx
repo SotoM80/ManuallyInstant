@@ -611,4 +611,25 @@ describe('Brand Manual – follow section', () => {
 
     expect(follow('Off')).toBeChecked();
   });
+
+  it('makes the sections column stay on the screen only while Off, on wide screens (scenarios 23–25)', () => {
+    renderApp('/brand-manual');
+    const root = document.querySelector('.brand-manual-page')!;
+    expect(root).toHaveAttribute('data-follow-section', 'on');
+
+    fireEvent.click(follow('Off'));
+    expect(root).toHaveAttribute('data-follow-section', 'off');
+
+    // The stylesheet: sticky and scrolling on its own, the preview no longer sticky (jsdom has no layout)
+    const css = jest.requireActual<typeof import('fs')>('fs').readFileSync(
+      `${__dirname}/../src/css/BrandManualPage.css`,
+      'utf8',
+    );
+    const block = css.slice(css.indexOf('@media (min-width: 901px)'));
+    expect(block).toMatch(/\[data-follow-section='off'\] > \.manual-sections \{[^}]*position: sticky;[^}]*overflow-y: auto;/);
+    expect(block).toMatch(/\[data-follow-section='off'\] > \.manual-preview \{\s*position: static;/);
+
+    fireEvent.click(follow('On'));
+    expect(root).toHaveAttribute('data-follow-section', 'on');
+  });
 });
