@@ -384,6 +384,28 @@
   }
 }
 
+/* Follow section Off, on wide screens (specs/brandmanual.md, ADR 0035): the sections column
+   stays on the screen, scrolling on its own when its form is taller, and the preview scrolls
+   with the page in every view. `>` keeps it off the PDF copy and the full screen view. */
+@media (min-width: 901px) {
+  .brand-manual-page[data-follow-section='off'] > .manual-sections {
+    position: sticky;
+    /* 8px of room inside, so the scroll does not clip the open section's shadow or the focus
+       rings; the forms still start 16px from the top of the screen */
+    top: 8px;
+    padding: 8px;
+    margin: -8px;
+    box-sizing: border-box;
+    max-height: calc(100vh - 16px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .brand-manual-page[data-follow-section='off'] > .manual-preview {
+    position: static;
+  }
+}
+
 /* Colors section: an accordion. Each color is a card; only the open one shows its fields,
    the others fold into their header row (chip, name, HEX) one under the other. */
 .palette-block {

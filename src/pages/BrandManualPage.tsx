@@ -188,7 +188,12 @@ export function BrandManualPage({
   // The form, the preview, full screen and the export share the profile values (specs/colorpalette.md)
   return (
     <CmykProvider hexes={paletteHexes}>
-      <div className="brand-manual-page" ref={pageRoot}>
+      <div
+        className="brand-manual-page"
+        ref={pageRoot}
+        // Off → the sections column stays on the screen and the preview scrolls (ADR 0035)
+        data-follow-section={followSection ? 'on' : 'off'}
+      >
         <ManualPreview
           cover={cover}
           logo={logo}
