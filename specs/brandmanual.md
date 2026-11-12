@@ -21,7 +21,7 @@ The content of the Logo section (it will have its own future spec). The content 
 
   Choosing an option changes the view immediately. It only changes how the preview looks, not the manual or the PDF.
 * **Template** (next to Preview view): A group labeled "Template" with three options: **Template 1** (default), **Template 2** and **Template 3**. It changes where the content sits on every page, immediately. See `templates.md`.
-* **Follow section** (after Template): a group labeled "Follow section" with two options, **On** (default) and **Off**. On: the open section's pages come first in the preview and the section moves beside them (see *The Open Section's Pages Come First*). Off: the pages and the sections always stay in their natural order. It only changes the order of the preview and of the sections column, never the manual, the Full screen view or the PDF. See ADR 0032.
+* **Follow section** (after Template): a group labeled "Follow section" with two options, **On** (default) and **Off**. On: the open section's pages come first in the preview and the section moves beside them (see *The Open Section's Pages Come First*). Off: the pages and the sections always stay in their natural order, and the sections column stays still on the screen while the pages scroll (see *Follow section Off*). It only changes the order of the preview and of the sections column, never the manual, the Full screen view or the PDF. See ADR 0032.
 * **Full screen** (after Follow section): a button that shows every page at the size of the screen, without the form. See `fullscreen.md`.
 * **Left column — Manual Preview**: A region labeled "Manual preview". It shows the manual's pages as small page thumbnails, in this order:
   1. **Cover**: shows the brand manual title with its style, the applied logo and "Designed by <name>", placed by the template (see `cover.md`). Each empty slot shows its placeholder: "Your brand manual title", "Your logo" and "Designed by …".
@@ -72,6 +72,7 @@ So the page being edited is always in view without scrolling. Everything below h
 * An Apply has nothing to do with the order: it only shows its waiting image.
 * With Cover open (as on start) nothing moves, because Cover is already first.
 * **Follow section Off**: no page and no section moves. The pages stay in their natural order (Cover first), the sections column keeps its order and is not pushed down, and the page is not scrolled. The open section's pages (in Logo and Usage, the main page of the area being worked in) still get the accent outline, so the user still sees which pages are being edited. Switching to Off while a section is open puts the pages and sections back in their natural order at once (they glide, as when folding); switching to On moves them as opening the section would.
+* **The sections column stays on the screen (Follow section Off)**: on wide screens (two columns), the sections column sticks to the screen, 16 px from its top, while the user scrolls the pages: it is as tall as the screen at most, and scrolls on its own when its content is taller (an open Logo or Skin). The preview scrolls with the page in every view (Grid, Overview and Pages), instead of sticking as it does with On. So the form stays where the user is working and the pages move beside it. Switching to On puts back the column and the preview as before. On narrow screens (one column) nothing sticks, as with On (ADR 0035).
 * **Logo areas**: the Logo section has four areas, each with its page: Concept → Brand concept, Anatomy → Anatomy, Versions → Logo versions, Clear space & size → Clear space. The area being worked in decides the **main page**: it comes first, with the accent outline, followed by the other Logo pages. An area becomes the one being worked in when the user clicks anywhere in it (a field, its title or an empty spot) or reaches it with the keyboard. Scrolling inside Logo does not change it, so the form and the preview never move at the same time. When Logo opens, Concept is the first one.
 * The open **section** moves too: it goes to the top of the right column (keeping its number, e.g. "5. Typography") and the column is pushed down so it starts at the same height as its page. The form and its page sit side by side. Folding it puts every section back in order. The sections glide like the pages. If the top of the column is above the screen when a section opens, the page scrolls smoothly up to it. On narrow screens (one column) the sections move but are not pushed down.
 
@@ -93,7 +94,7 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * The chosen orientation is kept when the user moves between pages. It is only reset (to Landscape) when the browser page is refreshed.
 * Every view always shows the same pages, in the same order, with the same orientation.
 * The chosen preview view is kept when the user moves between pages. It is only reset (to Grid) when the browser page is refreshed.
-* With Follow section Off, the preview and the sections column always keep their natural order, whatever section is open. The choice is kept when the user moves between pages, and reset (to On) when the browser page is refreshed.
+* With Follow section Off, the preview and the sections column always keep their natural order, whatever section is open; on wide screens the sections column stays on the screen and the preview scrolls. The choice is kept when the user moves between pages, and reset (to On) when the browser page is refreshed.
 
 ## Failure Modes
 * **Nothing typed yet**: The Cover shows the placeholders "Your brand manual title", "Your logo" and "Designed by …" instead of an empty page.
@@ -219,3 +220,18 @@ On screens narrower than `900px`, the two columns become one: the preview on top
 * **Given**: Follow section is Off.
 * **When**: The user goes to Home and then back to Brand Manual.
 * **Then**: Follow section is still Off.
+
+### Scenario 23: The Sections Column Stays on the Screen
+* **Given**: A wide screen, the Pages view, Follow section Off, and Typography open.
+* **When**: The user scrolls down to Mockups.
+* **Then**: The pages scroll by; the sections column, with the Typography form, stays 16 px from the top of the screen.
+
+### Scenario 24: A Tall Form Scrolls on Its Own
+* **Given**: Follow section Off and the Skin open, its form taller than the screen.
+* **When**: The user scrolls over the sections column.
+* **Then**: The column scrolls on its own and shows the rest of the form; it never goes past the bottom of the screen.
+
+### Scenario 25: Back to On
+* **Given**: Follow section Off, the sections column sticking.
+* **When**: The user chooses On.
+* **Then**: The column scrolls with the page again, and the preview sticks in Grid and Overview, as before.
