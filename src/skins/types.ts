@@ -42,6 +42,9 @@ export type Skin = {
   lines?: SkinLines
   // The footer of the inner pages (specs/footer.md, ADR 0031). Missing → not shown.
   footer?: SkinFooter
+  // The faint outline of the Color palette page's chips, set in the Colors section
+  // (specs/colorpalette.md, ADR 0034). Missing → on.
+  chipOutline?: boolean
 }
 
 // The sections whose pages can have a background of their own (the Skin section has no page)

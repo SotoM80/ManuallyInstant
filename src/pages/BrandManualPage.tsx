@@ -164,6 +164,8 @@ export function BrandManualPage({
     colors: (
       <ColorsForm
         onChange={onPaletteChange}
+        chipOutline={skin.chipOutline ?? true}
+        onChipOutlineChange={(on) => onSkinChange((prev) => ({ ...prev, chipOutline: on }))}
         draft={drafts.colors}
         onDraftChange={onDraftChange && ((draft) => onDraftChange('colors', draft))}
       />
