@@ -97,8 +97,7 @@ describe('Line spacing and lines – the templates\' CSS', () => {
     expect(widths).toEqual([
       'calc(1px * var(--line-technical, 1))', // clear space edge
       'calc(0.75px * var(--line-technical, 1))', // box around the logo
-      'calc(0.6px * var(--line-technical, 1))', // grid
-      'calc(1.2px * var(--line-technical, 1))', // logo outline
+      'calc(0.75px * var(--line-technical, 1))', // grid's edge and guide lines along the logo
       'calc(0.75px * var(--line-technical, 1))', // X marks
       'calc(0.75px * var(--line-technical, 1))', // rulers
       '8px', // the grab band of the guides
