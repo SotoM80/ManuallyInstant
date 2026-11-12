@@ -25,6 +25,9 @@ type ColorsFormProps = {
   // Optional owner of the form's fields (see useDraft)
   draft?: ColorsDraft
   onDraftChange?: (draft: ColorsDraft) => void
+  // The outline of the Color palette page's chips (kept in the Skin, ADR 0034); on by default
+  chipOutline?: boolean
+  onChipOutlineChange?: (on: boolean) => void
 }
 
 // Everything the form shows. `nextKey` is kept too: a row's key is its color's id in the
@@ -50,7 +53,13 @@ function newRow(key: number, rows: ColorRow[]): ColorRow {
 
 const NO_COLORS_DRAFT: ColorsDraft = { rows: [newRow(0, [])], openKey: 0, nextKey: 1 }
 
-export function ColorsForm({ onChange, draft: ownerDraft, onDraftChange }: ColorsFormProps) {
+export function ColorsForm({
+  onChange,
+  draft: ownerDraft,
+  onDraftChange,
+  chipOutline = true,
+  onChipOutlineChange = () => {},
+}: ColorsFormProps) {
   const [draft, update, current] = useDraft(NO_COLORS_DRAFT, ownerDraft, onDraftChange)
   const { rows, openKey } = draft
   const { valuesOf } = useCmyk()
@@ -200,6 +209,16 @@ export function ColorsForm({ onChange, draft: ownerDraft, onDraftChange }: Color
       >
         Add color
       </button>
+
+      {/* Only the page's chips: the form's own chips keep their look (specs/colorpalette.md) */}
+      <label className="skin-check palette-chip-outline">
+        <input
+          type="checkbox"
+          checked={chipOutline}
+          onChange={(event) => onChipOutlineChange(event.target.checked)}
+        />
+        Chip outline
+      </label>
     </form>
   )
 }

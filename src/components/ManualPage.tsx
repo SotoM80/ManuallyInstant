@@ -92,7 +92,14 @@ export function ManualPage({
       const kind = page === 'Correct use' ? 'correct' : 'incorrect'
       return <UsagePage kind={kind} examples={usage[kind]} logo={logo} cover={cover} orientation={orientation} color={textColor} />
     }
-    if (page === 'Color palette') return <ColorPalettePage palette={palette} color={textColor} emphasis={emphasis} />
+    if (page === 'Color palette') return (
+        <ColorPalettePage
+          palette={palette}
+          color={textColor}
+          emphasis={emphasis}
+          chipOutline={skin.chipOutline ?? true}
+        />
+      )
     if (page === 'Typography') return <TypographyPage fonts={typography} color={textColor} />
     if (page === 'Mockups') return <MockupsPage mockups={mockups} logo={logo} cover={cover} color={textColor} />
     if (!isCover) return <p className="manual-page-empty">Coming soon</p>

@@ -1032,6 +1032,11 @@
   gap: 8px;
 }
 
+/* Chip outline, under Add color in the Colors section */
+.palette-chip-outline {
+  margin-top: 12px;
+}
+
 /* Mockups section (specs/mockups.md): the products as checkboxes by group, then the settings of
    each ticked one (reusing the palette-block accordion) */
 .mockup-products {

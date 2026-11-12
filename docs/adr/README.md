@@ -44,3 +44,4 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0031](0031-page-numbers-and-footer-in-the-skin.md) | Page numbers and footer in the Skin, placed by the template | Accepted | 2026-11-11 |
 | [0032](0032-follow-section-can-be-turned-off.md) | Following the open section can be turned off | Accepted | 2026-11-11 |
 | [0033](0033-construction-grid-shows-only-guide-lines.md) | The construction grid shows only guide lines | Accepted | 2026-11-12 |
+| [0034](0034-color-chips-without-an-outline.md) | The color chips' outline can be turned off, from the Colors section | Accepted | 2026-11-12 |

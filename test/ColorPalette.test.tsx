@@ -259,3 +259,45 @@ describe('Color palette – navigation', () => {
     expect(page.getByText('Night')).toBeInTheDocument();
   });
 });
+
+// Spec: specs/colorpalette.md, Scenarios 15–16 — Chip outline (ADR 0034)
+describe('Color palette – chip outline', () => {
+  function getChipOutline() {
+    return within(getColorsForm()).getByRole('checkbox', { name: 'Chip outline' });
+  }
+
+  function getChipList() {
+    return getPalettePage().querySelector('.palette-colors')!;
+  }
+
+  it('is on by default, and turning it off removes the outline of the page chips only', () => {
+    renderApp();
+    pickBlue(1);
+    expect(getChipOutline()).toBeChecked();
+    expect(getChipList()).toHaveAttribute('data-chip-outline', 'true');
+
+    fireEvent.click(getChipOutline());
+
+    expect(getChipOutline()).not.toBeChecked();
+    expect(getChipList()).toHaveAttribute('data-chip-outline', 'false');
+    // The stylesheet takes the outline away from the page's chips only
+    const shared = jest.requireActual<typeof import('fs')>('fs').readFileSync(
+      `${__dirname}/../src/templates/shared.css`,
+      'utf8',
+    );
+    expect(shared).toMatch(/\.palette-colors\[data-chip-outline='false'\] \.palette-chip \{\s*box-shadow: none;/);
+  });
+
+  it('is kept when going Home and back, and brings the outline back when ticked', () => {
+    renderApp();
+    pickBlue(1);
+    fireEvent.click(getChipOutline());
+
+    fireEvent.click(screen.getByRole('link', { name: 'Home' }));
+    fireEvent.click(screen.getByRole('link', { name: 'Brand Manual' }));
+
+    expect(getChipOutline()).not.toBeChecked();
+    fireEvent.click(getChipOutline());
+    expect(getChipList()).toHaveAttribute('data-chip-outline', 'true');
+  });
+});

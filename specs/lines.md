@@ -47,7 +47,7 @@ After the **Image boxes** group and before **Layer gallery**, a group with the l
 |---|---|---|---|
 | Divider between the two columns (Template 3) | every page with two columns in Template 3, the Cover included | 1 px | Decorative lines |
 | Line between the two fonts (Template 3) | Typography | 1 px | Decorative lines |
-| Outline of each color chip | Color palette | 1 px | Decorative lines |
+| Outline of each color chip (unless **Chip outline** is off in Colors, `colorpalette.md`) | Color palette | 1 px | Decorative lines |
 | Edge of the clear space (dashed) | Clear space, 3.1 | 1 px | 1 px × Technical lines |
 | Box around the logo | Clear space, 3.1 | 0.75 px | 0.75 px × Technical lines |
 | Edge of the grid and guide lines along the logo | Clear space, 3.2 | 0.75 px | 0.75 px × Technical lines |

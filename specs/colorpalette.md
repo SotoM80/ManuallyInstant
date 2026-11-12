@@ -20,6 +20,7 @@ The form has one block per color, in order (Color 1, Color 2, …), then the but
 
 Under the blocks:
 * **Add color** button: adds a new block at the end. It is disabled when the palette has 6 colors.
+* **Chip outline**: a checkbox, on by default, with the look of the Skin's checkboxes (like **Outline** of Image boxes). It turns on or off the faint outline around every chip of the Color palette page (see below), at once (no Apply). It changes only the page: the small chips of the form's header rows keep their look. Its width stays the Skin's **Decorative lines** (`lines.md`); this box only says whether the outline is there (ADR 0034).
 
 The section has no Save button: every change reaches the preview at once.
 
@@ -60,7 +61,7 @@ The approximate values use the naive formula of ADR 0003: `K = 1 − max(R′, G
 | `#FFFFFF` | `255, 255, 255` | `0, 0, 0, 0` |
 
 ### Color palette page in the preview
-The page shows the heading **"Color palette"** and, for each color in order: a **chip** filled with the color, its **name**, and its values `HEX`, `RGB` and `CMYK ≈` (or `CMYK`, for a color with profile values). At the bottom, a small note: **"CMYK values are approximate"**, or **"CMYK values for ISO Coated v2 (ECI)"** (the server's profile name) when **every** color has profile values. The text uses the Skin's Page text color (Black until it is changed, see `skins.md`). The chip has a faint outline, so a color equal to the page background is still visible.
+The page shows the heading **"Color palette"** and, for each color in order: a **chip** filled with the color, its **name**, and its values `HEX`, `RGB` and `CMYK ≈` (or `CMYK`, for a color with profile values). At the bottom, a small note: **"CMYK values are approximate"**, or **"CMYK values for ISO Coated v2 (ECI)"** (the server's profile name) when **every** color has profile values. The text uses the Skin's Page text color (Black until it is changed, see `skins.md`). The chip has a faint outline, so a color equal to the page background is still visible; with **Chip outline** off it has none, and such a color blends into the page (the user's choice).
 
 Until the Colors section is touched, the page shows the placeholder `Your color palette`. A color with an empty name shows its label (`Color 1`, `Color 2`…) on the page.
 
@@ -90,6 +91,7 @@ Template 1               Template 2               Template 3
 * While a HEX is half typed or not valid, the page keeps the last valid color.
 * The page always shows the colors in the same order as the form.
 * The palette is kept when the user moves between pages; refreshing the browser clears it.
+* With Chip outline off, no chip of the Color palette page has an outline, in any template, view or PDF; it is kept between pages and back on after a refresh, like the palette.
 * Colors work the same in every template, orientation and preview view, and always stay inside the page.
 
 ## Failure Modes
@@ -168,3 +170,18 @@ No field is required. A wrong value is flagged on blur or Enter, with a red bord
 * **Given**: The app has a CMYK server address, but the server does not answer.
 * **When**: The user picks `#1E88E5`.
 * **Then**: The values stay `CMYK ≈ 87, 41, 0, 10`, the note says "CMYK values are approximate", and no error is shown.
+
+### Scenario 15: Chips Without an Outline
+* **Given**: The Colors section with Color 1 `#FFFFFF` on a white page; Chip outline on.
+* **When**: The user unticks **Chip outline**.
+* **Then**: The chips of the Color palette page lose their outline at once, in every template; the form's header chips do not change.
+
+### Scenario 16: The Outline Comes Back
+* **Given**: Chip outline off.
+* **When**: The user goes to Home and back to Brand Manual, then ticks Chip outline.
+* **Then**: Chip outline is still off on the way back, and once ticked every chip has its outline again, at the width of Decorative lines.
+
+### Scenario 17: The PDF Follows It
+* **Given**: Chip outline off.
+* **When**: The user makes both PDFs and opens the Full screen view.
+* **Then**: The chips have no outline in all of them.

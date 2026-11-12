@@ -7,6 +7,7 @@ type ColorPalettePageProps = {
   palette: PaletteColor[] | null // null → the Colors section is untouched, show the placeholder
   color: string // the Skin's Page text color
   emphasis?: ExportKind // in a PDF: print highlights CMYK, web highlights HEX and RGB (specs/export.md)
+  chipOutline?: boolean // the chips' faint outline, on unless turned off in Colors (ADR 0034)
 }
 
 type ValueRow = { key: 'hex' | 'rgb' | 'cmyk'; label: string }
@@ -22,7 +23,7 @@ const VALUE_ROWS: Record<ExportKind | 'preview', { rows: ValueRow[]; strong: Val
 }
 
 // Same markup for every template; the template's CSS decides how the colors are laid out.
-export function ColorPalettePage({ palette, color, emphasis }: ColorPalettePageProps) {
+export function ColorPalettePage({ palette, color, emphasis, chipOutline = true }: ColorPalettePageProps) {
   const { profile, valuesOf } = useCmyk()
   if (!palette) return <p className="manual-page-empty">Your color palette</p>
   const { rows, strong } = VALUE_ROWS[emphasis ?? 'preview']
@@ -34,7 +35,7 @@ export function ColorPalettePage({ palette, color, emphasis }: ColorPalettePageP
   return (
     <div className="palette-layout" style={{ color }} data-emphasis={emphasis}>
       <p className="palette-heading">Color palette</p>
-      <ul className="palette-colors" data-count={palette.length}>
+      <ul className="palette-colors" data-count={palette.length} data-chip-outline={chipOutline}>
         {palette.map((entry, index) => {
           const values = colorValues(entry.hex, cmykOf[index].cmyk)
           const cmykLabel = cmykOf[index].exact ? 'CMYK' : 'CMYK ≈'
