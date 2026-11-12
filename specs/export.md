@@ -134,7 +134,7 @@ The Apply buttons have nothing to do with the export: the PDF shows what the pre
 ### Scenario 11: The Clear Space Page Keeps Its Look
 * **Given**: The Clear space page shows the logo with its dashed frame, the grid drawn by the app and its measures in X.
 * **When**: A PDF is made.
-* **Then**: The page in the PDF looks like the preview: thin lines and a dashed frame in the Page text color, the faded logo visible through them, and the measures at their size, never filled in black.
+* **Then**: The page in the PDF looks like the preview: thin lines and a dashed frame in the Page text color, the logo at full strength between its guide lines, and the measures at their size, never filled in black.
 
 ### Scenario 12: Print PDF in CMYK
 * **Given**: The app has a CMYK server that answers; every section was touched; the title is "My Brand".

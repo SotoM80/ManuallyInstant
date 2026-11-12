@@ -39,7 +39,7 @@ After the **Image boxes** group and before **Layer gallery**, a group with the l
   Layer gallery ⌄
 ```
 
-**Why two units:** the decorative lines are all 1 px today, so their slider is their real width. The technical lines have several weights on purpose (the grid at 0.6 px is finer than the logo's outline at 1.2 px), so their slider multiplies each one and keeps those differences.
+**Why two units:** the decorative lines are all 1 px today, so their slider is their real width. The technical lines have several weights on purpose (the box around the logo in 3.1, at 0.75 px, is finer than the edge of its clear space, at 1 px), so their slider multiplies each one and keeps those differences.
 
 ### Which lines
 
@@ -50,8 +50,7 @@ After the **Image boxes** group and before **Layer gallery**, a group with the l
 | Outline of each color chip | Color palette | 1 px | Decorative lines |
 | Edge of the clear space (dashed) | Clear space, 3.1 | 1 px | 1 px × Technical lines |
 | Box around the logo | Clear space, 3.1 | 0.75 px | 0.75 px × Technical lines |
-| Grid of modules | Clear space, 3.2 | 0.6 px | 0.6 px × Technical lines |
-| Outline of the logo (dashed) | Clear space, 3.2 | 1.2 px | 1.2 px × Technical lines |
+| Edge of the grid and guide lines along the logo | Clear space, 3.2 | 0.75 px | 0.75 px × Technical lines |
 | X marks | Clear space, 3.2 | 0.75 px | 0.75 px × Technical lines |
 | Rulers (dimension lines) | Clear space, 3.2 | 0.75 px | 0.75 px × Technical lines |
 | Guides (dashed) | Clear space, 3.2 | 0.75 px | 0.75 px × Technical lines |
@@ -94,12 +93,12 @@ The lines keep their color (the Page text color, or the Cover's Text color on th
 ### Scenario 3: Thicker Technical Lines
 * **Given**: The Clear space page with the grid drawn by the app.
 * **When**: The user sets Technical lines to 200 %.
-* **Then**: The grid is 1.2 px, the logo's outline 2.4 px, the X marks, rulers and guides 1.5 px, the clear space edge 2 px and the box around the logo 1.5 px; the dashes keep their length; the dividers do not change.
+* **Then**: The grid's edge and guide lines, the X marks, rulers and guides 1.5 px, the clear space edge 2 px and the box around the logo 1.5 px; the dashes keep their length; the dividers do not change.
 
 ### Scenario 4: Thinner Technical Lines
 * **Given**: The Clear space page.
 * **When**: The user sets Technical lines to 50 %.
-* **Then**: The grid is 0.3 px and the logo's outline 0.6 px.
+* **Then**: The grid's edge and guide lines are 0.375 px and the clear space edge 0.5 px.
 
 ### Scenario 5: The Image Boxes Keep Their Own Outline
 * **Given**: Image boxes Outline on, Thickness 1 px.

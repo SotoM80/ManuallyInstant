@@ -488,8 +488,8 @@
   );
 }
 
-/* 3.2 drawn by the app: the logo under a grid of square modules (see ConstructionGrid).
-   Lines in the Typography color, thin at any size (non-scaling strokes). */
+/* 3.2 drawn by the app: the logo between four guide lines and the grid's edge (see
+   ConstructionGrid, ADR 0033). Lines in the Typography color, thin at any size (non-scaling strokes). */
 .construction-grid {
   position: absolute;
   inset: 6%;
@@ -498,26 +498,15 @@
   overflow: visible;
 }
 
-/* The logo is faded, so the grid over it can be read (as in printed manuals) */
-.construction-grid image {
-  opacity: 0.35;
-}
-
 .construction-grid :is(path, rect) {
   fill: none;
   stroke: currentColor;
   vector-effect: non-scaling-stroke;
 }
 
-.construction-grid-lines {
-  stroke-width: calc(0.6px * var(--line-technical, 1));
-  opacity: 0.45;
-}
-
-.construction-grid-logo {
-  stroke-width: calc(1.2px * var(--line-technical, 1));
-  stroke-dasharray: 3 2;
-  opacity: 0.9;
+.construction-grid-edges {
+  stroke-width: calc(0.75px * var(--line-technical, 1));
+  opacity: 0.6;
 }
 
 .construction-grid-x path {

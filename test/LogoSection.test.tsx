@@ -684,6 +684,25 @@ describe('Logo section – construction grid', () => {
     expect(grid).toHaveAttribute('data-modules', '16');
   });
 
+  it('draws only the edge and four guide lines along the logo, no modules, the logo at full strength (ADR 0033)', () => {
+    renderApp('/brand-manual');
+    uploadCoverLogo('cover.png');
+    clickApply();
+    openLogoSection();
+    type('Brand name', 'VOLTA');
+
+    const grid = within(getPage()).getByRole('img', { name: 'Generated construction grid' });
+    expect(grid.querySelector('.construction-grid-lines, .construction-grid-logo')).toBeNull();
+    const edges = grid.querySelector('.construction-grid-edges')!.getAttribute('d')!;
+    // The outer edge (one closed path) and the four lines: X from each side of the grid
+    expect(edges.match(/M/g)).toHaveLength(5);
+    const width = 16 + 2; // 16 modules and X = 1 on each side
+    expect(edges).toContain(`M1 0V`);
+    expect(edges).toContain(`M17 0V`);
+    expect(edges).toMatch(new RegExp(`M0 [\\d.]+H${width}M0 [\\d.]+H${width}$`));
+    expect(grid.querySelector('image')).not.toHaveStyle({ opacity: '0.35' });
+  });
+
   it('changes the density with Grid modules', () => {
     renderApp('/brand-manual');
     uploadCoverLogo('cover.png');

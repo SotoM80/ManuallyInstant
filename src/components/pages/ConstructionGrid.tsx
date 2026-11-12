@@ -37,13 +37,6 @@ function guideRuler(guides: number[], length: number, x: number, start: number):
   return { cuts, labels: cuts.slice(1).map((cut, i) => gapLabel(cut - cuts[i], x)) }
 }
 
-// Positions of the grid lines between 0 and `size`, one module apart, lined up with the
-// logo's box (which starts at `offset`), so a margin of 1.5 modules still meets a line
-function gridLines(size: number, offset: number) {
-  const first = offset - Math.floor(offset)
-  return Array.from({ length: Math.floor(size - first) + 1 }, (_, i) => first + i)
-}
-
 // Where a click falls on a band, in the band's own units (its box on screen maps linearly)
 function clickAt(event: MouseEvent<SVGRectElement>, axis: 'x' | 'y') {
   const band = event.currentTarget
@@ -53,9 +46,10 @@ function clickAt(event: MouseEvent<SVGRectElement>, axis: 'x' | 'y') {
     : Number(band.getAttribute('y')) + ((event.clientY - box.top) / (box.height || 1)) * Number(band.getAttribute('height'))
 }
 
-// 3.2 Construction grid, drawn by the app when none is uploaded: square modules fitted to
-// the visible part of the logo (its transparent margins are ignored), X of margin around
-// it, the logo's box in a dashed line, and X marked at the top. X is the same measure as the
+// 3.2 Construction grid, drawn by the app when none is uploaded: measured in square modules
+// fitted to the visible part of the logo (its transparent margins are ignored), with X of
+// margin around it. The modules are not drawn (ADR 0033): only the outer edge and four guide
+// lines along the logo's edges, crossing the grid like crop marks, and X marked at the top. X is the same measure as the
 // clear space of 3.1. Rulers above and beside it come from guides the user clicks, or from
 // typed steps. Everything is measured in modules, so the SVG scales to any page size.
 export function ConstructionGrid({
@@ -104,10 +98,13 @@ export function ConstructionGrid({
   const bottomY = height + 0.7 // where the overall width runs, under the grid
   const leftX = -0.7 // where the overall height runs, left of the grid
 
-  const lines = [
-    ...gridLines(width, margin).map((i) => `M${i} 0V${height}`),
-    ...gridLines(height, margin).map((j) => `M0 ${j}H${width}`),
-    `M0 0H${width}V${height}H0Z`, // the outer edge, even when it falls between lines
+  // The outer edge, then the four guide lines along the logo's edges, from edge to edge
+  const edges = [
+    `M0 0H${width}V${height}H0Z`,
+    `M${margin} 0V${height}`,
+    `M${margin + modules} 0V${height}`,
+    `M0 ${logoTop}H${width}`,
+    `M0 ${logoTop + logoHeight}H${width}`,
   ].join('')
 
   // A click on a band adds a guide there (snapped to half modules), or removes the one there
@@ -140,14 +137,7 @@ export function ConstructionGrid({
         {/* The grid, moved down to leave room for the top ruler */}
         <g transform={`translate(0 ${topRoom})`}>
           <image href={logo.url} {...image} preserveAspectRatio="none" />
-          <path className="construction-grid-lines" d={lines} />
-          <rect
-            className="construction-grid-logo"
-            x={margin}
-            y={logoTop}
-            width={modules}
-            height={logoHeight}
-          />
+          <path className="construction-grid-edges" d={edges} />
           {/* X, with a small dimension line in the top margin (the top ruler shows it instead) */}
           {!top && (
             <g className="construction-grid-x" aria-hidden="true">

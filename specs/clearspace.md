@@ -23,7 +23,7 @@ Detecting the shapes of the logo (circles, angles) or measuring its proportions 
 * **3.1 Clear space**: a diagram drawn in the same modules as the grid of 3.2: the visible part of the logo (its transparent margins are ignored), X of free room on every side, the dashed edge of that area and an "X" on each side. With a background on Version 1, the area inside the dashed edge is filled with it (see `imagebackground.md`); so is the box of 3.2. Then the sentence "The logo must always be surrounded by a free area… Its width is measured with the base unit X, which equals {Unit X}."
 * **3.2 Construction grid**: a fixed sentence about keeping the proportions, and one of these, in this order:
   1. The **uploaded** grid.
-  2. A grid **drawn by the app** over the Primary logo (the same image as 3.1): square modules fitted to the visible part of the logo (its transparent margins are ignored), *Grid modules* squares wide, with X of margin on every side. The logo is faded so the grid over it can be read. The logo's box is a dashed line, and X is marked with a small dimension line at the top. With rulers, a dimension line runs above the grid (Top ruler) and beside it (Side ruler), starting at the logo's edges: each step is drawn `value × X` long with its label ("X", "1.5X"), and a faint dashed guide crosses the grid at every step. Changing X makes the rulers grow or shrink with it. A ruler longer than the grid is still drawn whole.
+  2. A grid **drawn by the app** over the Primary logo (the same image as 3.1): measured in square modules fitted to the visible part of the logo (its transparent margins are ignored), *Grid modules* modules wide, with X of margin on every side. The modules themselves are not drawn, so the page stays clean (ADR 0033): only the grid's outer edge and **four guide lines** along the logo's edges (two vertical, two horizontal), each crossing the whole grid from edge to edge, like crop marks. The X of margin reads on every side, between the edge and the guide lines. The logo is shown at full strength, and X is marked with a small dimension line at the top. With rulers, a dimension line runs above the grid (Top ruler) and beside it (Side ruler), starting at the logo's edges: each step is drawn `value × X` long with its label ("X", "1.5X"), and a faint dashed guide crosses the grid at every step. Changing X makes the rulers grow or shrink with it. A ruler longer than the grid is still drawn whole.
   * **Guides with a click**: a faint band runs above the grid and another beside it. Clicking a band adds a guide there (snapped to half modules), and the ruler of that side then measures the logo from edge to edge, cut at every guide, each gap labelled in X (e.g. `3X 3X 6X`). Clicking a guide removes it. Guides stay on the same part of the logo when X changes; only their labels change. On a side with guides, they replace the typed ruler. Guides are not part of the Logo form: they are kept with the rest of the manual, so they survive moving to another page and back, and only go when the browser page is refreshed.
   * **Overall size**: below the grid, the logo's width in X; on its left, its height in X (rounded to two decimals, e.g. `8.57X`). Always shown with the drawn grid, and they follow X. Lines use the Skin's Page text color.
   3. A striped placeholder box, when there is no logo at all.
@@ -83,12 +83,12 @@ No field is required. A wrong value is flagged at once, with a red border, and t
 ### Scenario 6: Grid Drawn by the App
 * **Given**: A Cover logo is applied and no grid is uploaded.
 * **When**: The user looks at the page.
-* **Then**: 3.2 shows the logo under a grid 16 modules wide, fitted to the drawn part of the logo, with one module of margin and X marked at the top.
+* **Then**: 3.2 shows the logo at full strength between four guide lines along its drawn part, with one module of a 16-module grid (X) between them and the outer edge, X marked at the top, and no module lines.
 
 ### Scenario 7: Grid Density
 * **Given**: 3.2 shows the grid drawn by the app.
 * **When**: The user chooses **24** in Grid modules.
-* **Then**: The grid is 24 modules wide at once, and the logo keeps its size on the page.
+* **Then**: X is one twenty-fourth of the logo's width at once (the margin between the guide lines and the edge shrinks), and the logo keeps its size on the page.
 
 ### Scenario 8: The Uploaded Grid Wins
 * **Given**: 3.2 shows the grid drawn by the app.
