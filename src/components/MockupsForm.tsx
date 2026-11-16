@@ -20,6 +20,7 @@ import {
   extraPhotos,
   mockupLogo,
   moveExtra,
+  moveToOwnPage,
   ownPagePhotos,
   parseVersionValue,
   placeNewMockup,
@@ -337,6 +338,9 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                         Photo
                       </span>
                     )}
+                    {extraPageOf(mockups, item.id) !== null && (
+                      <span className="mockup-tag">{extraMockupsPage(extraPageOf(mockups, item.id) ?? 1)}</span>
+                    )}
                   </label>
                 )
               })}
@@ -411,6 +415,21 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
               <div className="palette-block-inner">
                 {/* Composing a photo mockup costs: only the open block draws its preview */}
                 {item.kind === 'photo' && isOpen && photoSettings(item, settings, shown)}
+                {item.kind === 'photo' && (
+                  <button
+                    type="button"
+                    className="palette-secondary-button"
+                    disabled={extraPhotos(mockups).length >= MAX_EXTRA}
+                    onClick={() => {
+                      const moved = moveToOwnPage(mockups, item.id)
+                      onChange(moved)
+                      setExtraOpen(true)
+                      setPlacedNote(`Moved to ${extraMockupsPage(extraPageOf(moved, item.id) ?? 1)}.`)
+                    }}
+                  >
+                    Move to a page of its own
+                  </button>
+                )}
                 <SkinColorField
                   label={`${item.name} ${item.colorLabel.toLowerCase()}`}
                   value={settings.color}
@@ -486,16 +505,20 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                           ))}
                         </select>
                       </div>
-                      <label className="skin-check">
-                        <input
-                          type="checkbox"
-                          aria-label={`${template.name} on a page of its own`}
-                          checked={ownPagePhotos(mockups).includes(template.id)}
-                          onChange={(event) => onChange(setOwnPage(mockups, template.id, event.target.checked))}
-                        />
-                        Own page
-                        <span className="logo-form-hint"> ({extraMockupsPage(extraPageOf(mockups, template.id) ?? 1)})</span>
-                      </label>
+                      {layout.cols * layout.rows === 1 ? (
+                        <p className="logo-form-hint">On {extraMockupsPage(extraPageOf(mockups, template.id) ?? 1)}.</p>
+                      ) : (
+                        <label className="skin-check">
+                          <input
+                            type="checkbox"
+                            aria-label={`${template.name} on a page of its own`}
+                            checked={ownPagePhotos(mockups).includes(template.id)}
+                            onChange={(event) => onChange(setOwnPage(mockups, template.id, event.target.checked))}
+                          />
+                          Own page
+                          <span className="logo-form-hint"> ({extraMockupsPage(extraPageOf(mockups, template.id) ?? 1)})</span>
+                        </label>
+                      )}
                       {/* With a logo, it is placed like on any photo mockup */}
                       {extraOpen && version !== 'none' ? (
                         photoSettings(template, settings, shown)
@@ -579,8 +602,8 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                 <output htmlFor="mockup-extra-margin">{layout.margin}%</output>
               </div>
               <p className="logo-form-hint">
-                1 × 1 gives each photo a page of its own; with a larger grid, tick Own page on a photo to give
-                it a whole page.
+                1 × 1 gives each photo a page of its own. With a larger grid, Own page on a photo gives it a
+                whole page.
               </p>
             </div>
           </div>

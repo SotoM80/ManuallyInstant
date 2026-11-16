@@ -8,6 +8,7 @@ import {
   extraPagePhotos,
   mockupLogo,
   moveExtra,
+  moveToOwnPage,
   pagesWith,
   parseVersionValue,
   placeNewMockup,
@@ -87,6 +88,17 @@ describe('the extra pages', () => {
     // Unticked, A and B share a page again; removed, it is no longer on its own
     expect(extraPagePhotos(setOwnPage(own, 'A', false), 1)).toEqual(['A', 'B']);
     expect(removeExtra(own, 'A').extraOwn).toEqual([]);
+  });
+
+  it('sends a photo ticked on the Mockups page back to a page of its own (scenario 43)', () => {
+    const three: Mockups = { chosen: ['a', 'b', 'c'], settings: {}, extra: ['A', 'B'] };
+    const ticked = toggleMockup(three, 'A', [...ORDER, 'A', 'B']);
+    expect(ticked.chosen).toContain('A');
+    expect(ticked.extra).toEqual(['B']);
+    const moved = moveToOwnPage(setExtraLayout(ticked, { cols: 2 }), 'A');
+    expect(moved.chosen).not.toContain('A');
+    expect(moved.extra).toEqual(['B', 'A']);
+    expect([1, 2].map((page) => extraPagePhotos(moved, page))).toEqual([['B'], ['A']]);
   });
 
   it('keeps the grid and the margin inside their limits', () => {

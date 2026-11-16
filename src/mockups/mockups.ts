@@ -110,6 +110,17 @@ export function extraPageOf(mockups: Mockups, id: string): number | null {
   return index < 0 ? null : index + 1
 }
 
+// Takes a photo off the Mockups page and gives it a page of its own, after the other extra pages
+export function moveToOwnPage(mockups: Mockups, id: string): Mockups {
+  if (extraPhotos(mockups).length >= MAX_EXTRA) return mockups
+  const moved = {
+    ...mockups,
+    chosen: mockups.chosen.filter((other) => other !== id),
+    extra: [...extraPhotos(mockups).filter((other) => other !== id), id],
+  }
+  return setOwnPage(moved, id, true)
+}
+
 export function setOwnPage(mockups: Mockups, id: string, own: boolean): Mockups {
   const others = ownPagePhotos(mockups).filter((other) => other !== id)
   return { ...mockups, extraOwn: own ? [...others, id] : others }

@@ -69,14 +69,14 @@ The logo keeps its proportions and is centered in its box (`xMidYMid meet`).
 
 ### More pages (ADR 0036)
 Photos that do not fit on the Mockups page go to **extra mockup pages**, after it: `Mockups 2`, `Mockups 3`…
-* **How a photo gets there**: Use now in the template editor, for a **new** template (uploaded or generated), when at least one mockup is already ticked. With none ticked, it is ticked on the Mockups page. A photo can still be ticked by hand onto the Mockups page, while it has room. A note under the upload says which page it went to: `Added to Mockups 2.`
+* **How a photo gets there**: Use now in the template editor, for a **new** template (uploaded or generated), when at least one mockup is already ticked. With none ticked, it is ticked on the Mockups page. A photo can still be ticked by hand onto the Mockups page, while it has room; there, its block has **Move to a page of its own**, which unticks it and puts it last on the extra pages, with Own page on. In the products list, a photo of the extra pages shows its page (`Mockups 2`). A note under the upload says which page it went to: `Added to Mockups 2.`
 * **Up to 24** photos on the extra pages; with 24, Use now adds the template to the list only, and the note says `The extra pages are full (24 photos).`
 * A photo is on the Mockups page or on an extra page, never both: **ticking** a photo of an extra page in the list moves it to the Mockups page. **Remove** takes it off its extra page; its template stays in the list.
 
 **The More pages block** in the section, under the settings of the ticked products, only when there is at least one extra photo. A folded block like the others, titled **More pages**, with:
 * The photos, in their order: a small picture, the name, the **Logo** select (with **No logo**, its default here), **Edit template**, **Move up** / **Move down**, and **Remove**.
 * **Columns** (1–3) and **Rows** (1–3), default 1 × 1: each photo takes a page of its own. With 2 × 2, four photos share a page.
-* **Own page** (a checkbox on each photo, off by default, with the photo's page beside it): that photo takes a whole page by itself, whatever the grid. The other photos keep filling the grid in order; a grid page is cut short by a photo on its own page, and the next photos start a new one.
+* **Own page** (a checkbox on each photo, off by default, with the photo's page beside it; shown only with a grid of more than one cell, since at 1 × 1 every photo has a page already, and the photo's page is shown instead): that photo takes a whole page by itself, whatever the grid. The other photos keep filling the grid in order; a grid page is cut short by a photo on its own page, and the next photos start a new one.
 * **Margin**: 0–20 % of the page width, step 1, default 8 % (the margin of every inner page). At 0 % the photos reach the edge of the page.
 * Grid and margin are the same for every extra page. Everything is live.
 
@@ -379,6 +379,11 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **Given**: An uploaded photo whose file name is longer than the sections column is wide.
 * **When**: It is on the extra pages.
 * **Then**: Its name in the More pages block wraps onto more lines and stays inside the column.
+
+### Scenario 43: Back to a Page of Its Own
+* **Given**: Photo A was on an extra page, and the user ticked it in the products list, so it is on the Mockups page.
+* **When**: The user clicks Move to a page of its own in A's block.
+* **Then**: A is unticked and is on the last extra page, alone, with Own page on; the section shows "Moved to Mockups N.".
 
 ### Scenario 39: In the PDF
 * **Given**: Two photos on the extra pages, 1 × 1.
