@@ -174,8 +174,10 @@ export function TemplateEditor({ template, logo, onSave, onClose }: TemplateEdit
   // The template as it is now, ready to use or to preview
   function build(): PhotoTemplate | null {
     if (!photo || !mask) return null
-    if (selectedShare(mask) === 0) {
-      setMessage('Select the product first: click it with the magic wand.')
+    // Only a product that can be tinted needs its selection: a photo that already carries the
+    // logo is used as it is (ADR 0036)
+    if (tintable && selectedShare(mask) === 0) {
+      setMessage('Select the product first: click it with the magic wand, or untick "The product can be tinted".')
       return null
     }
     const area = gridBounds(grid)

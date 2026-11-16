@@ -3,7 +3,8 @@ import { renderApp } from './renderApp';
 import { loadEditorMask, loadEditorPhoto, maskToDataUrl } from '../src/mockups/editorImage';
 import { renderPhotoMockup } from '../src/mockups/render/renderPhotoMockup';
 import { emptyMask } from '../src/mockups/selection';
-import { mockupCatalog, resetSessionTemplates } from '../src/mockups/catalog';
+import { mockupCatalog, resetSessionTemplates, savePhotoTemplate } from '../src/mockups/catalog';
+import type { PhotoTemplate } from '../src/mockups/types';
 
 // Spec: specs/mockups.md, The template editor. The canvas parts are mocked (jsdom draws nothing):
 // a 10 × 10 photo, white in the middle (the product) on gray.
@@ -157,10 +158,12 @@ describe('Template editor', () => {
     expect(undo).toBeDisabled();
   });
 
-  it('opens an uploaded photo as a new template, and ticks it once used (scenario 23)', async () => {
+  it('opens an uploaded photo as a new template, and ticks it once used with no mockup ticked (scenario 23)', async () => {
     renderApp();
     const form = openMockups();
-    fireEvent.click(within(form).getByRole('checkbox', { name: 'Mug' })); // room for a new one
+    // With no mockup ticked, a new photo is ticked on the Mockups page (otherwise: a new page)
+    for (const name of ['Business card', 'T-shirt', 'Mug'])
+      fireEvent.click(within(form).getByRole('checkbox', { name: new RegExp(`^${name}$`) }));
     const file = new File(['x'], 'tote bag.jpg', { type: 'image/jpeg' });
     await act(async () => {
       fireEvent.change(within(form).getByLabelText('Upload your own photo'), { target: { files: [file] } });
@@ -171,6 +174,69 @@ describe('Template editor', () => {
     clickPhoto(editor, 4, 4);
     fireEvent.click(within(editor).getByRole('button', { name: 'Use now' }));
     expect(within(form).getByRole('checkbox', { name: /^tote bag/ })).toBeChecked();
+  });
+
+  async function uploadAndUse(form: HTMLElement, name: string) {
+    const file = new File(['x'], name, { type: 'image/jpeg' });
+    await act(async () => {
+      fireEvent.change(within(form).getByLabelText('Upload your own photo'), { target: { files: [file] } });
+    });
+    const editor = screen.getByRole('dialog', { name: 'Template editor' });
+    await within(editor).findByLabelText('Photo: click the product to select it', {}, { timeout: 5000 });
+    return editor;
+  }
+
+  it('puts a photo on a new page when mockups are already ticked, with no selection and no logo (scenario 33)', async () => {
+    renderApp();
+    const form = openMockups();
+    const editor = await uploadAndUse(form, 'poster.jpg');
+    // An uploaded photo starts untinted: no selection needed
+    expect(within(editor).getByRole('checkbox', { name: 'The product can be tinted' })).not.toBeChecked();
+    fireEvent.click(within(editor).getByRole('button', { name: 'Use now' }));
+
+    expect(screen.queryByRole('dialog', { name: 'Template editor' })).not.toBeInTheDocument();
+    expect(within(form).getByText('Added to Mockups 2.')).toHaveAttribute('role', 'status');
+    const page = screen.getAllByRole('article', { name: 'Mockups 2' })[0];
+    expect(await within(page).findByRole('img', { name: 'poster mockup' })).toBeInTheDocument();
+    expect(page.querySelector('.photo-mockup-placeholder')).toBeNull();
+    expect(screen.getByText('11. Mockups 2')).toBeInTheDocument();
+    // The four mockups stay on the Mockups page
+    for (const name of ['Business card', 'T-shirt', 'Mug'])
+      expect(within(form).getByRole('checkbox', { name: new RegExp(`^${name}$`) })).toBeChecked();
+    // The More pages block lists it, with No logo
+    expect(within(form).getByRole('button', { name: 'More pages' })).toHaveAttribute('aria-expanded', 'true');
+    expect(within(form).getByRole('combobox', { name: 'poster logo' })).toHaveValue('none');
+  });
+
+  it('shares a page between photos with a grid, and removes one (scenarios 34 and 37)', async () => {
+    renderApp();
+    const form = openMockups();
+    for (const name of ['one.jpg', 'two.jpg']) {
+      const editor = await uploadAndUse(form, name);
+      fireEvent.click(within(editor).getByRole('button', { name: 'Use now' }));
+    }
+    expect(screen.getAllByRole('article', { name: 'Mockups 3' }).length).toBeGreaterThan(0);
+    fireEvent.change(within(form).getByLabelText('Columns'), { target: { value: '2' } });
+    expect(screen.queryByRole('article', { name: 'Mockups 3' })).not.toBeInTheDocument();
+    const page = screen.getAllByRole('article', { name: 'Mockups 2' })[0];
+    await waitFor(() => expect(within(page).getAllByRole('img')).toHaveLength(2));
+
+    fireEvent.click(within(form).getByRole('button', { name: 'Remove one' }));
+    fireEvent.click(within(form).getByRole('button', { name: 'Remove two' }));
+    expect(screen.queryByRole('article', { name: 'Mockups 2' })).not.toBeInTheDocument();
+    expect(within(form).queryByRole('button', { name: 'More pages' })).not.toBeInTheDocument();
+  }, 60000); // two photos through the editor
+
+  it('gives an uploaded photo an id no other template has (scenario 40)', async () => {
+    // As after leaving the page and coming back: a template of this session is already listed
+    const first = mockupCatalog().find((item) => item.kind === 'photo') as PhotoTemplate;
+    savePhotoTemplate({ ...first, id: 'upload-1', name: 'first' });
+    renderApp();
+    const form = openMockups();
+    const editor = await uploadAndUse(form, 'second.jpg');
+    fireEvent.click(within(editor).getByRole('button', { name: 'Use now' }));
+    expect(mockupCatalog().find((item) => item.id === 'upload-1')?.name).toBe('first');
+    expect(mockupCatalog().find((item) => item.id === 'upload-2')?.name).toBe('second');
   });
 
   it('refuses a file that is not a JPG or PNG photo up to 10 MB (scenario 24)', () => {

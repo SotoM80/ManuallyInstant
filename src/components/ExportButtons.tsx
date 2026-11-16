@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ExportPages } from './ExportPages'
 import type { ManualData } from './ManualPage'
-import { MANUAL_PAGES } from '../data/manualSections'
+import { pagesWith } from '../mockups/mockups'
 import { checkServer, CmykServerError } from '../export/cmykClient'
 import { cmykServerUrl } from '../export/cmykServerUrl'
 import { createCmykPdf, createPdf } from '../export/createPdf'
@@ -167,7 +167,7 @@ export function ExportButtons({ orientation, template, guides, ...data }: Export
           disabled={job !== null}
           onClick={() => ask(button.kind)}
         >
-          {job?.kind === button.kind ? progressLabel(step, MANUAL_PAGES.length) : button.label}
+          {job?.kind === button.kind ? progressLabel(step, pagesWith(data.mockups).length) : button.label}
         </button>
       ))}
 

@@ -4,6 +4,7 @@ type MockupArtProps = {
   product: MockupProduct
   color: string // the product's color, "#RRGGBB"
   logo: { url: string } | null // null → a dashed box where the logo goes
+  placeholder?: boolean // false → no dashed box either: No logo (ADR 0036)
   decorative?: boolean // a small drawing next to its name (the form): hidden from screen readers
 }
 
@@ -23,7 +24,7 @@ function opacity(part: MockupPart) {
 
 // One product with the logo on it, drawn from its data (see specs/mockups.md and ADR 0013).
 // Every color and opacity is an attribute, so the PDF copy draws it as is (ADR 0012).
-export function MockupArt({ product, color, logo, decorative = false }: MockupArtProps) {
+export function MockupArt({ product, color, logo, placeholder = true, decorative = false }: MockupArtProps) {
   const [width, height] = product.viewBox
   const box = product.logo
   const turn = box.rotate ? `rotate(${box.rotate} ${box.x + box.width / 2} ${box.y + box.height / 2})` : undefined
@@ -57,7 +58,7 @@ export function MockupArt({ product, color, logo, decorative = false }: MockupAr
             preserveAspectRatio="xMidYMid meet"
           />
         ) : (
-          <rect
+          placeholder && <rect
             className="mockup-logo-placeholder"
             x={box.x}
             y={box.y}

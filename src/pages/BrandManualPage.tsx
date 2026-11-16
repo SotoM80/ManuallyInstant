@@ -14,7 +14,7 @@ import { ExportButtons } from '../components/ExportButtons'
 import { CmykProvider } from '../components/CmykProvider'
 import { NO_SKIN } from '../skins/presets'
 import { ManualPreview } from '../components/ManualPreview'
-import { MANUAL_SECTIONS, SECTION_AREAS, SECTION_PAGES, orderPages } from '../data/manualSections'
+import { MANUAL_SECTIONS, SECTION_AREAS, SECTION_PAGES, manualPages, orderPages } from '../data/manualSections'
 import { NO_USAGE } from '../data/usageOptions'
 import { useAlignOpenSection } from '../utils/useAlignOpenSection'
 import type { Guides } from '../utils/guides'
@@ -23,7 +23,7 @@ import { useReorderGlide } from '../utils/useReorderGlide'
 import type { TemplateId } from '../templates'
 import type { Skin } from '../skins/types'
 import { MockupsForm } from '../components/MockupsForm'
-import { DEFAULT_MOCKUPS } from '../mockups/mockups'
+import { DEFAULT_MOCKUPS, extraPageCount } from '../mockups/mockups'
 import type { Mockups } from '../mockups/types'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView, UsageData } from '../types'
 import '../css/BrandManualPage.css'
@@ -98,7 +98,13 @@ export function BrandManualPage({
   // In a section with areas (Logo, Usage), the area being worked in decides which of its pages is
   // the main one; each section starts on its first area every time it opens
   const [area, setArea] = useState('')
-  const sectionPages = openSection ? SECTION_PAGES[openSection] : []
+  // The extra mockup pages belong to the Mockups section (ADR 0036)
+  const extraCount = extraPageCount(mockups)
+  const sectionPages = !openSection
+    ? []
+    : openSection === 'mockups'
+      ? manualPages(extraCount).filter((page) => page.startsWith('Mockups'))
+      : SECTION_PAGES[openSection]
   const areas = openSection ? SECTION_AREAS[openSection] : undefined
   const mainPage = areas ? areas.pages[area] ?? areas.pages[areas.first] : sectionPages[0]
   const featured = mainPage ? [mainPage, ...sectionPages.filter((page) => page !== mainPage)] : []
@@ -206,7 +212,7 @@ export function BrandManualPage({
           onPreviewViewChange={onPreviewViewChange}
           template={template}
           onTemplateChange={onTemplateChange}
-          pages={followSection ? orderPages(featured) : orderPages([])}
+          pages={followSection ? orderPages(featured, extraCount) : orderPages([], extraCount)}
           followSection={followSection}
           onFollowSectionChange={onFollowSectionChange}
           featured={mainPage ? [mainPage] : []}

@@ -11,9 +11,22 @@ import { ROTATION_LIMIT, SIZE_LIMITS, dragPlacement } from '../mockups/geometry'
 import { areaGrid, clampOnGrid, logoOutline, surfaceSize } from '../mockups/warp'
 import {
   DEFAULT_PLACEMENT,
+  EXTRA_LIMITS,
+  MAX_EXTRA,
   MAX_MOCKUPS,
   chosenVersion,
+  extraLayout,
+  extraPageOf,
+  extraPhotos,
   mockupLogo,
+  moveExtra,
+  moveToOwnPage,
+  ownPagePhotos,
+  parseVersionValue,
+  placeNewMockup,
+  removeExtra,
+  setExtraLayout,
+  setOwnPage,
   setMockupBlend,
   setMockupColor,
   setMockupPlacement,
@@ -21,7 +34,9 @@ import {
   settingsFor,
   toggleMockup,
   versionOptions,
+  versionValue,
 } from '../mockups/mockups'
+import { extraMockupsPage } from '../data/manualSections'
 import { keepInPlace } from '../utils/scrollAnchor'
 import type { MockupItem, MockupSettings, Mockups, Placement, PhotoTemplate } from '../mockups/types'
 import type { CoverData, LogoData, PaletteColor } from '../types'
@@ -150,6 +165,11 @@ function PlacementPreview({
   )
 }
 
+// The whole numbers from min to max
+function range({ min, max }: { min: number; max: number }) {
+  return Array.from({ length: max - min + 1 }, (_, i) => min + i)
+}
+
 // A photo the user can upload to make their own template (see specs/mockups.md)
 const PHOTO_TYPES = ['image/jpeg', 'image/png']
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024
@@ -159,7 +179,8 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
   const [openId, setOpenId] = useState<string | null>(null) // null → every block folded
   const [editing, setEditing] = useState<PhotoTemplate | null>(null) // the template in the editor
   const [uploadError, setUploadError] = useState('')
-  const uploads = useRef(0)
+  const [placedNote, setPlacedNote] = useState('') // where Use now put a new photo (ADR 0036)
+  const [extraOpen, setExtraOpen] = useState(false) // the More pages block
 
   // An uploaded photo opens the editor as a new template of this session
   function upload(file: File | undefined) {
@@ -172,12 +193,17 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
     openPhoto(URL.createObjectURL(file), file.name.replace(/\.[^.]+$/, ''))
   }
 
-  // An uploaded or a generated photo: the same new template of this session, in the editor
+  // An uploaded or a generated photo: the same new template of this session, in the editor.
+  // Its id is the first one free in the list, so a form mounted again never reuses one. It starts
+  // untinted: the user's own photo often has its colors and its logo already, and Use now then
+  // needs no selection (ADR 0036).
   function openPhoto(image: string, name: string) {
-    uploads.current += 1
+    let n = 1
+    while (catalog.some((item) => item.id === `upload-${n}`)) n += 1
+    setPlacedNote('')
     setEditing({
       kind: 'photo',
-      id: `upload-${uploads.current}`,
+      id: `upload-${n}`,
       name: name || 'My photo',
       group: 'apparel',
       image,
@@ -186,22 +212,37 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
       area: { x: 0, y: 0, width: 0, height: 0 }, // placed by the editor
       color: '#FFFFFF',
       colorLabel: 'Product color',
-      tintable: true,
+      tintable: false,
     })
   }
 
-  // "Use now": the template joins the list for this session; a new one is ticked if there is room
+  // "Use now": the template joins the list for this session; a new one goes to a new extra mockup
+  // page when mockups are already ticked, otherwise it is ticked (ADR 0036)
   function useTemplate(template: PhotoTemplate) {
     const isNew = !catalog.some((item) => item.id === template.id)
     savePhotoTemplate(template)
     setEditing(null)
-    if (isNew && !mockups.chosen.includes(template.id) && mockups.chosen.length < MAX_MOCKUPS) {
-      onChange(toggleMockup(mockups, template.id))
+    if (!isNew) return
+    const placed = placeNewMockup(mockups, template)
+    onChange(placed.mockups)
+    if (placed.place === 'page') {
       setOpenId(template.id)
+      setPlacedNote('')
+    } else if (placed.place === 'extra') {
+      const page = extraPageOf(placed.mockups, template.id) ?? 1
+      setPlacedNote(`Added to ${extraMockupsPage(page)}.`)
+      setExtraOpen(true)
+    } else {
+      setPlacedNote(`The extra pages are full (${MAX_EXTRA} photos).`)
     }
   }
   const full = mockups.chosen.length >= MAX_MOCKUPS
   const options = versionOptions(logo)
+  // The photos of the extra pages, and their grid and margin (ADR 0036)
+  const extra = extraPhotos(mockups)
+    .map((id) => catalog.find((item) => item.id === id))
+    .filter((item) => item?.kind === 'photo')
+  const layout = extraLayout(mockups)
 
   // Ticking a product opens its block (and folds the open one)
   function toggle(id: string) {
@@ -297,6 +338,9 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                         Photo
                       </span>
                     )}
+                    {extraPageOf(mockups, item.id) !== null && (
+                      <span className="mockup-tag">{extraMockupsPage(extraPageOf(mockups, item.id) ?? 1)}</span>
+                    )}
                   </label>
                 )
               })}
@@ -324,6 +368,11 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
       {uploadError && (
         <p className="export-message" role="alert">
           {uploadError}
+        </p>
+      )}
+      {placedNote && (
+        <p className="logo-form-hint" role="status">
+          {placedNote}
         </p>
       )}
       <GeneratePhotoPanel onPhoto={openPhoto} />
@@ -366,6 +415,21 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
               <div className="palette-block-inner">
                 {/* Composing a photo mockup costs: only the open block draws its preview */}
                 {item.kind === 'photo' && isOpen && photoSettings(item, settings, shown)}
+                {item.kind === 'photo' && (
+                  <button
+                    type="button"
+                    className="palette-secondary-button"
+                    disabled={extraPhotos(mockups).length >= MAX_EXTRA}
+                    onClick={() => {
+                      const moved = moveToOwnPage(mockups, item.id)
+                      onChange(moved)
+                      setExtraOpen(true)
+                      setPlacedNote(`Moved to ${extraMockupsPage(extraPageOf(moved, item.id) ?? 1)}.`)
+                    }}
+                  >
+                    Move to a page of its own
+                  </button>
+                )}
                 <SkinColorField
                   label={`${item.name} ${item.colorLabel.toLowerCase()}`}
                   value={settings.color}
@@ -377,14 +441,11 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                   <select
                     id={selectId}
                     aria-label={`${item.name} logo`}
-                    value={version === null ? 'primary' : String(version)}
-                    onChange={(event) => {
-                      const value = event.target.value
-                      onChange(setMockupVersion(mockups, item.id, value === 'primary' ? null : Number(value)))
-                    }}
+                    value={versionValue(version)}
+                    onChange={(event) => onChange(setMockupVersion(mockups, item.id, parseVersionValue(event.target.value)))}
                   >
                     {options.map((option) => (
-                      <option key={option.value ?? 'primary'} value={option.value ?? 'primary'}>
+                      <option key={versionValue(option.value)} value={versionValue(option.value)}>
                         {option.label}
                       </option>
                     ))}
@@ -395,6 +456,159 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
           </div>
         )
       })}
+
+      {extra.length > 0 && (
+        <div className="palette-block mockup-settings" data-open={extraOpen}>
+          <button
+            type="button"
+            className="palette-block-header"
+            aria-expanded={extraOpen}
+            aria-controls="mockup-extra-body"
+            onClick={(event) => {
+              keepInPlace(event.currentTarget)
+              setExtraOpen(!extraOpen)
+            }}
+          >
+            <span className="palette-block-title">More pages</span>
+            <span className="palette-block-chevron" aria-hidden="true" />
+          </button>
+          <div id="mockup-extra-body" className="palette-block-body" inert={!extraOpen}>
+            <div className="palette-block-inner">
+              <ol className="mockup-extra-list">
+                {extra.map((template, i) => {
+                  const settings = settingsFor(mockups, template)
+                  const version = chosenVersion(logo, settings.version)
+                  const shown = mockupLogo(logo, cover?.logo ?? null, settings.version)
+                  const selectId = `mockup-extra-${template.id}-logo`
+                  return (
+                    <li key={template.id} className="mockup-extra-item">
+                      <div className="mockup-extra-head">
+                        <span className="mockup-thumb">
+                          <img src={template.image} alt="" aria-hidden="true" />
+                        </span>
+                        <span className="palette-block-title">{template.name}</span>
+                      </div>
+                      <div className="skin-color">
+                        <label htmlFor={selectId}>Logo</label>
+                        <select
+                          id={selectId}
+                          aria-label={`${template.name} logo`}
+                          value={versionValue(version)}
+                          onChange={(event) =>
+                            onChange(setMockupVersion(mockups, template.id, parseVersionValue(event.target.value)))
+                          }
+                        >
+                          {options.map((option) => (
+                            <option key={versionValue(option.value)} value={versionValue(option.value)}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      {layout.cols * layout.rows === 1 ? (
+                        <p className="logo-form-hint">On {extraMockupsPage(extraPageOf(mockups, template.id) ?? 1)}.</p>
+                      ) : (
+                        <label className="skin-check">
+                          <input
+                            type="checkbox"
+                            aria-label={`${template.name} on a page of its own`}
+                            checked={ownPagePhotos(mockups).includes(template.id)}
+                            onChange={(event) => onChange(setOwnPage(mockups, template.id, event.target.checked))}
+                          />
+                          Own page
+                          <span className="logo-form-hint"> ({extraMockupsPage(extraPageOf(mockups, template.id) ?? 1)})</span>
+                        </label>
+                      )}
+                      {/* With a logo, it is placed like on any photo mockup */}
+                      {extraOpen && version !== 'none' ? (
+                        photoSettings(template, settings, shown)
+                      ) : (
+                        <button type="button" className="palette-secondary-button" onClick={() => setEditing(template)}>
+                          Edit template
+                        </button>
+                      )}
+                      <div className="template-editor-row">
+                        <button
+                          type="button"
+                          className="palette-secondary-button"
+                          aria-label={`Move ${template.name} up`}
+                          disabled={i === 0}
+                          onClick={() => onChange(moveExtra(mockups, template.id, -1))}
+                        >
+                          Move up
+                        </button>
+                        <button
+                          type="button"
+                          className="palette-secondary-button"
+                          aria-label={`Move ${template.name} down`}
+                          disabled={i === extra.length - 1}
+                          onClick={() => onChange(moveExtra(mockups, template.id, 1))}
+                        >
+                          Move down
+                        </button>
+                        <button
+                          type="button"
+                          className="palette-secondary-button"
+                          aria-label={`Remove ${template.name}`}
+                          onClick={() => onChange(removeExtra(mockups, template.id))}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ol>
+
+              <div className="skin-color">
+                <label htmlFor="mockup-extra-cols">Columns</label>
+                <select
+                  id="mockup-extra-cols"
+                  value={layout.cols}
+                  onChange={(event) => onChange(setExtraLayout(mockups, { cols: Number(event.target.value) }))}
+                >
+                  {range(EXTRA_LIMITS.cols).map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="skin-color">
+                <label htmlFor="mockup-extra-rows">Rows</label>
+                <select
+                  id="mockup-extra-rows"
+                  value={layout.rows}
+                  onChange={(event) => onChange(setExtraLayout(mockups, { rows: Number(event.target.value) }))}
+                >
+                  {range(EXTRA_LIMITS.rows).map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="skin-control">
+                <label htmlFor="mockup-extra-margin">Margin</label>
+                <input
+                  id="mockup-extra-margin"
+                  type="range"
+                  min={EXTRA_LIMITS.margin.min}
+                  max={EXTRA_LIMITS.margin.max}
+                  step={1}
+                  value={layout.margin}
+                  onChange={(event) => onChange(setExtraLayout(mockups, { margin: Number(event.target.value) }))}
+                />
+                <output htmlFor="mockup-extra-margin">{layout.margin}%</output>
+              </div>
+              <p className="logo-form-hint">
+                1 × 1 gives each photo a page of its own. With a larger grid, Own page on a photo gives it a
+                whole page.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {editing && (
         <TemplateEditor template={editing} logo={mockupLogo(logo, cover?.logo ?? null, null)} onSave={useTemplate} onClose={() => setEditing(null)} />

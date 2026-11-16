@@ -60,13 +60,25 @@ export type Placement = { x: number; y: number; scale: number; rotate: number }
 // Printed: the logo multiplies with the photo (dark logos). Solid: laid over it (light logos).
 export type Blend = 'printed' | 'solid'
 
-// What the user set for a product: its color, the id of its logo version (null → the Primary),
-// and for photo mockups where the logo sits and how it blends
-export type MockupSettings = { color: string; version: number | null; placement: Placement; blend: Blend }
+// The logo a mockup carries: the id of a logo version, null for the Primary, or 'none' for no
+// logo at all (a photo that already carries it, ADR 0036)
+export type MockupVersion = number | null | 'none'
+
+// What the user set for a product: its color, its logo version, and for photo mockups where the
+// logo sits and how it blends
+export type MockupSettings = { color: string; version: MockupVersion; placement: Placement; blend: Blend }
+
+// The grid and the margin of every extra mockup page: columns and rows 1–3, the margin in % of
+// the page's width (ADR 0036)
+export type ExtraLayout = { cols: number; rows: number; margin: number }
 
 // The ticked products, always in the order of the list, and the settings of every product,
-// ticked or not, so an unticked product keeps them
+// ticked or not, so an unticked product keeps them. `extra` holds the photos of the extra
+// mockup pages, in their order; none of them is ticked (ADR 0036).
 export type Mockups = {
   chosen: string[]
   settings: Record<string, MockupSettings>
+  extra?: string[]
+  extraLayout?: ExtraLayout
+  extraOwn?: string[] // the photos of the extra pages on a page of their own
 }

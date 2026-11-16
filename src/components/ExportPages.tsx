@@ -1,5 +1,5 @@
 import { forwardRef } from 'react'
-import { MANUAL_PAGES } from '../data/manualSections'
+import { pagesWith } from '../mockups/mockups'
 import { ManualPage } from './ManualPage'
 import type { ManualData } from './ManualPage'
 import { a4 } from '../export/exportSettings'
@@ -34,7 +34,7 @@ export const ExportPages = forwardRef<HTMLElement, ExportPagesProps>(function Ex
       style={{ width: px.width }}
     >
       <ol className="manual-pages">
-        {MANUAL_PAGES.map((page) => (
+        {pagesWith(data.mockups).map((page) => (
           <li key={page}>
             <PrintedPage page={page} orientation={orientation} guides={guides} emphasis={kind} {...data} />
           </li>

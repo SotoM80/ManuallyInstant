@@ -893,6 +893,44 @@
   border: 1px dashed rgb(0 0 0 / 45%);
 }
 
+/* An extra mockup page (specs/mockups.md, More pages, ADR 0036): the photos fill the page inside
+   the chosen margin (% of the page width), in equal cells of Columns × Rows, row by row. Laid
+   over the content's own 8 % padding, so the margin can go from 0 to 20 %. The same in every
+   template.
+   ┌──────────────┐   ┌──────────────┐
+   │ ┌──────────┐ │   │ ┌────┐┌────┐ │
+   │ │  photo   │ │   │ │    ││    │ │
+   │ └──────────┘ │   │ └────┘└────┘ │
+   └──────────────┘   └──────────────┘
+        1 × 1               2 × 1      */
+.extra-mockups-layout {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: calc(var(--extra-margin, 8) * 1cqw);
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(var(--extra-cols, 1), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--extra-rows, 1), minmax(0, 1fr));
+  gap: 2cqw;
+}
+
+.extra-mockup {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  container-type: size; /* the photo is measured on its cell */
+}
+
+/* As large as the cell allows, in the photo's proportions (--photo-ratio, set per photo), so the
+   logo's placeholder stays on the photo */
+.extra-mockup .photo-mockup {
+  width: min(100cqw, calc(100cqh * var(--photo-ratio, 1)));
+  max-height: none;
+}
+
 /* Page numbers and footer (specs/footer.md, ADR 0031): in the page's bottom margin, under the
    content, so it never covers or moves it. Template 1 (and any template that says nothing):
    centered, the number above the text.

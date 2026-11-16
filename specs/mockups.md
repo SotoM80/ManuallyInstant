@@ -1,7 +1,7 @@
 # Technical Specification: Mockups
 
 ## 1. What it does
-A **Mockups** section and a new page, **8. Mockups**, that show the brand's logo applied to products: a business card, a t-shirt, a mug, a phone screen… The user chooses **up to 4** products from a list of 6, and for each one its **color** and **which version of the logo** it carries (a white version on a dark product, for example). A product is either a flat **illustration** drawn by the app (it takes any color and stays sharp in both PDFs, ADR 0013) or a **photo template**: a real product photo on which the logo is composed with perspective, shading and the folds of the product, and which the user can tint and place the logo on by dragging it (ADR 0014, section *Photo mockups* below).
+A **Mockups** section and a new page, **10. Mockups**, that show the brand's logo applied to products: a business card, a t-shirt, a mug, a phone screen… The user chooses **up to 4** products from a list of 6, and for each one its **color** and **which version of the logo** it carries (a white version on a dark product, for example). A product is either a flat **illustration** drawn by the app (it takes any color and stays sharp in both PDFs, ADR 0013) or a **photo template**: a real product photo on which the logo is composed with perspective, shading and the folds of the product, and which the user can tint and place the logo on by dragging it (ADR 0014, section *Photo mockups* below).
 
 ## Out of Scope
 * **More products** (Envelope, Cap, Storefront sign, Bottle, Browser): later, one at a time, each with its own scenario. This version has 6.
@@ -10,7 +10,8 @@ A **Mockups** section and a new page, **8. Mockups**, that show the brand's logo
 * Saving a template made in the editor, or an uploaded photo, between sessions (ADR 0002): the editor can download it as a file for the developers to add.
 * Warnings when the logo and the product have the same or a similar color (a white logo on a white t-shirt): as with the palette (`colorpalette.md`), contrast is the designer's call.
 * Fitting very wide or very tall logos better: a logo keeps its proportions in its box, so a very long one can look small.
-* More than 4 mockups, a page per mockup, or choosing their order (they follow the order of the list).
+* More than 4 mockups **on the Mockups page**, or choosing their order there (they follow the order of the list). Photos that do not fit go to extra pages (*More pages*, ADR 0036).
+* On the extra pages: a grid or margin per page, captions, a layout per template, or illustrations (only photos go there).
 * Text on the products (a name or a phone number on the business card), or the brand fonts on them.
 * Saving the choice between sessions (ADR 0002).
 * For **generated photos** (ADR 0016): generating the logo itself, editing a photo with the generator, choosing the provider in the app, and keeping the API key between sessions.
@@ -33,7 +34,7 @@ A new section of the accordion, after Skin (it uses the logo versions of Logo an
 
 **Settings of each ticked product**, under the list, in the order of the list, as an **accordion** like the layers of the Skin: each product is a block with a header (its small drawing in its current color, and its name) that opens its body. Only one body is open at a time; all are folded at the start, and ticking a product opens its block and folds the open one. The body has:
 * **Color**: the same color field as the Skin (the Cover's color picker plus chips that copy a palette color, see `skins.md`). Its label says what it paints: **Icon color** for the Phone, **Product color** for the others. Each product starts with its own default color (below).
-* **Logo**: a select with every logo version. Version 1 reads `<name> (Primary)`, or `Primary` when it has no name; the others read as on the Logo versions page (`versionName`: their name, or `Version N`). Default: the Primary.
+* **Logo**: a select with every logo version. Version 1 reads `<name> (Primary)`, or `Primary` when it has no name; the others read as on the Logo versions page (`versionName`: their name, or `Version N`). Last, **No logo**: the product alone, for a photo that already carries the logo (ADR 0036). Default: the Primary (No logo on the extra pages).
 
 A product that is unticked keeps its color and logo version: ticking it again brings them back. They are only reset when the browser page is refreshed.
 
@@ -42,7 +43,7 @@ Everything is live: there is no Apply (ADR 0007). A new logo image still waits f
 Opening the section features the **Mockups** page (`SECTION_PAGES.mockups = ['Mockups']`).
 
 ### Which logo a mockup shows
-What the user chose and what is shown are kept apart: the mockup stores the chosen version, and the image is worked out when it is drawn. In this order, the first one that exists:
+What the user chose and what is shown are kept apart: the mockup stores the chosen version, and the image is worked out when it is drawn. With **No logo**, nothing: no logo and no placeholder. Otherwise, in this order, the first one that exists:
 1. The image of the chosen version.
 2. The image of the Primary version (Version 1).
 3. The logo applied in the Cover section.
@@ -66,6 +67,26 @@ The logo keeps its proportions and is centered in its box (`xMidYMid meet`).
 * Each mockup is an image for screen readers, named after its product (`role="img"`, `aria-label="T-shirt mockup"`).
 * The page uses the Skin's Page background, Page text and layers like every inner page (`skins.md`).
 
+### More pages (ADR 0036)
+Photos that do not fit on the Mockups page go to **extra mockup pages**, after it: `Mockups 2`, `Mockups 3`…
+* **How a photo gets there**: Use now in the template editor, for a **new** template (uploaded or generated), when at least one mockup is already ticked. With none ticked, it is ticked on the Mockups page. A photo can still be ticked by hand onto the Mockups page, while it has room; there, its block has **Move to a page of its own**, which unticks it and puts it last on the extra pages, with Own page on. In the products list, a photo of the extra pages shows its page (`Mockups 2`). A note under the upload says which page it went to: `Added to Mockups 2.`
+* **Up to 24** photos on the extra pages; with 24, Use now adds the template to the list only, and the note says `The extra pages are full (24 photos).`
+* A photo is on the Mockups page or on an extra page, never both: **ticking** a photo of an extra page in the list moves it to the Mockups page. **Remove** takes it off its extra page; its template stays in the list.
+
+**The More pages block** in the section, under the settings of the ticked products, only when there is at least one extra photo. A folded block like the others, titled **More pages**, with:
+* The photos, in their order: a small picture, the name, the **Logo** select (with **No logo**, its default here), **Edit template**, **Move up** / **Move down**, and **Remove**.
+* **Columns** (1–3) and **Rows** (1–3), default 1 × 1: each photo takes a page of its own. With 2 × 2, four photos share a page.
+* **Own page** (a checkbox on each photo, off by default, with the photo's page beside it; shown only with a grid of more than one cell, since at 1 × 1 every photo has a page already, and the photo's page is shown instead): that photo takes a whole page by itself, whatever the grid. The other photos keep filling the grid in order; a grid page is cut short by a photo on its own page, and the next photos start a new one.
+* **Margin**: 0–20 % of the page width, step 1, default 8 % (the margin of every inner page). At 0 % the photos reach the edge of the page.
+* Grid and margin are the same for every extra page. Everything is live.
+
+**The extra pages**
+* `ceil(photos / (columns × rows))` pages, in the order of the photos, filling each page row by row.
+* No header and no captions: the photos fill the page inside the margin, in equal cells with a small gap (2 % of the page width), each one whole (`contain`) and centered in its cell. A page that is not full leaves its last cells empty.
+* Each photo is a photo mockup (its tint, its logo or No logo, its placement and blend), named for screen readers like the others (`aria-label="<name> mockup"`).
+* The page number in the footer and under the page counts them (`11`, `12`…); the Skin of the Mockups section (its colors, picture, spacing) applies to them; opening the section features them with the Mockups page.
+* Both PDFs include them after the Mockups page; the export progress counts every page (`3/12`).
+
 ### The products
 Every product is drawn on its own `viewBox` (in its own units, not mm), from shapes painted with the **color** of the product, plus fixed translucent shadows and lights for volume, and a few fixed details (the phone's frame, the inside of the mug). Default colors are light, so a dark Primary logo reads on them.
 
@@ -86,6 +107,7 @@ Every product is drawn on its own `viewBox` (in its own units, not mm), from sha
 * `MockupArt`: draws one product in SVG from its data, with colors and opacities as **attributes** (never CSS classes), so the PDF copy draws it as is (ADR 0012).
 * `MockupsPage` (the page, with a `.mockups-layout` inside `.logo-page`) and `MockupsForm` (the section, controlled like `SkinForm`). The choice is kept in `App`, above the routes, like the Skin.
 * **Template CSS**: `.mockups-grid` and its captions in `src/templates/shared.css` (with sizes for the Grid and Pages views), and a `.mockups-layout` rule in `src/templates/template3/template3.css` like the ones of the other Logo pages (`anatomy-layout`, `versions-layout`, `clearspace-layout`), so it uses the side column.
+* **More pages** (ADR 0036): `Mockups` gets `extra: string[]` (the template ids, in order, at most 24) and `extraLayout: { cols, rows, margin }`; `version` can also be `'none'` (No logo). Pure functions in `mockups.ts`: `placeNewMockup` (ticks with room, otherwise adds to `extra`), `removeExtra`, `moveExtra`, `setExtraLayout`, `extraPageCount`. `manualPages(extraCount)` in `src/data/manualSections.ts` gives the 10 fixed pages and then `Mockups 2`…, and `pagesWith(mockups)` the list for given mockups: the preview, full screen, the export and its progress read it instead of `MANUAL_PAGES`. A page's number comes from its name (`pageNumber`: `Mockups 3` → 12), so the footer and the labels need no list; `sectionOfPage` puts the extra pages in the Mockups section. `ExtraMockupsPage` draws one extra page (`.extra-mockups-layout` in `shared.css`, the same in the three templates).
 * `MANUAL_SECTIONS` gets `mockups` (7th, after Usage), `MANUAL_PAGES` gets `Mockups` (10th, after Usage's two pages). Both PDFs include it, since they draw every page (`export.md`). The export's warning about empty sections never lists Mockups: it always has content (its defaults), and an empty Logo section is already listed.
 
 ### Photo mockups (ADR 0014)
@@ -118,12 +140,12 @@ In the product's block of the section, above Color and Logo:
 * All of it is kept per product, like its color, and reaches the page at once.
 
 #### The template editor
-A window over the page, opened with **Edit template** in a photo mockup's block, or by **Upload your own photo** in the section (a JPG or PNG up to 10 MB; a new template of this session, ticked when used if there is room):
+A window over the page, opened with **Edit template** in a photo mockup's block, or by **Upload your own photo** in the section (a JPG or PNG up to 10 MB; a new template of this session, put on a new extra page when used if mockups are already ticked (*More pages*), otherwise ticked):
 1. Choose a photo (JPG or PNG, up to 10 MB).
 2. Select the **product**: the **Magic wand** selects, with one click, every connected pixel of a similar color (Tolerance 1–80 %, default 25 %); **New / Add / Subtract** (or Shift + click to add, Alt + click to take away). The **Brush** adds and the **Eraser** removes by painting (Brush size 4–120 px). The selection is shown in purple over the photo; **Undo** (up to 20 steps) and **Clear selection**. Its edge is softened (2 px) when the template is saved, so the tint does not end in a hard line. It is saved as a mask image (`maskImage`, white where the product is).
 3. Mark the **logo area** with the **Logo area** tool: drag over the photo to draw it, then drag its points (the corners for an angle, the points in between for a curve). **Points across** (2–5) and **Points down** (2–3) add points along the current shape, without moving it.
-4. Set the name, the group, the default color and whether it can be tinted; see the result with the current logo, live.
-5. **Use now**: the template joins the list for this session. **Download template**: a JSON file (and the photo) to add to `templates.ts` and `public/mockups/`.
+4. Set the name, the group, the default color and whether it can be tinted; see the result with the current logo, live. An uploaded or generated photo starts with **The product can be tinted** off (it often has its colors and logo already); ticking it asks for the selection.
+5. **Use now**: the template joins the list for this session. A selection of the product is needed only when it can be tinted: a photo that already carries the logo is used with one click (the logo area stays in the middle of the photo until it is drawn). **Download template**: a JSON file (and the photo) to add to `templates.ts` and `public/mockups/`.
 
 **Upload your own photo** in the Mockups section opens the same editor with that photo; its template lives in this session (ADR 0002).
 
@@ -139,12 +161,13 @@ Next to **Upload your own photo**, a **Generate a photo** button opens a small p
 
 ## 3. Preconditions & Postconditions
 * **Preconditions**: The user is on the Brand Manual page (`/brand-manual`).
-* **Postconditions**: The Mockups page shows the ticked products, in the order of the list, each in its color and with its logo, and both PDFs have it as page 8.
+* **Postconditions**: The Mockups page shows the ticked products, in the order of the list, each in its color and with its logo, and both PDFs have it as page 10, followed by the extra mockup pages, if any.
 
 ## 4. Invariants
 * 0 to 4 products are ticked, always in the order of the list.
-* Every product, ticked or not, has a valid color and a logo version (or the Primary).
-* A mockup never shows a gap: it shows a logo, or the dashed placeholder box.
+* 0 to 24 photos are on the extra pages; none of them is also ticked; there are exactly `ceil(photos / (columns × rows))` extra pages.
+* Every product, ticked or not, has a valid color and a logo version (or the Primary, or No logo).
+* A mockup never shows a gap: it shows a logo, the dashed placeholder box, or, with No logo, the product alone.
 * The logo never leaves its box (or its area, in a photo mockup) and keeps its proportions.
 * A photo mockup is the same image in the preview and in both PDFs.
 * Removing a logo version never makes a mockup show another version: one that used it shows the Primary.
@@ -285,7 +308,7 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 ### Scenario 26: In the PDF
 * **Given**: Two photo mockups and two illustrated ones are ticked.
 * **When**: The user downloads the print PDF.
-* **Then**: Page 8 shows the four as in the preview; the PDF waits until the photo mockups are drawn.
+* **Then**: Page 10 shows the four as in the preview; the PDF waits until the photo mockups are drawn.
 
 ### Scenario 27: Generating a Photo
 * **Given**: The user opens Generate a photo, types a key and `ceramic mug`.
@@ -317,6 +340,61 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **When**: The user clicks Cancel.
 * **Then**: The request is stopped, no error is shown, and Generate can be clicked again.
 
+### Scenario 33: A Photo When Mockups Are Already Ticked
+* **Given**: Business card, T-shirt and Mug are ticked.
+* **When**: The user uploads `poster.jpg` and clicks Use now in the editor, with no selection.
+* **Then**: The editor closes; the preview has a page "Mockups 2", numbered 11, with the photo filling it inside an 8 % margin and no logo on it; the three mockups are still on the Mockups page; the section shows "Added to Mockups 2." and a More pages block with "poster".
+
+### Scenario 34: A Page per Photo, Then a Grid
+* **Given**: Three photos are on the extra pages, with Columns 1 and Rows 1.
+* **When**: The user sets Columns to 2.
+* **Then**: There are 3 extra pages before, and 2 after: the first with two photos side by side, the second with one in its left cell.
+
+### Scenario 35: Margin
+* **Given**: One photo on an extra page.
+* **When**: The user sets Margin to 0 %.
+* **Then**: The photo reaches the edge of the page (as far as its proportions allow); at 20 % it sits in a smaller area in the middle.
+
+### Scenario 36: A Logo on an Extra Page
+* **Given**: A photo on an extra page, with No logo, and a logo applied.
+* **When**: The user chooses "Primary" in its Logo select.
+* **Then**: The logo is placed in the photo's logo area, as on any photo mockup; choosing No logo again removes it, with no placeholder.
+
+### Scenario 37: Remove and Move
+* **Given**: Photos A, B and C on the extra pages, 1 × 1.
+* **When**: The user clicks Move up on C, then Remove on A.
+* **Then**: The extra pages show C, then B; A is still in the products list, unticked.
+
+### Scenario 38: Ticking a Photo of an Extra Page
+* **Given**: Photo A is on an extra page, and the Mug is unticked.
+* **When**: The user ticks A in the products list.
+* **Then**: A is on the Mockups page and no longer on the extra pages; with no other extra photo, the extra page and the More pages block are gone.
+
+### Scenario 41: A Photo on a Page of Its Own
+* **Given**: Photos A, B and C on the extra pages, with Columns 2.
+* **When**: The user ticks Own page on A.
+* **Then**: Mockups 2 shows A alone, filling the page inside its margin; Mockups 3 shows B and C side by side. Unticking it puts A and B together again.
+
+### Scenario 42: A Long Photo Name
+* **Given**: An uploaded photo whose file name is longer than the sections column is wide.
+* **When**: It is on the extra pages.
+* **Then**: Its name in the More pages block wraps onto more lines and stays inside the column.
+
+### Scenario 43: Back to a Page of Its Own
+* **Given**: Photo A was on an extra page, and the user ticked it in the products list, so it is on the Mockups page.
+* **When**: The user clicks Move to a page of its own in A's block.
+* **Then**: A is unticked and is on the last extra page, alone, with Own page on; the section shows "Moved to Mockups N.".
+
+### Scenario 39: In the PDF
+* **Given**: Two photos on the extra pages, 1 × 1.
+* **When**: The user downloads the print PDF.
+* **Then**: It has 12 pages, the last two the extra pages as in the preview, and the progress reads "…/12".
+
+### Scenario 40: An Uploaded Photo After Coming Back
+* **Given**: The user used an uploaded photo, opened another section and came back to Mockups.
+* **When**: They upload a second photo and click Use now.
+* **Then**: Both photos are in the list and on their pages: the second one does not replace the first.
+
 ## Build Order
 1. This spec and ADR 0013.
 2. Stable ids for the logo versions (`LogoVariant.id`), with a test that removing a version keeps the others' ids.
@@ -334,3 +412,10 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
    2. `src/mockups/generate/` (the `PhotoGenerator` interface, the chosen adapter, `buildPrompt`) with unit tests on a fake `fetch`.
    3. The panel in the Mockups section, sharing one `openPhoto` path with Upload your own photo; scenarios 27–32.
    4. ✅ README.
+9. **More pages** (ADR 0036):
+   1. This spec and ADR 0036.
+   2. The data and pure functions (`extra`, `extraLayout`, `'none'`), with unit tests.
+   3. The dynamic page list (`manualPages`) in the preview, full screen, the footer and the export; tests that count 10 pages count the fixed ones.
+   4. `ExtraMockupsPage` and its CSS; No logo with no placeholder.
+   5. The More pages block, Use now with a full page, the editor's selection only when tintable, and a free id for each upload; scenarios 33–40, and an e2e case with an extra page.
+   6. README.
