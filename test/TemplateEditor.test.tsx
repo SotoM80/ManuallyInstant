@@ -158,10 +158,12 @@ describe('Template editor', () => {
     expect(undo).toBeDisabled();
   });
 
-  it('opens an uploaded photo as a new template, and ticks it once used (scenario 23)', async () => {
+  it('opens an uploaded photo as a new template, and ticks it once used with no mockup ticked (scenario 23)', async () => {
     renderApp();
     const form = openMockups();
-    fireEvent.click(within(form).getByRole('checkbox', { name: 'Mug' })); // room for a new one
+    // With no mockup ticked, a new photo is ticked on the Mockups page (otherwise: a new page)
+    for (const name of ['Business card', 'T-shirt', 'Mug'])
+      fireEvent.click(within(form).getByRole('checkbox', { name: new RegExp(`^${name}$`) }));
     const file = new File(['x'], 'tote bag.jpg', { type: 'image/jpeg' });
     await act(async () => {
       fireEvent.change(within(form).getByLabelText('Upload your own photo'), { target: { files: [file] } });
@@ -184,15 +186,9 @@ describe('Template editor', () => {
     return editor;
   }
 
-  // The app ships 3 illustrations and a photo template: ticking the photo fills the Mockups page
-  function fillMockupsPage(form: HTMLElement) {
-    fireEvent.click(within(form).getByRole('checkbox', { name: /^Business card \(photo\)/ }));
-  }
-
-  it('puts a photo on a new page when the Mockups page is full, with no selection and no logo (scenario 33)', async () => {
+  it('puts a photo on a new page when mockups are already ticked, with no selection and no logo (scenario 33)', async () => {
     renderApp();
     const form = openMockups();
-    fillMockupsPage(form);
     const editor = await uploadAndUse(form, 'poster.jpg');
     // An uploaded photo starts untinted: no selection needed
     expect(within(editor).getByRole('checkbox', { name: 'The product can be tinted' })).not.toBeChecked();
@@ -215,7 +211,6 @@ describe('Template editor', () => {
   it('shares a page between photos with a grid, and removes one (scenarios 34 and 37)', async () => {
     renderApp();
     const form = openMockups();
-    fillMockupsPage(form);
     for (const name of ['one.jpg', 'two.jpg']) {
       const editor = await uploadAndUse(form, name);
       fireEvent.click(within(editor).getByRole('button', { name: 'Use now' }));

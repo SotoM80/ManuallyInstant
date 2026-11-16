@@ -72,8 +72,8 @@ export function extraPagePhotos(mockups: Mockups, page: number): string[] {
   return extraPhotos(mockups).slice((page - 1) * perPage, page * perPage)
 }
 
-// Where Use now puts a new template: ticked when the Mockups page has room, otherwise on the
-// extra pages with no logo (it often carries one already), while they have room
+// Where Use now puts a new template: ticked when the Mockups page has no mockup yet; otherwise
+// on a new extra page, with no logo (it often carries one already), while they have room
 export type NewMockupPlace = 'page' | 'extra' | 'full'
 
 export function placeNewMockup(
@@ -82,7 +82,7 @@ export function placeNewMockup(
   order?: string[],
 ): { mockups: Mockups; place: NewMockupPlace } {
   if (mockups.chosen.includes(item.id) || extraPhotos(mockups).includes(item.id)) return { mockups, place: 'page' }
-  if (mockups.chosen.length < MAX_MOCKUPS) return { mockups: toggleMockup(mockups, item.id, order), place: 'page' }
+  if (mockups.chosen.length === 0) return { mockups: toggleMockup(mockups, item.id, order), place: 'page' }
   if (extraPhotos(mockups).length >= MAX_EXTRA) return { mockups, place: 'full' }
   const settings = { ...(mockups.settings[item.id] ?? defaultSettings(item)), version: 'none' as const }
   return {

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 // Spec: specs/mockups.md, More pages (ADR 0036). In a real browser: an uploaded photo used with
-// the Mockups page full lands on "Mockups 2", as large as the chosen margin allows.
+// mockups already ticked lands on "Mockups 2", as large as the chosen margin allows.
 
 // A 40 × 30 PNG, one flat color: enough for the editor and the WebGL composer
 const PHOTO = Buffer.from(
@@ -9,16 +9,11 @@ const PHOTO = Buffer.from(
   'base64',
 )
 
-test('a photo that does not fit goes to an extra page, inside its margin', async ({ page }) => {
+test('a photo used with mockups already ticked goes to an extra page, inside its margin', async ({ page }) => {
   await page.goto('/brand-manual')
   const sections = page.getByRole('region', { name: 'Manual sections' })
   await sections.getByRole('button', { name: /^7\. Mockups/ }).click()
   const form = page.getByRole('form', { name: 'Mockups' })
-
-  // Fill the Mockups page: the ticked illustrations plus the photo template, up to four
-  for (const box of await form.getByRole('checkbox').all()) {
-    if (!(await box.isChecked()) && (await box.isEnabled())) await box.check()
-  }
 
   await form.getByLabel('Upload your own photo').setInputFiles({ name: 'poster.png', mimeType: 'image/png', buffer: PHOTO })
   const editor = page.getByRole('dialog', { name: 'Template editor' })

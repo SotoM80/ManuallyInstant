@@ -28,15 +28,17 @@ function withExtra(...ids: string[]): Mockups {
 }
 
 describe('placeNewMockup', () => {
-  it('ticks a new template when the Mockups page has room', () => {
-    const room: Mockups = { chosen: ['a', 'c'], settings: {} };
-    const placed = placeNewMockup(room, photo('b'), ORDER);
+  it('ticks a new template when no mockup is ticked', () => {
+    const none: Mockups = { chosen: [], settings: {} };
+    const placed = placeNewMockup(none, photo('b'), ORDER);
     expect(placed.place).toBe('page');
-    expect(placed.mockups.chosen).toEqual(['a', 'b', 'c']);
+    expect(placed.mockups.chosen).toEqual(['b']);
     expect(placed.mockups.extra ?? []).toEqual([]);
   });
 
-  it('puts it on the extra pages, with No logo, when the Mockups page is full (scenario 33)', () => {
+  it('puts it on the extra pages, with No logo, when mockups are already ticked (scenario 33)', () => {
+    const some: Mockups = { chosen: ['a', 'c'], settings: {} };
+    expect(placeNewMockup(some, photo('p1'), ORDER).place).toBe('extra');
     const placed = placeNewMockup(FULL, photo('p1'), ORDER);
     expect(placed.place).toBe('extra');
     expect(placed.mockups.chosen).toEqual(FULL.chosen);

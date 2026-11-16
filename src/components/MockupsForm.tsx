@@ -212,8 +212,8 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
     })
   }
 
-  // "Use now": the template joins the list for this session; a new one is ticked if there is room,
-  // otherwise it goes to the extra mockup pages (ADR 0036)
+  // "Use now": the template joins the list for this session; a new one goes to a new extra mockup
+  // page when mockups are already ticked, otherwise it is ticked (ADR 0036)
   function useTemplate(template: PhotoTemplate) {
     const isNew = !catalog.some((item) => item.id === template.id)
     savePhotoTemplate(template)

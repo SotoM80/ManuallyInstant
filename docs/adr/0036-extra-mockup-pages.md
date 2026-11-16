@@ -16,15 +16,17 @@ Options considered:
 * **Extra pages after the Mockups page**, generated from the photos: what the user asked for; the page list becomes dynamic.
 
 ## Decision
-When the Mockups page is full, **Use now** puts the new photo on **extra mockup pages** (`Mockups 2`, `Mockups 3`…) after the Mockups page. They hold the photos in a grid of **Columns × Rows** (1–3 each, default 1 × 1: a page per photo) inside a **Margin** (0–20 % of the page width, default 8 %), set once for all of them in a **More pages** block of the Mockups section, where each photo can also be moved, removed, edited or given a logo. Their logo starts as **No logo**, a new choice of the Logo select (for every mockup), which shows the photo alone, with no placeholder.
+When mockups are already ticked, **Use now** puts the new photo on **extra mockup pages** (`Mockups 2`, `Mockups 3`…) after the Mockups page. They hold the photos in a grid of **Columns × Rows** (1–3 each, default 1 × 1: a page per photo) inside a **Margin** (0–20 % of the page width, default 8 %), set once for all of them in a **More pages** block of the Mockups section, where each photo can also be moved, removed, edited or given a logo. Their logo starts as **No logo**, a new choice of the Logo select (for every mockup), which shows the photo alone, with no placeholder.
 
 The list of pages is worked out from the mockups (`manualPages(extraCount)`: the 10 fixed pages, then the extra ones) and passed to everything that read `MANUAL_PAGES`. The extra pages belong to the Mockups section, so they take its skin settings and are featured with it.
+
+Amended the same day, after trying it: at first a photo went to an extra page only with the Mockups page full (4). The app ships 3 illustrations, so there was always room, no page was ever added, and the More pages block never showed. As the user asked, a photo goes to a new page whenever mockups are already ticked.
 
 ## Consequences
 * **+** Use now always shows the photo on a page, with no extra step.
 * **+** Photos that already carry the logo can be shown as they are.
 * **+** The 10 pages, and every test with no extra photo, stay as they were.
 * **−** The manual no longer has a fixed number of pages: the page numbers, full screen, the export progress and the PDFs follow a list that changes. Tests that count 10 pages count the fixed ones.
-* **−** A photo is on the Mockups page or on an extra page, never both: ticking a photo of an extra page moves it to the Mockups page; there is no way back except Use now again with the Mockups page full.
+* **−** A photo is on the Mockups page or on an extra page, never both: ticking a photo of an extra page moves it to the Mockups page; there is no way back except Use now again.
 * **−** The extra pages look the same in the three templates (only CSS: they can differ later).
 * **−** A limit of 24 extra photos, to keep the PDF (and the CMYK conversion, one page per request) reasonable.

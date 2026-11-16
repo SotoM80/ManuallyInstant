@@ -69,7 +69,7 @@ The logo keeps its proportions and is centered in its box (`xMidYMid meet`).
 
 ### More pages (ADR 0036)
 Photos that do not fit on the Mockups page go to **extra mockup pages**, after it: `Mockups 2`, `Mockups 3`…
-* **How a photo gets there**: Use now in the template editor, for a **new** template (uploaded or generated), when the Mockups page already has 4. With room, it is ticked on the Mockups page, as before. A note under the upload says where it went: `Added to a new page (Mockups 2).`
+* **How a photo gets there**: Use now in the template editor, for a **new** template (uploaded or generated), when at least one mockup is already ticked. With none ticked, it is ticked on the Mockups page. A photo can still be ticked by hand onto the Mockups page, while it has room. A note under the upload says where it went: `Added to a new page (Mockups 2).`
 * **Up to 24** photos on the extra pages; with 24, Use now adds the template to the list only, and the note says `The extra pages are full (24 photos).`
 * A photo is on the Mockups page or on an extra page, never both: **ticking** a photo of an extra page in the list moves it to the Mockups page. **Remove** takes it off its extra page; its template stays in the list.
 
@@ -139,7 +139,7 @@ In the product's block of the section, above Color and Logo:
 * All of it is kept per product, like its color, and reaches the page at once.
 
 #### The template editor
-A window over the page, opened with **Edit template** in a photo mockup's block, or by **Upload your own photo** in the section (a JPG or PNG up to 10 MB; a new template of this session, ticked when used if there is room, otherwise put on an extra page: *More pages*):
+A window over the page, opened with **Edit template** in a photo mockup's block, or by **Upload your own photo** in the section (a JPG or PNG up to 10 MB; a new template of this session, put on a new extra page when used if mockups are already ticked (*More pages*), otherwise ticked):
 1. Choose a photo (JPG or PNG, up to 10 MB).
 2. Select the **product**: the **Magic wand** selects, with one click, every connected pixel of a similar color (Tolerance 1–80 %, default 25 %); **New / Add / Subtract** (or Shift + click to add, Alt + click to take away). The **Brush** adds and the **Eraser** removes by painting (Brush size 4–120 px). The selection is shown in purple over the photo; **Undo** (up to 20 steps) and **Clear selection**. Its edge is softened (2 px) when the template is saved, so the tint does not end in a hard line. It is saved as a mask image (`maskImage`, white where the product is).
 3. Mark the **logo area** with the **Logo area** tool: drag over the photo to draw it, then drag its points (the corners for an angle, the points in between for a curve). **Points across** (2–5) and **Points down** (2–3) add points along the current shape, without moving it.
@@ -339,10 +339,10 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **When**: The user clicks Cancel.
 * **Then**: The request is stopped, no error is shown, and Generate can be clicked again.
 
-### Scenario 33: A Photo When the Mockups Page Is Full
-* **Given**: Business card, T-shirt, Mug and Phone are ticked.
+### Scenario 33: A Photo When Mockups Are Already Ticked
+* **Given**: Business card, T-shirt and Mug are ticked.
 * **When**: The user uploads `poster.jpg` and clicks Use now in the editor, with no selection.
-* **Then**: The editor closes; the preview has a page "Mockups 2", numbered 11, with the photo filling it inside an 8 % margin and no logo on it; the four mockups are still on the Mockups page; the section shows "Added to a new page (Mockups 2)." and a More pages block with "poster".
+* **Then**: The editor closes; the preview has a page "Mockups 2", numbered 11, with the photo filling it inside an 8 % margin and no logo on it; the three mockups are still on the Mockups page; the section shows "Added to a new page (Mockups 2)." and a More pages block with "poster".
 
 ### Scenario 34: A Page per Photo, Then a Grid
 * **Given**: Three photos are on the extra pages, with Columns 1 and Rows 1.
