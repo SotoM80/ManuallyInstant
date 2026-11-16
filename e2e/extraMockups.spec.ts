@@ -48,4 +48,14 @@ test('a photo used with mockups already ticked goes to an extra page, inside its
   // Margin 0 %: edge to edge
   await form.getByLabel('Margin').fill('0')
   await expect.poll(() => fit(0)).toBe(true)
+
+  // Scenario 42: a long name wraps inside the sections column
+  const long = 'a-very-long-photo-file-name-for-the-product-poster-final-version-2026'
+  await form.getByLabel('Upload your own photo').setInputFiles({ name: `${long}.png`, mimeType: 'image/png', buffer: PHOTO })
+  await editor.getByRole('button', { name: 'Use now' }).click()
+  await expect(editor).toBeHidden()
+  const name = form.locator('.mockup-extra-head').getByText(long)
+  const column = (await form.boundingBox())!
+  const box = (await name.boundingBox())!
+  expect(box.x + box.width).toBeLessThanOrEqual(column.x + column.width)
 })

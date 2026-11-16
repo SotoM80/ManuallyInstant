@@ -1128,6 +1128,15 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+}
+
+/* A long photo name wraps inside the sidebar instead of running past it */
+.mockup-extra-head .palette-block-title {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: start;
 }
 
 /* A photo template's thumbnail, and its tag in the list */

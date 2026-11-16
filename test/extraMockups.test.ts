@@ -3,6 +3,8 @@ import {
   MAX_EXTRA,
   chosenVersion,
   extraPageCount,
+  extraPageLayout,
+  extraPageOf,
   extraPagePhotos,
   mockupLogo,
   moveExtra,
@@ -11,6 +13,7 @@ import {
   placeNewMockup,
   removeExtra,
   setExtraLayout,
+  setOwnPage,
   toggleMockup,
   versionValue,
 } from '../src/mockups/mockups';
@@ -68,6 +71,22 @@ describe('the extra pages', () => {
     expect(extraPagePhotos(two, 1)).toEqual(['p1', 'p2']);
     expect(extraPagePhotos(two, 2)).toEqual(['p3']);
     expect(extraPageCount(DEFAULT_MOCKUPS)).toBe(0);
+  });
+
+  it('gives a photo marked Own page a whole page, whatever the grid (scenario 41)', () => {
+    const grid = setExtraLayout(withExtra('A', 'B', 'C'), { cols: 2 });
+    const own = setOwnPage(grid, 'A', true);
+    expect(extraPagePhotos(own, 1)).toEqual(['A']);
+    expect(extraPagePhotos(own, 2)).toEqual(['B', 'C']);
+    expect(extraPageLayout(own, 1)).toMatchObject({ cols: 1, rows: 1 });
+    expect(extraPageLayout(own, 2)).toMatchObject({ cols: 2, rows: 1 });
+    expect(extraPageOf(own, 'C')).toBe(2);
+    // In the middle, it cuts the grid short
+    const middle = setOwnPage(grid, 'B', true);
+    expect([1, 2, 3].map((page) => extraPagePhotos(middle, page))).toEqual([['A'], ['B'], ['C']]);
+    // Unticked, A and B share a page again; removed, it is no longer on its own
+    expect(extraPagePhotos(setOwnPage(own, 'A', false), 1)).toEqual(['A', 'B']);
+    expect(removeExtra(own, 'A').extraOwn).toEqual([]);
   });
 
   it('keeps the grid and the margin inside their limits', () => {

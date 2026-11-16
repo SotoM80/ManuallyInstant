@@ -16,13 +16,16 @@ import {
   MAX_MOCKUPS,
   chosenVersion,
   extraLayout,
+  extraPageOf,
   extraPhotos,
   mockupLogo,
   moveExtra,
+  ownPagePhotos,
   parseVersionValue,
   placeNewMockup,
   removeExtra,
   setExtraLayout,
+  setOwnPage,
   setMockupBlend,
   setMockupColor,
   setMockupPlacement,
@@ -225,9 +228,8 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
       setOpenId(template.id)
       setPlacedNote('')
     } else if (placed.place === 'extra') {
-      const position = extraPhotos(placed.mockups).length - 1
-      const { cols, rows } = extraLayout(placed.mockups)
-      setPlacedNote(`Added to a new page (${extraMockupsPage(Math.floor(position / (cols * rows)) + 1)}).`)
+      const page = extraPageOf(placed.mockups, template.id) ?? 1
+      setPlacedNote(`Added to ${extraMockupsPage(page)}.`)
       setExtraOpen(true)
     } else {
       setPlacedNote(`The extra pages are full (${MAX_EXTRA} photos).`)
@@ -484,6 +486,16 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                           ))}
                         </select>
                       </div>
+                      <label className="skin-check">
+                        <input
+                          type="checkbox"
+                          aria-label={`${template.name} on a page of its own`}
+                          checked={ownPagePhotos(mockups).includes(template.id)}
+                          onChange={(event) => onChange(setOwnPage(mockups, template.id, event.target.checked))}
+                        />
+                        Own page
+                        <span className="logo-form-hint"> ({extraMockupsPage(extraPageOf(mockups, template.id) ?? 1)})</span>
+                      </label>
                       {/* With a logo, it is placed like on any photo mockup */}
                       {extraOpen && version !== 'none' ? (
                         photoSettings(template, settings, shown)
@@ -566,7 +578,10 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                 />
                 <output htmlFor="mockup-extra-margin">{layout.margin}%</output>
               </div>
-              <p className="logo-form-hint">1 × 1 gives each photo a page of its own.</p>
+              <p className="logo-form-hint">
+                1 × 1 gives each photo a page of its own; with a larger grid, tick Own page on a photo to give
+                it a whole page.
+              </p>
             </div>
           </div>
         </div>

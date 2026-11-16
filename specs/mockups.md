@@ -69,13 +69,14 @@ The logo keeps its proportions and is centered in its box (`xMidYMid meet`).
 
 ### More pages (ADR 0036)
 Photos that do not fit on the Mockups page go to **extra mockup pages**, after it: `Mockups 2`, `Mockups 3`…
-* **How a photo gets there**: Use now in the template editor, for a **new** template (uploaded or generated), when at least one mockup is already ticked. With none ticked, it is ticked on the Mockups page. A photo can still be ticked by hand onto the Mockups page, while it has room. A note under the upload says where it went: `Added to a new page (Mockups 2).`
+* **How a photo gets there**: Use now in the template editor, for a **new** template (uploaded or generated), when at least one mockup is already ticked. With none ticked, it is ticked on the Mockups page. A photo can still be ticked by hand onto the Mockups page, while it has room. A note under the upload says which page it went to: `Added to Mockups 2.`
 * **Up to 24** photos on the extra pages; with 24, Use now adds the template to the list only, and the note says `The extra pages are full (24 photos).`
 * A photo is on the Mockups page or on an extra page, never both: **ticking** a photo of an extra page in the list moves it to the Mockups page. **Remove** takes it off its extra page; its template stays in the list.
 
 **The More pages block** in the section, under the settings of the ticked products, only when there is at least one extra photo. A folded block like the others, titled **More pages**, with:
 * The photos, in their order: a small picture, the name, the **Logo** select (with **No logo**, its default here), **Edit template**, **Move up** / **Move down**, and **Remove**.
 * **Columns** (1–3) and **Rows** (1–3), default 1 × 1: each photo takes a page of its own. With 2 × 2, four photos share a page.
+* **Own page** (a checkbox on each photo, off by default, with the photo's page beside it): that photo takes a whole page by itself, whatever the grid. The other photos keep filling the grid in order; a grid page is cut short by a photo on its own page, and the next photos start a new one.
 * **Margin**: 0–20 % of the page width, step 1, default 8 % (the margin of every inner page). At 0 % the photos reach the edge of the page.
 * Grid and margin are the same for every extra page. Everything is live.
 
@@ -342,7 +343,7 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 ### Scenario 33: A Photo When Mockups Are Already Ticked
 * **Given**: Business card, T-shirt and Mug are ticked.
 * **When**: The user uploads `poster.jpg` and clicks Use now in the editor, with no selection.
-* **Then**: The editor closes; the preview has a page "Mockups 2", numbered 11, with the photo filling it inside an 8 % margin and no logo on it; the three mockups are still on the Mockups page; the section shows "Added to a new page (Mockups 2)." and a More pages block with "poster".
+* **Then**: The editor closes; the preview has a page "Mockups 2", numbered 11, with the photo filling it inside an 8 % margin and no logo on it; the three mockups are still on the Mockups page; the section shows "Added to Mockups 2." and a More pages block with "poster".
 
 ### Scenario 34: A Page per Photo, Then a Grid
 * **Given**: Three photos are on the extra pages, with Columns 1 and Rows 1.
@@ -368,6 +369,16 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **Given**: Photo A is on an extra page, and the Mug is unticked.
 * **When**: The user ticks A in the products list.
 * **Then**: A is on the Mockups page and no longer on the extra pages; with no other extra photo, the extra page and the More pages block are gone.
+
+### Scenario 41: A Photo on a Page of Its Own
+* **Given**: Photos A, B and C on the extra pages, with Columns 2.
+* **When**: The user ticks Own page on A.
+* **Then**: Mockups 2 shows A alone, filling the page inside its margin; Mockups 3 shows B and C side by side. Unticking it puts A and B together again.
+
+### Scenario 42: A Long Photo Name
+* **Given**: An uploaded photo whose file name is longer than the sections column is wide.
+* **When**: It is on the extra pages.
+* **Then**: Its name in the More pages block wraps onto more lines and stays inside the column.
 
 ### Scenario 39: In the PDF
 * **Given**: Two photos on the extra pages, 1 × 1.

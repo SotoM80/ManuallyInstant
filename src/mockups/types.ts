@@ -80,4 +80,5 @@ export type Mockups = {
   settings: Record<string, MockupSettings>
   extra?: string[]
   extraLayout?: ExtraLayout
+  extraOwn?: string[] // the photos of the extra pages on a page of their own
 }

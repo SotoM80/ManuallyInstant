@@ -195,7 +195,7 @@ describe('Template editor', () => {
     fireEvent.click(within(editor).getByRole('button', { name: 'Use now' }));
 
     expect(screen.queryByRole('dialog', { name: 'Template editor' })).not.toBeInTheDocument();
-    expect(within(form).getByText('Added to a new page (Mockups 2).')).toHaveAttribute('role', 'status');
+    expect(within(form).getByText('Added to Mockups 2.')).toHaveAttribute('role', 'status');
     const page = screen.getAllByRole('article', { name: 'Mockups 2' })[0];
     expect(await within(page).findByRole('img', { name: 'poster mockup' })).toBeInTheDocument();
     expect(page.querySelector('.photo-mockup-placeholder')).toBeNull();

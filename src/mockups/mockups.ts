@@ -54,10 +54,37 @@ export function extraLayout(mockups: Mockups): ExtraLayout {
   return mockups.extraLayout ?? DEFAULT_EXTRA_LAYOUT
 }
 
+// The photos on a page of their own, whatever the grid (Own page)
+export function ownPagePhotos(mockups: Mockups): string[] {
+  return mockups.extraOwn ?? []
+}
+
+// The extra pages, in order, each with its photos: the photos fill the Columns × Rows grid one
+// after the other, and a photo marked Own page takes a whole page by itself
+export function extraPages(mockups: Mockups): string[][] {
+  const { cols, rows } = extraLayout(mockups)
+  const perPage = cols * rows
+  const own = ownPagePhotos(mockups)
+  const pages: string[][] = []
+  let grid: string[] | null = null
+  for (const id of extraPhotos(mockups)) {
+    if (own.includes(id)) {
+      pages.push([id])
+      grid = null
+    } else {
+      if (!grid || grid.length >= perPage) {
+        grid = []
+        pages.push(grid)
+      }
+      grid.push(id)
+    }
+  }
+  return pages
+}
+
 // How many extra pages the photos fill, with the chosen grid
 export function extraPageCount(mockups: Mockups): number {
-  const { cols, rows } = extraLayout(mockups)
-  return Math.ceil(extraPhotos(mockups).length / (cols * rows))
+  return extraPages(mockups).length
 }
 
 // Every page of the manual with these mockups: the fixed pages, then the extra mockup pages
@@ -67,9 +94,25 @@ export function pagesWith(mockups: Mockups): string[] {
 
 // The photos of one extra page (1 → the first), row by row
 export function extraPagePhotos(mockups: Mockups, page: number): string[] {
-  const { cols, rows } = extraLayout(mockups)
-  const perPage = cols * rows
-  return extraPhotos(mockups).slice((page - 1) * perPage, page * perPage)
+  return extraPages(mockups)[page - 1] ?? []
+}
+
+// The grid of one extra page: 1 × 1 for a photo on a page of its own
+export function extraPageLayout(mockups: Mockups, page: number): ExtraLayout {
+  const layout = extraLayout(mockups)
+  const photos = extraPagePhotos(mockups, page)
+  return photos.length === 1 && ownPagePhotos(mockups).includes(photos[0]) ? { ...layout, cols: 1, rows: 1 } : layout
+}
+
+// The extra page (1 → the first) a photo is on, or null
+export function extraPageOf(mockups: Mockups, id: string): number | null {
+  const index = extraPages(mockups).findIndex((photos) => photos.includes(id))
+  return index < 0 ? null : index + 1
+}
+
+export function setOwnPage(mockups: Mockups, id: string, own: boolean): Mockups {
+  const others = ownPagePhotos(mockups).filter((other) => other !== id)
+  return { ...mockups, extraOwn: own ? [...others, id] : others }
 }
 
 // Where Use now puts a new template: ticked when the Mockups page has no mockup yet; otherwise
@@ -96,7 +139,11 @@ export function placeNewMockup(
 }
 
 export function removeExtra(mockups: Mockups, id: string): Mockups {
-  return { ...mockups, extra: extraPhotos(mockups).filter((other) => other !== id) }
+  return {
+    ...mockups,
+    extra: extraPhotos(mockups).filter((other) => other !== id),
+    extraOwn: ownPagePhotos(mockups).filter((other) => other !== id),
+  }
 }
 
 // Moves a photo of the extra pages one place up (-1) or down (+1)

@@ -22,6 +22,8 @@ The list of pages is worked out from the mockups (`manualPages(extraCount)`: the
 
 Amended the same day, after trying it: at first a photo went to an extra page only with the Mockups page full (4). The app ships 3 illustrations, so there was always room, no page was ever added, and the More pages block never showed. As the user asked, a photo goes to a new page whenever mockups are already ticked.
 
+Amended again: with a grid larger than 1 × 1, the user could not keep one photo on a page of its own. Each photo now has an **Own page** checkbox (`extraOwn`): it takes a whole page alone, and the others keep filling the grid in order. The pages are worked out by one pure function, `extraPages(mockups)`, which everything else (count, page photos, a page's grid) reads.
+
 ## Consequences
 * **+** Use now always shows the photo on a page, with no extra step.
 * **+** Photos that already carry the logo can be shown as they are.
