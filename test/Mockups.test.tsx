@@ -120,7 +120,7 @@ describe('Mockups – the section', () => {
     renderApp();
     const form = openMockups();
     const select = within(form).getByRole('combobox', { name: 'Mug logo' });
-    expect(within(select).getAllByRole('option').map((option) => option.textContent)).toEqual(['Primary']);
+    expect(within(select).getAllByRole('option').map((option) => option.textContent)).toEqual(['Primary', 'No logo']);
   });
 });
 

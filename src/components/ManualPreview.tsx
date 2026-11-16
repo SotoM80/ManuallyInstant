@@ -1,4 +1,4 @@
-import { MANUAL_PAGES } from '../data/manualSections'
+import { MANUAL_PAGES, pageNumber } from '../data/manualSections'
 import { ManualPage } from './ManualPage'
 import { TEMPLATES } from '../templates'
 import type { TemplateId } from '../templates'
@@ -195,7 +195,7 @@ export function ManualPreview({
             />
             {/* Always the natural number, so a page moved to the top still reads "9. Typography" */}
             <span className="manual-page-name">
-              {MANUAL_PAGES.indexOf(page) + 1}. {page}
+              {pageNumber(page)}. {page}
             </span>
           </li>
         ))}

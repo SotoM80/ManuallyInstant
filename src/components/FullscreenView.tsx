@@ -3,7 +3,8 @@ import type { RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { PrintedPage } from './ExportPages'
 import type { ManualData } from './ManualPage'
-import { MANUAL_PAGES } from '../data/manualSections'
+import { pageNumber } from '../data/manualSections'
+import { pagesWith } from '../mockups/mockups'
 import { a4 } from '../export/exportSettings'
 import type { TemplateId } from '../templates'
 import type { Guides } from '../utils/guides'
@@ -112,7 +113,7 @@ export function FullscreenView({ orientation, template, guides, onClose, returnF
         Exit full screen
       </button>
       <ol className="fullscreen-pages">
-        {MANUAL_PAGES.map((name, index) => (
+        {pagesWith(data.mockups).map((name) => (
           <li key={name} className="fullscreen-item">
             <div className="fullscreen-page" style={{ width, height }}>
               <div style={{ width: page.width, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
@@ -120,7 +121,7 @@ export function FullscreenView({ orientation, template, guides, onClose, returnF
               </div>
             </div>
             <span className="fullscreen-caption">
-              {index + 1}. {name}
+              {pageNumber(name)}. {name}
             </span>
           </li>
         ))}

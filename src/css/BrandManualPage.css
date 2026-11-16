@@ -1108,6 +1108,28 @@
   gap: 8px;
 }
 
+/* The More pages block (ADR 0036): one item per photo of the extra pages, a line between them */
+.mockup-extra-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.mockup-extra-item {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mockup-extra-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* A photo template's thumbnail, and its tag in the list */
 .mockup-thumb img {
   width: 100%;

@@ -79,10 +79,32 @@ export const SECTION_AREAS: Record<string, { pages: Record<string, string>; firs
   usage: { pages: USAGE_AREA_PAGES, first: 'correct' },
 }
 
+// The extra mockup pages (ADR 0036) come after the Mockups page, named "Mockups 2", "Mockups 3"…
+// Their name says where they are, so a page's number never needs the whole list.
+export function extraMockupsPage(index: number) {
+  return `Mockups ${index + 1}` // index 1 → "Mockups 2"
+}
+
+// 1 for "Mockups 2", 2 for "Mockups 3"…; null for any other page
+export function extraMockupsIndex(page: string): number | null {
+  const match = /^Mockups (\d+)$/.exec(page)
+  const index = match ? Number(match[1]) - 1 : 0
+  return index >= 1 ? index : null
+}
+
+// Every page of the manual: the fixed ones, then the extra mockup pages
+export function manualPages(extraCount = 0) {
+  return [...MANUAL_PAGES, ...Array.from({ length: extraCount }, (_, i) => extraMockupsPage(i + 1))]
+}
+
+// A page's place in the manual's natural order, the Cover being 1; 0 for an unknown page
+export function pageNumber(page: string): number {
+  const extra = extraMockupsIndex(page)
+  return extra === null ? MANUAL_PAGES.indexOf(page) + 1 : MANUAL_PAGES.length + extra
+}
+
 // The featured pages first, in the order given, then every other page in its natural order.
-export function orderPages(featured: string[]) {
-  return [
-    ...featured.filter((page) => MANUAL_PAGES.includes(page)),
-    ...MANUAL_PAGES.filter((page) => !featured.includes(page)),
-  ]
+export function orderPages(featured: string[], extraCount = 0) {
+  const pages = manualPages(extraCount)
+  return [...featured.filter((page) => pages.includes(page)), ...pages.filter((page) => !featured.includes(page))]
 }

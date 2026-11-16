@@ -1,4 +1,4 @@
-import { MANUAL_PAGES } from '../data/manualSections'
+import { pageNumber } from '../data/manualSections'
 import type { Skin, SkinFooter } from './types'
 
 // The footer of the inner pages, kept in the Skin (specs/footer.md, ADR 0031)
@@ -19,10 +19,9 @@ export function setFooter(skin: Skin, change: Partial<SkinFooter>): Skin {
 }
 
 // A page's number: its place in the manual's natural order, the Cover being 1 (never the
-// preview's order, which brings an open section's pages to the top)
-export function pageNumber(page: string): number {
-  return MANUAL_PAGES.indexOf(page) + 1
-}
+// preview's order, which brings an open section's pages to the top); extra mockup pages follow
+// the Mockups page (ADR 0036)
+export { pageNumber }
 
 // What one page's footer shows, or null when it has none (the Cover never has one)
 export function pageFooter(skin: Skin, page: string): { number: number | null; text: string } | null {

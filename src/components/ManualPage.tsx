@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { LOGO_PARTS } from '../data/manualSections'
+import { LOGO_PARTS, extraMockupsIndex } from '../data/manualSections'
 import { boxVariables } from '../skins/boxes'
 import { pageColor, pagePicture } from '../skins/sections'
 import { spacingVariables } from '../skins/spacing'
@@ -13,6 +13,7 @@ import { ClearSpacePage } from './pages/ClearSpacePage'
 import { ColorPalettePage } from './pages/ColorPalettePage'
 import { TypographyPage } from './pages/TypographyPage'
 import { MockupsPage } from './pages/MockupsPage'
+import { ExtraMockupsPage } from './pages/ExtraMockupsPage'
 import { UsagePage } from './pages/UsagePage'
 import { SkinBackdrop } from './pages/SkinBackdrop'
 import { PageFooter } from './PageFooter'
@@ -102,6 +103,8 @@ export function ManualPage({
       )
     if (page === 'Typography') return <TypographyPage fonts={typography} color={textColor} />
     if (page === 'Mockups') return <MockupsPage mockups={mockups} logo={logo} cover={cover} color={textColor} />
+    const extra = extraMockupsIndex(page)
+    if (extra !== null) return <ExtraMockupsPage index={extra} mockups={mockups} logo={logo} cover={cover} />
     if (!isCover) return <p className="manual-page-empty">Coming soon</p>
     // A new key on every applied logo (each one has its own URL) redraws the cover, so it grows in again
     return <CoverPage key={cover?.logo?.url ?? 'empty'} cover={cover} />

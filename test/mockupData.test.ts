@@ -128,8 +128,12 @@ describe('versionOptions', () => {
       { value: null, label: 'Horizontal (Primary)' },
       { value: 4, label: 'Negative' },
       { value: 7, label: 'Version 3' },
+      { value: 'none', label: 'No logo' },
     ]);
-    expect(versionOptions(null)).toEqual([{ value: null, label: 'Primary' }]);
+    expect(versionOptions(null)).toEqual([
+      { value: null, label: 'Primary' },
+      { value: 'none', label: 'No logo' },
+    ]);
   });
 });
 

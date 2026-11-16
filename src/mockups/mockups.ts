@@ -1,6 +1,7 @@
 import { versionName } from '../data/logoCopy'
+import { manualPages } from '../data/manualSections'
 import { findMockup, mockupCatalog } from './catalog'
-import type { Blend, MockupItem, MockupSettings, Mockups, Placement } from './types'
+import type { Blend, ExtraLayout, MockupItem, MockupSettings, MockupVersion, Mockups, Placement } from './types'
 import type { CoverData, LogoData } from '../types'
 
 // The Mockups section's choice (see specs/mockups.md). Every function returns a new choice, so
@@ -30,12 +31,98 @@ export function settingsFor(mockups: Mockups, item: MockupItem): MockupSettings 
   return mockups.settings[item.id] ?? defaultSettings(item)
 }
 
-// Ticks or unticks a product, keeping the order of the list and at most four
+// Ticks or unticks a product, keeping the order of the list and at most four. A photo of the
+// extra pages that is ticked moves to the Mockups page (ADR 0036).
 export function toggleMockup(mockups: Mockups, id: string, order = mockupCatalog().map((item) => item.id)): Mockups {
   const ticked = mockups.chosen.includes(id)
   if (!ticked && mockups.chosen.length >= MAX_MOCKUPS) return mockups
   const chosen = ticked ? mockups.chosen.filter((other) => other !== id) : [...mockups.chosen, id]
-  return { ...mockups, chosen: chosen.sort((a, b) => order.indexOf(a) - order.indexOf(b)) }
+  const next = { ...mockups, chosen: chosen.sort((a, b) => order.indexOf(a) - order.indexOf(b)) }
+  return !ticked && extraPhotos(mockups).includes(id) ? removeExtra(next, id) : next
+}
+
+// The extra mockup pages (ADR 0036): photos that did not fit on the Mockups page
+export const MAX_EXTRA = 24
+export const EXTRA_LIMITS = { cols: { min: 1, max: 3 }, rows: { min: 1, max: 3 }, margin: { min: 0, max: 20 } }
+export const DEFAULT_EXTRA_LAYOUT: ExtraLayout = { cols: 1, rows: 1, margin: 8 }
+
+export function extraPhotos(mockups: Mockups): string[] {
+  return mockups.extra ?? []
+}
+
+export function extraLayout(mockups: Mockups): ExtraLayout {
+  return mockups.extraLayout ?? DEFAULT_EXTRA_LAYOUT
+}
+
+// How many extra pages the photos fill, with the chosen grid
+export function extraPageCount(mockups: Mockups): number {
+  const { cols, rows } = extraLayout(mockups)
+  return Math.ceil(extraPhotos(mockups).length / (cols * rows))
+}
+
+// Every page of the manual with these mockups: the fixed pages, then the extra mockup pages
+export function pagesWith(mockups: Mockups): string[] {
+  return manualPages(extraPageCount(mockups))
+}
+
+// The photos of one extra page (1 → the first), row by row
+export function extraPagePhotos(mockups: Mockups, page: number): string[] {
+  const { cols, rows } = extraLayout(mockups)
+  const perPage = cols * rows
+  return extraPhotos(mockups).slice((page - 1) * perPage, page * perPage)
+}
+
+// Where Use now puts a new template: ticked when the Mockups page has room, otherwise on the
+// extra pages with no logo (it often carries one already), while they have room
+export type NewMockupPlace = 'page' | 'extra' | 'full'
+
+export function placeNewMockup(
+  mockups: Mockups,
+  item: Pick<MockupItem, 'id' | 'color'>,
+  order?: string[],
+): { mockups: Mockups; place: NewMockupPlace } {
+  if (mockups.chosen.includes(item.id) || extraPhotos(mockups).includes(item.id)) return { mockups, place: 'page' }
+  if (mockups.chosen.length < MAX_MOCKUPS) return { mockups: toggleMockup(mockups, item.id, order), place: 'page' }
+  if (extraPhotos(mockups).length >= MAX_EXTRA) return { mockups, place: 'full' }
+  const settings = { ...(mockups.settings[item.id] ?? defaultSettings(item)), version: 'none' as const }
+  return {
+    mockups: {
+      ...mockups,
+      extra: [...extraPhotos(mockups), item.id],
+      settings: { ...mockups.settings, [item.id]: settings },
+    },
+    place: 'extra',
+  }
+}
+
+export function removeExtra(mockups: Mockups, id: string): Mockups {
+  return { ...mockups, extra: extraPhotos(mockups).filter((other) => other !== id) }
+}
+
+// Moves a photo of the extra pages one place up (-1) or down (+1)
+export function moveExtra(mockups: Mockups, id: string, step: -1 | 1): Mockups {
+  const extra = [...extraPhotos(mockups)]
+  const from = extra.indexOf(id)
+  const to = from + step
+  if (from < 0 || to < 0 || to >= extra.length) return mockups
+  ;[extra[from], extra[to]] = [extra[to], extra[from]]
+  return { ...mockups, extra }
+}
+
+function clamp(value: number, { min, max }: { min: number; max: number }) {
+  return Math.min(max, Math.max(min, Math.round(value)))
+}
+
+export function setExtraLayout(mockups: Mockups, change: Partial<ExtraLayout>): Mockups {
+  const next = { ...extraLayout(mockups), ...change }
+  return {
+    ...mockups,
+    extraLayout: {
+      cols: clamp(next.cols, EXTRA_LIMITS.cols),
+      rows: clamp(next.rows, EXTRA_LIMITS.rows),
+      margin: clamp(next.margin, EXTRA_LIMITS.margin),
+    },
+  }
 }
 
 function setSetting(mockups: Mockups, id: string, change: Partial<MockupSettings>): Mockups {
@@ -48,8 +135,8 @@ export function setMockupColor(mockups: Mockups, id: string, color: string) {
   return setSetting(mockups, id, { color })
 }
 
-// The id of a logo version, or null for the Primary
-export function setMockupVersion(mockups: Mockups, id: string, version: number | null) {
+// The id of a logo version, null for the Primary, or 'none' for no logo
+export function setMockupVersion(mockups: Mockups, id: string, version: MockupVersion) {
   return setSetting(mockups, id, { version })
 }
 
@@ -62,28 +149,41 @@ export function setMockupBlend(mockups: Mockups, id: string, blend: Blend) {
 }
 
 // The version a mockup really uses: its id while that version exists (and is not the Primary),
-// otherwise null, the Primary. This is also what its Logo select shows.
-export function chosenVersion(logo: LogoData | null, version: number | null) {
+// 'none' for no logo, otherwise null, the Primary. This is also what its Logo select shows.
+export function chosenVersion(logo: LogoData | null, version: MockupVersion): MockupVersion {
+  if (version === 'none') return 'none'
   const others = logo?.variants.slice(1) ?? []
   return version !== null && others.some((variant) => variant.id === version) ? version : null
 }
 
-// The logo a mockup shows: the chosen version's image, else the Primary's, else the Cover's logo,
-// else null (a dashed box). A version with no image yet stays chosen; it just falls back meanwhile.
-export function mockupLogo(logo: LogoData | null, coverLogo: { url: string } | null, version: number | null) {
+// The logo a mockup shows: none with No logo; else the chosen version's image, else the Primary's,
+// else the Cover's logo, else null (a dashed box). A version with no image yet stays chosen; it
+// just falls back meanwhile.
+export function mockupLogo(logo: LogoData | null, coverLogo: { url: string } | null, version: MockupVersion) {
+  if (version === 'none') return null
   const id = chosenVersion(logo, version)
   const chosen = id === null ? null : logo?.variants.find((variant) => variant.id === id)?.image
   return chosen ?? logo?.variants[0]?.image ?? coverLogo ?? null
 }
 
 // The Logo select's options: the Primary as "Horizontal (Primary)" (or "Primary"), then the others
-// named as on the Logo versions page
-export function versionOptions(logo: LogoData | null) {
+// named as on the Logo versions page, then No logo
+export function versionOptions(logo: LogoData | null): { value: MockupVersion; label: string }[] {
   const [primary, ...others] = logo?.variants ?? []
   return [
     { value: null, label: primary?.name.trim() ? `${primary.name.trim()} (Primary)` : 'Primary' },
     ...others.map((variant, i) => ({ value: variant.id, label: versionName(variant.name, i + 1) })),
+    { value: 'none', label: 'No logo' },
   ]
+}
+
+// The Logo select's value for a version, and back
+export function versionValue(version: MockupVersion): string {
+  return version === null ? 'primary' : String(version)
+}
+
+export function parseVersionValue(value: string): MockupVersion {
+  return value === 'primary' ? null : value === 'none' ? 'none' : Number(value)
 }
 
 // The brand line of the page: the Logo section's brand name, else the Cover title, else none

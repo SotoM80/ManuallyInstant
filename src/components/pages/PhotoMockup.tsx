@@ -6,13 +6,14 @@ type PhotoMockupProps = {
   template: PhotoTemplate
   settings: MockupSettings
   logo: { url: string } | null // null → a dashed box where the logo goes
+  placeholder?: boolean // false → no dashed box either: No logo (ADR 0036)
   width?: number // of the image made, in pixels: enough for the print PDF by default
 }
 
 // A photo mockup, composed in WebGL and shown as an image, so the PDF copies it as it is
 // (see specs/mockups.md, Photo mockups, and ADR 0014). `data-rendering` tells the PDF export
 // to wait for it.
-export function PhotoMockup({ template, settings, logo, width = 1500 }: PhotoMockupProps) {
+export function PhotoMockup({ template, settings, logo, placeholder = true, width = 1500 }: PhotoMockupProps) {
   const [result, setResult] = useState<{ key: string; url: string | null }>({ key: '', url: null })
   const key = JSON.stringify([template.id, template.revision ?? 0, settings, logo?.url ?? null, width])
 
@@ -44,7 +45,7 @@ export function PhotoMockup({ template, settings, logo, width = 1500 }: PhotoMoc
       {!ready && <p className="photo-mockup-note">Preparing…</p>}
       {ready && !result.url && <p className="photo-mockup-note">This mockup could not be drawn</p>}
       {ready && result.url && <img src={result.url} alt={`${template.name} mockup`} />}
-      {ready && result.url && !logo && (
+      {ready && result.url && !logo && placeholder && (
         <span
           className="photo-mockup-placeholder"
           aria-hidden="true"

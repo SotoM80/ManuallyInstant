@@ -1,4 +1,4 @@
-import { SECTION_PAGES } from '../data/manualSections'
+import { SECTION_PAGES, extraMockupsIndex } from '../data/manualSections'
 import type { SectionBackground, SectionId, Skin } from './types'
 
 // A background for each section of the manual, kept in the Skin (specs/sectionbackgrounds.md,
@@ -18,6 +18,7 @@ export function isSectionId(id: string): id is SectionId {
 // The section a page belongs to, from the pages each section features (the Skin's entry only
 // points at its first painted page, so it is left out)
 export function sectionOfPage(page: string): SectionId | null {
+  if (extraMockupsIndex(page) !== null) return 'mockups' // the extra mockup pages (ADR 0036)
   return SECTION_IDS.find((id) => SECTION_PAGES[id]?.includes(page)) ?? null
 }
 
