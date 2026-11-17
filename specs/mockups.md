@@ -35,6 +35,8 @@ A new section of the accordion, after Skin (it uses the logo versions of Logo an
 **Settings of each ticked product**, under the list, in the order of the list, as an **accordion** like the layers of the Skin: each product is a block with a header (its small drawing in its current color, and its name) that opens its body. Only one body is open at a time; all are folded at the start, and ticking a product opens its block and folds the open one. The body has:
 * **Color**: the same color field as the Skin (the Cover's color picker plus chips that copy a palette color, see `skins.md`). Its label says what it paints: **Icon color** for the Phone, **Product color** for the others. Each product starts with its own default color (below).
 * **Logo**: a select with every logo version. Version 1 reads `<name> (Primary)`, or `Primary` when it has no name; the others read as on the Logo versions page (`versionName`: their name, or `Version N`). Last, **No logo**: the product alone, for a photo that already carries the logo (ADR 0036). Default: the Primary (No logo on the extra pages).
+* **Orientation**: a select, **Horizontal** (default) or **Vertical**, under the Logo select, in every mockup's block (illustrations and photos, also on the extra pages when the photo has a logo) (ADR 0037). Vertical turns the logo a quarter turn to the left, so it reads from bottom to top, **at the same size** it has horizontal: a long logo in a wide area then reaches past the area, and **Size** makes it smaller or larger. Changing it centers the logo again in its area (photo mockups), keeping Size and Rotation.
+* **Size** (illustrations; photos have it with their placement): 20–150 %, step 5, default 100 %, the logo resized around the center of the product's logo box (ADR 0037).
 
 A product that is unticked keeps its color and logo version: ticking it again brings them back. They are only reset when the browser page is refreshed.
 
@@ -133,8 +135,9 @@ Built in three phases, each one usable on its own.
 
 #### Placing the logo (photo mockups)
 In the product's block of the section, above Color and Logo:
-* A **preview** of that mockup, where the logo can be **dragged** inside its area (it never leaves it), or moved with the **arrow keys** (2 % of the area per press). While dragging, the logo follows the pointer as a plain image over the photo; the mockup is composed again when it is let go, so the drag stays smooth. Only the open block draws its preview.
-* **Size** (20–150 %, step 5, default 100 %) and **Rotation** (−45° to 45°, step 5, default 0°) sliders, and **Reset** (centered, 100 %, 0°).
+* A **preview** of that mockup, where the logo can be **dragged** anywhere on the photo, past its area, or moved with the **arrow keys** (2 % of the area per press). It never comes closer to the photo's edges than **Padding** (ADR 0037). While dragging, the logo follows the pointer as a plain image over the photo; the mockup is composed again when it is let go, so the drag stays smooth. Only the open block draws its preview.
+* **Size** (20–150 %, step 5, default 100 %) and **Rotation** (−45° to 45°, step 5, default 0°) sliders, and **Reset** (centered, 100 %, 0°; it keeps the Orientation). Rotation tilts the logo on top of its Orientation: Vertical with 10° is 80° to the left.
+* **Padding** (0–20 % of the photo's shorter side, step 1, default 5 %): the inner margin the logo stays inside. If the logo is too large to fit there (a long logo turned Vertical, a large Size), it is drawn smaller, just enough to fit; the photo itself never changes. The page and the PDF show it the same way.
 * **Blend**: Printed or Solid. (Later: **Amount** of the folds.)
 * **Edit template**: opens the template editor with this photo.
 * All of it is kept per product, like its color, and reaches the page at once.
@@ -384,6 +387,16 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **Given**: Photo A was on an extra page, and the user ticked it in the products list, so it is on the Mockups page.
 * **When**: The user clicks Move to a page of its own in A's block.
 * **Then**: A is unticked and is on the last extra page, alone, with Own page on; the section shows "Moved to Mockups N.".
+
+### Scenario 44: A Vertical Logo on an Illustration
+* **Given**: The Mug is ticked, with the Primary logo, wider than tall.
+* **When**: The user chooses Vertical in the Mug's Orientation select.
+* **Then**: The logo on the mug is turned a quarter turn to the left, at the same size; Size 150 % makes it larger around the same center; Horizontal turns it back. The other mockups do not change.
+
+### Scenario 45: A Vertical Logo on a Photo
+* **Given**: The photo business card, with the Primary logo, Size 100 % and Rotation 10°.
+* **When**: The user chooses Vertical.
+* **Then**: The logo is turned 80° to the left, at the same size (smaller only if it would not fit inside the Padding), and can be dragged anywhere on the photo, never past the Padding; Reset sets the place, Size and Rotation back and keeps Vertical. The print PDF shows it the same way.
 
 ### Scenario 39: In the PDF
 * **Given**: Two photos on the extra pages, 1 × 1.

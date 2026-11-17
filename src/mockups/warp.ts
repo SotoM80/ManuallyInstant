@@ -1,5 +1,5 @@
-import { clampPlacement, fitLogo } from './geometry'
-import type { AreaGrid, Placement, PhotoTemplate } from './types'
+import { ROTATION_LIMIT, SIZE_LIMITS, orientedLogo } from './geometry'
+import type { AreaGrid, LogoPlacement, Placement, PhotoTemplate } from './types'
 
 // Where the logo goes on a photo, as a grid of points the user drags in the template editor (see
 // specs/mockups.md, The logo area): 2 × 2 points are four corners (an area at an angle), more
@@ -28,11 +28,17 @@ export function gridBounds(grid: AreaGrid): PhotoTemplate['area'] {
   return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y }
 }
 
-// A smooth curve through points (Catmull-Rom; straight with two), at t from 0 to 1
+// A smooth curve through points (Catmull-Rom; straight with two), at t from 0 to 1. Past its
+// ends it goes on straight, along its first or last stretch, so a logo larger than its area
+// (Size over 100 %, a long logo turned Vertical) keeps its proportions instead of being
+// squashed against the edge
 function curve(points: Point[], t: number): Point {
-  if (points.length === 1 || t <= 0) return points[0]
-  if (t >= 1) return points[points.length - 1] // exactly, so the ends are where the user put them
+  if (points.length === 1 || t === 0) return points[0]
+  if (t === 1) return points[points.length - 1] // exactly, so the ends are where the user put them
   const segments = points.length - 1
+  const past = (from: Point, to: Point, by: number): Point => [from[0] + (from[0] - to[0]) * by, from[1] + (from[1] - to[1]) * by]
+  if (t < 0) return past(points[0], points[1], -t * segments)
+  if (t > 1) return past(points[segments], points[segments - 1], (t - 1) * segments)
   const at = Math.min(segments - 1e-9, Math.max(0, t * segments))
   const i = Math.floor(at)
   const local = at - i
@@ -85,10 +91,11 @@ export function surfaceSize(grid: AreaGrid) {
 
 // Where a point of the logo (s, t from 0 to 1 across and down it) falls in the area (u, v),
 // with the logo fitted, moved, resized and turned as `placement` says
-export function logoToArea(grid: AreaGrid, aspect: number, placement: Placement, s: number, t: number): Point {
+export function logoToArea(grid: AreaGrid, aspect: number, placement: LogoPlacement, s: number, t: number): Point {
   const surface = surfaceSize(grid)
-  const { width, height } = fitLogo({ x: 0, y: 0, ...surface }, aspect, placement.scale)
-  const turn = (placement.rotate * Math.PI) / 180
+  const logo = orientedLogo({ x: 0, y: 0, ...surface }, aspect, placement.scale, placement.orientation)
+  const { width, height } = logo
+  const turn = ((placement.rotate + logo.turn) * Math.PI) / 180
   const dx = (s - 0.5) * width
   const dy = (t - 0.5) * height
   return [
@@ -97,14 +104,59 @@ export function logoToArea(grid: AreaGrid, aspect: number, placement: Placement,
   ]
 }
 
-// The placement kept inside the area, on its surface size
-export function clampOnGrid(grid: AreaGrid, aspect: number, placement: Placement) {
-  return clampPlacement({ x: 0, y: 0, ...surfaceSize(grid) }, aspect, placement)
+// The photo's inner margin by default: 5 % of its shorter side
+export const DEFAULT_PADDING = 0.05
+export const PADDING_LIMITS = { min: 0, max: 0.2 }
+
+// The placement kept inside the photo, `padding` in from its edges (ADR 0037): the logo can go
+// anywhere on the photo, not only on its area, and is made smaller if it cannot fit there. The
+// photo itself is never changed. Worked out on the logo's outline, a few steps at a time, so
+// it holds for an area at an angle or on a curve too.
+export function clampInPhoto(grid: AreaGrid, photo: [number, number], aspect: number, placement: LogoPlacement): Placement {
+  const [photoWidth, photoHeight] = photo
+  const pad = Math.min(PADDING_LIMITS.max, Math.max(0, placement.padding ?? DEFAULT_PADDING)) * Math.min(photoWidth, photoHeight)
+  const room = { left: pad, top: pad, right: photoWidth - pad, bottom: photoHeight - pad }
+  let next: LogoPlacement = {
+    ...placement,
+    scale: Math.min(SIZE_LIMITS.max, Math.max(SIZE_LIMITS.min, placement.scale)),
+    rotate: Math.min(ROTATION_LIMIT, Math.max(-ROTATION_LIMIT, placement.rotate)),
+  }
+  for (let step = 0; step < 8; step++) {
+    const outline = logoOutline(grid, aspect, next, 4)
+    const xs = outline.map(([x]) => x)
+    const ys = outline.map(([, y]) => y)
+    const box = { left: Math.min(...xs), top: Math.min(...ys), right: Math.max(...xs), bottom: Math.max(...ys) }
+    const width = box.right - box.left
+    const height = box.bottom - box.top
+    // Too large for the room: smaller, then placed again
+    const shrink = Math.min((room.right - room.left) / width, (room.bottom - room.top) / height)
+    if (shrink < 0.999 && next.scale > SIZE_LIMITS.min) {
+      next = { ...next, scale: Math.max(SIZE_LIMITS.min, next.scale * shrink * 0.999) }
+      continue
+    }
+    const dx = box.left < room.left ? room.left - box.left : box.right > room.right ? room.right - box.right : 0
+    const dy = box.top < room.top ? room.top - box.top : box.bottom > room.bottom ? room.bottom - box.bottom : 0
+    if (Math.abs(dx) < 0.25 && Math.abs(dy) < 0.25) break
+    // From photo pixels to the area's (u, v) near the logo's center
+    const u = 0.5 + next.x
+    const v = 0.5 + next.y
+    const e = 0.01
+    const at = gridPoint(grid, u, v)
+    const alongU = gridPoint(grid, u + e, v)
+    const alongV = gridPoint(grid, u, v + e)
+    const a = (alongU[0] - at[0]) / e
+    const b = (alongV[0] - at[0]) / e
+    const c = (alongU[1] - at[1]) / e
+    const d = (alongV[1] - at[1]) / e
+    const det = a * d - b * c || 1
+    next = { ...next, x: next.x + (d * dx - b * dy) / det, y: next.y + (a * dy - c * dx) / det }
+  }
+  return { x: next.x, y: next.y, scale: next.scale, rotate: next.rotate }
 }
 
 // The mesh the logo is drawn on: `across` × `down` small quads, two triangles each, with where
 // each corner falls on the photo (in its pixels) and which point of the logo it shows
-export function logoMesh(grid: AreaGrid, aspect: number, placement: Placement, across = 32, down = 16) {
+export function logoMesh(grid: AreaGrid, aspect: number, placement: LogoPlacement, across = 32, down = 16) {
   const positions: number[] = []
   const logoPoints: number[] = []
   const vertex = (i: number, j: number) => {
@@ -129,7 +181,7 @@ export function logoMesh(grid: AreaGrid, aspect: number, placement: Placement, a
 }
 
 // The outline of the logo on the photo, to show where it is and to drag it
-export function logoOutline(grid: AreaGrid, aspect: number, placement: Placement, steps = 12): Point[] {
+export function logoOutline(grid: AreaGrid, aspect: number, placement: LogoPlacement, steps = 12): Point[] {
   const side = (from: Point, to: Point) =>
     Array.from({ length: steps }, (_, k) => {
       const f = k / steps

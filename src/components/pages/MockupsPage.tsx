@@ -45,7 +45,14 @@ export function MockupsPage({ mockups, logo, cover, color }: MockupsPageProps) {
                 {product.kind === 'photo' ? (
                   <PhotoMockup template={product} settings={settings} logo={shown} placeholder={settings.version !== 'none'} />
                 ) : (
-                  <MockupArt product={product} color={settings.color} logo={shown} placeholder={settings.version !== 'none'} />
+                  <MockupArt
+                    product={product}
+                    color={settings.color}
+                    logo={shown}
+                    placeholder={settings.version !== 'none'}
+                    orientation={settings.orientation}
+                    scale={settings.placement.scale}
+                  />
                 )}
                 <p className="mockup-name">{product.name}</p>
               </li>

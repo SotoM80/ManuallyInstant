@@ -1,7 +1,7 @@
 import { versionName } from '../data/logoCopy'
 import { manualPages } from '../data/manualSections'
 import { findMockup, mockupCatalog } from './catalog'
-import type { Blend, ExtraLayout, MockupItem, MockupSettings, MockupVersion, Mockups, Placement } from './types'
+import type { Blend, ExtraLayout, MockupItem, MockupSettings, MockupVersion, Mockups, Orientation, Placement } from './types'
 import type { CoverData, LogoData } from '../types'
 
 // The Mockups section's choice (see specs/mockups.md). Every function returns a new choice, so
@@ -200,6 +200,17 @@ export function setMockupVersion(mockups: Mockups, id: string, version: MockupVe
 
 export function setMockupPlacement(mockups: Mockups, id: string, placement: Placement) {
   return setSetting(mockups, id, { placement })
+}
+
+// Turning the logo centers it again (photo mockups), so the turned logo starts inside its area
+export function setMockupOrientation(mockups: Mockups, id: string, orientation: Orientation) {
+  const item = findMockup(id)
+  const current = mockups.settings[id] ?? (item ? defaultSettings(item) : defaultSettings({ color: '#FFFFFF' }))
+  return setSetting(mockups, id, { orientation, placement: { ...current.placement, x: 0, y: 0 } })
+}
+
+export function setMockupPadding(mockups: Mockups, id: string, padding: number) {
+  return setSetting(mockups, id, { padding })
 }
 
 export function setMockupBlend(mockups: Mockups, id: string, blend: Blend) {

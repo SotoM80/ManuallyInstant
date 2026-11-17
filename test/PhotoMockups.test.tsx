@@ -2,6 +2,9 @@ import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { renderApp } from './renderApp';
 import { uploadLogo } from './coverForm';
 import { renderPhotoMockup } from '../src/mockups/render/renderPhotoMockup';
+import { areaGrid, clampInPhoto } from '../src/mockups/warp';
+import { findMockup } from '../src/mockups/catalog';
+import type { PhotoTemplate } from '../src/mockups/types';
 import { createPdf } from '../src/export/createPdf';
 
 // Spec: specs/mockups.md, Photo mockups (ADR 0014). jsdom has no WebGL: the renderer is mocked,
@@ -82,7 +85,7 @@ describe('Photo mockups (phase 1)', () => {
     await waitFor(() => expect(lastInput().placement).toEqual({ x: 0, y: 0, scale: 1, rotate: 0 }));
   });
 
-  it('moves the logo with the arrow keys, never out of its area', async () => {
+  it('moves the logo with the arrow keys, past its area but never out of the photo padding (ADR 0037)', async () => {
     renderApp();
     uploadLogo();
     fireEvent.click(screen.getByRole('button', { name: 'Apply Logo' }));
@@ -92,8 +95,11 @@ describe('Photo mockups (phase 1)', () => {
     fireEvent.keyDown(handle, { key: 'ArrowRight' });
     await waitFor(() => expect(lastInput().placement.x).toBeCloseTo(0.02), { timeout: 5000 });
     for (let i = 0; i < 60; i++) fireEvent.keyDown(handle, { key: 'ArrowRight' });
-    // A 40 % square logo in a 2:1 area can move (1 − 0.2) / 2 = 0.4 across at most
-    await waitFor(() => expect(lastInput().placement.x).toBeCloseTo(0.4), { timeout: 5000 });
+    // Past the area's edge (0.4 for a 40 % square logo in a 2:1 area), up to 5 % inside the photo
+    const template = findMockup('business-card-photo') as PhotoTemplate;
+    const stop = clampInPhoto(areaGrid(template), template.size, 1, { x: 9, y: 0, scale: 0.4, rotate: 0 }).x;
+    expect(stop).toBeGreaterThan(0.4);
+    await waitFor(() => expect(lastInput().placement.x).toBeCloseTo(stop, 2), { timeout: 5000 });
   });
 
   it('says so when the mockup cannot be drawn, and the page keeps working (scenario 25)', async () => {

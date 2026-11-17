@@ -8,7 +8,7 @@ import { GeneratePhotoPanel } from './GeneratePhotoPanel'
 import { MOCKUP_GROUPS } from '../mockups/products'
 import { savePhotoTemplate, useMockupCatalog } from '../mockups/catalog'
 import { ROTATION_LIMIT, SIZE_LIMITS, dragPlacement } from '../mockups/geometry'
-import { areaGrid, clampOnGrid, logoOutline, surfaceSize } from '../mockups/warp'
+import { DEFAULT_PADDING, PADDING_LIMITS, areaGrid, clampInPhoto, logoOutline, surfaceSize } from '../mockups/warp'
 import {
   DEFAULT_PLACEMENT,
   EXTRA_LIMITS,
@@ -28,6 +28,8 @@ import {
   setExtraLayout,
   setOwnPage,
   setMockupBlend,
+  setMockupOrientation,
+  setMockupPadding,
   setMockupColor,
   setMockupPlacement,
   setMockupVersion,
@@ -97,7 +99,9 @@ function PlacementPreview({
   const [dragging, setDragging] = useState<Placement | null>(null)
   const aspect = useImageAspect(logo?.url ?? null)
   const grid = areaGrid(template)
-  const placement = dragging ?? settings.placement
+  const extras = { orientation: settings.orientation, padding: settings.padding }
+  // Shown where it is drawn: inside the photo's padding (ADR 0037)
+  const placement = { ...clampInPhoto(grid, template.size, aspect, { ...(dragging ?? settings.placement), ...extras }), ...extras }
   const [photoWidth, photoHeight] = template.size
   const outline = logoOutline(grid, aspect, placement)
     .map(([x, y]) => `${x},${y}`)
@@ -113,7 +117,7 @@ function PlacementPreview({
       photoWidth,
       surfaceSize(grid),
     )
-    return clampOnGrid(grid, aspect, next)
+    return clampInPhoto(grid, template.size, aspect, { ...next, ...extras })
   }
 
   function nudge(event: KeyboardEvent<SVGElement>) {
@@ -126,8 +130,8 @@ function PlacementPreview({
     const step = steps[event.key]
     if (!step) return
     event.preventDefault()
-    const next = { ...settings.placement, x: settings.placement.x + step[0], y: settings.placement.y + step[1] }
-    onPlacement(clampOnGrid(grid, aspect, next))
+    const next = { ...placement, x: placement.x + step[0], y: placement.y + step[1] }
+    onPlacement(clampInPhoto(grid, template.size, aspect, next))
   }
 
   return (
@@ -146,8 +150,8 @@ function PlacementPreview({
             onKeyDown={nudge}
             onPointerDown={(event) => {
               event.currentTarget.setPointerCapture?.(event.pointerId)
-              start.current = { x: event.clientX, y: event.clientY, placement: settings.placement }
-              setDragging(settings.placement)
+              start.current = { x: event.clientX, y: event.clientY, placement }
+              setDragging(placement)
             }}
             onPointerMove={(event) => {
               if (start.current) setDragging(moved(event))
@@ -252,10 +256,56 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
     else if (openId === id) setOpenId(null)
   }
 
+  // Horizontal or Vertical logo, for every mockup (ADR 0037)
+  function orientationField(id: string, name: string, settings: MockupSettings) {
+    const fieldId = `mockup-${id}-orientation`
+    return (
+      <div className="skin-color">
+        <label htmlFor={fieldId}>Orientation</label>
+        <select
+          id={fieldId}
+          aria-label={`${name} logo orientation`}
+          value={settings.orientation ?? 'horizontal'}
+          onChange={(event) =>
+            onChange(setMockupOrientation(mockups, id, event.target.value === 'vertical' ? 'vertical' : 'horizontal'))
+          }
+        >
+          <option value="horizontal">Horizontal</option>
+          <option value="vertical">Vertical</option>
+        </select>
+      </div>
+    )
+  }
+
+  function sizeField(id: string, name: string, settings: MockupSettings) {
+    const fieldId = `mockup-${id}-art-size`
+    const scale = Math.round(settings.placement.scale * 100)
+    return (
+      <div className="skin-control">
+        <label htmlFor={fieldId}>Size</label>
+        <input
+          id={fieldId}
+          aria-label={`${name} logo size`}
+          type="range"
+          min={SIZE_LIMITS.min * 100}
+          max={SIZE_LIMITS.max * 100}
+          step={5}
+          value={scale}
+          onChange={(event) =>
+            onChange(setMockupPlacement(mockups, id, { ...settings.placement, scale: Number(event.target.value) / 100 }))
+          }
+        />
+        <output htmlFor={fieldId}>{scale}%</output>
+      </div>
+    )
+  }
+
   function photoSettings(template: PhotoTemplate, settings: MockupSettings, shown: { url: string } | null) {
     const sizeId = `mockup-${template.id}-size`
     const rotationId = `mockup-${template.id}-rotation`
     const blendId = `mockup-${template.id}-blend`
+    const paddingId = `mockup-${template.id}-padding`
+    const padding = Math.round((settings.padding ?? DEFAULT_PADDING) * 100)
     const place = (placement: Placement) => onChange(setMockupPlacement(mockups, template.id, placement))
     return (
       <>
@@ -286,6 +336,20 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
           />
           <output htmlFor={rotationId}>{settings.placement.rotate}°</output>
         </div>
+        <div className="skin-control">
+          <label htmlFor={paddingId}>Padding</label>
+          <input
+            id={paddingId}
+            type="range"
+            min={PADDING_LIMITS.min * 100}
+            max={PADDING_LIMITS.max * 100}
+            step={1}
+            value={padding}
+            onChange={(event) => onChange(setMockupPadding(mockups, template.id, Number(event.target.value) / 100))}
+          />
+          <output htmlFor={paddingId}>{padding}%</output>
+        </div>
+        <p className="logo-form-hint">The logo can go anywhere on the photo, this far inside its edges.</p>
         <button type="button" className="palette-secondary-button" onClick={() => place(DEFAULT_PLACEMENT)}>
           Reset
         </button>
@@ -403,7 +467,14 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                 {item.kind === 'photo' ? (
                   <img src={item.image} alt="" aria-hidden="true" />
                 ) : (
-                  <MockupArt product={item} color={settings.color} logo={shown} decorative />
+                  <MockupArt
+                    product={item}
+                    color={settings.color}
+                    logo={shown}
+                    orientation={settings.orientation}
+                    scale={settings.placement.scale}
+                    decorative
+                  />
                 )}
               </span>
               <span className="palette-block-title">{item.name}</span>
@@ -451,6 +522,9 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                     ))}
                   </select>
                 </div>
+                {orientationField(item.id, item.name, settings)}
+                {/* Illustrations: the logo's Size too (photos have it with their placement) */}
+                {item.kind !== 'photo' && sizeField(item.id, item.name, settings)}
               </div>
             </div>
           </div>
@@ -519,6 +593,7 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                           <span className="logo-form-hint"> ({extraMockupsPage(extraPageOf(mockups, template.id) ?? 1)})</span>
                         </label>
                       )}
+                      {version !== 'none' && orientationField(template.id, template.name, settings)}
                       {/* With a logo, it is placed like on any photo mockup */}
                       {extraOpen && version !== 'none' ? (
                         photoSettings(template, settings, shown)

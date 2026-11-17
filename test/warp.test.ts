@@ -1,6 +1,6 @@
 import {
   areaGrid,
-  clampOnGrid,
+  clampInPhoto,
   gridBounds,
   gridFromRect,
   gridPoint,
@@ -36,6 +36,12 @@ describe('a straight area', () => {
     const size = surfaceSize(grid);
     expect(size.width).toBeCloseTo(400);
     expect(size.height).toBeCloseTo(200);
+  });
+
+  it('goes on straight past its edges, so a logo larger than the area is not squashed (ADR 0037)', () => {
+    close(gridPoint(grid, -0.5, 0.5), [-100, 300]);
+    close(gridPoint(grid, 0.5, 1.5), [300, 500]);
+    close(gridPoint(grid, 1.25, -0.25), [600, 150]);
   });
 
   it('puts a centered square logo in the middle, as tall as the area', () => {
@@ -110,7 +116,24 @@ describe('editing the area', () => {
     close(gridPoint(bent, 0.5, 0), [300, 230]);
   });
 
-  it('keeps the logo inside the area, measured on its surface', () => {
-    expect(clampOnGrid(grid, 1, { x: 0.9, y: 0, scale: 1, rotate: 0 }).x).toBeCloseTo(0.25);
+  // A 600 × 600 photo, its area 400 × 200 at (100, 200) (ADR 0037)
+  const PHOTO: [number, number] = [600, 600];
+
+  it('lets the logo go past its area, as far as the photo padding allows', () => {
+    // A square logo, 200 px: 5 % padding is 30 px, so its center stops at 470, 0.425 of the area across
+    expect(clampInPhoto(grid, PHOTO, 1, { x: 0.9, y: 0, scale: 1, rotate: 0 }).x).toBeCloseTo(0.425, 2);
+    // No padding: to the photo edge
+    expect(clampInPhoto(grid, PHOTO, 1, { x: 0.9, y: 0, scale: 1, rotate: 0, padding: 0 }).x).toBeCloseTo(0.5, 2);
+    // Up, past the area's top (200), to 30 px from the photo's top: center at 130
+    expect(clampInPhoto(grid, PHOTO, 1, { x: 0, y: -2, scale: 1, rotate: 0 }).y).toBeCloseTo(-0.85, 2);
+  });
+
+  it('makes a logo too large for the photo smaller, and keeps it inside (a long logo turned Vertical)', () => {
+    // 4:1 at 150 %: 600 long turned, more than the 540 px between the paddings
+    const placed = clampInPhoto(grid, PHOTO, 4, { x: 0, y: -1, scale: 1.5, rotate: 0, orientation: 'vertical' });
+    expect(placed.scale).toBeCloseTo(1.35, 1);
+    const ys = logoOutline(grid, 4, { ...placed, orientation: 'vertical' }).map(([, y]) => y);
+    expect(Math.min(...ys)).toBeGreaterThanOrEqual(29.5);
+    expect(Math.max(...ys)).toBeLessThanOrEqual(570.5);
   });
 });

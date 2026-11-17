@@ -57,6 +57,13 @@ export type MockupItem = MockupProduct | PhotoTemplate
 // share of the area's width and height, its size (1 → it fills the area) and its rotation in degrees
 export type Placement = { x: number; y: number; scale: number; rotate: number }
 
+// The logo as it is (Horizontal) or a quarter turn to the left, fitted again (Vertical, ADR 0037)
+export type Orientation = 'horizontal' | 'vertical'
+
+// A placement with the orientation it is drawn in and the photo's inner margin (padding, a share
+// of the photo's shorter side): what the geometry and the composer read
+export type LogoPlacement = Placement & { orientation?: Orientation; padding?: number }
+
 // Printed: the logo multiplies with the photo (dark logos). Solid: laid over it (light logos).
 export type Blend = 'printed' | 'solid'
 
@@ -65,8 +72,15 @@ export type Blend = 'printed' | 'solid'
 export type MockupVersion = number | null | 'none'
 
 // What the user set for a product: its color, its logo version, and for photo mockups where the
-// logo sits and how it blends
-export type MockupSettings = { color: string; version: MockupVersion; placement: Placement; blend: Blend }
+// logo sits and how it blends, and the logo's orientation (none saved → Horizontal)
+export type MockupSettings = {
+  color: string
+  version: MockupVersion
+  placement: Placement
+  blend: Blend
+  orientation?: Orientation
+  padding?: number // photo mockups: the logo stays this far inside the photo (none saved → 5 %)
+}
 
 // The grid and the margin of every extra mockup page: columns and rows 1–3, the margin in % of
 // the page's width (ADR 0036)
