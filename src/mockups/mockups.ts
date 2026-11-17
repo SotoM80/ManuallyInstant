@@ -1,7 +1,7 @@
 import { versionName } from '../data/logoCopy'
 import { manualPages } from '../data/manualSections'
 import { findMockup, mockupCatalog } from './catalog'
-import type { Blend, ExtraLayout, MockupItem, MockupSettings, MockupVersion, Mockups, Orientation, Placement } from './types'
+import type { Blend, ExtraLayout, MockupItem, MockupSettings, MockupVersion, Mockups, Orientation, PhotoTemplate, Placement } from './types'
 import type { CoverData, LogoData } from '../types'
 
 // The Mockups section's choice (see specs/mockups.md). Every function returns a new choice, so
@@ -211,6 +211,21 @@ export function setMockupOrientation(mockups: Mockups, id: string, orientation: 
 
 export function setMockupPadding(mockups: Mockups, id: string, padding: number) {
   return setSetting(mockups, id, { padding })
+}
+
+export function setMockupClip(mockups: Mockups, id: string, clip: boolean) {
+  return setSetting(mockups, id, { clip })
+}
+
+// Whether a photo template knows its product's shape: polygons, or a mask from the editor's
+// selection (none is saved with nothing selected, ADR 0038)
+export function hasProductShape(template: Pick<PhotoTemplate, 'mask' | 'maskImage'>) {
+  return template.mask.length > 0 || Boolean(template.maskImage)
+}
+
+// Whether the logo is clipped to the product: on by default, where the product is known
+export function clipsLogo(template: Pick<PhotoTemplate, 'mask' | 'maskImage'>, settings: MockupSettings) {
+  return (settings.clip ?? true) && hasProductShape(template)
 }
 
 export function setMockupBlend(mockups: Mockups, id: string, blend: Blend) {

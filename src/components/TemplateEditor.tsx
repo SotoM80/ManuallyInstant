@@ -192,7 +192,8 @@ export function TemplateEditor({ template, logo, onSave, onClose }: TemplateEdit
       group,
       size: photo.size,
       mask: [],
-      maskImage: maskToDataUrl(softenMask(mask, SOFT_EDGE)),
+      // With nothing selected, no mask: the product is unknown, so the logo is not clipped (ADR 0038)
+      maskImage: selectedShare(mask) > 0 ? maskToDataUrl(softenMask(mask, SOFT_EDGE)) : undefined,
       area,
       grid,
       color,

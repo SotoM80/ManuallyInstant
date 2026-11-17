@@ -12,6 +12,7 @@ export type PhotoMockupInput = {
   logoUrl: string | null
   placement: LogoPlacement // with the logo's orientation and the photo's padding (ADR 0037)
   blend: Blend
+  clip?: boolean // the logo drawn only on the product, where the mask is white (ADR 0038)
   width: number // of the image made, in pixels
 }
 
@@ -75,15 +76,18 @@ precision highp float;
 ${TINT}
 uniform sampler2D uLogo;
 uniform float uSolid;
+uniform float uClip;
 varying vec2 vLogo;
 varying vec2 vUV;
 void main() {
   float shade;
   vec3 under = tinted(vUV, shade);
   vec4 logo = texture2D(uLogo, vLogo);
+  vec4 product = texture2D(uMask, vUV);
+  float alpha = logo.a * mix(1.0, product.a * product.r, uClip); // clipped: only on the product
   vec3 printed = under * logo.rgb;
   vec3 solid = logo.rgb * mix(1.0, min(shade, 1.0), 0.6);
-  gl_FragColor = vec4(mix(under, mix(printed, solid, uSolid), logo.a), 1.0);
+  gl_FragColor = vec4(mix(under, mix(printed, solid, uSolid), alpha), 1.0);
 }`
 
 const images = new Map<string, Promise<HTMLImageElement>>()
@@ -238,6 +242,7 @@ async function compose(input: PhotoMockupInput) {
       const uniform = tint(logoProgram)
       gl.uniform1i(uniform('uLogo'), 2)
       gl.uniform1f(uniform('uSolid'), input.blend === 'solid' ? 1 : 0)
+      gl.uniform1f(uniform('uClip'), input.clip ? 1 : 0)
       gl.uniform2f(uniform('uSize'), photoWidth, photoHeight)
       attribute(gl, logoProgram, 'aPosition', mesh.positions)
       attribute(gl, logoProgram, 'aLogo', mesh.logoPoints)
@@ -255,7 +260,7 @@ const MAX_CACHED = 40
 const made = new Map<string, Promise<string>>()
 
 export function renderPhotoMockup(input: PhotoMockupInput): Promise<string> {
-  const key = JSON.stringify([input.template.id, input.template.revision ?? 0, input.template.image, input.color, input.logoUrl, input.placement, input.blend, input.width])
+  const key = JSON.stringify([input.template.id, input.template.revision ?? 0, input.template.image, input.color, input.logoUrl, input.placement, input.blend, input.clip ?? false, input.width])
   let image = made.get(key)
   if (!image) {
     image = compose(input)

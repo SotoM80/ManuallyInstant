@@ -28,6 +28,9 @@ import {
   setExtraLayout,
   setOwnPage,
   setMockupBlend,
+  setMockupClip,
+  clipsLogo,
+  hasProductShape,
   setMockupOrientation,
   setMockupPadding,
   setMockupColor,
@@ -350,6 +353,19 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
           <output htmlFor={paddingId}>{padding}%</output>
         </div>
         <p className="logo-form-hint">The logo can go anywhere on the photo, this far inside its edges.</p>
+        <label className="skin-check">
+          <input
+            type="checkbox"
+            aria-label={`Clip the logo to the ${template.name}`}
+            checked={clipsLogo(template, settings)}
+            disabled={!hasProductShape(template)}
+            onChange={(event) => onChange(setMockupClip(mockups, template.id, event.target.checked))}
+          />
+          Clip to product
+        </label>
+        {!hasProductShape(template) && (
+          <p className="logo-form-hint">Select the product in Edit template to clip the logo to it.</p>
+        )}
         <button type="button" className="palette-secondary-button" onClick={() => place(DEFAULT_PLACEMENT)}>
           Reset
         </button>

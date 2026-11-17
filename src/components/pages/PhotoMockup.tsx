@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { renderPhotoMockup } from '../../mockups/render/renderPhotoMockup'
+import { clipsLogo } from '../../mockups/mockups'
 import type { MockupSettings, PhotoTemplate } from '../../mockups/types'
 
 type PhotoMockupProps = {
@@ -25,6 +26,7 @@ export function PhotoMockup({ template, settings, logo, placeholder = true, widt
       logoUrl: logo?.url ?? null,
       placement: { ...settings.placement, orientation: settings.orientation, padding: settings.padding },
       blend: settings.blend,
+      clip: clipsLogo(template, settings),
       width,
     }).then(
       (url) => current && setResult({ key, url }),

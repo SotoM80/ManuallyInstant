@@ -138,6 +138,7 @@ In the product's block of the section, above Color and Logo:
 * A **preview** of that mockup, where the logo can be **dragged** anywhere on the photo, past its area, or moved with the **arrow keys** (2 % of the area per press). It never comes closer to the photo's edges than **Padding** (ADR 0037). While dragging, the logo follows the pointer as a plain image over the photo; the mockup is composed again when it is let go, so the drag stays smooth. Only the open block draws its preview.
 * **Size** (20–150 %, step 5, default 100 %) and **Rotation** (−45° to 45°, step 5, default 0°) sliders, and **Reset** (centered, 100 %, 0°; it keeps the Orientation). Rotation tilts the logo on top of its Orientation: Vertical with 10° is 80° to the left.
 * **Padding** (0–20 % of the photo's shorter side, step 1, default 5 %): the inner margin the logo stays inside. If the logo is too large to fit there (a long logo turned Vertical, a large Size), it is drawn smaller, just enough to fit; the photo itself never changes. The page and the PDF show it the same way.
+* **Clip to product** (a checkbox, on by default): the logo is drawn only on the product, as if printed on it, and the part of it past the product's edge is not drawn; the photo around it never changes. It works from the product's selection (the template's mask), so it is shown only for a photo whose product is known: the bundled templates, and a photo where the product was selected in the template editor. Otherwise it is disabled, with the hint `Select the product in Edit template to clip the logo to it.` A photo with more than one product (two cards) clips to all of them (ADR 0038).
 * **Blend**: Printed or Solid. (Later: **Amount** of the folds.)
 * **Edit template**: opens the template editor with this photo.
 * All of it is kept per product, like its color, and reaches the page at once.
@@ -397,6 +398,16 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **Given**: The photo business card, with the Primary logo, Size 100 % and Rotation 10°.
 * **When**: The user chooses Vertical.
 * **Then**: The logo is turned 80° to the left, at the same size (smaller only if it would not fit inside the Padding), and can be dragged anywhere on the photo, never past the Padding; Reset sets the place, Size and Rotation back and keeps Vertical. The print PDF shows it the same way.
+
+### Scenario 46: Clipped to the Product
+* **Given**: The photo business card, with the Primary logo turned Vertical at Size 130 %, so it reaches past the top card onto the table.
+* **When**: The mockup is drawn (Clip to product on, the default).
+* **Then**: The logo shows only on the card; the table around it is as in the photo. Unticking Clip to product draws the whole logo again, over the table; the print PDF shows the same as the page.
+
+### Scenario 47: No Product Selected
+* **Given**: An uploaded photo used without selecting its product.
+* **When**: The user opens its block.
+* **Then**: Clip to product is disabled, with its hint; the logo is drawn whole, inside the Padding.
 
 ### Scenario 39: In the PDF
 * **Given**: Two photos on the extra pages, 1 × 1.

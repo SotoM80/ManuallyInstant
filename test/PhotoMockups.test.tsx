@@ -102,6 +102,17 @@ describe('Photo mockups (phase 1)', () => {
     await waitFor(() => expect(lastInput().placement.x).toBeCloseTo(stop, 2), { timeout: 5000 });
   });
 
+  it('clips the logo to the product by default, and draws it whole when unticked (ADR 0038, scenario 46)', async () => {
+    renderApp();
+    const form = tickPhoto();
+    const clip = within(form).getByRole('checkbox', { name: `Clip the logo to the ${PHOTO}` });
+    expect(clip).toBeChecked();
+    await waitFor(() => expect(lastInput().clip).toBe(true));
+    fireEvent.click(clip);
+    await waitFor(() => expect(lastInput().clip).toBe(false));
+    expect(clip).not.toBeChecked();
+  });
+
   it('says so when the mockup cannot be drawn, and the page keeps working (scenario 25)', async () => {
     render.mockRejectedValue(new Error('No WebGL'));
     renderApp();
