@@ -8,7 +8,7 @@ import { GeneratePhotoPanel } from './GeneratePhotoPanel'
 import { MOCKUP_GROUPS } from '../mockups/products'
 import { savePhotoTemplate, useMockupCatalog } from '../mockups/catalog'
 import { ROTATION_LIMIT, SIZE_LIMITS, dragPlacement } from '../mockups/geometry'
-import { areaGrid, clampOnGrid, logoOutline, surfaceSize } from '../mockups/warp'
+import { DEFAULT_PADDING, PADDING_LIMITS, areaGrid, clampInPhoto, logoOutline, surfaceSize } from '../mockups/warp'
 import {
   DEFAULT_PLACEMENT,
   EXTRA_LIMITS,
@@ -29,6 +29,7 @@ import {
   setOwnPage,
   setMockupBlend,
   setMockupOrientation,
+  setMockupPadding,
   setMockupColor,
   setMockupPlacement,
   setMockupVersion,
@@ -98,7 +99,9 @@ function PlacementPreview({
   const [dragging, setDragging] = useState<Placement | null>(null)
   const aspect = useImageAspect(logo?.url ?? null)
   const grid = areaGrid(template)
-  const placement = { ...(dragging ?? settings.placement), orientation: settings.orientation }
+  const extras = { orientation: settings.orientation, padding: settings.padding }
+  // Shown where it is drawn: inside the photo's padding (ADR 0037)
+  const placement = { ...clampInPhoto(grid, template.size, aspect, { ...(dragging ?? settings.placement), ...extras }), ...extras }
   const [photoWidth, photoHeight] = template.size
   const outline = logoOutline(grid, aspect, placement)
     .map(([x, y]) => `${x},${y}`)
@@ -114,7 +117,7 @@ function PlacementPreview({
       photoWidth,
       surfaceSize(grid),
     )
-    return clampOnGrid(grid, aspect, { ...next, orientation: settings.orientation })
+    return clampInPhoto(grid, template.size, aspect, { ...next, ...extras })
   }
 
   function nudge(event: KeyboardEvent<SVGElement>) {
@@ -127,8 +130,8 @@ function PlacementPreview({
     const step = steps[event.key]
     if (!step) return
     event.preventDefault()
-    const next = { ...placement, x: settings.placement.x + step[0], y: settings.placement.y + step[1] }
-    onPlacement(clampOnGrid(grid, aspect, next))
+    const next = { ...placement, x: placement.x + step[0], y: placement.y + step[1] }
+    onPlacement(clampInPhoto(grid, template.size, aspect, next))
   }
 
   return (
@@ -147,8 +150,8 @@ function PlacementPreview({
             onKeyDown={nudge}
             onPointerDown={(event) => {
               event.currentTarget.setPointerCapture?.(event.pointerId)
-              start.current = { x: event.clientX, y: event.clientY, placement: settings.placement }
-              setDragging(settings.placement)
+              start.current = { x: event.clientX, y: event.clientY, placement }
+              setDragging(placement)
             }}
             onPointerMove={(event) => {
               if (start.current) setDragging(moved(event))
@@ -301,6 +304,8 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
     const sizeId = `mockup-${template.id}-size`
     const rotationId = `mockup-${template.id}-rotation`
     const blendId = `mockup-${template.id}-blend`
+    const paddingId = `mockup-${template.id}-padding`
+    const padding = Math.round((settings.padding ?? DEFAULT_PADDING) * 100)
     const place = (placement: Placement) => onChange(setMockupPlacement(mockups, template.id, placement))
     return (
       <>
@@ -331,6 +336,20 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
           />
           <output htmlFor={rotationId}>{settings.placement.rotate}°</output>
         </div>
+        <div className="skin-control">
+          <label htmlFor={paddingId}>Padding</label>
+          <input
+            id={paddingId}
+            type="range"
+            min={PADDING_LIMITS.min * 100}
+            max={PADDING_LIMITS.max * 100}
+            step={1}
+            value={padding}
+            onChange={(event) => onChange(setMockupPadding(mockups, template.id, Number(event.target.value) / 100))}
+          />
+          <output htmlFor={paddingId}>{padding}%</output>
+        </div>
+        <p className="logo-form-hint">The logo can go anywhere on the photo, this far inside its edges.</p>
         <button type="button" className="palette-secondary-button" onClick={() => place(DEFAULT_PLACEMENT)}>
           Reset
         </button>

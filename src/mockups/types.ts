@@ -60,8 +60,9 @@ export type Placement = { x: number; y: number; scale: number; rotate: number }
 // The logo as it is (Horizontal) or a quarter turn to the left, fitted again (Vertical, ADR 0037)
 export type Orientation = 'horizontal' | 'vertical'
 
-// A placement with the orientation it is drawn in: what the geometry and the composer read
-export type LogoPlacement = Placement & { orientation?: Orientation }
+// A placement with the orientation it is drawn in and the photo's inner margin (padding, a share
+// of the photo's shorter side): what the geometry and the composer read
+export type LogoPlacement = Placement & { orientation?: Orientation; padding?: number }
 
 // Printed: the logo multiplies with the photo (dark logos). Solid: laid over it (light logos).
 export type Blend = 'printed' | 'solid'
@@ -78,6 +79,7 @@ export type MockupSettings = {
   placement: Placement
   blend: Blend
   orientation?: Orientation
+  padding?: number // photo mockups: the logo stays this far inside the photo (none saved → 5 %)
 }
 
 // The grid and the margin of every extra mockup page: columns and rows 1–3, the margin in % of

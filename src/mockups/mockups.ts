@@ -209,6 +209,10 @@ export function setMockupOrientation(mockups: Mockups, id: string, orientation: 
   return setSetting(mockups, id, { orientation, placement: { ...current.placement, x: 0, y: 0 } })
 }
 
+export function setMockupPadding(mockups: Mockups, id: string, padding: number) {
+  return setSetting(mockups, id, { padding })
+}
+
 export function setMockupBlend(mockups: Mockups, id: string, blend: Blend) {
   return setSetting(mockups, id, { blend })
 }

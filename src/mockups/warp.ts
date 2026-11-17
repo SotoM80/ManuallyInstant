@@ -1,5 +1,5 @@
-import { clampPlacement, orientedLogo } from './geometry'
-import type { AreaGrid, LogoPlacement, PhotoTemplate } from './types'
+import { ROTATION_LIMIT, SIZE_LIMITS, orientedLogo } from './geometry'
+import type { AreaGrid, LogoPlacement, Placement, PhotoTemplate } from './types'
 
 // Where the logo goes on a photo, as a grid of points the user drags in the template editor (see
 // specs/mockups.md, The logo area): 2 × 2 points are four corners (an area at an angle), more
@@ -104,9 +104,54 @@ export function logoToArea(grid: AreaGrid, aspect: number, placement: LogoPlacem
   ]
 }
 
-// The placement kept inside the area, on its surface size
-export function clampOnGrid(grid: AreaGrid, aspect: number, placement: LogoPlacement) {
-  return clampPlacement({ x: 0, y: 0, ...surfaceSize(grid) }, aspect, placement)
+// The photo's inner margin by default: 5 % of its shorter side
+export const DEFAULT_PADDING = 0.05
+export const PADDING_LIMITS = { min: 0, max: 0.2 }
+
+// The placement kept inside the photo, `padding` in from its edges (ADR 0037): the logo can go
+// anywhere on the photo, not only on its area, and is made smaller if it cannot fit there. The
+// photo itself is never changed. Worked out on the logo's outline, a few steps at a time, so
+// it holds for an area at an angle or on a curve too.
+export function clampInPhoto(grid: AreaGrid, photo: [number, number], aspect: number, placement: LogoPlacement): Placement {
+  const [photoWidth, photoHeight] = photo
+  const pad = Math.min(PADDING_LIMITS.max, Math.max(0, placement.padding ?? DEFAULT_PADDING)) * Math.min(photoWidth, photoHeight)
+  const room = { left: pad, top: pad, right: photoWidth - pad, bottom: photoHeight - pad }
+  let next: LogoPlacement = {
+    ...placement,
+    scale: Math.min(SIZE_LIMITS.max, Math.max(SIZE_LIMITS.min, placement.scale)),
+    rotate: Math.min(ROTATION_LIMIT, Math.max(-ROTATION_LIMIT, placement.rotate)),
+  }
+  for (let step = 0; step < 8; step++) {
+    const outline = logoOutline(grid, aspect, next, 4)
+    const xs = outline.map(([x]) => x)
+    const ys = outline.map(([, y]) => y)
+    const box = { left: Math.min(...xs), top: Math.min(...ys), right: Math.max(...xs), bottom: Math.max(...ys) }
+    const width = box.right - box.left
+    const height = box.bottom - box.top
+    // Too large for the room: smaller, then placed again
+    const shrink = Math.min((room.right - room.left) / width, (room.bottom - room.top) / height)
+    if (shrink < 0.999 && next.scale > SIZE_LIMITS.min) {
+      next = { ...next, scale: Math.max(SIZE_LIMITS.min, next.scale * shrink * 0.999) }
+      continue
+    }
+    const dx = box.left < room.left ? room.left - box.left : box.right > room.right ? room.right - box.right : 0
+    const dy = box.top < room.top ? room.top - box.top : box.bottom > room.bottom ? room.bottom - box.bottom : 0
+    if (Math.abs(dx) < 0.25 && Math.abs(dy) < 0.25) break
+    // From photo pixels to the area's (u, v) near the logo's center
+    const u = 0.5 + next.x
+    const v = 0.5 + next.y
+    const e = 0.01
+    const at = gridPoint(grid, u, v)
+    const alongU = gridPoint(grid, u + e, v)
+    const alongV = gridPoint(grid, u, v + e)
+    const a = (alongU[0] - at[0]) / e
+    const b = (alongV[0] - at[0]) / e
+    const c = (alongU[1] - at[1]) / e
+    const d = (alongV[1] - at[1]) / e
+    const det = a * d - b * c || 1
+    next = { ...next, x: next.x + (d * dx - b * dy) / det, y: next.y + (a * dy - c * dx) / det }
+  }
+  return { x: next.x, y: next.y, scale: next.scale, rotate: next.rotate }
 }
 
 // The mesh the logo is drawn on: `across` × `down` small quads, two triangles each, with where

@@ -23,7 +23,7 @@ export function PhotoMockup({ template, settings, logo, placeholder = true, widt
       template,
       color: settings.color,
       logoUrl: logo?.url ?? null,
-      placement: { ...settings.placement, orientation: settings.orientation },
+      placement: { ...settings.placement, orientation: settings.orientation, padding: settings.padding },
       blend: settings.blend,
       width,
     }).then(

@@ -1,4 +1,4 @@
-import { areaGrid, logoMesh, surfaceSize } from '../warp'
+import { areaGrid, clampInPhoto, logoMesh, surfaceSize } from '../warp'
 import { orientedLogo } from '../geometry'
 import type { Blend, LogoPlacement, PhotoTemplate } from '../types'
 
@@ -10,7 +10,7 @@ export type PhotoMockupInput = {
   template: PhotoTemplate
   color: string // "#RRGGBB"
   logoUrl: string | null
-  placement: LogoPlacement // with the logo's orientation (ADR 0037)
+  placement: LogoPlacement // with the logo's orientation and the photo's padding (ADR 0037)
   blend: Blend
   width: number // of the image made, in pixels
 }
@@ -193,7 +193,9 @@ async function compose(input: PhotoMockupInput) {
   })
   const aspect = logo ? logo.naturalWidth / logo.naturalHeight || 1 : 1
   const grid = areaGrid(template)
-  const fitted = orientedLogo({ x: 0, y: 0, ...surfaceSize(grid) }, aspect, input.placement.scale, input.placement.orientation)
+  // Inside the photo's padding, whatever was saved (ADR 0037)
+  const placement = { ...clampInPhoto(grid, template.size, aspect, input.placement), orientation: input.placement.orientation }
+  const fitted = orientedLogo({ x: 0, y: 0, ...surfaceSize(grid) }, aspect, placement.scale, placement.orientation)
   const logoCanvas = logo
     ? canvas2d(fitted.width * toImage * LOGO_DETAIL, fitted.height * toImage * LOGO_DETAIL, (context) => {
         context.imageSmoothingQuality = 'high'
@@ -230,7 +232,7 @@ async function compose(input: PhotoMockupInput) {
 
     // Pass 2: the logo on its mesh
     if (logo) {
-      const mesh = logoMesh(grid, aspect, input.placement)
+      const mesh = logoMesh(grid, aspect, placement)
       const logoProgram = program(gl, LOGO_VERTEX, LOGO_FRAGMENT)
       gl.useProgram(logoProgram)
       const uniform = tint(logoProgram)

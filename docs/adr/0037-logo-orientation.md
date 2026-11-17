@@ -16,6 +16,8 @@ Every mockup gets an **Orientation** select, **Horizontal** (default) or **Verti
 * **Illustrations**: the logo image is drawn in the product's logo box, resized by Size around its center, and turned −90° with the box's own `rotate`.
 
 Amended after trying it: at first Vertical fitted the logo again in its area turned, so in a wide area it became much smaller. The user wants it to keep its size and to be able to make it larger.
+
+Amended again: kept at its size, a vertical logo in a thin area reached past the photo's top, and could not be moved (it was held inside its area, and larger than it). On photo mockups the logo is now held inside the **photo**, a **Padding** in from its edges (0–20 %, default 5 %), not inside its area: it can be dragged anywhere on the photo, and if it cannot fit within the Padding it is drawn just small enough to. One function, `clampInPhoto` (warp.ts), does it on the logo's outline, for the drag, the preview and the WebGL composer. Past its area, the logo follows the area's surface carried on straight (`curve` goes on past its ends).
 * One helper, in `geometry.ts`, gives the logo's size and turn for an orientation, so the illustration, the WebGL composer and the drag all agree.
 
 ## Consequences

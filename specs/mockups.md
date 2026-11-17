@@ -135,8 +135,9 @@ Built in three phases, each one usable on its own.
 
 #### Placing the logo (photo mockups)
 In the product's block of the section, above Color and Logo:
-* A **preview** of that mockup, where the logo can be **dragged** inside its area (it never leaves it), or moved with the **arrow keys** (2 % of the area per press). While dragging, the logo follows the pointer as a plain image over the photo; the mockup is composed again when it is let go, so the drag stays smooth. Only the open block draws its preview.
+* A **preview** of that mockup, where the logo can be **dragged** anywhere on the photo, past its area, or moved with the **arrow keys** (2 % of the area per press). It never comes closer to the photo's edges than **Padding** (ADR 0037). While dragging, the logo follows the pointer as a plain image over the photo; the mockup is composed again when it is let go, so the drag stays smooth. Only the open block draws its preview.
 * **Size** (20–150 %, step 5, default 100 %) and **Rotation** (−45° to 45°, step 5, default 0°) sliders, and **Reset** (centered, 100 %, 0°; it keeps the Orientation). Rotation tilts the logo on top of its Orientation: Vertical with 10° is 80° to the left.
+* **Padding** (0–20 % of the photo's shorter side, step 1, default 5 %): the inner margin the logo stays inside. If the logo is too large to fit there (a long logo turned Vertical, a large Size), it is drawn smaller, just enough to fit; the photo itself never changes. The page and the PDF show it the same way.
 * **Blend**: Printed or Solid. (Later: **Amount** of the folds.)
 * **Edit template**: opens the template editor with this photo.
 * All of it is kept per product, like its color, and reaches the page at once.
@@ -395,7 +396,7 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 ### Scenario 45: A Vertical Logo on a Photo
 * **Given**: The photo business card, with the Primary logo, Size 100 % and Rotation 10°.
 * **When**: The user chooses Vertical.
-* **Then**: The logo is turned 80° to the left, at the same size, and can still be dragged as far as the area allows; Reset sets the place, Size and Rotation back and keeps Vertical. The print PDF shows it the same way.
+* **Then**: The logo is turned 80° to the left, at the same size (smaller only if it would not fit inside the Padding), and can be dragged anywhere on the photo, never past the Padding; Reset sets the place, Size and Rotation back and keeps Vertical. The print PDF shows it the same way.
 
 ### Scenario 39: In the PDF
 * **Given**: Two photos on the extra pages, 1 × 1.
