@@ -1,7 +1,7 @@
 # ADR 0038: Clip the logo to the product on photo mockups
 
 ## Status
-Proposed — 2026-11-17
+Accepted — 2026-11-17
 
 ## Context
 Since ADR 0037 the logo on a photo mockup keeps its size when turned Vertical and can be moved anywhere on the photo, inside a Padding. A logo larger than the product (a long logo turned, a large Size) is then drawn past the product's edge, over the table or the wall behind it, like a sticker on the photo. A logo printed on a card or a t-shirt never does that.

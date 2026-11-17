@@ -80,6 +80,7 @@ export type MockupSettings = {
   blend: Blend
   orientation?: Orientation
   padding?: number // photo mockups: the logo stays this far inside the photo (none saved → 5 %)
+  clip?: boolean // photo mockups: the logo drawn only on the product (none saved → on, ADR 0038)
 }
 
 // The grid and the margin of every extra mockup page: columns and rows 1–3, the margin in % of

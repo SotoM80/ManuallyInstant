@@ -208,6 +208,21 @@ describe('Template editor', () => {
     expect(within(form).getByRole('combobox', { name: 'poster logo' })).toHaveValue('none');
   });
 
+  it('saves no mask with nothing selected, so the logo cannot be clipped (ADR 0038, scenario 47)', async () => {
+    renderApp();
+    const form = openMockups();
+    const editor = await uploadAndUse(form, 'poster.jpg');
+    fireEvent.click(within(editor).getByRole('button', { name: 'Use now' }));
+    const saved = mockupCatalog().find((item) => item.name === 'poster') as PhotoTemplate;
+    expect(saved.maskImage).toBeUndefined();
+    fireEvent.change(within(form).getByRole('combobox', { name: 'poster logo' }), { target: { value: 'primary' } });
+    const clip = await within(form).findByRole('checkbox', { name: 'Clip the logo to the poster' });
+    expect(clip).toBeDisabled();
+    expect(clip).not.toBeChecked();
+    expect(within(form).getByText('Select the product in Edit template to clip the logo to it.')).toBeInTheDocument();
+    expect((renderPhotoMockup as jest.Mock).mock.lastCall![0].clip).toBe(false);
+  });
+
   it('shares a page between photos with a grid, and removes one (scenarios 34 and 37)', async () => {
     renderApp();
     const form = openMockups();
