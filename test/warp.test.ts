@@ -38,6 +38,12 @@ describe('a straight area', () => {
     expect(size.height).toBeCloseTo(200);
   });
 
+  it('goes on straight past its edges, so a logo larger than the area is not squashed (ADR 0037)', () => {
+    close(gridPoint(grid, -0.5, 0.5), [-100, 300]);
+    close(gridPoint(grid, 0.5, 1.5), [300, 500]);
+    close(gridPoint(grid, 1.25, -0.25), [600, 150]);
+  });
+
   it('puts a centered square logo in the middle, as tall as the area', () => {
     close(logoToArea(grid, 1, DEFAULT_PLACEMENT, 0, 0), [0.25, 0]);
     close(logoToArea(grid, 1, DEFAULT_PLACEMENT, 1, 1), [0.75, 1]);

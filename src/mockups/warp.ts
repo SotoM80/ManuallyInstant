@@ -28,11 +28,17 @@ export function gridBounds(grid: AreaGrid): PhotoTemplate['area'] {
   return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y }
 }
 
-// A smooth curve through points (Catmull-Rom; straight with two), at t from 0 to 1
+// A smooth curve through points (Catmull-Rom; straight with two), at t from 0 to 1. Past its
+// ends it goes on straight, along its first or last stretch, so a logo larger than its area
+// (Size over 100 %, a long logo turned Vertical) keeps its proportions instead of being
+// squashed against the edge
 function curve(points: Point[], t: number): Point {
-  if (points.length === 1 || t <= 0) return points[0]
-  if (t >= 1) return points[points.length - 1] // exactly, so the ends are where the user put them
+  if (points.length === 1 || t === 0) return points[0]
+  if (t === 1) return points[points.length - 1] // exactly, so the ends are where the user put them
   const segments = points.length - 1
+  const past = (from: Point, to: Point, by: number): Point => [from[0] + (from[0] - to[0]) * by, from[1] + (from[1] - to[1]) * by]
+  if (t < 0) return past(points[0], points[1], -t * segments)
+  if (t > 1) return past(points[segments], points[segments - 1], (t - 1) * segments)
   const at = Math.min(segments - 1e-9, Math.max(0, t * segments))
   const i = Math.floor(at)
   const local = at - i

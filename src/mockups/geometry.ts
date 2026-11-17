@@ -16,12 +16,10 @@ export function fitLogo(area: Area, aspect: number, scale: number) {
 }
 
 // The logo's own size in its area, and its turn in degrees, for an orientation (ADR 0037):
-// Vertical fits the logo turned (its width along the area's height) and turns it a quarter
-// to the left, so it is as large as the area allows and never sticks out
+// Vertical keeps the size the logo has horizontal and turns it a quarter to the left, so
+// turning never shrinks it (a long logo may then reach past a wide area; Size sets it)
 export function orientedLogo(area: Area, aspect: number, scale: number, orientation: Orientation = 'horizontal') {
-  if (orientation !== 'vertical') return { ...fitLogo(area, aspect, scale), turn: 0 }
-  const turned = fitLogo(area, 1 / aspect, scale)
-  return { width: turned.height, height: turned.width, turn: -90 }
+  return { ...fitLogo(area, aspect, scale), turn: orientation === 'vertical' ? -90 : 0 }
 }
 
 // The same placement, moved and resized only as far as the logo stays inside its area

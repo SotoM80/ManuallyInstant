@@ -274,6 +274,29 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
     )
   }
 
+  function sizeField(id: string, name: string, settings: MockupSettings) {
+    const fieldId = `mockup-${id}-art-size`
+    const scale = Math.round(settings.placement.scale * 100)
+    return (
+      <div className="skin-control">
+        <label htmlFor={fieldId}>Size</label>
+        <input
+          id={fieldId}
+          aria-label={`${name} logo size`}
+          type="range"
+          min={SIZE_LIMITS.min * 100}
+          max={SIZE_LIMITS.max * 100}
+          step={5}
+          value={scale}
+          onChange={(event) =>
+            onChange(setMockupPlacement(mockups, id, { ...settings.placement, scale: Number(event.target.value) / 100 }))
+          }
+        />
+        <output htmlFor={fieldId}>{scale}%</output>
+      </div>
+    )
+  }
+
   function photoSettings(template: PhotoTemplate, settings: MockupSettings, shown: { url: string } | null) {
     const sizeId = `mockup-${template.id}-size`
     const rotationId = `mockup-${template.id}-rotation`
@@ -425,7 +448,14 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                 {item.kind === 'photo' ? (
                   <img src={item.image} alt="" aria-hidden="true" />
                 ) : (
-                  <MockupArt product={item} color={settings.color} logo={shown} orientation={settings.orientation} decorative />
+                  <MockupArt
+                    product={item}
+                    color={settings.color}
+                    logo={shown}
+                    orientation={settings.orientation}
+                    scale={settings.placement.scale}
+                    decorative
+                  />
                 )}
               </span>
               <span className="palette-block-title">{item.name}</span>
@@ -474,6 +504,8 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                   </select>
                 </div>
                 {orientationField(item.id, item.name, settings)}
+                {/* Illustrations: the logo's Size too (photos have it with their placement) */}
+                {item.kind !== 'photo' && sizeField(item.id, item.name, settings)}
               </div>
             </div>
           </div>

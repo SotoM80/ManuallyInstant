@@ -6,6 +6,7 @@ type MockupArtProps = {
   logo: { url: string } | null // null → a dashed box where the logo goes
   placeholder?: boolean // false → no dashed box either: No logo (ADR 0036)
   orientation?: Orientation // Vertical → the logo a quarter turn to the left (ADR 0037)
+  scale?: number // the logo's size, 1 → it fills the product's logo box (Size, ADR 0037)
   decorative?: boolean // a small drawing next to its name (the form): hidden from screen readers
 }
 
@@ -31,18 +32,16 @@ export function MockupArt({
   logo,
   placeholder = true,
   orientation = 'horizontal',
+  scale = 1,
   decorative = false,
 }: MockupArtProps) {
   const [width, height] = product.viewBox
-  // Vertical: the logo's box swapped around the same center, then turned a quarter to the left,
-  // so the logo fits the product's box turned (ADR 0037)
-  const vertical = orientation === 'vertical'
+  // The logo's box resized around its center (Size), and for Vertical turned a quarter to the
+  // left, at the same size (ADR 0037)
   const center = { x: product.logo.x + product.logo.width / 2, y: product.logo.y + product.logo.height / 2 }
-  const size = vertical
-    ? { width: product.logo.height, height: product.logo.width }
-    : { width: product.logo.width, height: product.logo.height }
+  const size = { width: product.logo.width * scale, height: product.logo.height * scale }
   const box = { x: center.x - size.width / 2, y: center.y - size.height / 2, ...size }
-  const degrees = (product.logo.rotate ?? 0) + (vertical ? -90 : 0)
+  const degrees = (product.logo.rotate ?? 0) + (orientation === 'vertical' ? -90 : 0)
   const turn = degrees ? `rotate(${degrees} ${center.x} ${center.y})` : undefined
   return (
     <svg

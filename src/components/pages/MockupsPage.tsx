@@ -51,6 +51,7 @@ export function MockupsPage({ mockups, logo, cover, color }: MockupsPageProps) {
                     logo={shown}
                     placeholder={settings.version !== 'none'}
                     orientation={settings.orientation}
+                    scale={settings.placement.scale}
                   />
                 )}
                 <p className="mockup-name">{product.name}</p>

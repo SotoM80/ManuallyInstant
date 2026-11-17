@@ -12,20 +12,18 @@ jest.setTimeout(20000);
 const WIDE_AREA = { x: 0, y: 0, width: 400, height: 200 };
 
 describe('the logo turned vertical', () => {
-  it('is fitted turned: its width runs along the area height, a quarter turn to the left', () => {
-    // A 2:1 logo in a 2:1 area: horizontal it fills it, vertical it is 200 long and 100 thick
+  it('keeps the size it has horizontal, turned a quarter to the left', () => {
     expect(orientedLogo(WIDE_AREA, 2, 1)).toEqual({ width: 400, height: 200, turn: 0 });
-    expect(orientedLogo(WIDE_AREA, 2, 1, 'vertical')).toEqual({ width: 200, height: 100, turn: -90 });
-    // In a tall area (the side of a mug), a wide logo turned is large
-    expect(orientedLogo({ x: 0, y: 0, width: 100, height: 400 }, 4, 1, 'vertical')).toMatchObject({ width: 400, height: 100 });
+    expect(orientedLogo(WIDE_AREA, 2, 1, 'vertical')).toEqual({ width: 400, height: 200, turn: -90 });
+    expect(orientedLogo(WIDE_AREA, 2, 1.5, 'vertical')).toMatchObject({ width: 600, height: 300 });
   });
 
-  it('stays inside its area when moved, measured turned', () => {
-    // Vertical, the 100-wide turned logo can move 150 px each way: 0.375 of the width
-    const moved = clampPlacement(WIDE_AREA, 2, { ...DEFAULT_PLACEMENT, x: 1, orientation: 'vertical' });
+  it('moves as far as the area allows, measured turned', () => {
+    // Vertical at 50 %, the logo is 100 across turned: it can move 150 px each way, 0.375 of the width
+    const moved = clampPlacement(WIDE_AREA, 2, { ...DEFAULT_PLACEMENT, scale: 0.5, x: 1, orientation: 'vertical' });
     expect(moved.x).toBeCloseTo(0.375);
     expect(moved).not.toHaveProperty('orientation');
-    // Horizontal it fills the width and cannot move
+    // Horizontal at 100 % it fills the width and cannot move
     expect(clampPlacement(WIDE_AREA, 2, { ...DEFAULT_PLACEMENT, x: 1 }).x).toBe(0);
   });
 
@@ -37,7 +35,7 @@ describe('the logo turned vertical', () => {
   });
 });
 
-describe('Orientation in the section (scenario 44)', () => {
+describe('Orientation and Size in the section (scenario 44)', () => {
   it('turns the logo on one illustration only, and back', () => {
     renderApp();
     uploadLogo();
@@ -53,17 +51,21 @@ describe('Orientation in the section (scenario 44)', () => {
     expect(select).toHaveValue('horizontal');
     fireEvent.change(select, { target: { value: 'vertical' } });
 
-    // The box swapped around the same center, then turned a quarter to the left
+    // The same size, turned a quarter to the left around the box's center
     const cx = mug.logo.x + mug.logo.width / 2;
     const cy = mug.logo.y + mug.logo.height / 2;
-    expect(Number(mugLogo().getAttribute('width'))).toBeCloseTo(mug.logo.height);
-    expect(Number(mugLogo().getAttribute('height'))).toBeCloseTo(mug.logo.width);
+    expect(Number(mugLogo().getAttribute('width'))).toBeCloseTo(mug.logo.width);
+    expect(Number(mugLogo().getAttribute('height'))).toBeCloseTo(mug.logo.height);
     expect(turnOf(mugLogo())).toBe(`rotate(${(mug.logo.rotate ?? 0) - 90} ${cx} ${cy})`);
+    // Size 150 %: larger around the same center
+    fireEvent.change(within(form).getByRole('slider', { name: 'Mug logo size' }), { target: { value: '150' } });
+    expect(Number(mugLogo().getAttribute('width'))).toBeCloseTo(mug.logo.width * 1.5);
+    expect(Number(mugLogo().getAttribute('x'))).toBeCloseTo(cx - (mug.logo.width * 1.5) / 2);
     // The others are not turned
     const card = within(page).getByRole('img', { name: 'Business card mockup' }).querySelector('image')!;
     expect(turnOf(card)).toBeNull();
 
     fireEvent.change(select, { target: { value: 'horizontal' } });
-    expect(Number(mugLogo().getAttribute('width'))).toBeCloseTo(mug.logo.width);
+    expect(turnOf(mugLogo())).toBe(mug.logo.rotate ? `rotate(${mug.logo.rotate} ${cx} ${cy})` : null);
   });
 });
