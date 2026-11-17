@@ -28,6 +28,7 @@ import {
   setExtraLayout,
   setOwnPage,
   setMockupBlend,
+  setMockupOrientation,
   setMockupColor,
   setMockupPlacement,
   setMockupVersion,
@@ -97,7 +98,7 @@ function PlacementPreview({
   const [dragging, setDragging] = useState<Placement | null>(null)
   const aspect = useImageAspect(logo?.url ?? null)
   const grid = areaGrid(template)
-  const placement = dragging ?? settings.placement
+  const placement = { ...(dragging ?? settings.placement), orientation: settings.orientation }
   const [photoWidth, photoHeight] = template.size
   const outline = logoOutline(grid, aspect, placement)
     .map(([x, y]) => `${x},${y}`)
@@ -113,7 +114,7 @@ function PlacementPreview({
       photoWidth,
       surfaceSize(grid),
     )
-    return clampOnGrid(grid, aspect, next)
+    return clampOnGrid(grid, aspect, { ...next, orientation: settings.orientation })
   }
 
   function nudge(event: KeyboardEvent<SVGElement>) {
@@ -126,7 +127,7 @@ function PlacementPreview({
     const step = steps[event.key]
     if (!step) return
     event.preventDefault()
-    const next = { ...settings.placement, x: settings.placement.x + step[0], y: settings.placement.y + step[1] }
+    const next = { ...placement, x: settings.placement.x + step[0], y: settings.placement.y + step[1] }
     onPlacement(clampOnGrid(grid, aspect, next))
   }
 
@@ -250,6 +251,27 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
     onChange(toggleMockup(mockups, id))
     if (ticking) setOpenId(id)
     else if (openId === id) setOpenId(null)
+  }
+
+  // Horizontal or Vertical logo, for every mockup (ADR 0037)
+  function orientationField(id: string, name: string, settings: MockupSettings) {
+    const fieldId = `mockup-${id}-orientation`
+    return (
+      <div className="skin-color">
+        <label htmlFor={fieldId}>Orientation</label>
+        <select
+          id={fieldId}
+          aria-label={`${name} logo orientation`}
+          value={settings.orientation ?? 'horizontal'}
+          onChange={(event) =>
+            onChange(setMockupOrientation(mockups, id, event.target.value === 'vertical' ? 'vertical' : 'horizontal'))
+          }
+        >
+          <option value="horizontal">Horizontal</option>
+          <option value="vertical">Vertical</option>
+        </select>
+      </div>
+    )
   }
 
   function photoSettings(template: PhotoTemplate, settings: MockupSettings, shown: { url: string } | null) {
@@ -403,7 +425,7 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                 {item.kind === 'photo' ? (
                   <img src={item.image} alt="" aria-hidden="true" />
                 ) : (
-                  <MockupArt product={item} color={settings.color} logo={shown} decorative />
+                  <MockupArt product={item} color={settings.color} logo={shown} orientation={settings.orientation} decorative />
                 )}
               </span>
               <span className="palette-block-title">{item.name}</span>
@@ -451,6 +473,7 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                     ))}
                   </select>
                 </div>
+                {orientationField(item.id, item.name, settings)}
               </div>
             </div>
           </div>
@@ -519,6 +542,7 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                           <span className="logo-form-hint"> ({extraMockupsPage(extraPageOf(mockups, template.id) ?? 1)})</span>
                         </label>
                       )}
+                      {version !== 'none' && orientationField(template.id, template.name, settings)}
                       {/* With a logo, it is placed like on any photo mockup */}
                       {extraOpen && version !== 'none' ? (
                         photoSettings(template, settings, shown)

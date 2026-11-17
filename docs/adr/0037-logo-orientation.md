@@ -1,7 +1,7 @@
 # ADR 0037: Horizontal or vertical logo on every mockup
 
 ## Status
-Proposed — 2026-11-16
+Accepted — 2026-11-17
 
 ## Context
 The logo sits on a mockup the way the logo image is: horizontal. On some products the user wants it vertical (along the side of a mug, up a t-shirt's sleeve, a photo shot sideways). Photo mockups have a **Rotation** slider (−45° to 45°), which tilts the logo but cannot turn it upright, and illustrations have no control at all.

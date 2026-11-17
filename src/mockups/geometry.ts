@@ -1,4 +1,4 @@
-import type { Placement, PhotoTemplate } from './types'
+import type { LogoPlacement, Orientation, Placement, PhotoTemplate } from './types'
 
 // The geometry of a photo mockup, in the photo's pixels (see specs/mockups.md, ADR 0014): fitting
 // the logo and keeping it inside its area. The shape of the area is in warp.ts.
@@ -15,13 +15,22 @@ export function fitLogo(area: Area, aspect: number, scale: number) {
   return { width, height: width / aspect }
 }
 
+// The logo's own size in its area, and its turn in degrees, for an orientation (ADR 0037):
+// Vertical fits the logo turned (its width along the area's height) and turns it a quarter
+// to the left, so it is as large as the area allows and never sticks out
+export function orientedLogo(area: Area, aspect: number, scale: number, orientation: Orientation = 'horizontal') {
+  if (orientation !== 'vertical') return { ...fitLogo(area, aspect, scale), turn: 0 }
+  const turned = fitLogo(area, 1 / aspect, scale)
+  return { width: turned.height, height: turned.width, turn: -90 }
+}
+
 // The same placement, moved and resized only as far as the logo stays inside its area
 // (the box around the turned logo must fit)
-export function clampPlacement(area: Area, aspect: number, placement: Placement): Placement {
+export function clampPlacement(area: Area, aspect: number, placement: LogoPlacement): Placement {
   const scale = Math.min(SIZE_LIMITS.max, Math.max(SIZE_LIMITS.min, placement.scale))
   const rotate = Math.min(ROTATION_LIMIT, Math.max(-ROTATION_LIMIT, placement.rotate))
-  const { width, height } = fitLogo(area, aspect, scale)
-  const turn = (rotate * Math.PI) / 180
+  const { width, height, turn: quarter } = orientedLogo(area, aspect, scale, placement.orientation)
+  const turn = ((rotate + quarter) * Math.PI) / 180
   const boxWidth = Math.abs(width * Math.cos(turn)) + Math.abs(height * Math.sin(turn))
   const boxHeight = Math.abs(width * Math.sin(turn)) + Math.abs(height * Math.cos(turn))
   const maxX = Math.max(0, (area.width - boxWidth) / 2 / area.width)

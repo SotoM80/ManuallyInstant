@@ -1,6 +1,6 @@
 import { areaGrid, logoMesh, surfaceSize } from '../warp'
-import { fitLogo } from '../geometry'
-import type { Blend, Placement, PhotoTemplate } from '../types'
+import { orientedLogo } from '../geometry'
+import type { Blend, LogoPlacement, PhotoTemplate } from '../types'
 
 // Composes a photo mockup in WebGL and returns it as a PNG data URL (see specs/mockups.md,
 // Photo mockups, and ADR 0014): the product tinted inside its mask with the photo's own
@@ -10,7 +10,7 @@ export type PhotoMockupInput = {
   template: PhotoTemplate
   color: string // "#RRGGBB"
   logoUrl: string | null
-  placement: Placement
+  placement: LogoPlacement // with the logo's orientation (ADR 0037)
   blend: Blend
   width: number // of the image made, in pixels
 }
@@ -193,7 +193,7 @@ async function compose(input: PhotoMockupInput) {
   })
   const aspect = logo ? logo.naturalWidth / logo.naturalHeight || 1 : 1
   const grid = areaGrid(template)
-  const fitted = fitLogo({ x: 0, y: 0, ...surfaceSize(grid) }, aspect, input.placement.scale)
+  const fitted = orientedLogo({ x: 0, y: 0, ...surfaceSize(grid) }, aspect, input.placement.scale, input.placement.orientation)
   const logoCanvas = logo
     ? canvas2d(fitted.width * toImage * LOGO_DETAIL, fitted.height * toImage * LOGO_DETAIL, (context) => {
         context.imageSmoothingQuality = 'high'

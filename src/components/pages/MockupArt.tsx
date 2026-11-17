@@ -1,10 +1,11 @@
-import type { MockupPart, MockupProduct } from '../../mockups/types'
+import type { MockupPart, MockupProduct, Orientation } from '../../mockups/types'
 
 type MockupArtProps = {
   product: MockupProduct
   color: string // the product's color, "#RRGGBB"
   logo: { url: string } | null // null → a dashed box where the logo goes
   placeholder?: boolean // false → no dashed box either: No logo (ADR 0036)
+  orientation?: Orientation // Vertical → the logo a quarter turn to the left (ADR 0037)
   decorative?: boolean // a small drawing next to its name (the form): hidden from screen readers
 }
 
@@ -24,10 +25,25 @@ function opacity(part: MockupPart) {
 
 // One product with the logo on it, drawn from its data (see specs/mockups.md and ADR 0013).
 // Every color and opacity is an attribute, so the PDF copy draws it as is (ADR 0012).
-export function MockupArt({ product, color, logo, placeholder = true, decorative = false }: MockupArtProps) {
+export function MockupArt({
+  product,
+  color,
+  logo,
+  placeholder = true,
+  orientation = 'horizontal',
+  decorative = false,
+}: MockupArtProps) {
   const [width, height] = product.viewBox
-  const box = product.logo
-  const turn = box.rotate ? `rotate(${box.rotate} ${box.x + box.width / 2} ${box.y + box.height / 2})` : undefined
+  // Vertical: the logo's box swapped around the same center, then turned a quarter to the left,
+  // so the logo fits the product's box turned (ADR 0037)
+  const vertical = orientation === 'vertical'
+  const center = { x: product.logo.x + product.logo.width / 2, y: product.logo.y + product.logo.height / 2 }
+  const size = vertical
+    ? { width: product.logo.height, height: product.logo.width }
+    : { width: product.logo.width, height: product.logo.height }
+  const box = { x: center.x - size.width / 2, y: center.y - size.height / 2, ...size }
+  const degrees = (product.logo.rotate ?? 0) + (vertical ? -90 : 0)
+  const turn = degrees ? `rotate(${degrees} ${center.x} ${center.y})` : undefined
   return (
     <svg
       className="mockup-art"
