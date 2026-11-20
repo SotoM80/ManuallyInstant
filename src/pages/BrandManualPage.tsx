@@ -15,21 +15,23 @@ import { CmykProvider } from '../components/CmykProvider'
 import { NO_SKIN } from '../skins/presets'
 import { ManualPreview } from '../components/ManualPreview'
 import { MANUAL_SECTIONS, SECTION_AREAS, SECTION_PAGES, manualPages, orderPages } from '../data/manualSections'
-import { NO_USAGE } from '../data/usageOptions'
 import { useAlignOpenSection } from '../utils/useAlignOpenSection'
 import type { Guides } from '../utils/guides'
 import type { DraftKey, Drafts } from '../utils/drafts'
+import type { GroupChange, ManualContent } from '../utils/appState'
 import { useReorderGlide } from '../utils/useReorderGlide'
 import type { TemplateId } from '../templates'
 import type { Skin } from '../skins/types'
 import { MockupsForm } from '../components/MockupsForm'
-import { DEFAULT_MOCKUPS, extraPageCount } from '../mockups/mockups'
+import { extraPageCount } from '../mockups/mockups'
 import type { Mockups } from '../mockups/types'
 import type { BrandFonts, CoverData, LogoData, Orientation, PaletteColor, PreviewView, UsageData } from '../types'
 import '../css/BrandManualPage.css'
 
 type BrandManualPageProps = {
-  cover: CoverData | null
+  // What goes into the PDF, kept by App (see utils/appState)
+  content: ManualContent
+  onContentChange: GroupChange<ManualContent>
   orientation: Orientation
   onOrientationChange: (orientation: Orientation) => void
   previewView: PreviewView
@@ -39,31 +41,17 @@ type BrandManualPageProps = {
   // Off → the pages and sections keep their natural order (specs/brandmanual.md, ADR 0032)
   followSection?: boolean
   onFollowSectionChange?: (follow: boolean) => void
-  onCoverChange: (cover: CoverData) => void
   // What each form shows, kept by App so the forms are filled again on the way back (see useDraft)
   drafts?: Drafts
   onDraftChange?: <K extends DraftKey>(key: K, draft: Drafts[K]) => void
-  // Guides clicked on the construction grid (Clear space page). They are drawn in the preview,
-  // so they are not part of the Logo form
-  guides: Guides
-  onGuidesChange: (guides: Guides) => void
-  logo: LogoData | null
-  onLogoChange: (logo: LogoData) => void
-  usage?: UsageData
-  onUsageChange?: (usage: UsageData) => void
-  palette: PaletteColor[] | null
-  onPaletteChange: (palette: PaletteColor[]) => void
-  typography: BrandFonts | null
-  onTypographyChange: (fonts: BrandFonts) => void
   skin?: Skin
   // A new skin, or a change made from the newest one (the section backgrounds, ADR 0025)
   onSkinChange?: Dispatch<SetStateAction<Skin>>
-  mockups?: Mockups
-  onMockupsChange?: (mockups: Mockups) => void
 }
 
 export function BrandManualPage({
-  cover,
+  content,
+  onContentChange,
   orientation,
   onOrientationChange,
   previewView,
@@ -72,24 +60,29 @@ export function BrandManualPage({
   onTemplateChange,
   followSection = true,
   onFollowSectionChange = () => {},
-  onCoverChange,
   drafts = {},
   onDraftChange,
-  guides,
-  onGuidesChange,
-  logo,
-  onLogoChange,
-  usage = NO_USAGE,
-  onUsageChange = () => {},
-  palette,
-  onPaletteChange,
-  typography,
-  onTypographyChange,
   skin = NO_SKIN,
-  mockups = DEFAULT_MOCKUPS,
-  onMockupsChange = () => {},
   onSkinChange = () => {},
 }: BrandManualPageProps) {
+  // The same names as before the groups (docs/refactors/0002), so the rest of the page is unchanged.
+  // Guides are clicked on the construction grid (Clear space page). They are drawn in the preview,
+  // so they are not part of the Logo form
+  const { cover, logo, usage, palette, typography, mockups, guides } = content
+  // Stable, like the setters they replace (some forms keep them in an effect's dependencies)
+  const { onCoverChange, onLogoChange, onUsageChange, onPaletteChange, onTypographyChange, onMockupsChange, onGuidesChange } =
+    useMemo(
+      () => ({
+        onCoverChange: (next: CoverData) => onContentChange('cover', next),
+        onLogoChange: (next: LogoData) => onContentChange('logo', next),
+        onUsageChange: (next: UsageData) => onContentChange('usage', next),
+        onPaletteChange: (next: PaletteColor[]) => onContentChange('palette', next),
+        onTypographyChange: (next: BrandFonts) => onContentChange('typography', next),
+        onMockupsChange: (next: Mockups) => onContentChange('mockups', next),
+        onGuidesChange: (next: Guides) => onContentChange('guides', next),
+      }),
+      [onContentChange],
+    )
   // The sections work like an accordion: only one is open, the others fold into their header.
   // Folded forms stay in the page (inert), so nothing typed in them is lost.
   const [openSection, setOpenSection] = useState<string | null>('cover')
