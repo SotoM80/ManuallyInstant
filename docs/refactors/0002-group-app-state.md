@@ -1,7 +1,7 @@
 # Refactor 0002 — App's state in three groups
 
 - **Date:** 2026-11-20 (planned on 2026-11-19)
-- **Branch:** `refactor/group-app-state` (not merged yet)
+- **Branch:** `refactor/group-app-state`, merged into `main` as `1a32ddb` (--no-ff)
 - **Commits:** `2184e21` → `98c9632` (4 commits)
 - **Files:** `src/App.tsx`, `src/pages/BrandManualPage.tsx`, `src/utils/appState.ts` (new)
 - **Context:** reviewer feedback: *"App.tsx has a lot of states, which could perhaps be grouped together"*
@@ -100,7 +100,7 @@ const [design, onDesignChange] = useGroup(DEFAULT_DESIGN)
 - Run alone, those files pass. `Export` and `PhotoMockups` also pass alone on the code **without** the change (23 / 23 both ways). The one `Export` test that failed in a lone run passes when run by itself.
 - **No test file was changed.**
 - `npm run test:e2e` → **3 / 3 passed** (every page in every view, 3 templates, Landscape and Portrait; extra mockup pages).
-- Manual check in `npm run dev`: *pending*.
+- Manual check by me in `npm run dev`: forms kept after Home and back, template, skin, view settings, both PDFs. ✅
 
 **What could not be verified:** the slow files time out under load, so the full suite proves nothing about them either way.
 
@@ -112,13 +112,13 @@ const [design, onDesignChange] = useGroup(DEFAULT_DESIGN)
 - ☑ Behaviour is the same, shown by the same tests
 - ☑ Checked whether any test was changed (none)
 - ☑ e2e (3 / 3)
-- ☐ Manual check (pending)
+- ☑ Manual check
 
 ## 11. Next actions
 
 - Make the slow tests reliable (still open from 0001).
 - A new section: one field in `ManualContent` and its initial value in `NO_CONTENT` (`src/utils/appState.ts`).
-- To undo: `git revert -m 1 <merge commit>` once merged.
+- To undo: `git revert -m 1 1a32ddb`.
 
 ---
 
@@ -214,7 +214,7 @@ const [design, onDesignChange] = useGroup(DEFAULT_DESIGN)
 - Corridos solos, esos archivos pasan. `Export` y `PhotoMockups` también pasan solos con el código **sin** el cambio (23 / 23 en los dos casos). El único test de `Export` que falló corriendo el archivo solo pasa al correrlo aislado.
 - **No se cambió ningún archivo de tests.**
 - `npm run test:e2e` → **3 / 3 pasan** (todas las páginas en todas las vistas, 3 plantillas, horizontal y vertical; páginas extra de mockups).
-- Prueba manual en `npm run dev`: *pendiente*.
+- Prueba manual mía en `npm run dev`: formularios conservados al ir a Home y volver, plantilla, skin, ajustes de vista, los 2 PDF. ✅
 
 **Lo que no se pudo verificar:** los archivos lentos se quedan sin tiempo con carga, así que la suite completa no prueba nada sobre ellos ni a favor ni en contra.
 
@@ -226,10 +226,10 @@ const [design, onDesignChange] = useGroup(DEFAULT_DESIGN)
 - ☑ El comportamiento es el mismo, y lo prueban los mismos tests
 - ☑ Revisé si se cambió algún test (ninguno)
 - ☑ e2e (3 / 3)
-- ☐ Prueba manual (pendiente)
+- ☑ Prueba manual
 
 ## 11. Próximas acciones
 
 - Hacer confiables los tests lentos (sigue abierto desde el 0001).
 - Una sección nueva: un campo en `ManualContent` y su valor inicial en `NO_CONTENT` (`src/utils/appState.ts`).
-- Para deshacer: `git revert -m 1 <commit del merge>` una vez mergeado.
+- Para deshacer: `git revert -m 1 1a32ddb`.
