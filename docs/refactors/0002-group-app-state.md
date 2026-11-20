@@ -99,7 +99,7 @@ const [design, onDesignChange] = useGroup(DEFAULT_DESIGN)
 - Full suite after step 2: 618 / 621; after step 4: 614 / 621. **Every failure was `Exceeded timeout`**, in the slow files already named in 0001 (`Export`, `PhotoMockups`, `SkinImageLayer`). The machine was under heavy load (load average ≈ 18).
 - Run alone, those files pass. `Export` and `PhotoMockups` also pass alone on the code **without** the change (23 / 23 both ways). The one `Export` test that failed in a lone run passes when run by itself.
 - **No test file was changed.**
-- `npm run test:e2e`: *pending* (port 5175 was taken by an old `npm run dev`).
+- `npm run test:e2e` → **3 / 3 passed** (every page in every view, 3 templates, Landscape and Portrait; extra mockup pages).
 - Manual check in `npm run dev`: *pending*.
 
 **What could not be verified:** the slow files time out under load, so the full suite proves nothing about them either way.
@@ -111,7 +111,8 @@ const [design, onDesignChange] = useGroup(DEFAULT_DESIGN)
 - ☑ Made one change at a time (one commit per group)
 - ☑ Behaviour is the same, shown by the same tests
 - ☑ Checked whether any test was changed (none)
-- ☐ e2e and manual check (pending)
+- ☑ e2e (3 / 3)
+- ☐ Manual check (pending)
 
 ## 11. Next actions
 
@@ -212,7 +213,7 @@ const [design, onDesignChange] = useGroup(DEFAULT_DESIGN)
 - Suite completa después del paso 2: 618 / 621; después del paso 4: 614 / 621. **Todos los fallos fueron `Exceeded timeout`**, en los archivos lentos ya nombrados en el 0001 (`Export`, `PhotoMockups`, `SkinImageLayer`). La máquina estaba muy cargada (carga media ≈ 18).
 - Corridos solos, esos archivos pasan. `Export` y `PhotoMockups` también pasan solos con el código **sin** el cambio (23 / 23 en los dos casos). El único test de `Export` que falló corriendo el archivo solo pasa al correrlo aislado.
 - **No se cambió ningún archivo de tests.**
-- `npm run test:e2e`: *pendiente* (el puerto 5175 estaba ocupado por un `npm run dev` viejo).
+- `npm run test:e2e` → **3 / 3 pasan** (todas las páginas en todas las vistas, 3 plantillas, horizontal y vertical; páginas extra de mockups).
 - Prueba manual en `npm run dev`: *pendiente*.
 
 **Lo que no se pudo verificar:** los archivos lentos se quedan sin tiempo con carga, así que la suite completa no prueba nada sobre ellos ni a favor ni en contra.
@@ -224,7 +225,8 @@ const [design, onDesignChange] = useGroup(DEFAULT_DESIGN)
 - ☑ Hice un cambio a la vez (un commit por grupo)
 - ☑ El comportamiento es el mismo, y lo prueban los mismos tests
 - ☑ Revisé si se cambió algún test (ninguno)
-- ☐ e2e y prueba manual (pendientes)
+- ☑ e2e (3 / 3)
+- ☐ Prueba manual (pendiente)
 
 ## 11. Próximas acciones
 
