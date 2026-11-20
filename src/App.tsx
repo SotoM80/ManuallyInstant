@@ -5,14 +5,10 @@ import { NavMenu } from './components/NavMenu'
 import { HomePage } from './pages/HomePage'
 import { BrandManualPage } from './pages/BrandManualPage'
 import type { DraftKey, Drafts } from './utils/drafts'
-import { NO_CONTENT, useGroup } from './utils/appState'
+import { DEFAULT_DESIGN, NO_CONTENT, useGroup } from './utils/appState'
 import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
 import { DEFAULT_BRAND_FONTS } from './data/fontOptions'
 import { loadGoogleFont } from './utils/googleFonts'
-import { DEFAULT_TEMPLATE } from './templates'
-import type { TemplateId } from './templates'
-import { NO_SKIN } from './skins/presets'
-import type { Skin } from './skins/types'
 import { loadLocalTemplates } from './mockups/catalog'
 import type { Orientation, PreviewView } from './types'
 import './css/App.css'
@@ -31,8 +27,7 @@ function App() {
   const [previewView, setPreviewView] = useState<PreviewView>('grid')
   // The open section's pages come first, and the section beside them (ADR 0032)
   const [followSection, setFollowSection] = useState(true)
-  const [template, setTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE)
-  const [skin, setSkin] = useState<Skin>(NO_SKIN)
+  const [design, onDesignChange] = useGroup(DEFAULT_DESIGN)
 
   // Photo templates for local tests only, if the file is there (see public/mockups/LICENSES.md)
   useEffect(() => {
@@ -74,12 +69,10 @@ function App() {
                 onFollowSectionChange={setFollowSection}
                 previewView={previewView}
                 onPreviewViewChange={setPreviewView}
-                template={template}
-                onTemplateChange={setTemplate}
+                design={design}
+                onDesignChange={onDesignChange}
                 drafts={drafts}
                 onDraftChange={onDraftChange}
-                skin={skin}
-                onSkinChange={setSkin}
               />
             }
           />
