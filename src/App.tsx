@@ -5,12 +5,11 @@ import { NavMenu } from './components/NavMenu'
 import { HomePage } from './pages/HomePage'
 import { BrandManualPage } from './pages/BrandManualPage'
 import type { DraftKey, Drafts } from './utils/drafts'
-import { DEFAULT_DESIGN, NO_CONTENT, useGroup } from './utils/appState'
+import { DEFAULT_DESIGN, DEFAULT_VIEW, NO_CONTENT, useGroup } from './utils/appState'
 import { DEFAULT_TITLE_STYLE } from './data/titleOptions'
 import { DEFAULT_BRAND_FONTS } from './data/fontOptions'
 import { loadGoogleFont } from './utils/googleFonts'
 import { loadLocalTemplates } from './mockups/catalog'
-import type { Orientation, PreviewView } from './types'
 import './css/App.css'
 
 function App() {
@@ -23,10 +22,7 @@ function App() {
   const onDraftChange = useCallback(<K extends DraftKey>(key: K, draft: Drafts[K]) => {
     setDrafts((prev) => ({ ...prev, [key]: draft }))
   }, [])
-  const [orientation, setOrientation] = useState<Orientation>('landscape')
-  const [previewView, setPreviewView] = useState<PreviewView>('grid')
-  // The open section's pages come first, and the section beside them (ADR 0032)
-  const [followSection, setFollowSection] = useState(true)
+  const [view, onViewChange] = useGroup(DEFAULT_VIEW)
   const [design, onDesignChange] = useGroup(DEFAULT_DESIGN)
 
   // Photo templates for local tests only, if the file is there (see public/mockups/LICENSES.md)
@@ -63,12 +59,8 @@ function App() {
               <BrandManualPage
                 content={content}
                 onContentChange={onContentChange}
-                orientation={orientation}
-                onOrientationChange={setOrientation}
-                followSection={followSection}
-                onFollowSectionChange={setFollowSection}
-                previewView={previewView}
-                onPreviewViewChange={setPreviewView}
+                view={view}
+                onViewChange={onViewChange}
                 design={design}
                 onDesignChange={onDesignChange}
                 drafts={drafts}

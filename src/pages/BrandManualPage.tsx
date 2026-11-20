@@ -17,7 +17,7 @@ import { MANUAL_SECTIONS, SECTION_AREAS, SECTION_PAGES, manualPages, orderPages 
 import { useAlignOpenSection } from '../utils/useAlignOpenSection'
 import type { Guides } from '../utils/guides'
 import type { DraftKey, Drafts } from '../utils/drafts'
-import type { GroupChange, ManualContent, ManualDesign, Update } from '../utils/appState'
+import type { GroupChange, ManualContent, ManualDesign, PreviewSettings, Update } from '../utils/appState'
 import { useReorderGlide } from '../utils/useReorderGlide'
 import type { TemplateId } from '../templates'
 import type { Skin } from '../skins/types'
@@ -31,16 +31,13 @@ type BrandManualPageProps = {
   // What goes into the PDF, kept by App (see utils/appState)
   content: ManualContent
   onContentChange: GroupChange<ManualContent>
-  orientation: Orientation
-  onOrientationChange: (orientation: Orientation) => void
-  previewView: PreviewView
-  onPreviewViewChange: (view: PreviewView) => void
+  // How the preview is seen on screen. With followSection off, the pages and sections keep
+  // their natural order (specs/brandmanual.md, ADR 0032)
+  view: PreviewSettings
+  onViewChange: GroupChange<PreviewSettings>
   // How the pages look; a skin change can also be made from the newest skin (ADR 0025)
   design: ManualDesign
   onDesignChange: GroupChange<ManualDesign>
-  // Off → the pages and sections keep their natural order (specs/brandmanual.md, ADR 0032)
-  followSection?: boolean
-  onFollowSectionChange?: (follow: boolean) => void
   // What each form shows, kept by App so the forms are filled again on the way back (see useDraft)
   drafts?: Drafts
   onDraftChange?: <K extends DraftKey>(key: K, draft: Drafts[K]) => void
@@ -49,14 +46,10 @@ type BrandManualPageProps = {
 export function BrandManualPage({
   content,
   onContentChange,
-  orientation,
-  onOrientationChange,
-  previewView,
-  onPreviewViewChange,
+  view,
+  onViewChange,
   design,
   onDesignChange,
-  followSection = true,
-  onFollowSectionChange = () => {},
   drafts = {},
   onDraftChange,
 }: BrandManualPageProps) {
@@ -86,6 +79,15 @@ export function BrandManualPage({
       onSkinChange: (update: Update<Skin>) => onDesignChange('skin', update),
     }),
     [onDesignChange],
+  )
+  const { orientation, previewView, followSection } = view
+  const { onOrientationChange, onPreviewViewChange, onFollowSectionChange } = useMemo(
+    () => ({
+      onOrientationChange: (next: Orientation) => onViewChange('orientation', next),
+      onPreviewViewChange: (next: PreviewView) => onViewChange('previewView', next),
+      onFollowSectionChange: (next: boolean) => onViewChange('followSection', next),
+    }),
+    [onViewChange],
   )
   // The sections work like an accordion: only one is open, the others fold into their header.
   // Folded forms stay in the page (inert), so nothing typed in them is lost.
