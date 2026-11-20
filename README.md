@@ -121,7 +121,7 @@ Limits: nothing is saved between sessions (refreshing clears the manual). Within
 ### How it was built
 - **Specs first**: each feature is described before it is coded, with Given-When-Then scenarios, in [`specs/`](specs/).
 - **Decisions on record**: every important choice, with the options weighed, is an Architecture Decision Record in [`docs/adr/`](docs/adr/README.md). For example: [live preview with Apply for images](docs/adr/0007-live-preview-with-apply-for-images.md), later [one Apply next to each image](docs/adr/0020-one-apply-per-image.md).
-- **Tested**: around 510 tests with Jest and React Testing Library, written from the spec scenarios, and 23 for the CMYK server with Node's test runner.
+- **Tested**: over 600 tests with Jest and React Testing Library, written from the spec scenarios, 23 for the CMYK server with Node's test runner, and layout tests in a real browser with Playwright.
 - **One feature at a time**: each change is tried on its own branch and only reaches `main` once it works.
 
 **Tech stack:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint · pdf-lib. CMYK server *(optional)*: Node · Express · sharp · Little CMS (lcms-wasm)
@@ -284,7 +284,7 @@ Límites: no se guarda nada entre sesiones (al recargar se borra el manual). Den
 ### Cómo se construyó
 - **Primero la spec**: cada feature se describe antes de programarla, con escenarios Given-When-Then, en [`specs/`](specs/).
 - **Decisiones registradas**: cada decisión importante, con las opciones que se compararon, es un Architecture Decision Record en [`docs/adr/`](docs/adr/README.md). Por ejemplo: [vista previa en vivo con Apply para las imágenes](docs/adr/0007-live-preview-with-apply-for-images.md), y después [un Apply junto a cada imagen](docs/adr/0020-one-apply-per-image.md).
-- **Con tests**: unos 510 tests con Jest y React Testing Library, escritos a partir de los escenarios de las specs, y 23 del servidor CMYK con el test runner de Node.
+- **Con tests**: más de 600 tests con Jest y React Testing Library, escritos a partir de los escenarios de las specs, 23 del servidor CMYK con el test runner de Node, y tests de maquetado en un navegador real con Playwright.
 - **Una feature a la vez**: cada cambio se prueba en su propia rama y solo llega a `main` cuando funciona.
 
 **Tecnologías:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint · pdf-lib. Servidor CMYK *(opcional)*: Node · Express · sharp · Little CMS (lcms-wasm)
