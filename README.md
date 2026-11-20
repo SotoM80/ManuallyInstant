@@ -8,6 +8,60 @@ A web app that builds a brand's visual identity manual in minutes.
 
 ## English
 
+### Install it on a computer
+
+**1. What you need**
+- **Node.js 22.18 or newer**, with npm (the LTS from [nodejs.org](https://nodejs.org/) is fine). Check with `node -v`.
+- **Git**. Check with `git --version`.
+- Internet for the first install.
+
+**2. Install and start the app**
+```bash
+git clone https://github.com/SotoM80/ManuallyInstant.git
+cd ManuallyInstant
+npm install
+npm run dev
+```
+Open the address the terminal shows (usually http://localhost:5173) and click **Brand Manual**. Type a title in **Cover**: if it appears on the cover page, it works.
+
+That is all you need to make manuals and download both PDFs. The next steps are optional.
+
+**3. Optional: real CMYK in the print PDF**
+1. Download *ECI_Offset_2008* from [eci.org](https://www.eci.org/en/downloads) and copy `ISOcoated_v2_eci.icc` into `server/profiles/` (profiles are not kept in git; more in [`server/profiles/README.md`](server/profiles/README.md)).
+2. Once, in the project folder:
+   ```bash
+   npm --prefix server install
+   cp server/.env.example server/.env
+   cp .env.example .env.local
+   ```
+3. Every time, in two terminals in the project folder:
+
+   | Terminal 1 | Terminal 2 |
+   |---|---|
+   | `npm run dev:server` | `npm run dev` |
+
+   If `npm run dev` was already running, stop it (Ctrl+C) and start it again.
+
+It works if the server shows `CMYK server on http://localhost:8787` and **Colors** shows `CMYK` instead of `CMYK ≈`. More in [`server/README.md`](server/README.md).
+
+**4. Optional: tests**
+```bash
+npm test                          # the app
+npm run test:server               # the CMYK server (after step 3)
+npx playwright install chromium   # first time only
+npm run test:e2e                  # layout in a real browser
+```
+
+**If something goes wrong**
+
+| You see | Do this |
+|---|---|
+| `npm install` or `npm run dev` fails at once | Check `node -v`: it must be 22.18 or newer. |
+| "server cannot be reached" on **↓ Print PDF** | Start `npm run dev:server` in another terminal. |
+| The same, with the server running | Vite is not on port 5173: add its port to `CORS_ORIGINS` in `server/.env`. |
+| Colors still show `CMYK ≈` | `.env.local` is missing, or `npm run dev` was not restarted. |
+| `The CMYK server cannot start: …` | The profile is not in `server/profiles/`, or its name is not `ISOcoated_v2_eci.icc` (then change `CMYK_PROFILE_PATH` in `server/.env`). |
+
 ### What it does
 Design agencies fill in seven sections, and the brand manual updates **live** next to the form:
 
@@ -73,28 +127,7 @@ Limits: nothing is saved between sessions (refreshing clears the manual). Within
 **Tech stack:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint · pdf-lib. CMYK server *(optional)*: Node · Express · sharp · Little CMS (lcms-wasm)
 
 ### For developers
-
-#### Getting started
-You need [Node.js](https://nodejs.org/) 20.19 or newer (or 22.12+), with npm.
-
-```bash
-git clone https://github.com/SotoM80/ManuallyInstant.git
-cd ManuallyInstant
-npm install
-npm run dev
-```
-
-Then open the address Vite prints (usually http://localhost:5173) and go to **Brand Manual**.
-
-#### The CMYK server (optional)
-For the print PDF in real CMYK (Node 22.18 or newer):
-
-1. Get a FOGRA39 ICC profile: ECI's *ISO Coated v2*, or Adobe's `CoatedFOGRA39.icc` (see [`server/profiles/README.md`](server/profiles/README.md)). Profiles are not kept in git.
-2. `cd server && npm install && cp .env.example .env`, then set `CMYK_PROFILE_PATH` in `server/.env`.
-3. In the project root, copy `.env.example` to `.env.local` (it sets `VITE_CMYK_SERVER_URL=http://localhost:8787`).
-4. Run `npm run dev:server` in one terminal and `npm run dev` in another. Restart Vite after changing `.env.local`.
-
-If Vite runs on another port than 5173, add it to `CORS_ORIGINS` in `server/.env`. More in [`server/README.md`](server/README.md).
+To install and run the app, see [Install it on a computer](#install-it-on-a-computer).
 
 #### Scripts
 | Command | What it does |
@@ -137,6 +170,60 @@ Write its spec in `specs/` first, and add its tests in `test/`.
 ---
 
 ## Español
+
+### Instalarla en un computador
+
+**1. Qué necesitas**
+- **Node.js 22.18 o más nuevo**, con npm (sirve la versión LTS de [nodejs.org](https://nodejs.org/)). Compruébalo con `node -v`.
+- **Git**. Compruébalo con `git --version`.
+- Internet para la primera instalación.
+
+**2. Instalar y arrancar la app**
+```bash
+git clone https://github.com/SotoM80/ManuallyInstant.git
+cd ManuallyInstant
+npm install
+npm run dev
+```
+Abre la dirección que muestra la terminal (normalmente http://localhost:5173) y haz clic en **Brand Manual**. Escribe un título en **Cover**: si aparece en la portada, funciona.
+
+Con esto ya puedes hacer manuales y descargar los dos PDF. Los pasos siguientes son opcionales.
+
+**3. Opcional: CMYK real en el PDF de imprenta**
+1. Descarga *ECI_Offset_2008* de [eci.org](https://www.eci.org/en/downloads) y copia `ISOcoated_v2_eci.icc` en `server/profiles/` (los perfiles no se guardan en git; más en [`server/profiles/README.md`](server/profiles/README.md)).
+2. Una sola vez, en la carpeta del proyecto:
+   ```bash
+   npm --prefix server install
+   cp server/.env.example server/.env
+   cp .env.example .env.local
+   ```
+3. Cada vez, en dos terminales en la carpeta del proyecto:
+
+   | Terminal 1 | Terminal 2 |
+   |---|---|
+   | `npm run dev:server` | `npm run dev` |
+
+   Si `npm run dev` ya estaba corriendo, detenlo (Ctrl+C) y vuelve a arrancarlo.
+
+Funciona si el servidor muestra `CMYK server on http://localhost:8787` y **Colors** muestra `CMYK` en vez de `CMYK ≈`. Más en [`server/README.md`](server/README.md).
+
+**4. Opcional: tests**
+```bash
+npm test                          # la app
+npm run test:server               # el servidor CMYK (después del paso 3)
+npx playwright install chromium   # solo la primera vez
+npm run test:e2e                  # el maquetado en un navegador real
+```
+
+**Si algo sale mal**
+
+| Ves | Haz esto |
+|---|---|
+| `npm install` o `npm run dev` fallan de inmediato | Revisa `node -v`: debe ser 22.18 o más nuevo. |
+| "server cannot be reached" en **↓ Print PDF** | Arranca `npm run dev:server` en otra terminal. |
+| Lo mismo, con el servidor corriendo | Vite no está en el puerto 5173: añade su puerto a `CORS_ORIGINS` en `server/.env`. |
+| Los colores siguen mostrando `CMYK ≈` | Falta `.env.local`, o no reiniciaste `npm run dev`. |
+| `The CMYK server cannot start: …` | El perfil no está en `server/profiles/`, o no se llama `ISOcoated_v2_eci.icc` (entonces cambia `CMYK_PROFILE_PATH` en `server/.env`). |
 
 ### Qué hace
 Las agencias de diseño completan siete secciones, y el manual de marca se actualiza **en vivo** al lado del formulario:
@@ -203,28 +290,7 @@ Límites: no se guarda nada entre sesiones (al recargar se borra el manual). Den
 **Tecnologías:** React 19 · TypeScript · Vite · Jest + React Testing Library · ESLint · pdf-lib. Servidor CMYK *(opcional)*: Node · Express · sharp · Little CMS (lcms-wasm)
 
 ### Para desarrolladores
-
-#### Cómo empezar
-Necesitas [Node.js](https://nodejs.org/) 20.19 o más nuevo (o 22.12+), con npm.
-
-```bash
-git clone https://github.com/SotoM80/ManuallyInstant.git
-cd ManuallyInstant
-npm install
-npm run dev
-```
-
-Después abre la dirección que muestra Vite (normalmente http://localhost:5173) y entra en **Brand Manual**.
-
-#### El servidor CMYK (opcional)
-Para el PDF de imprenta en CMYK real (Node 22.18 o más nuevo):
-
-1. Consigue un perfil ICC FOGRA39: el *ISO Coated v2* de ECI, o el `CoatedFOGRA39.icc` de Adobe (ver [`server/profiles/README.md`](server/profiles/README.md)). Los perfiles no se guardan en git.
-2. `cd server && npm install && cp .env.example .env`, y pon `CMYK_PROFILE_PATH` en `server/.env`.
-3. En la raíz del proyecto, copia `.env.example` a `.env.local` (define `VITE_CMYK_SERVER_URL=http://localhost:8787`).
-4. Ejecuta `npm run dev:server` en una terminal y `npm run dev` en otra. Reinicia Vite si cambias `.env.local`.
-
-Si Vite usa otro puerto que el 5173, añádelo a `CORS_ORIGINS` en `server/.env`. Más detalles en [`server/README.md`](server/README.md).
+Para instalar y arrancar la app, ver [Instalarla en un computador](#instalarla-en-un-computador).
 
 #### Scripts
 | Comando | Qué hace |
