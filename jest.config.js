@@ -1,5 +1,7 @@
 export default {
   testEnvironment: 'jsdom',
+  // Half the cores: many tests mount the whole app, and too many at once run out of time (20 s)
+  maxWorkers: '50%',
   roots: ['<rootDir>/test'],
   setupFilesAfterEnv: ['<rootDir>/test/setupTests.ts'],
   transform: { '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }] },
