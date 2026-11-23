@@ -55,7 +55,8 @@ ${TINT}
 varying vec2 vUV;
 void main() {
   float shade;
-  gl_FragColor = vec4(tinted(vUV, shade), 1.0);
+  // The photo's own transparency is kept: a PNG cut out of its background shows the page behind it
+  gl_FragColor = vec4(tinted(vUV, shade), texture2D(uPhoto, vUV).a);
 }`
 
 // Pass 2: the logo on its mesh, bent through the area's points (positions in the photo's pixels)
@@ -85,9 +86,17 @@ void main() {
   vec4 logo = texture2D(uLogo, vLogo);
   vec4 product = texture2D(uMask, vUV);
   float alpha = logo.a * mix(1.0, product.a * product.r, uClip); // clipped: only on the product
-  vec3 printed = under * logo.rgb;
-  vec3 solid = logo.rgb * mix(1.0, min(shade, 1.0), 0.6);
-  gl_FragColor = vec4(mix(under, mix(printed, solid, uSolid), alpha), 1.0);
+  // Where the photo is transparent there is nothing under the logo: it takes its own color there,
+  // unshaded, instead of the black hidden in the transparent pixels
+  float photoAlpha = texture2D(uPhoto, vUV).a;
+  vec3 printed = mix(vec3(1.0), under, photoAlpha) * logo.rgb;
+  vec3 solid = logo.rgb * mix(1.0, mix(1.0, min(shade, 1.0), photoAlpha), 0.6);
+  vec3 ink = mix(printed, solid, uSolid);
+  // The logo over the photo, both possibly transparent ("over"); an opaque photo gives
+  // mix(under, ink, alpha), fully opaque, as before
+  float outAlpha = alpha + photoAlpha * (1.0 - alpha);
+  vec3 color = (ink * alpha + under * photoAlpha * (1.0 - alpha)) / max(outAlpha, 0.0001);
+  gl_FragColor = vec4(color, outAlpha);
 }`
 
 const images = new Map<string, Promise<HTMLImageElement>>()

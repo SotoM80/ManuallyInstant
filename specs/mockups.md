@@ -125,6 +125,7 @@ Built in three phases, each one usable on its own.
 
 #### How a photo mockup is drawn
 * It is **composed in WebGL into a PNG image** (≈1500 px across, enough for the print PDF), and the page shows that image (`<img role="img" alt="<name> mockup">`). The PDF copies an image as it is (ADR 0012).
+* **Transparency**: a PNG photo keeps its transparent parts; the page shows through them.
 * **Tint** (if `tintable`): inside the mask, the photo's brightness times the product color, so folds and shadows stay.
 * **Logo**: placed in its area, then blended with the photo:
   * **Printed** (default): the logo multiplies with the photo, so it looks printed and the folds show through it. Dark logos on light products.
@@ -408,6 +409,11 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **Given**: An uploaded photo used without selecting its product.
 * **When**: The user opens its block.
 * **Then**: Clip to product is disabled, with its hint; the logo is drawn whole, inside the Padding.
+
+### Scenario 48: A Transparent PNG
+* **Given**: The user uploads a PNG photo of a product cut out of its background (transparent around it).
+* **When**: They click Use now.
+* **Then**: The transparent parts stay transparent on the mockup, so the page (its background and skin) shows behind the product, in the preview and in both PDFs; they never turn black. A logo over a transparent part takes its own color, unshaded.
 
 ### Scenario 39: In the PDF
 * **Given**: Two photos on the extra pages, 1 × 1.
