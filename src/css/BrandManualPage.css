@@ -1131,7 +1131,11 @@
   min-width: 0;
 }
 
-/* A long photo name wraps inside the sidebar instead of running past it */
+/* A long photo name wraps inside the sidebar instead of running past it, wherever it is shown:
+   the Products list, the header of its settings and the extra pages. "anywhere" also breaks a
+   name with no hyphens or spaces, like IMG_2026_poster_final */
+.mockup-choice-name,
+.mockup-settings .palette-block-title,
 .mockup-extra-head .palette-block-title {
   flex: 1;
   min-width: 0;

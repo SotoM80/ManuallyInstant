@@ -128,7 +128,7 @@ Built in three phases, each one usable on its own.
 * **Tint** (if `tintable`): inside the mask, the photo's brightness times the product color, so folds and shadows stay.
 * **Logo**: placed in its area, then blended with the photo:
   * **Printed** (default): the logo multiplies with the photo, so it looks printed and the folds show through it. Dark logos on light products.
-  * **Solid**: the logo is laid over the photo, with the photo's shading on top. Light logos on dark products (a white logo would vanish with Printed). A hint says so.
+  * **Solid**: the logo is laid over the photo, with the photo's shading on top. Light logos on dark products (a white logo would vanish with Printed). A hint under Blend says so, and that a black logo looks the same with either (both multiply by the logo's color, and black stays black).
 * **The logo area** is a grid of points the user drags in the template editor (`grid`: 2 to 5 points across, 2 or 3 down): **four corners** mark an area at an angle (a card on a table), **more points across** follow a curve (the side of a mug). The logo is drawn on a mesh of small triangles bent smoothly through the points (Catmull-Rom curves), and keeps its proportions along the area's surface. A plain rectangle (`area` with no `grid`) is its four corners. The photo's brightness under the logo shades it.
 * **Later, wrinkles**: a small displacement from the blurred brightness of the photo, to bend the logo with the fabric. Amount: 0–100 %, default 40 %.
 * While a mockup is being drawn, its cell shows `Preparing…`. If it cannot be drawn (no WebGL, the photo does not load), the cell shows `This mockup could not be drawn` and the rest of the page works.
@@ -380,9 +380,9 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **Then**: Mockups 2 shows A alone, filling the page inside its margin; Mockups 3 shows B and C side by side. Unticking it puts A and B together again.
 
 ### Scenario 42: A Long Photo Name
-* **Given**: An uploaded photo whose file name is longer than the sections column is wide.
-* **When**: It is on the extra pages.
-* **Then**: Its name in the More pages block wraps onto more lines and stays inside the column.
+* **Given**: An uploaded photo whose file name is longer than the sections column is wide, even one with no space or hyphen to break at (`IMG_2026_poster_final`).
+* **When**: It is on the Mockups page or on the extra pages.
+* **Then**: Its name wraps onto more lines and stays inside the column wherever the column shows it: the Products list, the header of its settings and the More pages block.
 
 ### Scenario 43: Back to a Page of Its Own
 * **Given**: Photo A was on an extra page, and the user ticked it in the products list, so it is on the Mockups page.

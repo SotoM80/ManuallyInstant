@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 // Spec: specs/mockups.md, More pages (ADR 0036). In a real browser: an uploaded photo used with
 // mockups already ticked lands on "Mockups 2", as large as the chosen margin allows.
@@ -8,6 +8,25 @@ const PHOTO = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAACgAAAAeCAIAAADRv8uKAAAAK0lEQVR4nO3NMQ0AAAgDsAlDGBKRhQw4mvRvputExGKxWCwWi8VisVj8N15LdPWbc08/QwAAAABJRU5ErkJggg==',
   'base64',
 )
+
+// A photo name with no hyphen or space to break at, as cameras and phones name them
+const LONG = 'a_very_long_photo_file_name_for_the_product_poster_final_version_2026'
+
+// Every place the sidebar shows the name stays inside it. The letters themselves are measured,
+// not their box: a box can fit while its text runs past it.
+async function expectNamesInside(page: Page, name: string) {
+  const sidebar = (await page.getByRole('region', { name: 'Manual sections' }).boundingBox())!
+  const form = page.getByRole('form', { name: 'Mockups' })
+  for (const shown of await form.getByText(name).all()) {
+    if (!(await shown.isVisible())) continue
+    const right = await shown.evaluate((el) => {
+      const range = document.createRange()
+      range.selectNodeContents(el)
+      return range.getBoundingClientRect().right
+    })
+    expect(right).toBeLessThanOrEqual(sidebar.x + sidebar.width)
+  }
+}
 
 test('a photo used with mockups already ticked goes to an extra page, inside its margin', async ({ page }) => {
   await page.goto('/brand-manual')
@@ -49,13 +68,29 @@ test('a photo used with mockups already ticked goes to an extra page, inside its
   await form.getByLabel('Margin').fill('0')
   await expect.poll(() => fit(0)).toBe(true)
 
-  // Scenario 42: a long name wraps inside the sections column
-  const long = 'a-very-long-photo-file-name-for-the-product-poster-final-version-2026'
+  // Scenario 42: a long name wraps inside the sections column, even with no hyphen to break at
+  const long = LONG
   await form.getByLabel('Upload your own photo').setInputFiles({ name: `${long}.png`, mimeType: 'image/png', buffer: PHOTO })
   await editor.getByRole('button', { name: 'Use now' }).click()
   await expect(editor).toBeHidden()
-  const name = form.locator('.mockup-extra-head').getByText(long)
-  const column = (await form.boundingBox())!
-  const box = (await name.boundingBox())!
-  expect(box.x + box.width).toBeLessThanOrEqual(column.x + column.width)
+  await expect(form.locator('.mockup-extra-head').getByText(long)).toBeVisible()
+  await expectNamesInside(page, long)
+})
+
+// Scenario 42, again for a photo on the Mockups page itself: its name in the Products list and in
+// the header of its settings wraps too
+test('a long photo name wraps inside the sidebar on the Mockups page', async ({ page }) => {
+  await page.goto('/brand-manual')
+  const sections = page.getByRole('region', { name: 'Manual sections' })
+  await sections.getByRole('button', { name: /^7\. Mockups/ }).click()
+  const form = page.getByRole('form', { name: 'Mockups' })
+
+  await form.getByLabel('Upload your own photo').setInputFiles({ name: `${LONG}.png`, mimeType: 'image/png', buffer: PHOTO })
+  const editor = page.getByRole('dialog', { name: 'Template editor' })
+  await editor.getByLabel('Photo: click the product to select it').waitFor()
+  await editor.getByRole('button', { name: 'Use now' }).click()
+  await expect(editor).toBeHidden()
+
+  await expect(form.locator('.mockup-settings .palette-block-title').getByText(LONG)).toBeVisible()
+  await expectNamesInside(page, LONG)
 })

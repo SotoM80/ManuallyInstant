@@ -383,7 +383,7 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
             <option value="solid">Solid</option>
           </select>
         </div>
-        <p className="logo-form-hint">Printed suits dark logos. A white logo needs Solid, or it vanishes into the photo.</p>
+        <p className="logo-form-hint">Solid is for white or light logos. Black looks the same with both.</p>
         <button type="button" className="palette-secondary-button" onClick={() => setEditing(template)}>
           Edit template
         </button>
@@ -412,7 +412,7 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
                       onChange={() => toggle(item.id)}
                     />
                     <Thumbnail item={item} settings={settingsFor(mockups, item)} />
-                    {item.name}
+                    <span className="mockup-choice-name">{item.name}</span>
                     {item.kind === 'photo' && (
                       <span className="mockup-tag" aria-hidden="true">
                         Photo
