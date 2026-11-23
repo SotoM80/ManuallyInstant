@@ -113,7 +113,7 @@ Key features:
 - ✅ A background color for each logo image (see the [spec](specs/imagebackground.md)).
 - ✅ Export to two PDFs: one for print (300 dpi, CMYK values highlighted) and one for the web (216 dpi, HEX/RGB, lightweight) (see the [spec](specs/export.md)).
 - ✅ An optional CMYK server: the print PDF in real CMYK and the palette's values from an ICC profile, checked against Illustrator (see the [spec](specs/cmykserver.md), ADRs [0018](docs/adr/0018-optional-stateless-cmyk-server.md) and [0019](docs/adr/0019-real-cmyk-with-icc-profile.md)).
-- 🔜 Mockups (see the [spec](specs/mockups.md)): 3 illustrated products and a photo business card work, with the template editor and generated photos (not tried yet with a real key); more products and licensed photos to come.
+- 🔜 Mockups (see the [spec](specs/mockups.md)): 3 illustrated products and your own photos work, with the template editor and generated photos (not tried yet with a real key); more products and licensed photos to come.
 - 🔜 A last review of the layout of every page (Phase 3), and a vector print PDF with selectable text.
 
 Limits: nothing is saved between sessions (refreshing clears the manual). Within a session, everything typed in the forms is kept while moving between pages. Without the CMYK server, CMYK values are an approximation and the print PDF stays in RGB; with it, pages are images, so black text prints with the four inks. The server has no login yet. See [PLAN.md](PLAN.md) for the full list.
@@ -276,7 +276,7 @@ Funciones clave:
 - ✅ Un color de fondo para cada imagen del logo (ver el [spec](specs/imagebackground.md)).
 - ✅ La exportación a dos PDF: uno para imprenta (300 dpi, valores CMYK destacados) y otro para web (216 dpi, HEX/RGB, liviano) (ver el [spec](specs/export.md)).
 - ✅ Un servidor CMYK opcional: el PDF de imprenta en CMYK real y los valores de la paleta desde un perfil ICC, comprobados con Illustrator (ver el [spec](specs/cmykserver.md) y las ADR [0018](docs/adr/0018-optional-stateless-cmyk-server.md) y [0019](docs/adr/0019-real-cmyk-with-icc-profile.md)).
-- 🔜 Mockups (ver el [spec](specs/mockups.md)): funcionan 3 productos ilustrados y una tarjeta con foto, con el editor de plantillas y las fotos generadas (aún sin probar con una clave real); faltan más productos y fotos con licencia.
+- 🔜 Mockups (ver el [spec](specs/mockups.md)): funcionan 3 productos ilustrados y tus propias fotos, con el editor de plantillas y las fotos generadas (aún sin probar con una clave real); faltan más productos y fotos con licencia.
 - 🔜 Una última revisión del maquetado de cada hoja (Fase 3), y un PDF de imprenta vectorial con texto seleccionable.
 
 Límites: no se guarda nada entre sesiones (al recargar se borra el manual). Dentro de una sesión, todo lo escrito en los formularios se mantiene al moverse entre páginas. Sin el servidor CMYK, los valores CMYK son una aproximación y el PDF de imprenta sigue en RGB; con él, las hojas son imágenes, así que el texto negro se imprime con las cuatro tintas. El servidor todavía no tiene login. La lista completa está en [PLAN.md](PLAN.md).

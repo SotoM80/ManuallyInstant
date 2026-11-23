@@ -116,6 +116,7 @@ Every product is drawn on its own `viewBox` (in its own units, not mm), from sha
 Built in three phases, each one usable on its own.
 
 #### The photos the app ships
+* **None for now**: the business card photo was removed on 2026-11-23, so users upload their own photos (or generate them). The list of shipped templates stays, for licensed photos later; the tests use a photo template of their own (`test/photoTemplateFixture.ts`).
 * Kept in `public/mockups/<id>.jpg`, with their license in `public/mockups/LICENSES.md` (source, author, license, link). Only photos with a **commercial license** are added.
 * What a good photo is: at least **1500 px** across (1000 px is enough for a mockup up to about 85 mm wide in the print PDF); the product in **white or a light neutral color** (so it can be tinted); the place for the logo clearly visible; little else in the frame.
 * Each photo has a **template**: `{ id, name, group, kind: 'photo', image, size: [w, h], mask, maskImage?, area, grid?, color, tintable }`, in `src/mockups/templates.ts`. `mask` is one or more polygons of the product in the photo's pixels, or `maskImage` a mask made in the editor; `area` is the box where the logo goes and `grid` its shape (see below); `color` is the default color; `tintable` is false for products that keep their own color (e.g. a wooden sign).
@@ -401,12 +402,12 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **Then**: The logo on the mug is turned a quarter turn to the left, at the same size; Size 150 % makes it larger around the same center; Horizontal turns it back. The other mockups do not change.
 
 ### Scenario 45: A Vertical Logo on a Photo
-* **Given**: The photo business card, with the Primary logo, Size 100 % and Rotation 10°.
+* **Given**: An uploaded photo of business cards, with the Primary logo, Size 100 % and Rotation 10°.
 * **When**: The user chooses Vertical.
 * **Then**: The logo is turned 80° to the left, at the same size (smaller only if it would not fit inside the Padding), and can be dragged anywhere on the photo, never past the Padding; Reset sets the place, Size and Rotation back and keeps Vertical. The print PDF shows it the same way.
 
 ### Scenario 46: Clipped to the Product
-* **Given**: The photo business card, with the Primary logo turned Vertical at Size 130 %, so it reaches past the top card onto the table.
+* **Given**: An uploaded photo of business cards, its cards selected in Edit template, with the Primary logo turned Vertical at Size 130 %, so it reaches past the top card onto the table.
 * **When**: The mockup is drawn (Clip to product on, the default).
 * **Then**: The logo shows only on the card; the table around it is as in the photo. Unticking Clip to product draws the whole logo again, over the table; the print PDF shows the same as the page.
 

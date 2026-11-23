@@ -146,3 +146,10 @@ describe('mockupsBrand (scenario 14)', () => {
     expect(mockupsBrand(null, null)).toBe('');
   });
 });
+
+// setupTests.ts gives every test a photo template of its own; the app itself ships none
+describe('the photo templates the app ships', () => {
+  it('are none: users upload their own photos', () => {
+    expect(jest.requireActual('../src/mockups/templates').PHOTO_TEMPLATES).toEqual([]);
+  });
+});
