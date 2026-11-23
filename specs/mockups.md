@@ -151,9 +151,16 @@ A window over the page, opened with **Edit template** in a photo mockup's block,
 2. Select the **product**: the **Magic wand** selects, with one click, every connected pixel of a similar color (Tolerance 1–80 %, default 25 %); **New / Add / Subtract** (or Shift + click to add, Alt + click to take away). The **Brush** adds and the **Eraser** removes by painting (Brush size 4–120 px). The selection is shown in purple over the photo; **Undo** (up to 20 steps) and **Clear selection**. Its edge is softened (2 px) when the template is saved, so the tint does not end in a hard line. It is saved as a mask image (`maskImage`, white where the product is).
 3. Mark the **logo area** with the **Logo area** tool: drag over the photo to draw it, then drag its points (the corners for an angle, the points in between for a curve). **Points across** (2–5) and **Points down** (2–3) add points along the current shape, without moving it.
 4. Set the name, the group, the default color and whether it can be tinted; see the result with the current logo, live. An uploaded or generated photo starts with **The product can be tinted** off (it often has its colors and logo already); ticking it asks for the selection.
-5. **Use now**: the template joins the list for this session. A selection of the product is needed only when it can be tinted: a photo that already carries the logo is used with one click (the logo area stays in the middle of the photo until it is drawn). **Download template**: a JSON file (and the photo) to add to `templates.ts` and `public/mockups/`.
+5. **Use now**: the template joins the list for this session. A selection of the product is needed only when it can be tinted: a photo that already carries the logo is used with one click (the logo area stays in the middle of the photo until it is drawn). **Download template**: one file, `<name>.template.json`, with the photo and the selection inside, to open again later (see *Template files* below).
 
 **Upload your own photo** in the Mockups section opens the same editor with that photo; its template lives in this session (ADR 0002).
+
+#### Template files (ADR 0040)
+* **Download template** saves the whole template in **one file**, `<name>.template.json` (the name made safe for a file name): `{ "app": "ManuallyInstant", "kind": "mockup-template", "version": 1, "template": {…} }`. The photo and the selection are inside it as data URLs; the photo keeps its own type, so a PNG keeps its transparency. A template the app ships is saved the same way.
+* **Open template** in the Mockups section, next to Upload your own photo, reads one or more such files (up to 15 MB each). Each template is added to the session, ready to use, with no editor, exactly as **Use now** adds a new one: ticked on the Mockups page with none ticked, otherwise on the extra pages (*More pages*). It keeps its name, group, color, selection and logo area; **Edit template** opens it in the editor as usual.
+* Each opened template gets an id no other template has, so a file opened twice gives two templates.
+* A file that is not a template (another JSON, a broken file, a photo that is not PNG, JPG or WebP, larger than 15 MB) is refused, with `This file is not a ManuallyInstant template.` under the button; the other files picked with it still open. A note says how many opened: `Opened 2 templates.`
+* Nothing is saved by the app (ADR 0002): the user keeps the files, for example in the client's project folder.
 
 #### Generated photos (ADR 0016)
 Next to **Upload your own photo**, a **Generate a photo** button opens a small panel:
@@ -430,6 +437,26 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **Given**: The user used an uploaded photo, opened another section and came back to Mockups.
 * **When**: They upload a second photo and click Use now.
 * **Then**: Both photos are in the list and on their pages: the second one does not replace the first.
+
+### Scenario 50: Save a Template to a File
+* **Given**: The user uploaded `mug.png`, selected the mug and drew the logo area in the template editor.
+* **When**: They click Download template.
+* **Then**: One file, `mug.template.json`, is saved, with the photo (as a PNG) and the selection inside.
+
+### Scenario 51: Open It in a New Session
+* **Given**: The page was refreshed, so the mug template is gone; `mug.template.json` is on the computer and no mockup is ticked.
+* **When**: The user clicks Open template and picks the file.
+* **Then**: "mug" is in the products list, ticked, on the Mockups page, with its selection, logo area and color as saved; the note reads `Opened 1 template.`
+
+### Scenario 52: A File That Is Not a Template
+* **Given**: The Mockups section is open.
+* **When**: The user opens `palette.json` (any other JSON) with Open template.
+* **Then**: Nothing is added, and `This file is not a ManuallyInstant template.` shows under the button.
+
+### Scenario 53: The Same Template Twice
+* **Given**: `mug.template.json` is already open.
+* **When**: The user opens it again.
+* **Then**: A second "mug" is added with its own id; the first one does not change.
 
 ## Build Order
 1. This spec and ADR 0013.

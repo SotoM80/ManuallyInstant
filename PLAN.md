@@ -31,6 +31,7 @@
 - [x] Skin textures: Grain and Paper (`feTurbulence`, drawn by the browser in the PDF too)
 - [ ] Revisit the textures after more use: how dense the grain is and how strong the fibers are (`gain` and `cut` in `src/skins/draw/grain.ts` and `paper.ts`), maybe more textures
 - [ ] Move skin layers by drag and drop, on top of the ↑ ↓ buttons (optional)
+- [ ] Later: **Save project / Open project**: the whole manual (texts, fonts, palette, template, skin, logo, usage, mockups and their templates) in one file the user keeps, with every image inside as a data URL, as ADR 0040 does for one template. Needs a spec and an ADR first; points to settle: a `version` and defaults for fields added later, a size limit above 15 MB, a confirmation before replacing the current manual, CMYK computed again from the HEX
 - [ ] Cover title uses the Primary font of the Typography section (today it keeps its own font picker)
 - [ ] Mockups section and page "8. Mockups" (specs/mockups.md, ADR 0013): the logo on up to 4 of 6 products drawn by the app as SVG from plain data, each with its color and logo version
   - [x] Spec and ADR 0013
@@ -45,4 +46,5 @@
     - [x] Local-only test photos through `public/mockups/local-templates.json` (ignored by git)
     - [ ] More shipped photos with a commercial license (a plain white t-shirt, a mug at an angle, a tote bag), each with its template made in the editor
     - [ ] Folds: displacement from the photo's brightness (Amount slider)
+    - [ ] Later: **Save to my templates** in the template editor, only with `npm run dev`: a small Vite plugin writes the photo to `public/mockups/` and the template to `local-templates.json`, so it is listed at every start; with a **Remove from my templates** button, or old projects' templates pile up. For "house" templates reused in every project; a client's templates go in a file of their own (ADR 0040)
     - [ ] Accept ADRs 0013 and 0014, README, merge to `main`

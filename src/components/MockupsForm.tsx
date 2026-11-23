@@ -7,6 +7,7 @@ import { TemplateEditor } from './TemplateEditor'
 import { GeneratePhotoPanel } from './GeneratePhotoPanel'
 import { MOCKUP_GROUPS } from '../mockups/products'
 import { savePhotoTemplate, useMockupCatalog } from '../mockups/catalog'
+import { MAX_TEMPLATE_FILE_BYTES, TEMPLATE_FILE_EXTENSION, readFileText, readTemplateFile } from '../mockups/templateFile'
 import { ROTATION_LIMIT, SIZE_LIMITS, dragPlacement } from '../mockups/geometry'
 import { DEFAULT_PADDING, PADDING_LIMITS, areaGrid, clampInPhoto, logoOutline, surfaceSize } from '../mockups/warp'
 import {
@@ -177,6 +178,13 @@ function range({ min, max }: { min: number; max: number }) {
   return Array.from({ length: max - min + 1 }, (_, i) => min + i)
 }
 
+// The first `upload-<n>` id no template has: uploads and opened templates never share one
+function freeUploadNumber(taken: string[]) {
+  let n = 1
+  while (taken.includes(`upload-${n}`)) n += 1
+  return n
+}
+
 // A photo the user can upload to make their own template (see specs/mockups.md)
 const PHOTO_TYPES = ['image/jpeg', 'image/png']
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024
@@ -188,6 +196,7 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
   const [uploadError, setUploadError] = useState('')
   const [placedNote, setPlacedNote] = useState('') // where Use now put a new photo (ADR 0036)
   const [extraOpen, setExtraOpen] = useState(false) // the More pages block
+  const [openError, setOpenError] = useState('') // Open template (ADR 0040)
 
   // An uploaded photo opens the editor as a new template of this session
   function upload(file: File | undefined) {
@@ -205,8 +214,7 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
   // untinted: the user's own photo often has its colors and its logo already, and Use now then
   // needs no selection (ADR 0036).
   function openPhoto(image: string, name: string) {
-    let n = 1
-    while (catalog.some((item) => item.id === `upload-${n}`)) n += 1
+    const n = freeUploadNumber(catalog.map((item) => item.id))
     setPlacedNote('')
     setEditing({
       kind: 'photo',
@@ -221,6 +229,48 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
       colorLabel: 'Product color',
       tintable: false,
     })
+  }
+
+  // Open template: templates saved as files join the list, ready to use, each where Use now would
+  // put a new one. They are added one after the other on the same mockups, so several files at
+  // once all land (ADR 0040).
+  async function openTemplates(files: File[]) {
+    if (files.length === 0) return
+    const taken = catalog.map((item) => item.id)
+    let current = mockups
+    let opened = 0
+    let refused = 0
+    let lastPlace: string | null = null
+    let lastId: string | null = null
+    for (const file of files) {
+      const template = file.size <= MAX_TEMPLATE_FILE_BYTES ? readTemplateFile(await readFileText(file)) : null
+      if (!template) {
+        refused += 1
+        continue
+      }
+      const id = `upload-${freeUploadNumber(taken)}`
+      taken.push(id)
+      const fresh = { ...template, id, revision: Date.now() }
+      savePhotoTemplate(fresh)
+      const placed = placeNewMockup(current, fresh)
+      current = placed.mockups
+      lastPlace = placed.place
+      lastId = id
+      opened += 1
+    }
+    setOpenError(refused > 0 ? 'This file is not a ManuallyInstant template.' : '')
+    if (opened === 0) return
+    onChange(current)
+    const count = `Opened ${opened} template${opened === 1 ? '' : 's'}.`
+    if (lastPlace === 'page' && lastId) {
+      setOpenId(lastId)
+      setPlacedNote(count)
+    } else if (lastPlace === 'extra' && lastId) {
+      setPlacedNote(`${count} Added to ${extraMockupsPage(extraPageOf(current, lastId) ?? 1)}.`)
+      setExtraOpen(true)
+    } else {
+      setPlacedNote(`${count} The extra pages are full (${MAX_EXTRA} photos).`)
+    }
   }
 
   // "Use now": the template joins the list for this session; a new one goes to a new extra mockup
@@ -445,6 +495,27 @@ export function MockupsForm({ mockups, onChange, logo, cover, palette }: Mockups
           }}
         />
       </div>
+      <div className="file-field mockup-upload">
+        <label htmlFor="mockup-open-template" className="palette-secondary-button">
+          Open template
+        </label>
+        <input
+          id="mockup-open-template"
+          type="file"
+          multiple
+          accept={`${TEMPLATE_FILE_EXTENSION},.json,application/json`}
+          aria-invalid={openError !== ''}
+          onChange={(event) => {
+            void openTemplates(Array.from(event.target.files ?? []))
+            event.target.value = '' // the same file can be chosen again
+          }}
+        />
+      </div>
+      {openError && (
+        <p className="export-message" role="alert">
+          {openError}
+        </p>
+      )}
       {uploadError && (
         <p className="export-message" role="alert">
           {uploadError}

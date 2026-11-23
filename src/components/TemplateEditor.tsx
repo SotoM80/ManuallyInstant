@@ -7,6 +7,7 @@ import { DEFAULT_PLACEMENT, defaultSettings } from '../mockups/mockups'
 import { brush, combineMasks, emptyMask, magicWand, selectedShare, softenMask } from '../mockups/selection'
 import type { Mask, SelectMode } from '../mockups/selection'
 import { drawSelection, loadEditorMask, loadEditorPhoto, maskToDataUrl } from '../mockups/editorImage'
+import { templateFileName, templateFileText, toDataUrl } from '../mockups/templateFile'
 import type { EditorPhoto } from '../mockups/editorImage'
 import { areaGrid, gridBounds, gridFromRect, gridPoint, movePoint, resampleGrid } from '../mockups/warp'
 import type { AreaGrid, MockupGroup, PhotoTemplate } from '../mockups/types'
@@ -207,16 +208,19 @@ export function TemplateEditor({ template, logo, onSave, onClose }: TemplateEdit
     if (built) onSave(built)
   }
 
-  function downloadTemplate() {
+  // One file with the whole template, its photo and its selection inside, to open again in a
+  // later session with Open template (ADR 0040)
+  async function downloadTemplate() {
     const built = build()
     if (!built) return
-    // A photo the user uploaded only lives in this session: download it too, with the path it
-    // would have in public/mockups/
-    const ownPhoto = built.image.startsWith('blob:')
-    const file = { ...built, image: ownPhoto ? `/mockups/${built.id}.jpg` : built.image, revision: undefined }
-    download(URL.createObjectURL(new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' })), `${built.id}.json`)
-    if (ownPhoto) download(built.image, `${built.id}.jpg`)
+    try {
+      const text = templateFileText({ ...built, image: await toDataUrl(built.image) })
+      download(URL.createObjectURL(new Blob([text], { type: 'application/json' })), templateFileName(built.name))
+    } catch {
+      setMessage('The template could not be saved: its photo could not be read.')
+    }
   }
+
 
   const [photoWidth, photoHeight] = photo?.size ?? template.size
 
