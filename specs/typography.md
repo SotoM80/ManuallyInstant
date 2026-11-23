@@ -40,7 +40,7 @@ The two fonts are not only shown on the Typography page: every inner page is dra
 
 ### Typography page in the preview
 The page shows the heading **"Typography"** and, for each font (Primary first):
-* its **usage**: `Primary · Headings` or `Secondary · Body text`;
+* its **usage**: `Primary · Headings` or `Secondary · Body text`, drawn in the font, so changing the Secondary font never changes the Primary block;
 * its **name**, drawn in the font;
 * a large **"Aa"** in the font;
 * the **alphabet and numbers** in the font: `ABCDEFGHIJKLMNOPQRSTUVWXYZ`, `abcdefghijklmnopqrstuvwxyz`, `0123456789`.

@@ -24,13 +24,16 @@ export function TypographyPage({ fonts, color }: TypographyPageProps) {
         {USAGES.map((usage) => {
           const family = fonts[usage.key]
           return (
-            // The usage label stays in the page's font; everything else is drawn in the brand font
+            // Everything in the block, its usage label included, is drawn in its own font: the
+            // label would otherwise inherit the page's Secondary font (ADR 0029)
             <li key={usage.key} className="type-font">
               <p className="type-sample" style={{ fontFamily: toFontFamilyCss(family) }} aria-hidden="true">
                 Aa
               </p>
               <div className="type-info">
-                <p className="type-usage">{usage.label}</p>
+                <p className="type-usage" style={{ fontFamily: toFontFamilyCss(family) }}>
+                  {usage.label}
+                </p>
                 <p className="type-name" style={{ fontFamily: toFontFamilyCss(family) }}>
                   {family}
                 </p>
