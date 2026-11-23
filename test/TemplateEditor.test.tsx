@@ -5,6 +5,7 @@ import { renderPhotoMockup } from '../src/mockups/render/renderPhotoMockup';
 import { emptyMask } from '../src/mockups/selection';
 import { mockupCatalog, resetSessionTemplates, savePhotoTemplate } from '../src/mockups/catalog';
 import type { PhotoTemplate } from '../src/mockups/types';
+import { templateFileText } from '../src/mockups/templateFile';
 
 // Spec: specs/mockups.md, The template editor. The canvas parts are mocked (jsdom draws nothing):
 // a 10 × 10 photo, white in the middle (the product) on gray.
@@ -252,6 +253,94 @@ describe('Template editor', () => {
     fireEvent.click(within(editor).getByRole('button', { name: 'Use now' }));
     expect(mockupCatalog().find((item) => item.id === 'upload-1')?.name).toBe('first');
     expect(mockupCatalog().find((item) => item.id === 'upload-2')?.name).toBe('second');
+  });
+
+  // jsdom's Blob has no text(): read it as a file
+  function blobText(blob: Blob) {
+    return new Promise<string>((done) => {
+      const reader = new FileReader();
+      reader.onload = () => done(reader.result as string);
+      reader.readAsText(blob);
+    });
+  }
+
+  it('saves the template as one file, with its PNG photo inside (ADR 0040, scenario 50)', async () => {
+    renderApp();
+    const form = openMockups();
+    const editor = await uploadAndUse(form, 'cutout.png');
+    // jsdom cannot read a blob URL: the photo comes from this stand-in
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = jest.fn(async () => ({ blob: async () => new Blob(['x'], { type: 'image/png' }) })) as unknown as typeof fetch;
+    const names: string[] = [];
+    const click = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
+      names.push(this.download);
+    });
+    const blobs: Blob[] = [];
+    const createUrl = URL.createObjectURL;
+    URL.createObjectURL = (blob: Blob) => {
+      blobs.push(blob);
+      return 'blob:template';
+    };
+    try {
+      await act(async () => {
+        fireEvent.click(within(editor).getByRole('button', { name: 'Download template' }));
+      });
+      await waitFor(() => expect(names).toEqual(['cutout.template.json']));
+      const saved = JSON.parse(await blobText(blobs[0]));
+      expect(saved).toMatchObject({ app: 'ManuallyInstant', kind: 'mockup-template', version: 1 });
+      expect(saved.template.name).toBe('cutout');
+      expect(saved.template.image).toMatch(/^data:image\/png;base64,/);
+    } finally {
+      globalThis.fetch = realFetch;
+      URL.createObjectURL = createUrl;
+      click.mockRestore();
+    }
+  });
+
+  // A template file as Download template makes it
+  function templateFile(name: string, fileName = `${name}.template.json`) {
+    const first = mockupCatalog().find((item) => item.kind === 'photo') as PhotoTemplate;
+    const text = templateFileText({ ...first, id: 'saved', name, image: 'data:image/png;base64,eA==' });
+    return new File([text], fileName, { type: 'application/json' });
+  }
+
+  async function openTemplate(form: HTMLElement, ...files: File[]) {
+    await act(async () => {
+      fireEvent.change(within(form).getByLabelText('Open template'), { target: { files } });
+    });
+  }
+
+  it('opens a saved template, ready to use, ticked with none ticked (scenario 51)', async () => {
+    renderApp();
+    const form = openMockups();
+    for (const box of within(form).getAllByRole('checkbox', { checked: true })) fireEvent.click(box);
+    await openTemplate(form, templateFile('mug'));
+    expect(await within(form).findByText('Opened 1 template.')).toBeInTheDocument();
+    expect(within(form).getByRole('checkbox', { name: /^mug/ })).toBeChecked();
+    expect(screen.queryByRole('dialog', { name: 'Template editor' })).not.toBeInTheDocument();
+    const opened = mockupCatalog().find((item) => item.name === 'mug') as PhotoTemplate;
+    expect(opened.id).toMatch(/^upload-/);
+    expect(opened.image).toBe('data:image/png;base64,eA==');
+  });
+
+  it('opens several files at once, each on its own (scenario 53, twice the same)', async () => {
+    renderApp();
+    const form = openMockups();
+    await openTemplate(form, templateFile('mug'), templateFile('mug'));
+    expect(await within(form).findByText(/^Opened 2 templates\./)).toBeInTheDocument();
+    const mugs = mockupCatalog().filter((item) => item.name === 'mug');
+    expect(mugs).toHaveLength(2);
+    expect(mugs[0].id).not.toBe(mugs[1].id);
+  });
+
+  it('refuses a file that is not a template, and adds nothing (scenario 52)', async () => {
+    renderApp();
+    const form = openMockups();
+    const before = mockupCatalog().length;
+    const palette = new File([JSON.stringify({ colors: ['#FF0000'] })], 'palette.json', { type: 'application/json' });
+    await openTemplate(form, palette);
+    expect(await within(form).findByRole('alert')).toHaveTextContent('This file is not a ManuallyInstant template.');
+    expect(mockupCatalog()).toHaveLength(before);
   });
 
   it('refuses a file that is not a JPG or PNG photo up to 10 MB (scenario 24)', () => {

@@ -50,3 +50,4 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0037](0037-logo-orientation.md) | Horizontal or vertical logo on every mockup | Accepted | 2026-11-17 |
 | [0038](0038-clip-logo-to-product.md) | Clip the logo to the product on photo mockups | Accepted | 2026-11-17 |
 | [0039](0039-solid-logo-shaded-by-folds-only.md) | A Solid logo is shaded by the folds only, not by the product's color | Accepted | 2026-11-23 |
+| [0040](0040-templates-saved-as-one-file.md) | A mockup template is saved as one file and opened again | Accepted | 2026-11-23 |

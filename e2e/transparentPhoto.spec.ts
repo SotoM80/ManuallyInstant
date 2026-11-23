@@ -1,4 +1,5 @@
 import { deflateSync, crc32 } from 'node:zlib'
+import { readFile } from 'node:fs/promises'
 import { expect, test } from '@playwright/test'
 
 // Spec: specs/mockups.md, Scenario 48 (photo mockups, ADR 0014). In a real browser, where the
@@ -65,4 +66,41 @@ test('a transparent PNG photo keeps its transparency on the mockup', async ({ pa
 
   expect(await alphaAt(0.1)).toBe(0) // the transparent half: still transparent, not black
   expect(await alphaAt(0.9)).toBe(255) // the red half: still opaque
+})
+
+// Spec: specs/mockups.md, Template files (ADR 0040), scenarios 50 and 51, in a real browser: the
+// template is saved as one file, the page is refreshed (nothing is kept), and the file opens it
+// again, its PNG photo still transparent
+test('a template saved as a file opens again after a refresh', async ({ page }) => {
+  await page.goto('/brand-manual')
+  const sections = page.getByRole('region', { name: 'Manual sections' })
+  await sections.getByRole('button', { name: /^7\. Mockups/ }).click()
+  const form = page.getByRole('form', { name: 'Mockups' })
+  await form.getByLabel('Upload your own photo').setInputFiles({ name: 'cutout.png', mimeType: 'image/png', buffer: halfTransparentPng() })
+  const editor = page.getByRole('dialog', { name: 'Template editor' })
+  await editor.getByLabel('Photo: click the product to select it').waitFor()
+
+  const [download] = await Promise.all([page.waitForEvent('download'), editor.getByRole('button', { name: 'Download template' }).click()])
+  expect(download.suggestedFilename()).toBe('cutout.template.json')
+  const saved = await readFile(await download.path())
+  expect(JSON.parse(saved.toString()).template.image).toMatch(/^data:image\/png;base64,/)
+
+  await page.reload()
+  await page.getByRole('region', { name: 'Manual sections' }).getByRole('button', { name: /^7\. Mockups/ }).click()
+  await expect(form.getByText('cutout')).toHaveCount(0)
+  await form.getByLabel('Open template').setInputFiles({ name: 'cutout.template.json', mimeType: 'application/json', buffer: saved })
+  await expect(form.getByText(/^Opened 1 template\./)).toBeVisible()
+
+  const mockup = page.getByRole('region', { name: 'Manual preview' }).getByRole('img', { name: 'cutout mockup' }).first()
+  await expect(mockup).toBeVisible()
+  const alpha = await mockup.evaluate(async (img: HTMLImageElement) => {
+    await img.decode()
+    const canvas = document.createElement('canvas')
+    canvas.width = img.naturalWidth
+    canvas.height = img.naturalHeight
+    const context = canvas.getContext('2d')!
+    context.drawImage(img, 0, 0)
+    return context.getImageData(Math.floor(canvas.width * 0.1), Math.floor(canvas.height / 2), 1, 1).data[3]
+  })
+  expect(alpha).toBe(0)
 })
