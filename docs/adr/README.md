@@ -46,3 +46,7 @@ An **ADR** (Architecture Decision Record) is a short document that records **one
 | [0033](0033-construction-grid-shows-only-guide-lines.md) | The construction grid shows only guide lines | Accepted | 2026-11-12 |
 | [0034](0034-color-chips-without-an-outline.md) | The color chips' outline can be turned off, from the Colors section | Accepted | 2026-11-12 |
 | [0035](0035-sections-column-sticks-with-follow-section-off.md) | With Follow section Off, the sections column stays on the screen | Accepted | 2026-11-12 |
+| [0036](0036-extra-mockup-pages.md) | Extra mockup pages for photos that do not fit on the Mockups page | Accepted | 2026-11-16 |
+| [0037](0037-logo-orientation.md) | Horizontal or vertical logo on every mockup | Accepted | 2026-11-17 |
+| [0038](0038-clip-logo-to-product.md) | Clip the logo to the product on photo mockups | Accepted | 2026-11-17 |
+| [0039](0039-solid-logo-shaded-by-folds-only.md) | A Solid logo is shaded by the folds only, not by the product's color | Accepted | 2026-11-23 |

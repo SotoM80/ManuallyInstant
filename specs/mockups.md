@@ -129,7 +129,7 @@ Built in three phases, each one usable on its own.
 * **Tint** (if `tintable`): inside the mask, the photo's brightness times the product color, so folds and shadows stay.
 * **Logo**: placed in its area, then blended with the photo:
   * **Printed** (default): the logo multiplies with the photo, so it looks printed and the folds show through it. Dark logos on light products.
-  * **Solid**: the logo is laid over the photo, with the photo's shading on top. Light logos on dark products (a white logo would vanish with Printed). A hint under Blend says so, and that a black logo looks the same with either (both multiply by the logo's color, and black stays black).
+  * **Solid**: the logo is laid over the photo, with the photo's shading on top: only what is darker than the product's mean tone under the logo (its folds and shadows) darkens it, not the product's own color, so a white logo stays white on a black product (ADR 0039). Light logos on dark products (a white logo would vanish with Printed). A hint under Blend says so, and that a black logo looks the same with either (both multiply by the logo's color, and black stays black).
 * **The logo area** is a grid of points the user drags in the template editor (`grid`: 2 to 5 points across, 2 or 3 down): **four corners** mark an area at an angle (a card on a table), **more points across** follow a curve (the side of a mug). The logo is drawn on a mesh of small triangles bent smoothly through the points (Catmull-Rom curves), and keeps its proportions along the area's surface. A plain rectangle (`area` with no `grid`) is its four corners. The photo's brightness under the logo shades it.
 * **Later, wrinkles**: a small displacement from the blurred brightness of the photo, to bend the logo with the fabric. Amount: 0–100 %, default 40 %.
 * While a mockup is being drawn, its cell shows `Preparing…`. If it cannot be drawn (no WebGL, the photo does not load), the cell shows `This mockup could not be drawn` and the rest of the page works.
@@ -284,6 +284,11 @@ For photo mockups: `Preparing…` while drawing, `This mockup could not be drawn
 * **Given**: "T-shirt (photo)" is navy with a white logo version.
 * **When**: The user sets Blend to Solid.
 * **Then**: The white logo shows, with the folds of the shirt shading it; with Printed it would vanish, which the hint explains.
+
+### Scenario 49: A White Logo on a Photo of a Dark Product
+* **Given**: An uploaded photo of a black mug, not tinted, with a white logo version.
+* **When**: The user sets Blend to Solid.
+* **Then**: The logo is white where the mug has its usual tone, not gray, and darker only in the mug's shadows (ADR 0039).
 
 ### Scenario 21: An Area at an Angle, and a Curve
 * **Given**: The template editor is open on a photo of a mug, with the Logo area tool.

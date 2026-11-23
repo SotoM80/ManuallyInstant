@@ -1,6 +1,7 @@
 import { areaGrid, clampInPhoto, logoMesh, surfaceSize } from '../warp'
 import { orientedLogo } from '../geometry'
 import type { Blend, LogoPlacement, PhotoTemplate } from '../types'
+import { meanBrightness, meshBox } from './shading'
 
 // Composes a photo mockup in WebGL and returns it as a PNG data URL (see specs/mockups.md,
 // Photo mockups, and ADR 0014): the product tinted inside its mask with the photo's own
@@ -78,6 +79,7 @@ ${TINT}
 uniform sampler2D uLogo;
 uniform float uSolid;
 uniform float uClip;
+uniform float uMean; // the photo's mean brightness under the logo
 varying vec2 vLogo;
 varying vec2 vUV;
 void main() {
@@ -90,7 +92,10 @@ void main() {
   // unshaded, instead of the black hidden in the transparent pixels
   float photoAlpha = texture2D(uPhoto, vUV).a;
   vec3 printed = mix(vec3(1.0), under, photoAlpha) * logo.rgb;
-  vec3 solid = logo.rgb * mix(1.0, mix(1.0, min(shade, 1.0), photoAlpha), 0.6);
+  // Solid is shaded by what is darker than the product's mean under the logo (its folds), not by
+  // the product's own darkness: a white logo stays white on a black product
+  float relative = min(shade * uWhite / uMean, 1.0);
+  vec3 solid = logo.rgb * mix(1.0, mix(1.0, relative, photoAlpha), 0.6);
   vec3 ink = mix(printed, solid, uSolid);
   // The logo over the photo, both possibly transparent ("over"); an opaque photo gives
   // mix(under, ink, alpha), fully opaque, as before
@@ -246,12 +251,17 @@ async function compose(input: PhotoMockupInput) {
     // Pass 2: the logo on its mesh
     if (logo) {
       const mesh = logoMesh(grid, aspect, placement)
+      const box = meshBox(mesh.positions, toImage, width, height)
+      const pixels = (source: HTMLCanvasElement) =>
+        source.getContext('2d')!.getImageData(box.x, box.y, box.width, box.height)
+      const mean = meanBrightness(pixels(photoCanvas), pixels(maskCanvas), WHITE_LEVEL)
       const logoProgram = program(gl, LOGO_VERTEX, LOGO_FRAGMENT)
       gl.useProgram(logoProgram)
       const uniform = tint(logoProgram)
       gl.uniform1i(uniform('uLogo'), 2)
       gl.uniform1f(uniform('uSolid'), input.blend === 'solid' ? 1 : 0)
       gl.uniform1f(uniform('uClip'), input.clip ? 1 : 0)
+      gl.uniform1f(uniform('uMean'), mean)
       gl.uniform2f(uniform('uSize'), photoWidth, photoHeight)
       attribute(gl, logoProgram, 'aPosition', mesh.positions)
       attribute(gl, logoProgram, 'aLogo', mesh.logoPoints)
