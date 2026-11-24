@@ -62,6 +62,16 @@ npm run test:e2e                  # layout in a real browser
 | Colors still show `CMYK ≈` | `.env.local` is missing, or `npm run dev` was not restarted. |
 | `The CMYK server cannot start: …` | The profile is not in `server/profiles/`, or its name is not `ISOcoated_v2_eci.icc` (then change `CMYK_PROFILE_PATH` in `server/.env`). |
 
+### Put it online
+The app is a set of static files, so any static host works. Netlify and Cloudflare Pages are the simplest, because they read [`public/_redirects`](public/_redirects), which lets a reload on `/brand-manual` work.
+
+1. Push the project to GitHub.
+2. On the host, create a site from that repository.
+3. Build command: `npm run build`. Output folder: `dist`. Node 22.18 or newer.
+4. Open the site, go to **Brand Manual**, and reload the page: if it loads, it works.
+
+Without the CMYK server, the app online works as it does on a computer without it (CMYK `≈`, RGB print PDF). To add it, see [`server/README.md`](server/README.md#run-it-online), then set `VITE_CMYK_SERVER_URL` to the server's `https://` address in the host's settings and build the site again.
+
 ### What it does
 Design agencies fill in seven sections, and the brand manual updates **live** next to the form:
 
@@ -225,6 +235,16 @@ npm run test:e2e                  # el maquetado en un navegador real
 | Lo mismo, con el servidor corriendo | Vite no está en el puerto 5173: añade su puerto a `CORS_ORIGINS` en `server/.env`. |
 | Los colores siguen mostrando `CMYK ≈` | Falta `.env.local`, o no reiniciaste `npm run dev`. |
 | `The CMYK server cannot start: …` | El perfil no está en `server/profiles/`, o no se llama `ISOcoated_v2_eci.icc` (entonces cambia `CMYK_PROFILE_PATH` en `server/.env`). |
+
+### Publicarla online
+La app es un conjunto de archivos estáticos, así que sirve cualquier hosting estático. Netlify y Cloudflare Pages son los más simples, porque leen [`public/_redirects`](public/_redirects), que permite recargar la página en `/brand-manual`.
+
+1. Sube el proyecto a GitHub.
+2. En el hosting, crea un sitio a partir de ese repositorio.
+3. Comando de build: `npm run build`. Carpeta de salida: `dist`. Node 22.18 o más nuevo.
+4. Abre el sitio, entra en **Brand Manual** y recarga la página: si carga, funciona.
+
+Sin el servidor CMYK, la app online funciona igual que en un computador sin él (CMYK `≈`, PDF de imprenta en RGB). Para añadirlo, mira [`server/README.md`](server/README.md#run-it-online); luego define `VITE_CMYK_SERVER_URL` con la dirección `https://` del servidor en la configuración del hosting y vuelve a hacer el build del sitio.
 
 ### Qué hace
 Las agencias de diseño completan siete secciones, y el manual de marca se actualiza **en vivo** al lado del formulario:
