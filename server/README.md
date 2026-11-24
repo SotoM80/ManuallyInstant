@@ -16,6 +16,17 @@ From the project root, `npm run dev:server` does the same as `npm run dev` here.
 
 Check it: `curl http://localhost:8787/v1/health`.
 
+## Run it online
+The server needs a host that keeps Node running (Render, Railway, Fly.io or your own server); a static host is not enough.
+
+1. Start command: `npm start`, in the `server/` folder, with Node 22.18 or newer.
+2. Upload `ISOcoated_v2_eci.icc` to the host (a secret file or a disk) and set `CMYK_PROFILE_PATH` to it. Use the ECI profile: Adobe's comes with Adobe's apps and is not meant to be shared from a server.
+3. Set `CORS_ORIGINS` to the app's address, for example `https://my-app.netlify.app` (several separated by commas).
+4. Serve it over `https://`: a page on `https` cannot call a server on `http`.
+5. Check that the host accepts uploads of up to `MAX_PAGE_MB` (40 MB by default).
+
+It has no login: anyone who knows its address can use it. `MAX_CONCURRENT`, `MAX_PAGE_MB` and `MAX_PAGE_PIXELS` limit the work it takes on. On free plans that sleep, the first export after a while can take up to a minute.
+
 ## Test it
 ```sh
 npm test          # Node's test runner (node --test)
