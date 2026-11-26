@@ -95,4 +95,20 @@ describe('BrandForm – logo waits for Apply', () => {
       expect.objectContaining({ logo: { url: 'blob:brand.png', name: 'brand.png', size: 'Medium' } }),
     );
   });
+
+  // Chrome sends a change with no file when the file dialog is cancelled
+  it('keeps the chosen file and the applied logo when the file dialog is cancelled', () => {
+    const onChange = jest.fn();
+    render(<BrandForm onChange={onChange} />);
+    const input = screen.getByLabelText('Logo', { selector: 'input' });
+    fireEvent.change(input, { target: { files: [makeFile('brand.png')] } });
+    fireEvent.click(screen.getByRole('button', { name: 'Apply Logo' }));
+    onChange.mockClear();
+
+    fireEvent.change(input, { target: { files: [] } });
+
+    expect(screen.getByText('brand.png')).toBeInTheDocument();
+    expect(screen.queryByText('No file chosen')).not.toBeInTheDocument();
+    expect(onChange).not.toHaveBeenCalled(); // the Cover still shows brand.png
+  });
 });

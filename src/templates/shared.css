@@ -52,6 +52,8 @@
    height of 26.1 px on a Grid page 460 px wide, times the Cover's Text line spacing. */
 .cover-designed-by {
   grid-area: designed;
+  /* Like the title: a long name with no spaces (a URL, an email) breaks instead of leaving the page */
+  overflow-wrap: anywhere;
   font-size: 2.4cqw;
   line-height: calc(5.7cqw * var(--text-leading, 1));
   opacity: 0.75;

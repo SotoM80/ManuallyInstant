@@ -30,11 +30,12 @@ export type CoverData = {
   colors: ManualColors
 }
 
-// Colors of the manual pages, as "#RRGGBB".
+// Colors of the Cover, as "#RRGGBB" (the Title, Text and Background color fields).
+// Only the Cover uses them: every other page takes its colors from the skin (pageColor, skins/sections.ts).
 export type ManualColors = {
   title: string // the brand manual title
   text: string // the rest of the Cover's text: "Designed by" (and the divider of Template 3)
-  background: string // background of every page
+  background: string // background of the Cover
 }
 
 // One color of the brand palette (Colors section), with its HEX as "#RRGGBB".
