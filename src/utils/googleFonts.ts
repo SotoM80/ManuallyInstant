@@ -24,6 +24,9 @@ function addStylesheet(href: string) {
   // browser hides them, and html-to-image downloads the stylesheet again on every export
   link.crossOrigin = 'anonymous'
   link.href = href
+  // Offline, or Google fails: the text falls back to sans-serif. Drop the link so the next call
+  // for the same font tries again, instead of finding it and doing nothing forever
+  link.onerror = () => link.remove()
   document.head.appendChild(link)
 }
 

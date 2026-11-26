@@ -135,8 +135,11 @@ export function BrandForm({ onChange, draft: ownerDraft, onDraftChange }: BrandF
   }
 
   // A wrong file is flagged as soon as it is chosen. A valid one waits for its Apply.
+  // No file (Chrome sends one when the file dialog is cancelled): the field keeps what it had,
+  // so it never says "No file chosen" while the Cover still shows a logo.
   function handleLogoChange(file: File | null) {
-    update((prev) => ({ logo: chooseFile(prev.logo, file), logoError: file ? validateLogo(file) : '' }))
+    if (!file) return
+    update((prev) => ({ logo: chooseFile(prev.logo, file), logoError: validateLogo(file) }))
   }
 
   return (

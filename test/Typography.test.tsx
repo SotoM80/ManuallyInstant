@@ -1,7 +1,7 @@
 import { screen, fireEvent, within } from '@testing-library/react';
 import { renderApp } from './renderApp';
 import { toFontFamilyCss } from '../src/data/fontOptions';
-import { fontPreviewHref, googleFontHref } from '../src/utils/googleFonts';
+import { fontPreviewHref, googleFontHref, loadGoogleFont } from '../src/utils/googleFonts';
 
 function getTypographyForm() {
   return screen.getByRole('form', { name: 'Typography' });
@@ -47,6 +47,17 @@ describe('Typography – loading fonts', () => {
     expect(fontPreviewHref(['Lora', 'Inter'])).toBe(
       'https://fonts.googleapis.com/css2?family=Lora&family=Inter&text=ILaenort&display=swap',
     );
+  });
+
+  it('tries a font again after its stylesheet failed to load (offline, Google down)', () => {
+    const href = googleFontHref('Lato');
+    const find = () => document.head.querySelector<HTMLLinkElement>(`link[href="${href}"]`);
+    loadGoogleFont('Lato');
+    find()?.dispatchEvent(new Event('error'));
+    expect(find()).toBeNull();
+
+    loadGoogleFont('Lato');
+    expect(find()).not.toBeNull();
   });
 
   it('adds the preview stylesheet once when the section is shown', () => {

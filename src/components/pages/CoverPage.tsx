@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { LOGO_SCALES } from '../../data/logoOptions'
+import { DEFAULT_LOGO_SIZE, LOGO_SCALES } from '../../data/logoOptions'
 import { DEFAULT_TITLE_STYLE, toTitleCss } from '../../data/titleOptions'
 import type { CoverData } from '../../types'
 
@@ -30,7 +30,7 @@ export function CoverPage({ cover }: CoverPageProps) {
   // Its size is measured on the page (cqw), so it is the same in every view (ADR 0027)
   const pageTitleCss = { ...toTitleCss(cover.style), color: cover.colors.title }
   // The logo size scales the image inside its area (see .cover-logo img in shared.css)
-  const logoCss = { '--logo-scale': LOGO_SCALES[cover.logo?.size ?? 'Medium'] } as CSSProperties
+  const logoCss = { '--logo-scale': LOGO_SCALES[cover.logo?.size ?? DEFAULT_LOGO_SIZE] } as CSSProperties
   // The Text color is set on the whole layout so "Designed by" (and the divider of
   // Template 3) take it; the title has its own Title color.
   return (
