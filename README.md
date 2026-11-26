@@ -87,7 +87,7 @@ Key features:
 - **Two PDFs in one click**: **↓ Print PDF** (300 dpi, CMYK values highlighted) and **↓ Web PDF** (216 dpi, HEX and RGB highlighted, lightweight), at the top of the sections. Every page, in the chosen template, orientation and skin, looks as in the preview, with the Google Fonts of every page embedded; empty sections are pointed out before downloading.
 - **Real CMYK for print** *(optional)*: with the small CMYK server running, the print PDF comes out in real CMYK with an ICC profile (FOGRA39 for now), and the palette shows the same values as Illustrator (within a point). If the server cannot be reached, the app offers the RGB print PDF instead.
 - **Live preview**: text, colors and fonts show as you type. A new image waits for the **Apply** button next to its field, so it is never swapped in by accident, and each Apply shows only its own image.
-- **Full screen**: the **⤢ Full screen** button in the preview shows the 10 pages one below the other, drawn as in the PDF and each one fitted whole to the viewer's screen. Esc or **Exit full screen** closes it.
+- **Full screen**: the **⤢ Full screen** button in the preview shows every page one below the other, drawn as in the PDF and each one fitted whole to the viewer's screen. Esc or **Exit full screen** closes it.
 - **Work side by side**: when a section opens, it moves to the top of its column and its page moves to the top of the preview, at the same height. In the Logo and Usage sections, clicking in an area (Concept, Anatomy, Versions…, or Correct use and Incorrect use) makes its page the main one. Prefer the pages to stay put? Set **Follow section** to **Off** in the preview: pages and sections keep their natural order, the page being edited is still outlined, and on wide screens the sections column stays on the screen while the pages scroll by.
 - **Logo scrolls on its own**: the long Logo section scrolls inside, so the preview stays still; at its top or bottom, the page scrolls on.
 - **Construction grid drawn for you**: the app reads the logo's visible pixels and measures it in square modules (12, 16 or 24 across) and draws a clean grid: only its outer edge and four guide lines along the logo's edges, with the logo at full strength. X is a setting shared by the clear space and the grid; click the grid's rulers to place guides measured in X, and the logo's overall width and height are shown in X too. Uploading your own grid is still possible.
@@ -113,7 +113,7 @@ Key features:
 ### Status
 - ✅ Every section (Cover, Logo, Usage, Colors, Typography, Skin), the live preview and the three templates.
 - ✅ Logo pages: Brand concept, Anatomy, Logo versions and Clear space.
-- ✅ Usage pages: Correct use and Incorrect use, each with a grid of up to 6 examples (see the [spec](specs/usage.md)). The manual has 10 pages.
+- ✅ Usage pages: Correct use and Incorrect use, each with a grid of up to 6 examples (see the [spec](specs/usage.md)). The manual has 10 fixed pages, plus extra mockup pages for more photos (ADR 0036).
 - ✅ Anatomy parts filled from the layers of an SVG exported from Illustrator (see the [spec](specs/logolayers.md)).
 - ✅ A construction grid drawn by the app, fitted to the logo, with guides and measures in X.
 - ✅ Skins: page colors and up to 4 layers of gradients, shapes, patterns, textures and images (see the [spec](specs/skins.md)), and the style of the image boxes (see the [spec](specs/imageboxes.md)).
@@ -261,7 +261,7 @@ Funciones clave:
 - **Dos PDF con un clic**: **↓ Print PDF** (300 dpi, valores CMYK destacados) y **↓ Web PDF** (216 dpi, HEX y RGB destacados, liviano), arriba de las secciones. Todas las hojas, con la plantilla, la orientación y la skin elegidas, se ven como en la vista previa, con las fuentes de Google de todas las hojas incrustadas; antes de descargar se avisa si hay secciones vacías.
 - **CMYK real para imprenta** *(opcional)*: con el pequeño servidor CMYK encendido, el PDF de imprenta sale en CMYK real con un perfil ICC (por ahora FOGRA39), y la paleta muestra los mismos valores que Illustrator (con un punto de diferencia como máximo). Si el servidor no responde, la app ofrece el PDF de imprenta en RGB.
 - **Vista previa en vivo**: el texto, los colores y las fuentes se ven mientras escribes. Una imagen nueva espera al botón **Apply** que tiene al lado, así nunca se cambia por accidente, y cada Apply muestra solo su propia imagen.
-- **Pantalla completa**: el botón **⤢ Full screen** del preview muestra las 10 hojas una debajo de otra, dibujadas como en el PDF y cada una ajustada entera a la pantalla de quien la mira. Esc o **Exit full screen** la cierran.
+- **Pantalla completa**: el botón **⤢ Full screen** del preview muestra todas las hojas una debajo de otra, dibujadas como en el PDF y cada una ajustada entera a la pantalla de quien la mira. Esc o **Exit full screen** la cierran.
 - **Trabajo lado a lado**: al abrir una sección, sube al primer lugar de su columna y su hoja sube al primer lugar del preview, a la misma altura. En las secciones Logo y Usage, al hacer clic en un área (Concept, Anatomy, Versions…, o Correct use e Incorrect use) su hoja pasa a ser la principal. ¿Prefieres que las hojas no se muevan? Pon **Follow section** en **Off** en el preview: las hojas y las secciones mantienen su orden natural, la hoja que se edita sigue marcada y, en pantallas anchas, la columna de secciones se queda fija mientras las hojas se desplazan.
 - **Logo con su propio scroll**: la sección Logo, que es larga, se desplaza por dentro y el preview no se mueve; al llegar arriba o abajo, sigue moviendo la página.
 - **Retícula de construcción automática**: la app lee los píxeles visibles del logo y lo mide en módulos cuadrados (12, 16 o 24 de ancho) y dibuja una retícula limpia: solo su borde exterior y cuatro líneas guía en los bordes del logo, con el logo nítido. X es un ajuste común al área de respeto y a la retícula; con un clic en las reglas de la retícula se colocan guías medidas en X, y también se muestran el ancho y el alto totales del logo en X. Se puede seguir subiendo una retícula propia.
@@ -287,7 +287,7 @@ Funciones clave:
 ### Estado
 - ✅ Todas las secciones (Cover, Logo, Usage, Colors, Typography, Skin), la vista previa en vivo y las tres plantillas.
 - ✅ Hojas de Logo: Brand concept, Anatomy, Logo versions y Clear space.
-- ✅ Hojas de Usage: Correct use e Incorrect use, cada una con una grilla de hasta 6 ejemplos (ver el [spec](specs/usage.md)). El manual tiene 10 hojas.
+- ✅ Hojas de Usage: Correct use e Incorrect use, cada una con una grilla de hasta 6 ejemplos (ver el [spec](specs/usage.md)). El manual tiene 10 hojas fijas, más hojas extra de mockups para más fotos (ADR 0036).
 - ✅ Las partes de Anatomy se llenan con las capas de un SVG exportado desde Illustrator (ver el [spec](specs/logolayers.md)).
 - ✅ Una retícula de construcción dibujada por la app, ajustada al logo, con guías y medidas en X.
 - ✅ Skins: colores de página y hasta 4 capas de degradados, formas, patrones, texturas e imágenes (ver el [spec](specs/skins.md)), y el estilo de los recuadros de imagen (ver el [spec](specs/imageboxes.md)).
